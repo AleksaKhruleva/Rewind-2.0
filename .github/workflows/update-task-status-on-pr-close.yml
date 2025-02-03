@@ -1,0 +1,81 @@
+name: Update Task Status on PR Close and Merge
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  update-task-status-on-pr-close:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Check if PR Was Merged or Not Merged
+        id: check_merged_or_not
+        run: |
+          echo "📌 PR merged? ${{ github.event.pull_request.merged }}"
+          
+          # Проверяем, был ли PR слит
+          if [[ "${{ github.event.pull_request.merged }}" != "true" ]]; then
+            echo "❌ PR закрыт, но не был слит. Меняем статус на 'inProgress'."
+            echo "status=inProgress" >> $GITHUB_ENV  # Устанавливаем статус "inProgress"
+          else
+            echo "✅ PR был слит (merged). Меняем статус на 'Merged'."
+            echo "status=merged" >> $GITHUB_ENV  # Устанавливаем статус "merged"
+          fi
+
+      - name: Validate PR Title Format and Extract ISSUE_KEY
+        id: check_pr_title
+        shell: bash
+        run: |
+          echo "📌 Validating PR title: ${{ github.event.pull_request.title }}"
+
+          # Проверяем формат и извлекаем ключ задачи
+          if [[ "${{ github.event.pull_request.title }}" =~ ^(REWIND-[1-9][0-9]*): ]]; then
+            ISSUE_KEY="${BASH_REMATCH[1]}"
+            echo "🔑 Extracted ISSUE_KEY: $ISSUE_KEY"
+            
+            # Записываем ISSUE_KEY в файл окружения для использования в следующих шагах
+            echo "ISSUE_KEY=$ISSUE_KEY" >> $GITHUB_ENV
+          else
+            echo "❌ Invalid PR title format. Expected 'REWIND-{number}: description'"
+            exit 1
+          fi
+
+      - name: Update Task Status Based on PR Merge Status
+        run: |
+          if [ -z "${{ env.ISSUE_KEY }}" ]; then
+            echo "❌ ISSUE_KEY not found!"
+            exit 1
+          fi
+
+          if [ "${{ env.status }}" == "inProgress" ]; then
+            echo "ℹ️ Updating task ${{ env.ISSUE_KEY }} to 'inProgress' status..."
+            RESPONSE=$(curl -s -o response.txt -w "%{http_code}" -X POST "https://api.tracker.yandex.net/v2/issues/${{ env.ISSUE_KEY }}/transitions/inProgress/_execute" \
+              -H "Authorization: OAuth ${{ secrets.YANDEX_TRACKER_TOKEN }}" \
+              -H "X-Cloud-Org-ID: ${{ secrets.YANDEX_CLOUD_ORG_ID }}")
+
+            if [ "$RESPONSE" -ne 200 ]; then
+              echo "❌ Error updating task. Response code: $RESPONSE"
+              cat response.txt
+              exit 1
+            else
+              echo "✅ Task updated to 'inProgress' status successfully"
+            fi
+          elif [ "${{ env.status }}" == "merged" ]; then
+            echo "ℹ️ Updating task ${{ env.ISSUE_KEY }} to 'Merged' status..."
+            RESPONSE=$(curl -s -o response.txt -w "%{http_code}" -X POST "https://api.tracker.yandex.net/v2/issues/${{ env.ISSUE_KEY }}/transitions/merged/_execute" \
+              -H "Authorization: OAuth ${{ secrets.YANDEX_TRACKER_TOKEN }}" \
+              -H "X-Cloud-Org-ID: ${{ secrets.YANDEX_CLOUD_ORG_ID }}")
+
+            if [ "$RESPONSE" -ne 200 ]; then
+              echo "❌ Error updating task. Response code: $RESPONSE"
+              cat response.txt
+              exit 1
+            else
+              echo "✅ Task updated to 'Merged' status successfully"
+            fi
+          fi

@@ -1,0 +1,60 @@
+name: Update Task Status on PR Open
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+
+jobs:
+  update-task-status-on-pr-open:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Validate PR Title Format and Extract ISSUE_KEY
+        id: check_pr_title
+        shell: bash
+        run: |
+          echo "📌 Validating PR title: ${{ github.event.pull_request.title }}"
+
+          # Проверяем формат и извлекаем ключ задачи
+          if [[ "${{ github.event.pull_request.title }}" =~ ^(REWIND-[1-9][0-9]*): ]]; then
+            ISSUE_KEY="${BASH_REMATCH[1]}"
+            echo "🔑 Extracted ISSUE_KEY: $ISSUE_KEY"
+            
+            # Записываем ISSUE_KEY в файл окружения для использования в следующих шагах
+            echo "ISSUE_KEY=$ISSUE_KEY" >> $GITHUB_ENV
+          else
+            echo "❌ Invalid PR title format. Expected 'REWIND-{number}: description'"
+            exit 1
+          fi
+
+      - name: Debug Issue Key
+        run: |
+          echo "🔑 Extracted ISSUE_KEY: ${{ env.ISSUE_KEY }}"  # Проверяем, что ISSUE_KEY передаётся
+
+      - name: Update Task Status to "inReview"
+        shell: bash
+        run: |
+          if [ -z "${{ env.ISSUE_KEY }}" ]; then
+            echo "❌ Ошибка: ISSUE_KEY не найден!"
+            exit 1
+          fi
+
+          echo "ℹ️ Обновление задачи ${{ env.ISSUE_KEY }} до статуса 'inReview'..."
+
+          # Здесь делаем запрос к API Yandex Tracker для обновления статуса
+          RESPONSE=$(curl -s -o response.txt -w "%{http_code}" -X POST "https://api.tracker.yandex.net/v2/issues/${{ env.ISSUE_KEY }}/transitions/inReview1/_execute" \
+            -H "Authorization: OAuth ${{ secrets.YANDEX_TRACKER_TOKEN }}" \
+            -H "X-Cloud-Org-ID: ${{ secrets.YANDEX_CLOUD_ORG_ID }}")
+
+          if [ "$RESPONSE" -ne 200 ]; then
+            echo "❌ Ошибка при обновлении задачи. Код ответа: $RESPONSE"
+            cat response.txt
+            exit 1
+          else
+            echo "✅ Успешно обновлён статус задачи ${{ env.ISSUE_KEY }} до 'inReview'"
+          fi
