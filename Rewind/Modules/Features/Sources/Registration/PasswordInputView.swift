@@ -21,7 +21,6 @@ public struct PasswordInputView: View {
                 StyledTextField(
                     text: $email,
                     placeholder: "password",
-                    submitLabel: .continue,
                     isSecure: true
                 )
                 .multilineTextAlignment(.center)

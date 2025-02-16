@@ -21,8 +21,7 @@ public struct EmailInputView: View {
                 StyledTextField(
                     text: $email,
                     placeholder: "email@email.ru",
-                    keyboardType: .emailAddress,
-                    submitLabel: .continue
+                    keyboardType: .emailAddress
                 )
                 .multilineTextAlignment(.center)
             }

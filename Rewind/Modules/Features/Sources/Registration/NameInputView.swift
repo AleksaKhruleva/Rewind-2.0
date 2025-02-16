@@ -20,8 +20,7 @@ public struct NameInputView: View {
                 
                 StyledTextField(
                     text: $email,
-                    placeholder: "name",
-                    submitLabel: .continue
+                    placeholder: "name"
                 )
                 .multilineTextAlignment(.center)
             }
