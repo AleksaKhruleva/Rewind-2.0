@@ -5,25 +5,38 @@ public struct StyledTextField: View {
     private let placeholder: String
     private let keyboardType: UIKeyboardType
     private let submitLabel: SubmitLabel
+    private let isSecure: Bool
     
     public init(
         text: Binding<String>,
         placeholder: String,
         keyboardType: UIKeyboardType = .default,
-        submitLabel: SubmitLabel = .done
+        submitLabel: SubmitLabel = .done,
+        isSecure: Bool = false
     ) {
         self._text = text
         self.placeholder = placeholder
         self.keyboardType = keyboardType
         self.submitLabel = submitLabel
+        self.isSecure = isSecure
     }
     
     public var body: some View {
-        TextField(
-            "",
-            text: $text,
-            prompt: Text(placeholder).foregroundStyle(Color(UIColor.systemGray5))
-        )
+        ZStack(alignment: .trailing) {
+            if isSecure {
+                SecureField(
+                    "",
+                    text: $text,
+                    prompt: Text(placeholder).foregroundStyle(Color(UIColor.systemGray5))
+                )
+            } else {
+                TextField(
+                    "",
+                    text: $text,
+                    prompt: Text(placeholder).foregroundStyle(Color(UIColor.systemGray5))
+                )
+            }
+        }
         .font(.system(size: 22, weight: .semibold, design: .monospaced))
         .foregroundStyle(Color.primaryColor)
         .keyboardType(keyboardType)
@@ -34,9 +47,17 @@ public struct StyledTextField: View {
 }
 
 #Preview {
-    StyledTextField(
-        text: .constant(""),
-        placeholder: "email@email.ru",
-        keyboardType: .emailAddress
-    )
+    VStack(spacing: 20) {
+        StyledTextField(
+            text: .constant(""),
+            placeholder: "email@email.ru",
+            keyboardType: .emailAddress
+        )
+        
+        StyledTextField(
+            text: .constant(""),
+            placeholder: "password",
+            isSecure: true
+        )
+    }
 }
