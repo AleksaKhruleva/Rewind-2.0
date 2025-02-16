@@ -2,7 +2,7 @@ import SwiftUI
 import UIComponents
 
 public struct PasswordInputView: View {
-    @State private var email: String = ""
+    @State private var password: String = ""
     
     public init() { }
     
@@ -19,7 +19,7 @@ public struct PasswordInputView: View {
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
                 
                 StyledTextField(
-                    text: $email,
+                    text: $password,
                     placeholder: "password",
                     isSecure: true
                 )

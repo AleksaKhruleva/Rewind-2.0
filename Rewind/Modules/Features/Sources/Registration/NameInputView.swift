@@ -2,7 +2,7 @@ import SwiftUI
 import UIComponents
 
 public struct NameInputView: View {
-    @State private var email: String = ""
+    @State private var name: String = ""
     
     public init() { }
     
@@ -19,7 +19,7 @@ public struct NameInputView: View {
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
                 
                 StyledTextField(
-                    text: $email,
+                    text: $name,
                     placeholder: "name"
                 )
                 .multilineTextAlignment(.center)
