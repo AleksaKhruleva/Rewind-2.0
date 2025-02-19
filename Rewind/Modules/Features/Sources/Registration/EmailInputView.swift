@@ -3,6 +3,7 @@ import UIComponents
 
 public struct EmailInputView: View {
     @State private var email: String = ""
+    @FocusState private var isFocused: Bool
     
     public init() { }
     
@@ -15,7 +16,6 @@ public struct EmailInputView: View {
             
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
                 Text("What's your email?")
-                    .foregroundStyle(Color.primaryColor)
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
                 
                 StyledTextField(
@@ -24,8 +24,12 @@ public struct EmailInputView: View {
                     keyboardType: .emailAddress
                 )
                 .multilineTextAlignment(.center)
+                .focused($isFocused)
             }
             .modifier(VStackPositionModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
+        }
+        .onAppear {
+            isFocused = true
         }
         .hideKeyboardOnTap()
         .hideKeyboardOnDrag()

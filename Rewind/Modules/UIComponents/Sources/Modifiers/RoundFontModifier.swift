@@ -12,6 +12,7 @@ public struct RoundFontModifier: ViewModifier {
     public func body(content: Content) -> some View {
         content
             .font(.system(size: size, weight: weight, design: .rounded))
+            .foregroundStyle(Color.primaryColor)
     }
 }
 

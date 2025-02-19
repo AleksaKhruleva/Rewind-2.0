@@ -3,6 +3,7 @@ import UIComponents
 
 public struct PasswordInputView: View {
     @State private var password: String = ""
+    @FocusState private var isFocused: Bool
     
     public init() { }
     
@@ -15,7 +16,6 @@ public struct PasswordInputView: View {
             
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
                 Text("Enter your password")
-                    .foregroundStyle(Color.primaryColor)
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
                 
                 StyledTextField(
@@ -24,8 +24,12 @@ public struct PasswordInputView: View {
                     isSecure: true
                 )
                 .multilineTextAlignment(.center)
+                .focused($isFocused)
             }
             .modifier(VStackPositionModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
+        }
+        .onAppear {
+            isFocused = true
         }
         .hideKeyboardOnTap()
         .hideKeyboardOnDrag()

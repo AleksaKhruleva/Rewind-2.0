@@ -3,6 +3,7 @@ import UIComponents
 
 public struct NameInputView: View {
     @State private var name: String = ""
+    @FocusState private var isFocused: Bool
     
     public init() { }
     
@@ -15,7 +16,6 @@ public struct NameInputView: View {
             
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
                 Text("What's your name?")
-                    .foregroundStyle(Color.primaryColor)
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
                 
                 StyledTextField(
@@ -23,8 +23,12 @@ public struct NameInputView: View {
                     placeholder: "name"
                 )
                 .multilineTextAlignment(.center)
+                .focused($isFocused)
             }
             .modifier(VStackPositionModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
+        }
+        .onAppear {
+            isFocused = true
         }
         .hideKeyboardOnTap()
         .hideKeyboardOnDrag()
