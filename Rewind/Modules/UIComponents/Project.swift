@@ -3,5 +3,10 @@ import ProjectDescriptionHelpers
 
 let uiComponentsProject = Project.featureFramework(
     name: "UIComponents",
-    resources: ["Resources/**"]
+    resources: ["Resources/**"],
+    infoPlist: .extendingDefault(with: [
+        "UIAppFonts": [
+            "Fonts/AdvertisingScriptBold.ttf",
+        ]
+    ])
 )

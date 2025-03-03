@@ -44,8 +44,8 @@ public struct StyledTextField: View {
             }
         }
         .font(.system(size: 22, weight: .semibold, design: .monospaced))
-        .foregroundStyle(Color.primaryColor)
-        .tint(Color.pinkColor)
+        .foregroundStyle(UIComponentsAsset.primaryColor.swiftUIColor)
+        .tint(UIComponentsAsset.pinkColor.swiftUIColor)
         .keyboardType(keyboardType)
         .textInputAutocapitalization(.never)
         .autocorrectionDisabled(true)
