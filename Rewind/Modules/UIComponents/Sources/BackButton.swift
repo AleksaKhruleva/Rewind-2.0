@@ -5,8 +5,8 @@ public struct BackButton: View {
         case left, right
     }
     
-    private let action: () -> Void
     private let direction: Direction
+    private let action: () -> Void
     
     public init(direction: Direction, action: @escaping () -> Void) {
         self.direction = direction
@@ -18,7 +18,7 @@ public struct BackButton: View {
             Image(systemName: direction == .left ? "chevron.left" : "chevron.right")
                 .font(.system(size: 20, weight: .black))
                 .frame(width: 40, height: 40)
-                .tint(.primaryColor)
+                .tint(UIComponentsAsset.primaryColor.swiftUIColor)
         }
     }
 }

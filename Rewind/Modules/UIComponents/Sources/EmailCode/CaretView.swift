@@ -5,7 +5,7 @@ struct CaretView: View {
     
     var body: some View {
         Rectangle()
-            .fill(Color.pinkColor)
+            .fill(UIComponentsAsset.pinkColor.swiftUIColor)
             .frame(width: 2, height: 30)
             .opacity(isVisible ? 1 : 0)
             .onAppear {
