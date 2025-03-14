@@ -1,0 +1,140 @@
+version: "3.8"
+
+services:
+  # --- База данных ---
+  db:
+    image: postgres:15-alpine
+    container_name: rewind-db
+    environment:
+      POSTGRES_USER: rewind_user
+      POSTGRES_PASSWORD: rewind_password
+      POSTGRES_DB: rewind_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  # --- Сервисы Go ---
+  auth-service:
+    build: ./Rewind/auth-service # Обновленный путь к Dockerfile
+    container_name: rewind-auth-service
+    environment:
+      DATABASE_URL: postgres://rewind_user:rewind_password@db:5432/rewind_db?sslmode=disable
+      GRPC_PORT: 50051
+      JWT_SECRET: your-secret-jwt-key
+      NOTIFICATION_SERVICE_GRPC_ADDRESS: notification-service:50053
+    ports:
+      - "8081:8080"
+      - "50051:50051"
+    depends_on:
+      - db
+      - notification-service
+
+  group-service:
+    build: ./Rewind/group-service # Обновленный путь к Dockerfile
+    container_name: rewind-group-service
+    environment:
+      DATABASE_URL: postgres://rewind_user:rewind_password@db:5432/rewind_db?sslmode=disable
+      GRPC_PORT: 50052
+      AUTH_SERVICE_GRPC_ADDRESS: auth-service:50051
+    ports:
+      - "50052:50052"
+    depends_on:
+      - db
+      - auth-service
+
+  memory-service:
+    build: ./Rewind/memory-service # Обновленный путь к Dockerfile
+    container_name: rewind-memory-service
+    environment:
+      DATABASE_URL: postgres://rewind_user:rewind_password@db:5432/rewind_db?sslmode=disable
+      GRPC_PORT: 50054
+      AUTH_SERVICE_GRPC_ADDRESS: auth-service:50051
+      GROUP_SERVICE_GRPC_ADDRESS: group-service:50052
+      NOTIFICATION_SERVICE_GRPC_ADDRESS: notification-service:50053
+      STORAGE_BUCKET_NAME: your-s3-bucket-name
+      STORAGE_REGION: your-s3-region
+      STORAGE_ACCESS_KEY_ID: your-s3-access-key-id
+      STORAGE_SECRET_ACCESS_KEY: your-s3-secret-access-key
+      STORAGE_ENDPOINT: your-s3-endpoint
+    ports:
+      - "50054:50054"
+    depends_on:
+      - db
+      - auth-service
+      - group-service
+      - notification-service
+
+  notification-service:
+    build: ./Rewind/notification-service # Обновленный путь к Dockerfile
+    container_name: rewind-notification-service
+    environment:
+      RABBITMQ_URL: amqp://rabbitmq:5672
+      GRPC_PORT: 50053
+    ports:
+      - "50053:50053"
+    depends_on:
+      - rabbitmq
+
+  # --- API Gateway (Nginx) ---
+  api-gateway:
+    image: nginx:latest
+    container_name: rewind-api-gateway
+    ports:
+      - "80:80"
+    volumes:
+      - ./Rewind/api-gateway/nginx.conf:/etc/nginx/nginx.conf:ro # Обновленный путь к nginx.conf
+    depends_on:
+      - auth-service
+      - group-service
+      - memory-service
+
+  # --- Очередь сообщений ---
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rewind-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  redis:
+    image: redis:7-alpine
+    container_name: rewind-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  # --- Мониторинг (Prometheus & Grafana) ---
+  prometheus:
+    image: prom/prometheus:v2.48.1
+    container_name: rewind-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./Rewind/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro # Обновленный путь к prometheus.yml
+      - prometheus_data:/prometheus
+    depends_on:
+      - auth-service
+
+  grafana:
+    image: grafana/grafana:10.2.3
+    container_name: rewind-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+
+volumes:
+  db_data:
+  rabbitmq_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
