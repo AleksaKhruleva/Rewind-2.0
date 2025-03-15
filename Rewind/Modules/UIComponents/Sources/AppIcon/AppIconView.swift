@@ -48,6 +48,13 @@ public struct AppIconView: View {
     
     public var taskTitle: some View {
         Text(viewModel.task)
+            .modifier(AppIconTaskModifier())
+    }
+}
+
+public struct AppIconTaskModifier: ViewModifier {
+    public func body(content: Content) -> some View {
+        content
             .font(.system(size: 10, weight: .bold, design: .monospaced))
             .frame(width: 62, height: 24)
             .background(UIComponentsAsset.appIconLightGray.swiftUIColor)
