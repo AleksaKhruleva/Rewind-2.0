@@ -38,7 +38,7 @@ struct RewindImagePicker<Content: View>: View {
             .fullScreenCover(isPresented: $isImageEditorPresented) {
                 selectedImage = nil
             } content: {
-                RewindImageEditor(image: $selectedImage) { croppedImage, status in
+                RewindImageEditor(image: $selectedImage, cropType: .circle) { croppedImage, status in
                     guard let croppedImage else { return }
                     self.cropedImage = croppedImage
                 }
@@ -47,7 +47,7 @@ struct RewindImagePicker<Content: View>: View {
 }
 
 #Preview {
-    RewindImageEditor(image: Binding.constant(UIComponentsAsset.avatar.image)) { _, _ in
+    RewindImageEditor(image: Binding.constant(UIComponentsAsset.avatar.image), cropType: .circle) { _, _ in
         
     }
 }

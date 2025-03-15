@@ -34,28 +34,12 @@ public struct BlurredAvatarView: View {
             BlurredAvatarTable(
                 showPicker: $showPicker,
                 saveImage: {
-                    // TODO: Alert or smth
-                    guard let image else { return }
-                    
-                    let imageSaver = ImageSaver()
-                    imageSaver.writeToPhotoAlbum(image: image)
+                    // TODO: smth
                 }
             )
         }
     }
 }
-
-class ImageSaver: NSObject {
-    func writeToPhotoAlbum(image: UIImage) {
-        UIImageWriteToSavedPhotosAlbum(image, self, #selector(saveCompleted), nil)
-    }
-
-    @objc func saveCompleted(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
-        print("Save finished!")
-    }
-}
-
-
 
 #Preview {
     BlurredAvatarView(
