@@ -1,10 +1,3 @@
-//
-//  RewindHeader.swift
-//  UIComponents
-//
-//  Created by Danila Rakhmanov on 02.03.2025.
-//
-
 import SwiftUI
 
 public struct RewindHeader<LeftContent: View, CenterContent: View, RightContent: View>: View {

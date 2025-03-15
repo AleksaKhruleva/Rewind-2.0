@@ -1,10 +1,3 @@
-//
-//  BlurredAvatarTableCell.swift
-//  UIComponents
-//
-//  Created by Danila Rakhmanov on 02.03.2025.
-//
-
 import SwiftUI
 
 struct BlurredAvatarTableCell: View {
