@@ -1,8 +1,14 @@
 import SwiftUI
 import PhotosUI
 
+enum CropType {
+    case rectangle
+    case circle
+}
+
 struct RewindImageEditor: View {
     @Binding var image: UIImage?
+    var cropType: CropType
     var onCrop: (UIImage?, Bool) -> ()
     
     @State private var scale: CGFloat = 1
@@ -54,10 +60,13 @@ struct RewindImageEditor: View {
     
     var imageMask: some View {
         GeometryReader { geometry in
+            let width = geometry.size.width
             Color.white.opacity(0.8)
                 .overlay(
-                    Circle()
-                        .frame(width: geometry.size.width, height: geometry.size.width)
+                    Rectangle()
+                        .frame(width: width, height: width)
+                        // TODO: 40 to constants
+                        .cornerRadius(cropType == .circle ? width / 2 : 40)
                         .blendMode(.destinationOut)
                 )
                 .compositingGroup()

@@ -46,7 +46,7 @@ public struct RewindButton: View {
             Image(systemName: type.rawValue)
                 .font(.system(size: 20, weight: .black))
                 .frame(width: 40, height: 40)
-                .tint(.primaryColor)
+                .tint(UIComponentsAsset.primaryColor.swiftUIColor)
                 .opacity(type == .empty ? 0 : 1)
         }
     }
