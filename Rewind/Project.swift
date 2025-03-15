@@ -13,6 +13,7 @@ let project = Project(
             bundleId: "io.tuist.Rewind",
             infoPlist: .extendingDefault(
                 with: [
+                    "CFBundleIconName": "AppIcons",
                     "UILaunchScreen": [
                         "UIColorName": "",
                         "UIImageName": "",
