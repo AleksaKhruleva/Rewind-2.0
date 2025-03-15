@@ -33,7 +33,7 @@ public struct AccountView: View {
                         VStack(alignment: .leading, spacing: 5) {
                             Text("App Icons")
                                 .foregroundColor(UIComponentsAsset.tableNameTextColor.swiftUIColor)
-                                .font(.system(size: 17, weight: .black, design: .rounded))
+                                .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .black))
                                 .padding(.leading, 15)
                             
                             appIconsTable
@@ -69,7 +69,7 @@ public struct AccountView: View {
                     .cornerRadius(20)
                 
                 Text("flowykk")
-                    .font(.system(size: 17, weight: .bold, design: .rounded))
+                    .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .bold))
                     .foregroundColor(UIComponentsAsset.primaryColor.swiftUIColor)
             }
         } rightView: {

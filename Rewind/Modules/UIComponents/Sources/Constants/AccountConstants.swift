@@ -1,6 +1,6 @@
 import Foundation
 
-enum AccountConstants {
+public enum AccountConstants {
     public static let groups = [
         ("person.2.fill", "8 group", true)
     ]
@@ -25,4 +25,7 @@ enum AccountConstants {
         ("rectangle.portrait.and.arrow.right.fill", "Sign out", true),
         ("trash.fill", "Delete account", true)
     ]
+    
+    public static let defaultFontSize: CGFloat = 17
+    public static let avatarTextFontSize: CGFloat = 20
 }

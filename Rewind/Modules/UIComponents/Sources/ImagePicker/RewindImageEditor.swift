@@ -42,7 +42,7 @@ struct RewindImageEditor: View {
             }
         } centerView: {
             Text("Image Editor")
-                .font(.system(size: 17, weight: .bold, design: .rounded))
+                .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .bold))
                 .foregroundColor(UIComponentsAsset.primaryColor.swiftUIColor)
         } rightView: {
             RewindButton(type: .checkmark) {

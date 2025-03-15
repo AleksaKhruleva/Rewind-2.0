@@ -1,10 +1,22 @@
 import SwiftUI
 
 struct InformationTableCell: View {
-    let icon: String
-    let text: String
-    let needChevron: Bool
-    let action: () -> Void
+    private let icon: String
+    private let text: String
+    private let needChevron: Bool
+    private let action: () -> Void
+    
+    public init(
+        icon: String,
+        text: String,
+        needChevron: Bool,
+        action: @escaping () -> Void
+    ) {
+        self.icon = icon
+        self.text = text
+        self.needChevron = needChevron
+        self.action = action
+    }
     
     var body: some View {
         HStack(spacing: 10) {
@@ -13,7 +25,7 @@ struct InformationTableCell: View {
                 .frame(width: 30, height: 30)
             
             Text(text)
-                .font(.system(size: 17, weight: .bold, design: .rounded))
+                .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .bold))
             
             Spacer()
             

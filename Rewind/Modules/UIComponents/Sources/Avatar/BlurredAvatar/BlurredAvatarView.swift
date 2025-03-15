@@ -1,8 +1,8 @@
 import SwiftUI
 
 public struct BlurredAvatarView: View {
-    @State var image: UIImage?
-    @State var showPicker: Bool = false
+    @State private var image: UIImage?
+    @State private var showPicker: Bool = false
     @Binding var isPresented: Bool
 
     public init(image: UIImage, isPresented: Binding<Bool>) {

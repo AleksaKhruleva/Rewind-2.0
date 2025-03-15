@@ -1,8 +1,8 @@
 import SwiftUI
 
 public struct AvatarView: View {
-    let image: UIImage
-    let text: String
+    private let image: UIImage
+    private let text: String
     
     public init(image: UIImage?, text: String) {
         self.image = image ?? UIImage(systemName: "person.fill")!
@@ -19,7 +19,7 @@ public struct AvatarView: View {
             
             Text("flowykk")
                 .foregroundColor(UIComponentsAsset.primaryColor.swiftUIColor)
-                .font(.system(size: 20, weight: .black, design: .rounded))
+                .modifier(RoundFontModifier(size: AccountConstants.avatarTextFontSize, weight: .black))
         }
     }
 }

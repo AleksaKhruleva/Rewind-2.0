@@ -1,9 +1,9 @@
 import SwiftUI
 
 public struct RewindHeader<LeftContent: View, CenterContent: View, RightContent: View>: View {
-    let leftView: LeftContent
-    let centerView: CenterContent
-    let rightView: RightContent
+    private let leftView: LeftContent
+    private let centerView: CenterContent
+    private let rightView: RightContent
 
     public init(
         @ViewBuilder leftView: () -> LeftContent,

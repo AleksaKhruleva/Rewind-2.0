@@ -1,9 +1,9 @@
 import SwiftUI
 
 public struct InformationTable: View {
-    let title: String
-    let data: [(String, String, Bool)]
-    let isRisky: Bool
+    private let title: String
+    private let data: [(String, String, Bool)]
+    private let isRisky: Bool
     
     public init(title: String, data: [(String, String, Bool)], isRisky: Bool) {
         self.title = title
@@ -19,7 +19,7 @@ public struct InformationTable: View {
                     UIComponentsAsset.riskyTableNameTextColor.swiftUIColor :
                     UIComponentsAsset.tableNameTextColor.swiftUIColor
                 )
-                .font(.system(size: 17, weight: .black, design: .rounded))
+                .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .black))
                 .padding(.leading, 15)
             
             VStack(alignment: .leading, spacing: 0) {

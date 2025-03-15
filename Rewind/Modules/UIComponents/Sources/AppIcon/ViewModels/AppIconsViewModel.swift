@@ -26,22 +26,18 @@ public class AppIconsViewModel: ObservableObject, Identifiable {
         }
     }
     
-    func changeAppIcon(icon: AppIconViewModel) {
+    private func changeAppIcon(icon: AppIconViewModel) {
         guard UIApplication.shared.supportsAlternateIcons else { return }
         guard !icon.locked else { return }
 
-        UIApplication.shared.setAlternateIconName(icon.name) { [weak self] error in
-            guard let self else { return }
-            guard error == nil else {
-                print("Ошибка смены иконки: \(error!.localizedDescription) \(icon.name)")
-                return
-            }
-            
-            UserDefaults.standard.set(icon.name, forKey: "appIcon")
-            for icon in self.appIcons {
-                icon.dispatch(.change)
-            }
-            print("Иконка успешно изменена на \(icon.name)")
+        if icon.name == "RewindLight" {
+            UIApplication.shared.setAlternateIconName(nil)
+        }
+        UIApplication.shared.setAlternateIconName(icon.name)
+        
+        UserDefaults.standard.set(icon.name, forKey: "appIcon")
+        for icon in self.appIcons {
+            icon.dispatch(.change)
         }
     }
 }
