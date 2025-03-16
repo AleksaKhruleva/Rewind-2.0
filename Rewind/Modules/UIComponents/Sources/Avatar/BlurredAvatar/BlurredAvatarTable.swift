@@ -6,7 +6,7 @@ struct BlurredAvatarTable: View {
     
     public var body: some View {
         VStack(alignment: .leading, spacing: -8) {
-            BlurredAvatarTableCell(
+            BlurredTableCell(
                 icon: "photo",
                 title: "Set new image",
                 action: {
@@ -14,7 +14,7 @@ struct BlurredAvatarTable: View {
                 }
             )
             
-            BlurredAvatarTableCell(
+            BlurredTableCell(
                 icon: "square.and.arrow.down.fill",
                 title: "Save Image",
                 action: saveImage
