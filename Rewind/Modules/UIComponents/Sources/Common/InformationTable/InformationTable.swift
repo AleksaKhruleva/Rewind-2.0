@@ -14,12 +14,16 @@ public struct InformationTable: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text(title)
-                .foregroundColor(
-                    isRisky ?
-                    UIComponentsAsset.riskyTableNameTextColor.swiftUIColor :
-                    UIComponentsAsset.tableNameTextColor.swiftUIColor
-                )
-                .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .black))
+                .modifier(
+                    RoundFontModifier(
+                        size: AccountConstants.defaultFontSize,
+                        weight: .black,
+                        foregroundColor:
+                            isRisky ?
+                            UIComponentsAsset.riskyTableNameTextColor.swiftUIColor :
+                            UIComponentsAsset.tableNameTextColor.swiftUIColor
+                        )
+                    )
                 .padding(.leading, 15)
             
             VStack(alignment: .leading, spacing: 0) {
@@ -28,14 +32,10 @@ public struct InformationTable: View {
                         icon: item.0,
                         text: item.1,
                         needChevron: item.2,
+                        isRisky: isRisky,
                         action: {
                             print(item.1)
                         }
-                    )
-                    .foregroundColor(
-                        isRisky ?
-                        UIComponentsAsset.riskyTableTextColor.swiftUIColor :
-                        UIComponentsAsset.primaryColor.swiftUIColor
                     )
                 }
             }

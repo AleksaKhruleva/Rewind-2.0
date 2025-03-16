@@ -13,12 +13,14 @@ public struct BlurredAvatarView: View {
     public var body: some View {
       Color.black.opacity(0.05)
           .background(BlurView())
-          .ignoresSafeArea()
           .overlay(
             content
           )
+          .ignoresSafeArea()
           .onTapGesture {
-              isPresented.toggle()
+              withAnimation {
+                  isPresented.toggle()
+              }
           }
           .customImagePicker(show: $showPicker, croppedImage: $image)
     }
@@ -29,7 +31,6 @@ public struct BlurredAvatarView: View {
                 .resizable()
                 .frame(width: 320, height: 320)
                 .clipShape(Circle())
-            
             
             BlurredAvatarTable(
                 showPicker: $showPicker,

@@ -5,7 +5,8 @@ import Features
 struct RewindApp: App {
     var body: some Scene {
         WindowGroup {
-            AccountView()
+            GalleryView()
+//            AccountView()
         }
     }
 }

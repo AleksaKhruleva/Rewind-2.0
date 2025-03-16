@@ -10,47 +10,47 @@ public struct AccountView: View {
     
     public var body: some View {
         VStack {
-            if !isBlurredAvatarPresented {
-                header
-            }
+            header
             
-            ZStack {
-                Color.white.ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(spacing: 15) {
-                        avatar
-                            .onTapGesture {
+            ScrollView {
+                VStack(spacing: 15) {
+                    avatar
+                        .onTapGesture {
+                            withAnimation {
                                 isBlurredAvatarPresented.toggle()
                             }
-                        
-                        groupsTable
-                        
-                        activityTable
-                        
-                        generalTable
-                        
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text("App Icons")
-                                .foregroundColor(UIComponentsAsset.tableNameTextColor.swiftUIColor)
-                                .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .black))
-                                .padding(.leading, 15)
-                            
-                            appIconsTable
                         }
+                    
+                    groupsTable
+                    
+                    activityTable
+                    
+                    generalTable
+                    
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text("App Icons")
+                            .foregroundColor(UIComponentsAsset.tableNameTextColor.swiftUIColor)
+                            .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .black))
+                            .padding(.leading, 15)
                         
-                        riskyTable
+                        appIconsTable
                     }
-                    .padding(.horizontal, 16)
+                    
+                    riskyTable
+                    
+                    RewindNoteTextView(text: "✨  You are already 100 days with Rewind!")
+                        .padding(.vertical, 4)
                 }
-                .scrollIndicators(.hidden)
-                
-                if isBlurredAvatarPresented {
-                    BlurredAvatarView(
-                        image: UIComponentsAsset.avatar.image,
-                        isPresented: $isBlurredAvatarPresented
-                    )
-                }
+                .padding(.horizontal, 16)
+            }
+            .scrollIndicators(.hidden)
+        }
+        .overlay {
+            if isBlurredAvatarPresented {
+                BlurredAvatarView(
+                    image: UIComponentsAsset.avatar.image,
+                    isPresented: $isBlurredAvatarPresented
+                )
             }
         }
     }
@@ -61,17 +61,10 @@ public struct AccountView: View {
                 print(1)
             }
         } centerView: {
-            HStack(spacing: 12) {
-                Image(uiImage: UIComponentsAsset.avatar.image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 30, height: 30)
-                    .cornerRadius(20)
-                
-                Text("flowykk")
-                    .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .bold))
-                    .foregroundColor(UIComponentsAsset.primaryColor.swiftUIColor)
-            }
+            HeaderBadgeView(
+                image: UIComponentsAsset.avatar.image,
+                text: "flowykk"
+            )
         } rightView: {
             RewindButton(type: .empty) {}
         }
