@@ -1,10 +1,3 @@
-//
-//  AuthorBadgeView.swift
-//  UIComponents
-//
-//  Created by Danila Rakhmanov on 15.03.2025.
-//
-
 import SwiftUI
 
 struct AuthorBadgeView: View {
