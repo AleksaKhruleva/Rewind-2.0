@@ -64,3 +64,8 @@ stop:
 mocks:
 	cd ./internal/app/services && go generate
 	cd ./internal/app/repositories && go generate
+
+# Генерация протофайлов для auth-service из Backend
+.PHONY: proto-auth
+proto-auth:
+	cd ./auth-service && protoc --go_out=./pkg --go-grpc_out=./pkg --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative proto/auth.proto
