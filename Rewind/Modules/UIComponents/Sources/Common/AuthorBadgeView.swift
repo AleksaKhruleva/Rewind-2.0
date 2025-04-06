@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct AuthorBadgeView: View {
+public struct AuthorBadgeView: View {
     private let image: UIImage
     private let name: String
     private let date: String
