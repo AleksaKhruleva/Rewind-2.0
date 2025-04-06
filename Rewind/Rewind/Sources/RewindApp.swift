@@ -6,7 +6,6 @@ struct RewindApp: App {
     var body: some Scene {
         WindowGroup {
             GalleryView()
-//            AccountView()
         }
     }
 }
