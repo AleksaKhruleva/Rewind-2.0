@@ -38,6 +38,12 @@ public struct GalleryView: View {
                 }
             }
             .scrollIndicators(.hidden)
+            .safeAreaInset(edge: .bottom) {
+                ZStack(alignment: .bottom) {
+                    
+                    footer
+                }
+            }
             
             Spacer(minLength: 0)
         }
@@ -47,6 +53,33 @@ public struct GalleryView: View {
                     image: selectedMedia,
                     isPresented: $isBlurredMediaPresented
                 )
+            }
+        }
+    }
+    
+    private var footer: some View {
+        ZStack {
+            HStack {
+                RewindMediaButton(size: 50, fontSize: 28, type: .plus) {
+                    print("plus")
+                }
+                
+                Spacer()
+                
+                RewindMediaButton(size: 60, fontSize: 28, type: .rewind) {
+                    print("plus")
+                }
+                
+                Spacer()
+                
+                RewindMediaButton(size: 50, fontSize: 28, type: .settings) {
+                    print("plus")
+                }
+            }
+            .padding(.horizontal, 50)
+            .padding(.bottom, 20)
+            .background {
+                BackgroundGradientView(height: 130)
             }
         }
     }
