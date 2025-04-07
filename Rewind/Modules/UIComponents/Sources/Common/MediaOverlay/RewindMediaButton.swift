@@ -4,8 +4,13 @@ public struct RewindMediaButton: View {
     public enum ButtonType: String {
         case like = "heart"
         case save = "square.and.arrow.down.fill"
+        case plus = "plus"
+        case rewind = "arrowtriangle.right.fill"
+        case settings = "gearshape.fill"
     }
     
+    private let size: CGFloat
+    private let fontSize: CGFloat
     private let type: ButtonType
     private let fillable: Bool
     private let filledColor: Color
@@ -14,11 +19,15 @@ public struct RewindMediaButton: View {
     @State private var filled: Bool = false
     
     public init(
+        size: CGFloat = 40,
+        fontSize: CGFloat = 22,
         type: ButtonType,
         fillable: Bool = false,
         filledColor: Color = UIComponentsAsset.pinkColor.swiftUIColor,
         action: @escaping () -> Void = {}
     ) {
+        self.size = size
+        self.fontSize = fontSize
         self.type = type
         self.fillable = fillable
         self.filledColor = filledColor
@@ -27,8 +36,8 @@ public struct RewindMediaButton: View {
     
     public var body: some View {
         Image(systemName: imageName)
-            .font(.system(size: 22, weight: .bold))
-            .frame(width: 40, height: 40)
+            .font(.system(size: fontSize, weight: .bold))
+            .frame(width: size, height: size)
             .background(Color.white.opacity(0.5))
             .foregroundColor(foregroundColor)
             .clipShape(Circle())
@@ -70,8 +79,13 @@ extension RewindMediaButton {
         Color.black.opacity(0.9).ignoresSafeArea()
         
         HStack {
-            RewindMediaButton(type: .like, fillable: true) { print("like") }
-            RewindMediaButton(type: .save) { print("save") }
+            RewindMediaButton(type: .like, fillable: true) {
+                print("like")
+            }
+            
+            RewindMediaButton(type: .save) {
+                print("save")
+            }
         }
     }
 }
