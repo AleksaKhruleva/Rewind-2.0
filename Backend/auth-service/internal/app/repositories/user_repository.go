@@ -14,6 +14,7 @@ type UserRepositoryInterface interface {
 	CreateUser(tx *gorm.DB, user *models.User) error
 	Save(tx *gorm.DB, user *models.User) error
 	GetRefreshToken(tx *gorm.DB, refreshToken string) (*models.RefreshToken, error)
+	DeleteRefreshToken(tx *gorm.DB, id uint) error
 }
 
 type UserRepository struct {
@@ -86,4 +87,11 @@ func (r *UserRepository) GetRefreshToken(tx *gorm.DB, refreshToken string) (*mod
 	var token models.RefreshToken
 	result := tx.Where("refresh_token = ?", refreshToken).First(&token)
 	return &token, result.Error
+}
+
+func (r *UserRepository) DeleteRefreshToken(tx *gorm.DB, id uint) error {
+	if tx == nil {
+		tx = r.db
+	}
+	return tx.Delete(models.RefreshToken{}, "id = ?", id).Error
 }

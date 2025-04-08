@@ -10,6 +10,9 @@ service AuthService {
   rpc SetPasswordAndUsername(SetPasswordAndUsernameRequest) returns (SetPasswordAndUsernameResponse) {}
   rpc Login(LoginRequest) returns (LoginResponse) {}
   rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse) {}
+  rpc ForgotPassword(ForgotPasswordRequest) returns (ForgotPasswordResponse) {}
+  rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse) {}
+  rpc Logout(LogoutRequest) returns (LogoutResponse) {}
 }
 
 message StartRegistrationRequest {
@@ -57,4 +60,29 @@ message RefreshTokenRequest {
 
 message RefreshTokenResponse {
   string access_token = 1;
+}
+
+message ForgotPasswordRequest {
+  string email = 1;
+}
+
+message ForgotPasswordResponse {
+  bool success = 1;
+}
+
+message ResetPasswordRequest {
+  string token = 1;
+  string new_password = 2;
+}
+
+message ResetPasswordResponse {
+  bool success = 1;
+}
+
+message LogoutRequest {
+  string refresh_token = 1;
+}
+
+message LogoutResponse {
+  bool success = 1;
 }

@@ -16,7 +16,7 @@ type RedisRepositoryInterface interface {
 	HGet(ctx context.Context, key, field string) *redis.StringCmd
 	Expire(ctx context.Context, key string, expiration time.Duration) *redis.BoolCmd
 	HGetAll(ctx context.Context, key string) *redis.StringStringMapCmd
-	SetEX(ctx context.Context, key string, value interface{}, expiration time.Duration) *redis.StatusCmd // Добавлен метод SetEX
+	SetEX(ctx context.Context, key string, value interface{}, expiration time.Duration) *redis.StatusCmd
 }
 
 // RedisRepository является реализацией интерфейса RedisRepositoryInterface, использующей go-redis.
