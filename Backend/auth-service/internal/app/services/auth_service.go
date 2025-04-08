@@ -1,0 +1,167 @@
+package services
+
+import (
+	"Rewind/auth-service/internal/app/models"
+	"Rewind/auth-service/internal/app/repositories"
+	"Rewind/auth-service/internal/utils"
+	"context"
+	"fmt"
+	"golang.org/x/crypto/bcrypt"
+	"log"
+	"math/rand"
+	"os"
+	"time"
+
+	pb "Rewind/auth-service/pkg/proto"
+	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
+)
+
+type AuthService struct {
+	userRepo repositories.UserRepositoryInterface
+	pb.UnimplementedAuthServiceServer
+	validator *validator.Validate
+	redisRepo repositories.RedisRepositoryInterface
+}
+
+func NewAuthService(repo repositories.UserRepositoryInterface, validator *validator.Validate, redisClient repositories.RedisRepositoryInterface) *AuthService {
+	return &AuthService{
+		userRepo:  repo,
+		validator: validator,
+		redisRepo: redisClient,
+	}
+}
+
+func (s *AuthService) StartRegistration(ctx context.Context, req *pb.StartRegistrationRequest) (*pb.StartRegistrationResponse, error) {
+	email := req.GetEmail()
+
+	if err := s.validator.Var(email, "required,email"); err != nil {
+		return nil, fmt.Errorf("invalid email format: %w", err)
+	}
+	registrationID := uuid.New().String()
+
+	verificationCode := fmt.Sprintf("%06d", rand.Intn(1000000)) // Генерирует случайное число от 000000 до 999999
+
+	redisKey := fmt.Sprintf("registration:%s", registrationID)
+	expiryTime := time.Minute * 15 // Код действителен в течение 15 минут (настройте по необходимости)
+
+	err := s.redisRepo.HSet(ctx, redisKey, map[string]interface{}{
+		"email": email,
+		"code":  verificationCode,
+	}).Err()
+	if err != nil {
+		return nil, fmt.Errorf("failed to store verification code in Redis: %w", err)
+	}
+
+	err = s.redisRepo.Expire(ctx, redisKey, expiryTime).Err()
+	if err != nil {
+		log.Printf("Warning: failed to set expiry for Redis key %s: %v\n", redisKey, err)
+	}
+
+	// TODO: 5. Отправка кода верификации на email пользователя
+	// Вам нужно интегрировать ваш сервис с сервисом отправки email (например, через отдельный Notification Service).
+	fmt.Printf("Verification code for email %s: %s\n", email, verificationCode) // Временный вывод кода для демонстрации
+
+	return &pb.StartRegistrationResponse{RegistrationId: registrationID, Success: true}, nil
+}
+
+func (s *AuthService) VerifyEmailCode(ctx context.Context, req *pb.VerifyEmailCodeRequest) (*pb.VerifyEmailCodeResponse, error) {
+	registrationID := req.GetRegistrationId()
+	verificationCode := req.GetVerificationCode()
+
+	redisKey := fmt.Sprintf("registration:%s", registrationID)
+
+	registrationData, err := s.redisRepo.HGetAll(ctx, redisKey).Result()
+	if err != nil {
+		return nil, fmt.Errorf("invalid or expired registration ID: %w", err)
+	}
+
+	storedEmail, okEmail := registrationData["email"]
+	storedCode, okCode := registrationData["code"]
+
+	if !okEmail || !okCode {
+		return nil, fmt.Errorf("registration data incomplete for ID: %s", registrationID)
+	}
+
+	if verificationCode != storedCode {
+		return &pb.VerifyEmailCodeResponse{Success: false}, fmt.Errorf("invalid verification code")
+	}
+
+	verifiedKey := fmt.Sprintf("verified:%s", registrationID)
+	expiryTime := time.Minute * 120
+
+	err = s.redisRepo.SetEX(ctx, verifiedKey, storedEmail, expiryTime).Err()
+	if err != nil {
+		return nil, fmt.Errorf("failed to mark email as verified in Redis: %w", err)
+	}
+
+	err = s.redisRepo.Del(ctx, redisKey).Err()
+	if err != nil {
+		log.Printf("Warning: failed to delete registration data from Redis for ID %s: %v\n", registrationID, err)
+	}
+
+	return &pb.VerifyEmailCodeResponse{Success: true}, nil
+}
+
+func (s *AuthService) SetPasswordAndUsername(ctx context.Context, req *pb.SetPasswordAndUsernameRequest) (*pb.SetPasswordAndUsernameResponse, error) {
+	registrationID := req.GetRegistrationId()
+	password := req.GetPassword()
+	username := req.GetUsername()
+
+	if err := s.validator.Var(password, "required,min=6"); err != nil {
+		return nil, fmt.Errorf("invalid password: %w", err)
+	}
+	if err := s.validator.Var(username, "required,min=3,max=50"); err != nil {
+		return nil, fmt.Errorf("invalid username: %w", err)
+	}
+
+	verifiedKey := fmt.Sprintf("verified:%s", registrationID)
+
+	email, err := s.redisRepo.Get(ctx, verifiedKey).Result()
+	if err != nil {
+		return nil, fmt.Errorf("invalid or expired registration ID: %w", err)
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, fmt.Errorf("failed to hash password: %w", err)
+	}
+
+	newUser := &models.User{
+		Email:    email,
+		Password: string(hashedPassword),
+		Username: username,
+	}
+
+	err = s.userRepo.CreateUser(nil, newUser)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create user in database: %w", err)
+	}
+
+	err = s.redisRepo.Del(ctx, verifiedKey).Err()
+	if err != nil {
+		log.Printf("Warning: failed to delete verification record from Redis for ID %s: %v\n", registrationID, err)
+	}
+
+	secretKey := os.Getenv("JWT_SECRET_KEY")
+	if secretKey == "" {
+		return nil, fmt.Errorf("JWT_SECRET_KEY environment variable not found")
+	}
+
+	accessToken, err := utils.GenerateAccessToken(newUser.ID, username, secretKey)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate access token")
+	}
+
+	refreshToken, err := utils.GenerateRefreshToken()
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate refresh token")
+	}
+
+	err = s.userRepo.AddSession(nil, newUser.ID, refreshToken)
+	if err != nil {
+		return nil, fmt.Errorf("failed to add refresh token to database")
+	}
+
+	return &pb.SetPasswordAndUsernameResponse{AccessToken: accessToken, RefreshToken: refreshToken}, nil
+}

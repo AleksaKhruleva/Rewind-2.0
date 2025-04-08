@@ -15,6 +15,8 @@ type RedisRepositoryInterface interface {
 	HSet(ctx context.Context, key string, values ...interface{}) *redis.IntCmd
 	HGet(ctx context.Context, key, field string) *redis.StringCmd
 	Expire(ctx context.Context, key string, expiration time.Duration) *redis.BoolCmd
+	HGetAll(ctx context.Context, key string) *redis.StringStringMapCmd
+	SetEX(ctx context.Context, key string, value interface{}, expiration time.Duration) *redis.StatusCmd // Добавлен метод SetEX
 }
 
 // RedisRepository является реализацией интерфейса RedisRepositoryInterface, использующей go-redis.
@@ -22,8 +24,7 @@ type RedisRepository struct {
 	client *redis.Client
 }
 
-// NewRedisRepository создает новый экземпляр RedisRepository.
-func NewRedisRepository(redisURL string) (*RedisRepository, error) {
+func InitRedisClient(redisURL string) (*redis.Client, error) {
 	opt, err := redis.ParseURL(redisURL)
 	if err != nil {
 		return nil, err
@@ -33,7 +34,12 @@ func NewRedisRepository(redisURL string) (*RedisRepository, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &RedisRepository{client: client}, nil
+	return client, nil
+}
+
+// NewRedisRepository создает новый экземпляр RedisRepository.
+func NewRedisRepository(redisClient *redis.Client) *RedisRepository {
+	return &RedisRepository{client: redisClient}
 }
 
 func (r *RedisRepository) Set(ctx context.Context, key string, value interface{}, expiration time.Duration) *redis.StatusCmd {
@@ -58,4 +64,12 @@ func (r *RedisRepository) HGet(ctx context.Context, key, field string) *redis.St
 
 func (r *RedisRepository) Expire(ctx context.Context, key string, expiration time.Duration) *redis.BoolCmd {
 	return r.client.Expire(ctx, key, expiration)
+}
+
+func (r *RedisRepository) HGetAll(ctx context.Context, key string) *redis.StringStringMapCmd {
+	return r.client.HGetAll(ctx, key)
+}
+
+func (r *RedisRepository) SetEX(ctx context.Context, key string, value interface{}, expiration time.Duration) *redis.StatusCmd {
+	return r.client.SetEX(ctx, key, value, expiration)
 }
