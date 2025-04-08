@@ -8,6 +8,8 @@ service AuthService {
   rpc StartRegistration(StartRegistrationRequest) returns (StartRegistrationResponse) {}
   rpc VerifyEmailCode(VerifyEmailCodeRequest) returns (VerifyEmailCodeResponse) {}
   rpc SetPasswordAndUsername(SetPasswordAndUsernameRequest) returns (SetPasswordAndUsernameResponse) {}
+  rpc Login(LoginRequest) returns (LoginResponse) {}
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse) {}
 }
 
 message StartRegistrationRequest {
@@ -37,4 +39,22 @@ message SetPasswordAndUsernameRequest {
 message SetPasswordAndUsernameResponse {
   string access_token = 1;
   string refresh_token = 2;
+}
+
+message LoginRequest {
+  string identifier = 1; // Может быть email или username
+  string password = 2;
+}
+
+message LoginResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message RefreshTokenResponse {
+  string access_token = 1;
 }

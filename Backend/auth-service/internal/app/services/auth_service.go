@@ -5,8 +5,10 @@ import (
 	"Rewind/auth-service/internal/app/repositories"
 	"Rewind/auth-service/internal/utils"
 	"context"
+	"errors"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 	"log"
 	"math/rand"
 	"os"
@@ -164,4 +166,104 @@ func (s *AuthService) SetPasswordAndUsername(ctx context.Context, req *pb.SetPas
 	}
 
 	return &pb.SetPasswordAndUsernameResponse{AccessToken: accessToken, RefreshToken: refreshToken}, nil
+}
+
+func (s *AuthService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
+	identifier := req.GetIdentifier()
+	password := req.GetPassword()
+
+	if err := s.validator.Var(password, "required"); err != nil {
+		return nil, fmt.Errorf("password is required")
+	}
+	if err := s.validator.Var(identifier, "required"); err != nil {
+		return nil, fmt.Errorf("email or username is required")
+	}
+
+	var user *models.User
+	var err error
+
+	// Попытка найти пользователя по email
+	if err = s.validator.Var(identifier, "email"); err == nil {
+		user, err = s.userRepo.GetUserByEmail(nil, identifier)
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("failed to query user by email: %w", err)
+		}
+	}
+
+	// Если по email не найден или формат не email, пытаемся найти по username
+	if user == nil {
+		user, err = s.userRepo.GetUserByUsername(nil, identifier)
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("failed to query user by username: %w", err)
+		}
+	}
+
+	// Если пользователь не найден ни по email, ни по username
+	if user == nil {
+		return nil, fmt.Errorf("invalid credentials")
+	}
+
+	// Проверка пароля
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return nil, fmt.Errorf("invalid credentials")
+	}
+
+	secretKey := os.Getenv("JWT_SECRET_KEY")
+	if secretKey == "" {
+		return nil, fmt.Errorf("JWT_SECRET_KEY environment variable not found")
+	}
+
+	accessToken, err := utils.GenerateAccessToken(user.ID, user.Username, secretKey)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate access token")
+	}
+
+	refreshToken, err := utils.GenerateRefreshToken()
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate refresh token")
+	}
+
+	err = s.userRepo.AddSession(nil, user.ID, refreshToken)
+	if err != nil {
+		return nil, fmt.Errorf("failed to add refresh token to database")
+	}
+
+	return &pb.LoginResponse{AccessToken: accessToken, RefreshToken: refreshToken}, nil
+}
+
+func (s *AuthService) RefreshToken(ctx context.Context, req *pb.RefreshTokenRequest) (*pb.RefreshTokenResponse, error) {
+	refreshToken := req.GetRefreshToken()
+
+	if refreshToken == "" {
+		return nil, fmt.Errorf("refresh token is required")
+	}
+
+	refreshTokenRecord, err := s.userRepo.GetRefreshToken(nil, refreshToken)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("invalid refresh token")
+		}
+		return nil, fmt.Errorf("failed to query refresh token: %w", err)
+	}
+
+	user, err := s.userRepo.GetUserByID(nil, refreshTokenRecord.UserID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("user associated with refresh token not found")
+		}
+		return nil, fmt.Errorf("failed to query user: %w", err)
+	}
+
+	secretKey := os.Getenv("JWT_SECRET_KEY")
+	if secretKey == "" {
+		return nil, fmt.Errorf("JWT_SECRET_KEY environment variable not found")
+	}
+
+	newAccessToken, err := utils.GenerateAccessToken(user.ID, user.Username, secretKey)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate new access token")
+	}
+
+	return &pb.RefreshTokenResponse{AccessToken: newAccessToken}, nil
 }
