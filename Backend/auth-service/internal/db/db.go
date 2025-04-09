@@ -2,7 +2,7 @@
 package db
 
 import (
-	"Rewind/auth-service/internal/app/models"
+	"Rewind-auth-service/internal/app/models"
 	"fmt"
 	"log"
 	"os"
@@ -24,12 +24,12 @@ func InitDB() *gorm.DB {
 		dbHost, dbPort, dbUser, dbPassword, dbName)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("Ошибка подключения к БД: %v", err)
+		log.Fatalf("Error while connecting to DB: %v", err)
 	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
-		log.Fatalf("Ошибка получения *sql.DB: %v", err)
+		log.Fatalf("Error while getting *sql.DB: %v", err)
 	}
 
 	// Настройка параметров пула соединений
@@ -39,14 +39,14 @@ func InitDB() *gorm.DB {
 
 	// Проверяем соединение
 	if err := sqlDB.Ping(); err != nil {
-		log.Fatalf("Не удалось подключиться к БД: %v", err)
+		log.Fatalf("Couldn't connect to DB: %v", err)
 	}
 
-	log.Println("Подключение к БД установлено")
+	log.Println("Connected to DB")
 
 	err = db.AutoMigrate(&models.User{}, &models.RefreshToken{})
 	if err != nil {
-		log.Fatal("Ошибка миграции таблиц: ", err)
+		log.Fatal("Tables migration error: ", err)
 	}
 
 	return db

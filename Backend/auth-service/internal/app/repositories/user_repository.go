@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"Rewind/auth-service/internal/app/models"
+	"Rewind-auth-service/internal/app/models"
 	"fmt"
 	"gorm.io/gorm"
 )

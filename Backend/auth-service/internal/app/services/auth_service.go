@@ -1,10 +1,10 @@
 package services
 
 import (
-	"Rewind/auth-service/internal/app/models"
-	"Rewind/auth-service/internal/app/repositories"
-	"Rewind/auth-service/internal/rabbitmq"
-	"Rewind/auth-service/internal/utils"
+	"Rewind-auth-service/internal/app/models"
+	"Rewind-auth-service/internal/app/repositories"
+	"Rewind-auth-service/internal/utils"
+	"Rewind-auth-service/pkg/rabbitmq"
 	"context"
 	"errors"
 	"fmt"
@@ -17,7 +17,7 @@ import (
 	"os"
 	"time"
 
-	pb "Rewind/auth-service/pkg/proto"
+	pb "Rewind-auth-service/pkg/proto"
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 )

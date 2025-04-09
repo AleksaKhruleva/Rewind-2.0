@@ -33,3 +33,6 @@ xcuserdata/
 Tuist/Dependencies/
 Tuist/.build
 Tuist/Cache/
+
+
+/Backend/auth-service/.env
