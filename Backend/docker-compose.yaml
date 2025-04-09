@@ -39,7 +39,7 @@ services:
         condition: service_started
 
 #  group-service:
-#    build: ./Rewind/group-service # Обновленный путь к Dockerfile
+#    build: ./group-service # Обновленный путь к Dockerfile
 #    container_name: rewind-group-service
 #    environment:
 #      DATABASE_URL: postgres://rewind_user:rewind_password@db:5432/rewind_db?sslmode=disable
@@ -52,7 +52,7 @@ services:
 #      - auth-service
 #
 #  memory-service:
-#    build: ./Rewind/memory-service # Обновленный путь к Dockerfile
+#    build: ./memory-service # Обновленный путь к Dockerfile
 #    container_name: rewind-memory-service
 #    environment:
 #      DATABASE_URL: postgres://rewind_user:rewind_password@db:5432/rewind_db?sslmode=disable
@@ -73,16 +73,17 @@ services:
 #      - group-service
 #      - notification-service
 
-#  notification-service:
-#    build: ./Rewind/notification-service # Обновленный путь к Dockerfile
-#    container_name: rewind-notification-service
-#    environment:
-#      RABBITMQ_URL: amqp://rabbitmq:5672
-#      GRPC_PORT: 50053
-#    ports:
-#      - "50053:50053"
-#    depends_on:
-#      - rabbitmq
+  notification-service:
+    build: ./notification-service # Обновленный путь к Dockerfile
+    container_name: rewind-notification-service
+    environment:
+      RABBITMQ_URL: amqp://rabbitmq:5672
+      GRPC_PORT: 50053
+    ports:
+      - "50053:50053"
+    depends_on:
+      rabbitmq:
+        condition: service_started
 
   # --- API Gateway (Nginx) ---
 #  api-gateway:
