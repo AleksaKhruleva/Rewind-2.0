@@ -1,9 +1,9 @@
 package di
 
 import (
-	"Rewind/auth-service/internal/app/repositories"
-	"Rewind/auth-service/internal/app/services"
-	pb "Rewind/auth-service/pkg/proto"
+	"Rewind-auth-service/internal/app/repositories"
+	"Rewind-auth-service/internal/app/services"
+	pb "Rewind-auth-service/pkg/proto"
 	"github.com/go-playground/validator/v10"
 	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"

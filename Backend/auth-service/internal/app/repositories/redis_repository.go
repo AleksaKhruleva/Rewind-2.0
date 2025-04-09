@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"os"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -24,7 +25,8 @@ type RedisRepository struct {
 	client *redis.Client
 }
 
-func InitRedisClient(redisURL string) (*redis.Client, error) {
+func InitRedisClient() (*redis.Client, error) {
+	redisURL := os.Getenv("REDIS_URL")
 	opt, err := redis.ParseURL(redisURL)
 	if err != nil {
 		return nil, err
