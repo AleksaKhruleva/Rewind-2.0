@@ -69,3 +69,10 @@ mocks:
 .PHONY: proto-auth
 proto-auth:
 	cd ./auth-service && protoc --go_out=./pkg --go-grpc_out=./pkg --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative proto/auth.proto
+
+
+# Генерация протофайлов для api-gateway-service из Backend
+.PHONY: proto-api-gateway
+proto-api-gateway:
+	cp ./auth-service/proto/auth.proto ./api-gateway-service/proto
+	cd ./api-gateway-service && protoc --go_out=./pkg --go-grpc_out=./pkg --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative proto/auth.proto
