@@ -50,7 +50,7 @@ public struct GradientModifier: ViewModifier {
 
 #Preview {
     Text("Gradient Text")
-        .font(.system(size: 50, weight: .semibold, design: .rounded))
+        .modifier(RoundFontModifier(size: 50, weight: .bold))
         .modifier(
             GradientModifier(
                 colors: [Color.blue, Color.cyan, Color.indigo],

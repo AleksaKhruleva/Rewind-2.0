@@ -13,6 +13,7 @@ let project = Project(
             bundleId: "io.tuist.Rewind",
             infoPlist: .extendingDefault(
                 with: [
+                    "NSPhotoLibraryUsageDescription": "You can save any rewinds to your gallery!",
                     "UILaunchScreen": [
                         "UIColorName": "",
                         "UIImageName": "",
