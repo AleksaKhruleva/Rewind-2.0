@@ -3,6 +3,7 @@ package services
 import (
 	"Rewind/auth-service/internal/app/models"
 	"Rewind/auth-service/internal/app/repositories"
+	"Rewind/auth-service/internal/rabbitmq"
 	"Rewind/auth-service/internal/utils"
 	"context"
 	"errors"
@@ -62,9 +63,11 @@ func (s *AuthService) StartRegistration(ctx context.Context, req *pb.StartRegist
 		log.Printf("Warning: failed to set expiry for Redis key %s: %v\n", redisKey, err)
 	}
 
-	// TODO: 5. Отправка кода верификации на email пользователя
-	// Вам нужно интегрировать ваш сервис с сервисом отправки email (например, через отдельный Notification Service).
-	fmt.Printf("Verification code for email %s: %s\n", email, verificationCode) // Временный вывод кода для демонстрации
+	err = rabbitmq.PublishVerificationCode(email, verificationCode)
+	if err != nil {
+		log.Printf("Error publishing verification code to RabbitMQ: %v", err)
+		return nil, fmt.Errorf("failed to publish verification code: %w", err)
+	}
 
 	return &pb.StartRegistrationResponse{RegistrationId: registrationID, Success: true}, nil
 }
@@ -309,8 +312,11 @@ func (s *AuthService) ForgotPassword(ctx context.Context, req *pb.ForgotPassword
 	}
 	resetLink := fmt.Sprintf("%s/reset-password?token=%s", frontendURL, url.QueryEscape(resetToken))
 
-	log.Printf("ForgotPassword: Sending reset password link to %s: %s\n", email, resetLink)
-	// TODO: Интегрировать с сервисом отправки email
+	// 6. Отправка ссылки для сброса пароля в сервис уведомлений
+	err = rabbitmq.PublishForgotPasswordEmail(email, resetLink)
+	if err != nil {
+		return nil, fmt.Errorf("failed to send email reset password: %w", err)
+	}
 
 	return &pb.ForgotPasswordResponse{Success: true}, nil
 }
