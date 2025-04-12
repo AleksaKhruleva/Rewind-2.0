@@ -14,26 +14,28 @@ public struct MediaDetailsView: View {
     public init() {}
     
     public var body: some View {
-        ScrollView {
+        VStack {
             header
             
-            VStack(alignment: .leading, spacing: 16) {
-                Image(uiImage: UIComponentsAsset.avatar.image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 380, height: 380)
-                    .cornerRadius(40)
-                
-                author
-                    .padding(.leading)
-                
-                tagsView
-                
-                riskyTable
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    Image(uiImage: UIComponentsAsset.avatar.image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 380, height: 380)
+                        .cornerRadius(40)
+                    
+                    author
+                        .padding(.leading)
+                    
+                    tagsView
+                    
+                    riskyTable
+                }
+                .padding(.horizontal, 12)
             }
-            .padding(.horizontal, 12)
+            .scrollIndicators(.hidden)
         }
-        .scrollIndicators(.hidden)
     }
     
     private var header: some View {
