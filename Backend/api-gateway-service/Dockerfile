@@ -7,15 +7,16 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -ldflags="-s -w" -o notification-service ./cmd/main.go
+RUN go build -ldflags="-s -w" -o api-gateway-service ./cmd/main.go
 
 FROM scratch
 
-COPY --from=builder /app/notification-service /app/
+COPY --from=builder /app/api-gateway-service /app/
 COPY --from=builder /app/.env /app/
+
 
 WORKDIR /app
 
-EXPOSE 50053
+EXPOSE 8080
 
-ENTRYPOINT ["/app/notification-service"]
+ENTRYPOINT ["/app/api-gateway-service"]

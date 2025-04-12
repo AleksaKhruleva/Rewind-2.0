@@ -79,17 +79,15 @@ func ConsumeVerificationCodes(conn *amqp.Connection) {
 		if err != nil {
 			log.Printf("Failed to unmarshal verification code message: %v", err)
 		} else {
-			log.Printf(" [x] Received verification code for: %s, Code: %s", message.Email, message.Code)
-			err := email.SendVerificationEmail(message.Email, message.Code)
-			if err != nil {
-				log.Printf("Couldn't send verification email: %s", err)
-				return
-			}
-			// Подтверждаем обработку сообщения
 			err = d.Ack(false)
 			if err != nil {
 				log.Printf("Failed to acknowledge message: %v", err)
 				return
+			}
+			log.Printf(" [x] Received verification code for: %s, Code: %s", message.Email, message.Code)
+			err := email.SendVerificationEmail(message.Email, message.Code)
+			if err != nil {
+				log.Printf("Couldn't send verification email: %s", err)
 			}
 		}
 	}
@@ -140,18 +138,17 @@ func ConsumePasswordResetEmails(conn *amqp.Connection) {
 		if err != nil {
 			log.Printf("Failed to unmarshal password reset email message: %v", err)
 		} else {
-			log.Printf(" [x] Received password reset request for: %s, Link: %s", message.Email, message.ResetLink)
-			err := email.SendPasswordResetEmail(message.Email, message.ResetLink)
-			if err != nil {
-				log.Printf("Couldn't send password reset email message: %s", err)
-				return
-			}
-
 			// Подтверждаем обработку сообщения
 			err = d.Ack(false)
 			if err != nil {
 				log.Printf("Failed to acknowledge message: %v", err)
 				return
+			}
+
+			log.Printf(" [x] Received password reset request for: %s, Link: %s", message.Email, message.ResetLink)
+			err := email.SendPasswordResetEmail(message.Email, message.ResetLink)
+			if err != nil {
+				log.Printf("Couldn't send password reset email message: %s", err)
 			}
 		}
 	}

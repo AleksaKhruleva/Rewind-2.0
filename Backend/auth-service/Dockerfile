@@ -17,7 +17,6 @@ COPY --from=builder /app/.env /app/
 
 WORKDIR /app
 
-EXPOSE 8080
 EXPOSE 50051
 
 ENTRYPOINT ["/app/auth-service"]
