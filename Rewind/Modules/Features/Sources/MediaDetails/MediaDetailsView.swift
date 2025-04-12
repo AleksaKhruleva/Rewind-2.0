@@ -18,11 +18,7 @@ public struct MediaDetailsView: View {
             header
             
             VStack(alignment: .leading, spacing: 16) {
-                Image(uiImage: UIComponentsAsset.avatar.image)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 380, height: 380)
-                    .cornerRadius(40)
+                rewind
                 
                 author
                     .padding(.leading)
@@ -46,6 +42,17 @@ public struct MediaDetailsView: View {
                 .foregroundColor(UIComponentsAsset.primaryColor.swiftUIColor)
         } rightView: {
             RewindButton(type: .rightChevron) {}
+        }
+    }
+    
+    private var rewind: some View {
+        HStack {
+            Spacer(minLength: 0)
+            Image(uiImage: UIComponentsAsset.avatar.image)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .cornerRadius(40)
+            Spacer(minLength: 0)
         }
     }
     
