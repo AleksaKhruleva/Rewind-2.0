@@ -14,7 +14,7 @@ public struct MediaDetailsView: View {
     public init() {}
     
     public var body: some View {
-        ScrollView {
+        VStack {
             header
             
             VStack(alignment: .leading, spacing: 16) {
@@ -27,9 +27,7 @@ public struct MediaDetailsView: View {
                 
                 riskyTable
             }
-            .padding(.horizontal, 12)
         }
-        .scrollIndicators(.hidden)
     }
     
     private var header: some View {
