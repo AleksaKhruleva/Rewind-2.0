@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct VStackPositionModifier: ViewModifier {
+public struct VStackTopOffsetModifier: ViewModifier {
     private let topOffsetRatio: CGFloat
     
     public init(topOffsetRatio: CGFloat) {
@@ -9,14 +9,14 @@ public struct VStackPositionModifier: ViewModifier {
     
     public func body(content: Content) -> some View {
         GeometryReader { geometry in
-            content
-                .frame(maxWidth: .infinity)
-                .position(
-                    x: geometry.size.width / 2,
-                    y: geometry.size.height * topOffsetRatio
-                )
+            VStack(spacing: 0) {
+                Spacer().frame(height: geometry.size.height * topOffsetRatio)
+                content
+                    .frame(maxWidth: .infinity, alignment: .center)
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
@@ -26,7 +26,7 @@ public struct VStackPositionModifier: ViewModifier {
         Text("test2")
     }
     .modifier(
-        VStackPositionModifier(
+        VStackTopOffsetModifier(
             topOffsetRatio: AuthConstants.contentTopOffsetRatio
         )
     )

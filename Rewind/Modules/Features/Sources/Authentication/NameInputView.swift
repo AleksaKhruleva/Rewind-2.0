@@ -1,8 +1,8 @@
 import SwiftUI
 import UIComponents
 
-public struct PasswordInputView: View {
-    @State private var password: String = ""
+public struct NameInputView: View {
+    @State private var name: String = ""
     @FocusState private var isFocused: Bool
     
     public init() { }
@@ -15,18 +15,17 @@ public struct PasswordInputView: View {
             .modifier(BackButtonPositionModifier())
             
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
-                Text("Enter your password")
+                Text("What's your name?")
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
                 
                 StyledTextField(
-                    text: $password,
-                    placeholder: "password",
-                    isSecure: true
+                    text: $name,
+                    placeholder: "name"
                 )
                 .multilineTextAlignment(.center)
                 .focused($isFocused)
             }
-            .modifier(VStackPositionModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
+            .modifier(VStackTopOffsetModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
         }
         .onAppear {
             isFocused = true
@@ -37,5 +36,5 @@ public struct PasswordInputView: View {
 }
 
 #Preview {
-    PasswordInputView()
+    NameInputView()
 }
