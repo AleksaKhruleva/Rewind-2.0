@@ -40,7 +40,7 @@ public struct CodeInputView: View {
                 
                 CodeView(code: $code, isFocused: _isFocused)
             }
-            .modifier(VStackPositionModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
+            .modifier(VStackTopOffsetModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
         }
         .onAppear {
             isFocused = true

@@ -30,7 +30,7 @@ public struct TagInputView: View {
                     dismiss()
                 }
             }
-            .modifier(VStackPositionModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
+            .modifier(VStackTopOffsetModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
         }
         .onAppear {
             isFocused = true

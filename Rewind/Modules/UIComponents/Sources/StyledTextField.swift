@@ -6,8 +6,8 @@ public struct StyledTextField: View {
     private let keyboardType: UIKeyboardType
     private let submitLabel: SubmitLabel
     private let isSecure: Bool
-    private let frameWidth: CGFloat
-    private let frameHeight: CGFloat
+    private let frameWidth: CGFloat?
+    private let frameHeight: CGFloat?
     
     public init(
         text: Binding<String>,
@@ -15,8 +15,8 @@ public struct StyledTextField: View {
         keyboardType: UIKeyboardType = .default,
         submitLabel: SubmitLabel = .done,
         isSecure: Bool = false,
-        frameWidth: CGFloat = .infinity,
-        frameHeight: CGFloat = .infinity
+        frameWidth: CGFloat? = nil,
+        frameHeight: CGFloat? = nil
     ) {
         self._text = text
         self.placeholder = placeholder

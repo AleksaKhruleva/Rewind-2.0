@@ -11,7 +11,7 @@ public struct WelcomeView: View {
             VStack {
                 GradientTitle(text: "Rewind", fontSize: 80)
             }
-            .modifier(VStackPositionModifier(topOffsetRatio: 0.39))
+            .modifier(VStackTopOffsetModifier(topOffsetRatio: 0.39))
             
             VStack(spacing: 12) {
                 GradientButton(title: "Sing in", width: textWidth) {
@@ -22,11 +22,11 @@ public struct WelcomeView: View {
                     // TODO: do something later
                 } label: {
                     Text("Have an account?")
-                        .modifier(RoundFontModifier(size: 20, foregroundColor: Color(hex: "FF6DB6")))
+                        .modifier(RoundFontModifier(size: 20, foregroundColor: UIComponentsAsset.lightPinkColor.swiftUIColor))
                         .modifier(MeasureWidthModifier(width: $textWidth))
                 }
             }
-            .modifier(VStackPositionModifier(topOffsetRatio: 0.91))
+            .modifier(VStackTopOffsetModifier(topOffsetRatio: 0.87))
         }
     }
 }

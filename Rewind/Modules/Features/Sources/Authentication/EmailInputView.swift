@@ -1,11 +1,14 @@
 import SwiftUI
 import UIComponents
 
-public struct NameInputView: View {
-    @State private var name: String = ""
+public struct EmailInputView: View {
+    @State private var email: String = ""
     @FocusState private var isFocused: Bool
+    private let flow: AuthFlow
     
-    public init() { }
+    public init(flow: AuthFlow) {
+        self.flow = flow
+    }
     
     public var body: some View {
         ZStack(alignment: .topLeading) {
@@ -15,17 +18,18 @@ public struct NameInputView: View {
             .modifier(BackButtonPositionModifier())
             
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
-                Text("What's your name?")
+                Text("What's your email?")
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
                 
                 StyledTextField(
-                    text: $name,
-                    placeholder: "name"
+                    text: $email,
+                    placeholder: "email@email.ru",
+                    keyboardType: .emailAddress
                 )
                 .multilineTextAlignment(.center)
                 .focused($isFocused)
             }
-            .modifier(VStackPositionModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
+            .modifier(VStackTopOffsetModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
         }
         .onAppear {
             isFocused = true
@@ -36,5 +40,5 @@ public struct NameInputView: View {
 }
 
 #Preview {
-    NameInputView()
+    EmailInputView(flow: .registration)
 }
