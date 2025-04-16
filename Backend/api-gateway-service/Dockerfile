@@ -7,16 +7,16 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -ldflags="-s -w" -o auth-service ./cmd/main.go
+RUN go build -ldflags="-s -w" -o api-gateway-service ./cmd/main.go
 
 FROM scratch
 
-COPY --from=builder /app/auth-service /app/
+COPY --from=builder /app/api-gateway-service /app/
 COPY --from=builder /app/.env /app/
 
 
 WORKDIR /app
 
-EXPOSE 50051
+EXPOSE 8080
 
-ENTRYPOINT ["/app/auth-service"]
+ENTRYPOINT ["/app/api-gateway-service"]

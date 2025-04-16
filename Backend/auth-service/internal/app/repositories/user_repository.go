@@ -85,7 +85,7 @@ func (r *UserRepository) GetRefreshToken(tx *gorm.DB, refreshToken string) (*mod
 		tx = r.db
 	}
 	var token models.RefreshToken
-	result := tx.Where("refresh_token = ?", refreshToken).First(&token)
+	result := tx.Where("token = ?", refreshToken).First(&token)
 	return &token, result.Error
 }
 

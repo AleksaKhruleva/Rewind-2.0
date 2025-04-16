@@ -35,5 +35,4 @@ Tuist/.build
 Tuist/Cache/
 
 
-/Backend/auth-service/.env
-/Backend/notification-service/.env
+*/.env

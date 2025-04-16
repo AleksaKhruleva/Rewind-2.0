@@ -26,6 +26,7 @@ func sendEmail(toEmail, subject, body string) error {
 		"\r\n" +
 		body + "\r\n")
 
+	log.Println("Sending email to ", toEmail)
 	err := smtp.SendMail(addr, auth, fromEmail, []string{toEmail}, msg)
 	if err != nil {
 		return fmt.Errorf("failed to send email: %w", err)

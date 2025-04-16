@@ -2,11 +2,15 @@ package main
 
 import (
 	"Rewind-notification-service/pkg/rabbitmq"
+	"github.com/joho/godotenv"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
 )
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Println("Error loading .env file")
+	}
 	conn, err := rabbitmq.Connect()
 	if err != nil {
 		log.Fatalf("Failed to connect to RabbitMQ: %v", err)

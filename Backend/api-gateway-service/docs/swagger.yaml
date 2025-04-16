@@ -1,0 +1,373 @@
+definitions:
+  requests.ForgotPasswordRequest:
+    properties:
+      email:
+        type: string
+    type: object
+  requests.LoginRequest:
+    properties:
+      identifier:
+        type: string
+      password:
+        type: string
+    type: object
+  requests.LogoutRequest:
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  requests.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  requests.ResetPasswordRequest:
+    properties:
+      new_password:
+        type: string
+      token:
+        type: string
+    type: object
+  requests.SetPasswordAndUsernameRequest:
+    properties:
+      password:
+        type: string
+      registration_id:
+        type: string
+      username:
+        type: string
+    type: object
+  requests.StartRegistrationRequest:
+    properties:
+      email:
+        type: string
+    type: object
+  requests.VerifyEmailCodeRequest:
+    properties:
+      registration_id:
+        type: string
+      verification_code:
+        type: string
+    type: object
+  responses.ForgotPasswordResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+  responses.LoginResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  responses.LogoutResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+  responses.RefreshTokenResponse:
+    properties:
+      access_token:
+        type: string
+    type: object
+  responses.ResetPasswordResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+  responses.SetPasswordAndUsernameResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  responses.StartRegistrationResponse:
+    properties:
+      registration_id:
+        description: Unique ID to track the registration process
+        type: string
+      success:
+        type: boolean
+    type: object
+  responses.VerifyEmailCodeResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is the API Gateway for the Rewind application.
+  title: Rewind API Gateway
+  version: "1.0"
+paths:
+  /api/auth/forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: Sends a password reset link to the user's email.
+      parameters:
+      - description: User email for password reset
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.ForgotPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.ForgotPasswordResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Request password reset
+      tags:
+      - auth
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Logs in an existing user.
+      parameters:
+      - description: Login credentials
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: User login
+      tags:
+      - auth
+  /api/auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logs out a user by invalidating the refresh token.
+      parameters:
+      - description: Refresh token to invalidate
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.LogoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.LogoutResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: User logout
+      tags:
+      - auth
+  /api/auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Refreshes the access token using a refresh token.
+      parameters:
+      - description: Refresh token
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.RefreshTokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Refresh access token
+      tags:
+      - auth
+  /api/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Initiates the user registration process by sending a verification
+        email.
+      parameters:
+      - description: User email for registration
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.StartRegistrationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.StartRegistrationResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Start user registration (First stage of registration)
+      tags:
+      - auth
+  /api/auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Resets the user's password using a reset token.
+      parameters:
+      - description: Password reset details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.ResetPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.ResetPasswordResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Reset password
+      tags:
+      - auth
+  /api/auth/set-password:
+    post:
+      consumes:
+      - application/json
+      description: Sets the user's password and username after email verification.
+      parameters:
+      - description: Password and username details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.SetPasswordAndUsernameRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.SetPasswordAndUsernameResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Set password and username (Third stage of registration)
+      tags:
+      - auth
+  /api/auth/verify-email:
+    post:
+      consumes:
+      - application/json
+      description: Verifies the email verification code sent to the user.
+      parameters:
+      - description: Verification details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.VerifyEmailCodeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.VerifyEmailCodeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Verify email code (Second stage of registration)
+      tags:
+      - auth
+swagger: "2.0"

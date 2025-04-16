@@ -21,6 +21,31 @@ services:
       - db_data:/var/lib/postgresql/data
 
   # --- Сервисы Go ---
+
+  api-gateway-service:
+    build: ./api-gateway-service # Путь к Dockerfile для api-gateway-service
+    container_name: rewind-api-gateway-service
+    environment:
+      API_GATEWAY_PORT: "8080"
+      AUTH_SERVICE_GRPC_ADDRESS: rewind-auth-service:50051
+      # Добавьте здесь адреса gRPC других сервисов по мере их появления
+      # GROUP_SERVICE_GRPC_ADDRESS: rewind-group-service:50052
+      # MEMORY_SERVICE_GRPC_ADDRESS: rewind-memory-service:50053
+      # NOTIFICATION_SERVICE_GRPC_ADDRESS: rewind-notification-service:50054
+    ports:
+      - "8080:8080" # Или другой порт по вашему выбору для доступа к API Gateway
+    depends_on:
+      auth-service:
+        condition: service_started
+      # Добавьте зависимости от других сервисов по мере необходимости
+      # rewind-group-service:
+      #   condition: service_started
+      # rewind-memory-service:
+      #   condition: service_started
+      # rewind-notification-service:
+      #   condition: service_started
+
+
   auth-service:
     build: ./auth-service # Обновленный путь к Dockerfile
     container_name: rewind-auth-service
@@ -28,7 +53,6 @@ services:
       DATABASE_URL: postgres://rewind_user:rewind_password@db:5432/rewind_db?sslmode=disable
       GRPC_PORT: ":50051"
     ports:
-      - "8081:8080"
       - "50051:50051"
     depends_on:
       db:
@@ -83,7 +107,7 @@ services:
       - "50053:50053"
     depends_on:
       rabbitmq:
-        condition: service_started
+        condition: service_healthy
 
   # --- API Gateway (Nginx) ---
 #  api-gateway:
@@ -107,6 +131,12 @@ services:
       - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "status" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
 
   redis:
     image: redis:7-alpine

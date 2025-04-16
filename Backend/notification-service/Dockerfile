@@ -9,8 +9,10 @@ COPY . .
 
 RUN go build -ldflags="-s -w" -o notification-service ./cmd/main.go
 
-FROM scratch
+FROM alpine:latest
+# Используем Alpine, который включает CA-сертификаты
 
+# Копируем скомпилированное приложение и конфигурационные файлы
 COPY --from=builder /app/notification-service /app/
 COPY --from=builder /app/.env /app/
 
