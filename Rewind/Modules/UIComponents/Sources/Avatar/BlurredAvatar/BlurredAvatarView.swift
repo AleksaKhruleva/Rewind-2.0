@@ -4,6 +4,9 @@ public struct BlurredAvatarView: View {
     @State private var image: UIImage?
     @State private var showPicker: Bool = false
     @Binding var isPresented: Bool
+    
+    @Environment(\.showToast)
+    private var showToast
 
     public init(image: UIImage, isPresented: Binding<Bool>) {
         self.image = image
@@ -35,7 +38,9 @@ public struct BlurredAvatarView: View {
             BlurredAvatarTable(
                 showPicker: $showPicker,
                 saveImage: {
-                    // TODO: smth
+                    saveImageWithToast(image: image) { message in
+                        showToast(message)
+                    }
                 }
             )
         }

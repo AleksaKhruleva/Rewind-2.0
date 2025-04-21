@@ -3,12 +3,15 @@ import SwiftUI
 public struct BlurredMediaView: View {
     @State private var image: UIImage
     @Binding var isPresented: Bool
+    
+    @Environment(\.showToast)
+    private var showToast
 
     public init(image: UIImage, isPresented: Binding<Bool>) {
         self.image = image
         self._isPresented = isPresented
     }
-
+    
     public var body: some View {
       Color.black.opacity(0.05)
           .background(BlurView())
@@ -32,7 +35,7 @@ public struct BlurredMediaView: View {
                     RewindMediaButtonsOverlay {
                         // TODO: smth
                     } saveAction: {
-                        ImageSaver.shared.writeToPhotoAlbum(image: image)
+                        saveImage(image: image)
                     }
                 }
                 
@@ -80,9 +83,7 @@ public struct BlurredMediaView: View {
                 icon: "square.and.arrow.down.fill",
                 title: "Save Image",
                 needChevron: true,
-                action: {
-                    // TODO: smth
-                }
+                action: { saveImage(image: image) }
             )
         }
         .background(.white)
@@ -101,6 +102,12 @@ public struct BlurredMediaView: View {
         )
         .background(UIComponentsAsset.riskyTableBackgroundColor.swiftUIColor)
         .modifier(BlurredMediaTableModifier())
+    }
+    
+    private func saveImage(image: UIImage) {
+        saveImageWithToast(image: image) { message in
+            showToast(message)
+        }
     }
 }
 
