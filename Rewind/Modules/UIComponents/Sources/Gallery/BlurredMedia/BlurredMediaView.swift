@@ -3,13 +3,19 @@ import SwiftUI
 public struct BlurredMediaView: View {
     @State private var image: UIImage
     @Binding var isPresented: Bool
+    var showMediaDetails: (UIImage) -> Void
     
     @Environment(\.showToast)
     private var showToast
 
-    public init(image: UIImage, isPresented: Binding<Bool>) {
+    public init(
+        image: UIImage,
+        isPresented: Binding<Bool>,
+        showMediaDetails: @escaping (UIImage) -> Void
+    ) {
         self.image = image
         self._isPresented = isPresented
+        self.showMediaDetails = showMediaDetails
     }
     
     public var body: some View {
@@ -18,7 +24,7 @@ public struct BlurredMediaView: View {
           .ignoresSafeArea()
           .onTapGesture {
               withAnimation {
-                  isPresented.toggle()
+                  isPresented = false
               }
           }
           .overlay(
@@ -43,6 +49,7 @@ public struct BlurredMediaView: View {
                 
             riskyCell
         }
+        .padding(.horizontal, 8)
     }
     
     private var author: some View {
@@ -58,14 +65,7 @@ public struct BlurredMediaView: View {
     }
     
     private var mediaView: some View {
-        Image(uiImage: image)
-            .resizable()
-            .aspectRatio(contentMode: .fill)
-            .frame(
-                width: 380,
-                height: 380
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 40))
+        Rectangle().toSquare(image, cornerRadius: 40)
     }
     
     private var actionsTable: some View {
@@ -74,9 +74,7 @@ public struct BlurredMediaView: View {
                 icon: "gearshape.fill",
                 title: "Media details",
                 needChevron: true,
-                action: {
-                    // TODO: smth
-                }
+                action: { showMediaDetails(image) }
             )
             
             BlurredTableCell(
@@ -114,13 +112,6 @@ public struct BlurredMediaView: View {
 struct BlurredMediaTableModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .frame(width: 380)
             .cornerRadius(18)
     }
-}
-
-#Preview {
-    BlurredMediaView(
-        image: UIComponentsAsset.media10.image,
-        isPresented: Binding.constant(true))
 }
