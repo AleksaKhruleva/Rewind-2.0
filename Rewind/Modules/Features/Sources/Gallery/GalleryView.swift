@@ -4,6 +4,7 @@ import UIComponents
 public struct GalleryView: View {
     @State private var isBlurredMediaPresented = false
     @State private var selectedMedia: UIImage?
+    @Environment(GalleryRouter.self) var router
     
     public init() {}
     
@@ -40,7 +41,6 @@ public struct GalleryView: View {
             .scrollIndicators(.hidden)
             .safeAreaInset(edge: .bottom) {
                 ZStack(alignment: .bottom) {
-                    
                     footer
                 }
             }
@@ -51,7 +51,8 @@ public struct GalleryView: View {
             if let selectedMedia, isBlurredMediaPresented {
                 BlurredMediaView(
                     image: selectedMedia,
-                    isPresented: $isBlurredMediaPresented
+                    isPresented: $isBlurredMediaPresented,
+                    showMediaDetails: router.navigateToMediaDetails
                 )
             }
         }

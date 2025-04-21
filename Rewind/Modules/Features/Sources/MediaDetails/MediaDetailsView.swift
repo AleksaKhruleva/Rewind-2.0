@@ -2,56 +2,54 @@ import SwiftUI
 import UIComponents
 
 public struct MediaDetailsView: View {
-    @State var tags = [
-        "Ninetendo",
-        "XBox",
-        "PlayStatio",
-        "PlayStation 2",
-        "PlayStation 33333333",
-        "PlayStation 4"
-      ]
+    @State var tags: [String] = []
+    var image: UIImage
+    
+    @Environment(\.dismiss) private var dismiss
 
-    public init() {}
+    public init(image: UIImage) {
+        self.image = image
+    }
     
     public var body: some View {
         VStack {
             header
             
-            VStack(alignment: .leading, spacing: 16) {
-                rewind
-                
-                author
-                    .padding(.leading)
-                
-                tagsView
-                
-                riskyTable
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    rewind
+                    
+                    author
+                        .padding(.leading)
+                    
+                    tagsView
+                    
+                    riskyTable
+                }
+                .ignoresSafeArea()
             }
+            .scrollIndicators(.hidden)
+            .scrollBounceBehavior(.basedOnSize)
+            .padding(.horizontal, 8)
         }
+        .navigationBarHidden(true)
     }
     
     private var header: some View {
         RewindHeader {
-            RewindButton(type: .rightChevron) {}
-                .hidden()
+            RewindButton(type: .leftChevron) { dismiss() }
         } centerView: {
             Text("Media details")
                 .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .bold))
                 .foregroundColor(UIComponentsAsset.primaryColor.swiftUIColor)
         } rightView: {
-            RewindButton(type: .rightChevron) {}
+            RewindButton(type: .leftChevron) {}
+                .hidden()
         }
     }
     
     private var rewind: some View {
-        HStack {
-            Spacer(minLength: 0)
-            Image(uiImage: UIComponentsAsset.avatar.image)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .cornerRadius(40)
-            Spacer(minLength: 0)
-        }
+        Rectangle().toSquare(image, cornerRadius: 40)
     }
     
     private var author: some View {
@@ -96,5 +94,5 @@ public struct MediaDetailsView: View {
 }
 
 #Preview {
-    MediaDetailsView()
+    MediaDetailsView(image: UIComponentsAsset.avatar.image)
 }
