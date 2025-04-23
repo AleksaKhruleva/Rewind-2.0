@@ -8,9 +8,10 @@ struct SquareImageModifier: ViewModifier {
         self.cornerRadius = cornerRadius
         self.image = image
     }
-
+    
     func body(content: Content) -> some View {
         content
+            .foregroundStyle(.clear)
             .aspectRatio(1, contentMode: .fit)
             .overlay(
                 Image(uiImage: image)
