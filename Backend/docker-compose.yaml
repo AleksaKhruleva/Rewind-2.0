@@ -110,17 +110,51 @@ services:
         condition: service_healthy
 
   # --- API Gateway (Nginx) ---
-#  api-gateway:
-#    image: nginx:latest
-#    container_name: rewind-api-gateway
-#    ports:
-#      - "80:80"
-#    volumes:
-#      - ./Rewind/api-gateway/nginx.conf:/etc/nginx/nginx.conf:ro # Обновленный путь к nginx.conf
-#    depends_on:
-#      - auth-service
-#      - group-service
-#      - memory-service
+  nginx:
+    image: nginx:stable-alpine
+    container_name: rewind-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # Монтируем наш файл конфигурации сайта внутрь контейнера Nginx
+      # Он будет прочитан Nginx'ом
+      - ./nginx/conf/rewindapp.ru.conf:/etc/nginx/conf.d/rewindapp.ru.conf:ro
+      # Монтируем тома для хранения сертификатов Let's Encrypt и файлов конфигурации Certbot
+      # Nginx будет читать сертификаты из этих томов
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      # Монтируем том для прохождения проверки домена Certbot'ом (Webroot)
+      # Nginx должен отдавать файлы из этой директории по адресу /.well-known/acme-challenge/
+      - www-data:/var/www/certbot
+
+    depends_on:
+      # Nginx зависит от сервиса приложения, который он проксирует
+      - api-gateway-service
+
+
+  # --- Certbot ---
+  # Этот сервис используется для получения и продления сертификатов
+  # Он не работает постоянно, а запускается по мере необходимости
+  certbot:
+    image: certbot/certbot # Используем официальный образ Certbot
+    container_name: rewind-certbot
+    volumes:
+      # Монтируем те же тома, что и Nginx, чтобы certbot мог писать сертификаты и читать настройки
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      # Монтируем тот же том для прохождения проверки домена (Certbot будет писать сюда файлы)
+      - www-data:/var/www/certbot
+      # Опционально: можно смонтировать конфиги Nginx, если Certbot используется с плагином --nginx
+      # но метод --webroot проще в Docker. Если используете --webroot, этот том не нужен:
+      # - ./nginx/conf:/etc/nginx/conf.d:ro
+
+    depends_on:
+      # Certbot должен быть запущен, когда Nginx готов принимать запросы для проверки домена по 80 порту
+      - nginx
+
+    # Команда Certbot запускается вручную или через скрипт/cron
+    # Сам контейнер не должен быть запущен в обычном compose up -d
 
   # --- Очередь сообщений ---
   rabbitmq:
@@ -175,5 +209,8 @@ volumes:
   db_data:
   rabbitmq_data:
   redis_data:
+  certbot-etc:
+  certbot-var:
+  www-data:
 #  prometheus_data:
 #  grafana_data:
