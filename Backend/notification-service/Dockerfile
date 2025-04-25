@@ -21,3 +21,4 @@ WORKDIR /app
 EXPOSE 50053
 
 ENTRYPOINT ["/app/notification-service"]
+
