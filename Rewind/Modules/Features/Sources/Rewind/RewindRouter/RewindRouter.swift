@@ -1,32 +1,21 @@
 import SwiftUI
 
-@Observable
-final class RewindRouter {
-    enum Route: Hashable {
-        case mediaDetails(UIImage)
-        case account
-        case gallery
-    }
+public final class RewindRouter {
+    private weak var appRouter: AppRouter?
     
-    var path = NavigationPath()
-    
-    func navigateToMediaDetails(image: UIImage) {
-        path.append(Route.mediaDetails(image))
-    }
-    
-    func navigateToAccount() {
-        path.append(Route.account)
+    public init(appRouter: AppRouter) {
+        self.appRouter = appRouter
     }
     
     func navigateToGallery() {
-        path.append(Route.gallery)
+        appRouter?.navigate(to: .gallery)
     }
     
-    func popBack() {
-        path.removeLast()
+    func navigateToAccount() {
+        appRouter?.navigate(to: .account)
     }
     
-    func popToRoot() {
-        path.removeLast(path.count)
+    func navigateToMediaDetails(_ image: UIImage) {
+        appRouter?.navigate(to: .mediaDetails(image))
     }
 }

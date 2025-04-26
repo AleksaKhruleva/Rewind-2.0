@@ -22,7 +22,7 @@ public struct BlurredAvatarView: View {
           .ignoresSafeArea()
           .onTapGesture {
               withAnimation {
-                  isPresented.toggle()
+                  isPresented = false
               }
           }
           .customImagePicker(show: $showPicker, croppedImage: $image)

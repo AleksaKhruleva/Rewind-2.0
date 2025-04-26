@@ -25,7 +25,7 @@ public struct TagsSectionView: View {
                 Spacer()
                 
                 Button("autogenerate") {
-                    tags.shuffle()
+                    withAnimation { tags.shuffle() }
                 }
                 .buttonStyle(.plain)
                 .foregroundColor(UIComponentsAsset.pinkColor.swiftUIColor)

@@ -4,9 +4,15 @@ import UIComponents
 public struct GalleryView: View {
     @State private var isBlurredMediaPresented = false
     @State private var selectedMedia: UIImage?
-    @Environment(GalleryRouter.self) var router
     
-    public init() {}
+    let router: GalleryRouter
+    
+    @Environment(\.dismiss)
+    private var dismiss
+    
+    public init(router: GalleryRouter) {
+        self.router = router
+    }
     
     public var body: some View {
         VStack(spacing: 0) {
@@ -78,9 +84,7 @@ public struct GalleryView: View {
                 
                 Spacer()
                 
-                RewindMediaButton(size: 60, fontSize: 28, type: .rewind) {
-                    print("plus")
-                }
+                RewindMediaButton(size: 60, fontSize: 28, type: .rewind) { dismiss() }
                 
                 Spacer()
                 
@@ -95,8 +99,4 @@ public struct GalleryView: View {
             }
         }
     }
-}
-
-#Preview {
-    GalleryView()
 }

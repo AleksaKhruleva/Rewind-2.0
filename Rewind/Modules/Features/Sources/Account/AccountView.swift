@@ -6,6 +6,9 @@ public struct AccountView: View {
     @StateObject private var appIconsViewModel = AppIconsViewModel()
     @State private var isBlurredAvatarPresented = false
 
+    @Environment(\.dismiss)
+    private var dismiss
+    
     public init() {}
     
     public var body: some View {
@@ -16,8 +19,8 @@ public struct AccountView: View {
                 VStack(spacing: 15) {
                     avatar
                         .onTapGesture {
-                            withAnimation {
-                                isBlurredAvatarPresented.toggle()
+                            withAnimation(.spring(response: 0.2)) {
+                                isBlurredAvatarPresented = true
                             }
                         }
                     
@@ -57,9 +60,7 @@ public struct AccountView: View {
     
     var header: some View {
         RewindHeader {
-            RewindButton(type: .leftChevron) {
-                print(1)
-            }
+            RewindButton(type: .leftChevron) { dismiss() }
         } centerView: {
             HeaderBadgeView(
                 image: UIComponentsAsset.avatar.image,
