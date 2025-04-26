@@ -13,11 +13,11 @@ public struct AvatarView: View {
         VStack {
             Image(uiImage: image)
                 .resizable()
-                .aspectRatio(contentMode: .fit)
+                .aspectRatio(contentMode: .fill)
                 .frame(width: 130, height: 130)
                 .cornerRadius(65)
             
-            Text("flowykk")
+            Text(text)
                 .foregroundColor(UIComponentsAsset.primaryColor.swiftUIColor)
                 .modifier(RoundFontModifier(size: AccountConstants.avatarTextFontSize, weight: .black))
         }
@@ -26,4 +26,8 @@ public struct AvatarView: View {
 
 #Preview {
     AvatarView(image: UIImage(named: "avatar"), text: "flowykk")
+    AvatarView(
+        image: UIComponentsAsset.matthewMcConaughey.image,
+        text: "Matthew"
+    )
 }
