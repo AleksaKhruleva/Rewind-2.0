@@ -19,6 +19,7 @@ struct SquareImageModifier: ViewModifier {
                     .scaledToFill()
             )
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+            .contentShape(RoundedRectangle(cornerRadius: cornerRadius))
     }
 }
 
