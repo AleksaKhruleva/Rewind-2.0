@@ -27,7 +27,7 @@ struct QuoteCreationView: View {
                     
                     generalTable
                     
-                    tagsView
+                    TagsSectionView(tags: $viewModel.tags)
                 }
             }
             .scrollIndicators(.hidden)
@@ -55,8 +55,7 @@ struct QuoteCreationView: View {
                 }
             }
             .foregroundColor(.red)
-            .opacity(viewModel.quoteState == .empty ? 0.5 : 1)
-            .disabled(viewModel.quoteState == .empty)
+            .disabledWithOpacity(viewModel.quoteState == .empty)
         }
     }
     
@@ -135,37 +134,7 @@ struct QuoteCreationView: View {
             .background(UIComponentsAsset.tableBackgroundColor.swiftUIColor)
             .cornerRadius(24)
         }
-        .opacity(viewModel.quoteState == .empty ? 0.5 : 1)
-        .disabled(viewModel.quoteState == .empty)
-    }
-    
-    private var tagsView: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Text("Tags")
-                    .foregroundColor(UIComponentsAsset.tableNameTextColor.swiftUIColor)
-                    .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .black))
-                    .padding(.leading, 16)
-                
-                Text("\(viewModel.tags.count)/5")
-                    .foregroundColor(UIComponentsAsset.secondaryColor.swiftUIColor)
-                    .modifier(RoundFontModifier(size: 14, weight: .black))
-                    .padding(.leading, 4)
-                
-                Spacer()
-                
-                Text("autogenerate")
-                    .foregroundColor(UIComponentsAsset.pinkColor.swiftUIColor)
-                    .modifier(RoundFontModifier(size: 14, weight: .black))
-                    .padding(.trailing, 16)
-                    .opacity(viewModel.tags.isEmpty ? 0.5 : 1)
-                    .onTapGesture {
-                        viewModel.tags.shuffle()
-                    }
-            }
-            
-            TagsView(tags: $viewModel.tags)
-        }
+        .disabledWithOpacity(viewModel.quoteState == .empty)
     }
     
     private var continueButton: some View {
@@ -180,7 +149,7 @@ struct QuoteCreationView: View {
             showToast("Your quote was saved successfully! 💬")
             dismiss()
         }
-        .opacity(viewModel.quoteState == .empty ? 0.5 : 1)
+        .disabledWithOpacity(viewModel.quoteState == .empty)
     }
 }
 

@@ -22,7 +22,7 @@ public struct MediaDetailsView: View {
                     author
                         .padding(.leading)
                     
-                    tagsView
+                    TagsSectionView(tags: $tags)
                     
                     riskyTable
                 }
@@ -57,35 +57,6 @@ public struct MediaDetailsView: View {
             name: "flowykk",
             date: "23.11.2024"
         )
-    }
-    
-    private var tagsView: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Text("Tags")
-                    .foregroundColor(UIComponentsAsset.tableNameTextColor.swiftUIColor)
-                    .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .black))
-                    .padding(.leading, 16)
-                
-                Text("\(tags.count)/5")
-                    .foregroundColor(UIComponentsAsset.secondaryColor.swiftUIColor)
-                    .modifier(RoundFontModifier(size: 14, weight: .black))
-                    .padding(.leading, 4)
-                
-                Spacer()
-                
-                Text("autogenerate")
-                    .foregroundColor(UIComponentsAsset.pinkColor.swiftUIColor)
-                    .modifier(RoundFontModifier(size: 14, weight: .black))
-                    .padding(.trailing, 16)
-                    .opacity(tags.isEmpty ? 0.5 : 1)
-                    .onTapGesture {
-                        tags.shuffle()
-                    }
-            }
-            
-            TagsView(tags: $tags)
-        }
     }
     
     private var riskyTable: some View {

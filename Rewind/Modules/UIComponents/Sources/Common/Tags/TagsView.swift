@@ -1,15 +1,11 @@
 import SwiftUI
 
-public struct TagsView: View {
+struct TagsView: View {
     @Binding var tags: [String]
     @State private var totalHeight = CGFloat.zero
     @State private var tagInputPresented = false
-    
-    public init (tags: Binding<[String]>) {
-        self._tags = tags
-    }
 
-    public var body: some View {
+    var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             GeometryReader { geometry in
                 self.generateContent(in: geometry)
@@ -76,8 +72,7 @@ public struct TagsView: View {
                 .onTapGesture {
                     tagInputPresented = true
                 }
-                .opacity(tags.count < 5 ? 1 : 0.5)
-                .disabled(tags.count >= 5)
+                .disabledWithOpacity(tags.count >= maxTags)
         }
         .onGeometryChange(for: CGSize.self) { proxy in
             return proxy.size
@@ -118,7 +113,6 @@ public struct TagsView: View {
         "XBox",
         "PlayStatio",
         "PlayStation 2",
-//        "PlayStation 33333333",
         "PlayStation 4ddd"
       ]))
 }
