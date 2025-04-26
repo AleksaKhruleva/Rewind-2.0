@@ -60,7 +60,7 @@ stop:
 
 .PHONY: swagger
 swagger:
-	swag init -g api-gateway-service/cmd/main.go
+	cd ./api-gateway-service && swag init -g cmd/main.go
 
 # Генерация моков
 .PHONY: mocks

@@ -99,7 +99,7 @@ func (h *AuthHandler) VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} responses.SetPasswordAndUsernameResponse
 // @Failure 400 {object} map[string]string
 // @Failure 500 {object} map[string]string
-// @Router /api/auth/set-password [post]
+// @Router /api/auth/finish-register [post]
 func (h *AuthHandler) SetPasswordAndUsername(w http.ResponseWriter, r *http.Request) {
 	var req requests.SetPasswordAndUsernameRequest
 	if err := decodeJSONBody(r, &req); err != nil {
