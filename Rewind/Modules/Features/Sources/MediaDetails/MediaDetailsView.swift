@@ -32,7 +32,6 @@ public struct MediaDetailsView: View {
             .scrollBounceBehavior(.basedOnSize)
             .padding(.horizontal, 8)
         }
-        .navigationBarHidden(true)
     }
     
     private var header: some View {
@@ -79,6 +78,7 @@ public struct MediaDetailsView: View {
                     .foregroundColor(UIComponentsAsset.pinkColor.swiftUIColor)
                     .modifier(RoundFontModifier(size: 14, weight: .black))
                     .padding(.trailing, 16)
+                    .opacity(tags.isEmpty ? 0.5 : 1)
                     .onTapGesture {
                         tags.shuffle()
                     }

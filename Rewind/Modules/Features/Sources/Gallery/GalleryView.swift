@@ -10,7 +10,14 @@ public struct GalleryView: View {
     
     public var body: some View {
         VStack(spacing: 0) {
-            GalleryHeader(image: UIComponentsAsset.media5.image, groupName: "Group name")
+            GalleryHeader(
+                image: UIComponentsAsset.media5.image,
+                groupName: "Group name",
+                onAddingQuote: router.navigateToQuote,
+                onAddingMedia: {
+                    // TODO: smth
+                }
+            )
             
             ScrollView {
                 VStack {
@@ -61,9 +68,13 @@ public struct GalleryView: View {
     private var footer: some View {
         ZStack {
             HStack {
-                RewindMediaButton(size: 50, fontSize: 28, type: .plus) {
-                    print("plus")
-                }
+                GalleryMenu(
+                    label: { RewindMediaButton(size: 50, fontSize: 28, type: .plus) {} },
+                    onAddingQuote: router.navigateToQuote,
+                    onAddingMedia: {
+                        // TODO: smth
+                    }
+                )
                 
                 Spacer()
                 

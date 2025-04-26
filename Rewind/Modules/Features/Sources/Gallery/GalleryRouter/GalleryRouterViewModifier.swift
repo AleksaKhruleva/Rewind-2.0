@@ -10,8 +10,11 @@ struct GalleryRouterViewModifier: ViewModifier {
             switch route {
             case let .mediaDetails(image):
                 MediaDetailsView(image: image)
+            case .quote:
+                QuoteCreationView()
             }
         }
+        .toolbar(.hidden)
     }
     
     func body(content: Content) -> some View {

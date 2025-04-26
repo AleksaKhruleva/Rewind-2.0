@@ -1,35 +1,27 @@
 import SwiftUI
+import UIComponents
 
-public struct TagInputView: View {
-    private var onSubmit: (String) -> Void
+struct QuoteInputView: View {
+    @Binding var quote: String
+    var onSubmit: () -> Void
     
-    @State private var tag: String = ""
-    @FocusState private var isFocused: Bool
-    
-    @Environment(\.dismiss)
-    private var dismiss
-    
-    public init(onSubmit: @escaping (String) -> Void) {
-        self.onSubmit = onSubmit
-    }
+    @FocusState var isFocused: Bool
     
     public var body: some View {
         VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
-            Text("Enter new tag")
+            Text("Enter new quote")
                 .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
             
             StyledTextField(
-                text: $tag,
-                placeholder: "tag"
+                text: $quote,
+                placeholder: "quote"
             )
             .multilineTextAlignment(.center)
             .focused($isFocused)
-            .onSubmit {
-                onSubmit(tag)
-                dismiss()
-            }
+            .onSubmit { onSubmit() }
         }
         .modifier(VStackTopOffsetModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
+        .padding(.horizontal)
         .background(UIComponentsAsset.tableBackgroundColor.swiftUIColor)
         .onAppear {
             isFocused = true

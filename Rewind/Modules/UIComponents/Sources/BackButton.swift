@@ -27,6 +27,7 @@ public struct RewindButton: View {
     public enum ButtonType: String {
         case leftChevron = "chevron.left"
         case rightChevron = "chevron.right"
+        case trash = "trash"
         case xmark
         case checkmark
         case plus
