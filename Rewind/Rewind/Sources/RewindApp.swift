@@ -10,13 +10,13 @@ struct RewindApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack(path: $appRouter.path) {
-                RewindView(router: .init(appRouter: appRouter)) // Change only this line if needed! pls! 😌
-                    .setupToast(toastController: toastController)
+                RewindView(router: .init(appRouter: appRouter))
                     .setUpNavigation(appRouter: appRouter)
-                    .environment(\.showToast, {
-                        toastController.present(with: $0)
-                    })
             }
+            .setupToast(toastController: toastController)
+            .environment(\.showToast, {
+                toastController.present(with: $0)
+            })
         }
     }
 }
