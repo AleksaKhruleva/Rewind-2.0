@@ -127,6 +127,8 @@ services:
       # Монтируем том для прохождения проверки домена Certbot'ом (Webroot)
       # Nginx должен отдавать файлы из этой директории по адресу /.well-known/acme-challenge/
       - www-data:/var/www/certbot
+      - ./nginx/certs:/etc/nginx/certs:ro
+
 
     depends_on:
       # Nginx зависит от сервиса приложения, который он проксирует
