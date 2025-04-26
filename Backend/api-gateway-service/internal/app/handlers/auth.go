@@ -3,6 +3,8 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"io"
 	"net/http"
 
@@ -40,6 +42,19 @@ func (h *AuthHandler) StartRegistration(w http.ResponseWriter, r *http.Request) 
 
 	resp, err := h.authService.StartRegistration(r.Context(), req.Email)
 	if err != nil {
+		st, ok := status.FromError(err)
+		if ok {
+			switch st.Code() {
+			case codes.InvalidArgument:
+				respondError(w, http.StatusBadRequest, st.Message())
+				return
+			case codes.AlreadyExists:
+				respondError(w, http.StatusConflict, st.Message())
+				return
+			default:
+				respondError(w, http.StatusInternalServerError, st.Message())
+			}
+		}
 		respondError(w, http.StatusInternalServerError, fmt.Sprintf("Auth service error: %v", err))
 		return
 	}

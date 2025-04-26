@@ -58,6 +58,9 @@ docker:
 stop:
 	docker compose down
 
+.PHONY: swagger
+swagger:
+	swag init -g api-gateway-service/cmd/main.go
 
 # Генерация моков
 .PHONY: mocks
