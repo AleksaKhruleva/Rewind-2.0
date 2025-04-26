@@ -8,7 +8,8 @@ struct RewindApp: App {
     
     var body: some Scene {
         WindowGroup {
-            AccountView() // Change only this line if needed! pls! 😌
+            GalleryView() // Change only this line if needed! pls! 😌
+                .withGalleryRouter()
                 .overlay {
                     ToastView(controller: toastController)
                 }

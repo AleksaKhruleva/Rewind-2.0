@@ -3,32 +3,38 @@ import SwiftUI
 public struct GalleryHeader: View {
     private let image: UIImage
     private let groupName: String
+    private let onAddingQuote: () -> Void
+    private let onAddingMedia: () -> Void
     
-    public init(image: UIImage, groupName: String) {
+    @Environment(\.dismiss)
+    private var dismiss
+    
+    public init(
+        image: UIImage,
+        groupName: String,
+        onAddingQuote: @escaping () -> Void,
+        onAddingMedia: @escaping () -> Void
+    ) {
         self.image = image
         self.groupName = groupName
+        self.onAddingQuote = onAddingQuote
+        self.onAddingMedia = onAddingMedia
     }
     
     public var body: some View {
         RewindHeader {
-            RewindButton(type: .leftChevron) {
-                // TODO: smth
-            }
+            RewindButton(type: .leftChevron) { dismiss() }
         } centerView: {
             HeaderBadgeView(
                 image: image,
                 text: groupName
             )
         } rightView: {
-            GalleryMenu {
-                RewindButton(type: .plus) {
-                    // TODO: smth
-                }
-            }
+            GalleryMenu(
+                label: { RewindButton(type: .plus) {} },
+                onAddingQuote: onAddingQuote,
+                onAddingMedia: onAddingMedia
+            )
         }
     }
-}
-
-#Preview {
-    GalleryHeader(image: UIComponentsAsset.media5.image, groupName: "Group name")
 }

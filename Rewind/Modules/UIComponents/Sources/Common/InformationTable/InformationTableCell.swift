@@ -1,30 +1,16 @@
 import SwiftUI
 
 struct InformationTableCell: View {
-    private let icon: String
-    private let text: String
-    private let needChevron: Bool
-    private let isRisky: Bool
-    private let action: () -> Void
+    var icon: String
+    var text: String
+    var needChevron: Bool
+    var isRisky: Bool
+    var action: () -> Void
     
-    private var foregroundColor: Color {
+    var foregroundColor: Color {
         isRisky ?
         UIComponentsAsset.riskyTableTextColor.swiftUIColor :
         UIComponentsAsset.primaryColor.swiftUIColor
-    }
-    
-    public init(
-        icon: String,
-        text: String,
-        needChevron: Bool,
-        isRisky: Bool = false,
-        action: @escaping () -> Void
-    ) {
-        self.icon = icon
-        self.text = text
-        self.needChevron = needChevron
-        self.isRisky = isRisky
-        self.action = action
     }
     
     var body: some View {
