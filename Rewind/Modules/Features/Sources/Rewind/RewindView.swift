@@ -5,10 +5,16 @@ public struct RewindView: View {
     @State private var rolls = 0
     @State private var currentIndex = 0
     @State private var showImage = true
-    @Environment(RewindRouter.self) var router
+    
+    var router: RewindRouter
+    
     @Environment(\.showToast)
     private var showToast
     
+    public init(router: RewindRouter) {
+        self.router = router
+    }
+        
     // Временно, пока не появится ViewModel
     private let mediaImages: [UIImage] = [
         UIComponentsAsset.media21.image,
@@ -22,16 +28,11 @@ public struct RewindView: View {
         UIComponentsAsset.media16.image,
     ]
     
-    public init() { }
-    
     public var body: some View {
         ZStack {
             VStack(spacing: 10) {
                 MediaTopButtons {
-                    router
-                        .navigateToMediaDetails(
-                            image: mediaImages[currentIndex]
-                        )
+                    router.navigateToMediaDetails(mediaImages[currentIndex])
                 } onSettingsTap: {
                     // TODO: open settings
                 }
@@ -45,7 +46,7 @@ public struct RewindView: View {
                 }
             }
             .modifier(VStackTopOffsetModifier(topOffsetRatio: 0.15))
-            .padding()
+            .padding(.horizontal, 8)
             
             VStack {
                 header
@@ -95,8 +96,10 @@ public struct RewindView: View {
         Rectangle()
             .toSquare(mediaImages[currentIndex % mediaImages.count], cornerRadius: 40)
             .onTapGesture {
-                rolls += 1
-                currentIndex = (currentIndex + 1) % mediaImages.count
+                withAnimation {
+                    rolls += 1
+                    currentIndex = (currentIndex + 1) % mediaImages.count
+                }
             }
             .overlay {
                 RewindMediaButtonsOverlay {
@@ -118,9 +121,4 @@ public struct RewindView: View {
             )
         }
     }
-}
-
-#Preview {
-    RewindView()
-        .withRewindRouter()
 }

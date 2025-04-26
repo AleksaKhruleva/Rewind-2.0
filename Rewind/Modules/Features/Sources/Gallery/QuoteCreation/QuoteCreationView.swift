@@ -1,7 +1,7 @@
 import SwiftUI
 import UIComponents
 
-struct QuoteCreationView: View {
+public struct QuoteCreationView: View {
     @State var viewModel = QuoteCreationViewModel()
     @State var quoteWidth: CGFloat = .zero
     
@@ -13,7 +13,9 @@ struct QuoteCreationView: View {
     @Environment(\.showToast)
     private var showToast
     
-    var body: some View {
+    public init() {}
+    
+    public var body: some View {
         VStack(spacing: 0) {
             header
             

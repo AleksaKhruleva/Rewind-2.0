@@ -1,28 +1,17 @@
-import Foundation
 import SwiftUI
 
-@Observable
-final class GalleryRouter {
-    enum GalleryRoute: Hashable {
-        case mediaDetails(UIImage)
-        case quote
-    }
+public final class GalleryRouter {
+    private weak var appRouter: AppRouter?
     
-    var path = NavigationPath()
-    
-    func navigateToMediaDetails(image: UIImage) {
-        path.append(GalleryRoute.mediaDetails(image))
+    public init(appRouter: AppRouter) {
+        self.appRouter = appRouter
     }
     
     func navigateToQuote() {
-        path.append(GalleryRoute.quote)
+        appRouter?.navigate(to: .quote)
     }
     
-    func popBack() {
-        path.removeLast()
-    }
-    
-    func popToRoot() {
-        path.removeLast(path.count)
+    func navigateToMediaDetails(_ image: UIImage) {
+        appRouter?.navigate(to: .mediaDetails(image))
     }
 }
