@@ -89,7 +89,7 @@ func (h *AuthHandler) VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, resp)
 }
 
-// SetPasswordAndUsername обработчик для POST /api/auth/set-password
+// SetPasswordAndUsername обработчик для POST /api/auth/finish-register
 // @Summary Set password and username (Third stage of registration)
 // @Description Sets the user's password and username after email verification.
 // @Tags auth
