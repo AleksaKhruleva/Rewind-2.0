@@ -6,7 +6,7 @@ enum ToastActionMessages: String {
 }
 
 // Saving image
-func saveImageWithToast(image: UIImage?, toastAction: @escaping (String) -> Void) {
+public func saveImageWithToast(image: UIImage?, toastAction: @escaping (String) -> Void) {
     guard let image else {
         toastAction(ToastActionMessages.imageSavingFailure.rawValue)
         return
