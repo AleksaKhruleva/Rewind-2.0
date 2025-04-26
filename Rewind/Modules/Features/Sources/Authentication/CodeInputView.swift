@@ -2,8 +2,8 @@ import SwiftUI
 import UIComponents
 
 public struct CodeInputView: View {
-    @State private var code: String = ""
-    @FocusState private var isFocused: Bool
+    @State private var code: [String] = Array(repeating: "", count: 4)
+    @State private var focusedField: Int = 0
     
     public init() { }
     
@@ -18,32 +18,11 @@ public struct CodeInputView: View {
                 Text("Enter code from email")
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
                 
-                StyledTextField(
-                    text: $code,
-                    placeholder: "",
-                    keyboardType: .numberPad,
-                    frameWidth: .zero,
-                    frameHeight: .zero
-                )
-                .focused($isFocused)
-                .onChange(of: code) { oldValue, newValue in
-                    // TODO: move this to ViewModel later
-                    if newValue.count == CodeConstants.numberOfDigits {
-                        let isValidCode = Bool.random() // TODO: replace with real check later
-                        if !isValidCode {
-                            code = ""
-                        } else {
-                            isFocused = false
-                        }
-                    }
+                CodeInputTextField(code: $code, error: nil) { _ in
+                    // TODO: Something when code is filled
                 }
-                
-                CodeView(code: $code, isFocused: _isFocused)
             }
             .modifier(VStackTopOffsetModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
-        }
-        .onAppear {
-            isFocused = true
         }
         .hideKeyboardOnTap()
         .hideKeyboardOnDrag()
