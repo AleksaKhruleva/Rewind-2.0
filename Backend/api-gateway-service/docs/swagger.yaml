@@ -96,13 +96,47 @@ definitions:
       success:
         type: boolean
     type: object
-host: localhost:8080
+host: rewindapp.ru
 info:
   contact: {}
   description: This is the API Gateway for the Rewind application.
   title: Rewind API Gateway
   version: "1.0"
 paths:
+  /api/auth/finish-register:
+    post:
+      consumes:
+      - application/json
+      description: Sets the user's password and username after email verification.
+      parameters:
+      - description: Password and username details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.SetPasswordAndUsernameRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.SetPasswordAndUsernameResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Set password and username (Third stage of registration)
+      tags:
+      - auth
   /api/auth/forgot-password:
     post:
       consumes:
@@ -300,40 +334,6 @@ paths:
               type: string
             type: object
       summary: Reset password
-      tags:
-      - auth
-  /api/auth/set-password:
-    post:
-      consumes:
-      - application/json
-      description: Sets the user's password and username after email verification.
-      parameters:
-      - description: Password and username details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/requests.SetPasswordAndUsernameRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/responses.SetPasswordAndUsernameResponse'
-        "400":
-          description: Bad Request
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal Server Error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Set password and username (Third stage of registration)
       tags:
       - auth
   /api/auth/verify-email:

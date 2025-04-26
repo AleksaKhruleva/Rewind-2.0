@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 	"log"
 	"math/rand"
@@ -41,7 +43,11 @@ func (s *AuthService) StartRegistration(ctx context.Context, req *pb.StartRegist
 	email := req.GetEmail()
 
 	if err := s.validator.Var(email, "required,email"); err != nil {
-		return nil, fmt.Errorf("invalid email format: %w", err)
+		return nil, status.Errorf(codes.InvalidArgument, "invalid email format: %v", err)
+	}
+	_, err := s.userRepo.GetUserByEmail(nil, email)
+	if err == nil {
+		return nil, status.Errorf(codes.AlreadyExists, "user with email %s already exists", email)
 	}
 	registrationID := uuid.New().String()
 
@@ -50,7 +56,7 @@ func (s *AuthService) StartRegistration(ctx context.Context, req *pb.StartRegist
 	redisKey := fmt.Sprintf("registration:%s", registrationID)
 	expiryTime := time.Minute * 15 // Код действителен в течение 15 минут (настройте по необходимости)
 
-	err := s.redisRepo.HSet(ctx, redisKey, map[string]interface{}{
+	err = s.redisRepo.HSet(ctx, redisKey, map[string]interface{}{
 		"email": email,
 		"code":  verificationCode,
 	}).Err()
