@@ -32,6 +32,7 @@ public struct RewindButton: View {
         case checkmark
         case plus
         case empty
+        case gearshape = "gearshape.fill"
     }
     
     private let type: ButtonType
