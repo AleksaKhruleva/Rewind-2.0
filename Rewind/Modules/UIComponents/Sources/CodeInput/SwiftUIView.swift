@@ -4,7 +4,7 @@ public struct CodeInputTextField: View {
     @Binding
     var code: [String]
     var error: Error?
-    var onCodeFilledUpdate: (Bool) -> Void
+    var onCodeFilled: () -> Void
     
     @State
     private var focusedField: Int = 0
@@ -12,11 +12,15 @@ public struct CodeInputTextField: View {
     public init(
         code: Binding<[String]>,
         error: Error? = nil,
-        onCodeFilledUpdate: @escaping (Bool) -> Void
+        onCodeFilled: @escaping () -> Void
     ) {
         self._code = code
         self.error = error
-        self.onCodeFilledUpdate = onCodeFilledUpdate
+        self.onCodeFilled = onCodeFilled
+    }
+    
+    var joinedCode: String {
+        code.joined()
     }
     
     public var body: some View {
@@ -27,6 +31,10 @@ public struct CodeInputTextField: View {
             }
         }
         .onChange(of: code) { _, newValue in focusedField = newValue.count }
-        .onChange(of: code.count == 4) { _, newValue in onCodeFilledUpdate(newValue) }
+        .onChange(of: joinedCode.count == 4) { _, newValue in
+            if newValue {
+                onCodeFilled()
+            }
+        }
     }
 }

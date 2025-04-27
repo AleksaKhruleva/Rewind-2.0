@@ -6,16 +6,21 @@ public struct EmailInputView: View {
     @FocusState private var isFocused: Bool
     private let flow: AuthFlow
     
-    public init(flow: AuthFlow) {
+    var router: AuthenticationRouter
+    
+    @Environment(\.dismiss)
+    private var dismiss
+    
+    public init(flow: AuthFlow, router: AuthenticationRouter) {
         self.flow = flow
+        self.router = router
     }
     
     public var body: some View {
         ZStack(alignment: .topLeading) {
-            BackButton(direction: .left) {
-                // TODO: do something later
+            RewindHeader {
+                RewindButton(type: .leftChevron) { dismiss() }
             }
-            .modifier(BackButtonPositionModifier())
             
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
                 Text("What's your email?")
@@ -28,6 +33,14 @@ public struct EmailInputView: View {
                 )
                 .multilineTextAlignment(.center)
                 .focused($isFocused)
+                .onSubmit {
+                    switch flow {
+                    case .registration:
+                        router.navigateToCode()
+                    case .login:
+                        router.navigateToPassword(for: flow)
+                    }
+                }
             }
             .modifier(VStackTopOffsetModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
         }
@@ -40,5 +53,6 @@ public struct EmailInputView: View {
 }
 
 #Preview {
-    EmailInputView(flow: .registration)
+    let router = AppRouter()
+    EmailInputView(flow: .registration, router: .init(appRouter: router))
 }

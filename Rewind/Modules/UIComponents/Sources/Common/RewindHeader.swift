@@ -5,12 +5,15 @@ public struct RewindHeader<LeftContent: View, CenterContent: View, RightContent:
     private let leftView: LeftContent
     private let centerView: CenterContent
     private let rightView: RightContent
+    
+    @Environment(\.dismiss)
+    private var dismiss
 
     public init(
         backgroundColor: Color = .white,
         @ViewBuilder leftView: () -> LeftContent,
-        @ViewBuilder centerView: () -> CenterContent,
-        @ViewBuilder rightView: () -> RightContent
+        @ViewBuilder centerView: () -> CenterContent = { EmptyView() },
+        @ViewBuilder rightView: () -> RightContent = { EmptyView() }
     ) {
         self.backgroundColor = backgroundColor
         self.leftView = leftView()

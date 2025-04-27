@@ -42,8 +42,7 @@ public struct MediaDetailsView: View {
                 .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .bold))
                 .foregroundColor(UIComponentsAsset.primaryColor.swiftUIColor)
         } rightView: {
-            RewindButton(type: .leftChevron) {}
-                .hidden()
+            RewindButton(type: .leftChevron).hidden()
         }
     }
     

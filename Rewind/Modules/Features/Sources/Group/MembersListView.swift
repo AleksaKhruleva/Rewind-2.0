@@ -36,7 +36,7 @@ public struct MembersListView: View {
     
     private var header: some View {
         RewindHeader {
-            RewindButton(type: .empty) {}
+            RewindButton(type: .empty)
         } centerView: {
             HeaderBadgeView(image: UIComponentsAsset.groupAvatar.image, text: "Friends' Members")
         } rightView: {

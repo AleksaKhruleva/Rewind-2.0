@@ -10,16 +10,25 @@ public struct PasswordInputView: View {
     @FocusState private var isFocused: Bool
     private let flow: AuthFlow
     
-    public init(flow: AuthFlow) {
+    var router: AuthenticationRouter
+    
+    public init(flow: AuthFlow, router: AuthenticationRouter) {
         self.flow = flow
+        self.router = router
     }
     
     public var body: some View {
         ZStack(alignment: .topLeading) {
-            BackButton(direction: .left) {
-                // TODO: do something later
+            RewindHeader {
+                RewindButton(type: .leftChevron) {
+                    switch flow {
+                    case .registration:
+                        router.dismiss(by: 2)
+                    case .login:
+                        router.dismiss(by: 1)
+                    }
+                }
             }
-            .modifier(BackButtonPositionModifier())
             
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
                 Text("Enter your password")
@@ -32,6 +41,14 @@ public struct PasswordInputView: View {
                 )
                 .multilineTextAlignment(.center)
                 .focused($isFocused)
+                .onSubmit {
+                    switch flow {
+                    case .registration:
+                        router.navigateToName()
+                    case .login:
+                        router.navigateToRewind()
+                    }
+                }
                 
                 if flow == .login {
                     if showNotice {
@@ -44,10 +61,9 @@ public struct PasswordInputView: View {
             }
             .modifier(VStackTopOffsetModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
         }
-        // TODO: fix constraint warning later and uncomment
-        //        .onAppear {
-        //            isFocused = true
-        //        }
+        .onAppear {
+            isFocused = true
+        }
         .hideKeyboardOnTap()
         .hideKeyboardOnDrag()
     }
@@ -113,5 +129,6 @@ public struct PasswordInputView: View {
 }
 
 #Preview {
-    PasswordInputView(flow: .login)
+    let router = AppRouter()
+    PasswordInputView(flow: .login, router: .init(appRouter: router))
 }

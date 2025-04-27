@@ -4,7 +4,11 @@ import UIComponents
 public struct WelcomeView: View {
     @State private var textWidth: CGFloat = 0
     
-    public init() { }
+    var router: AuthenticationRouter
+    
+    public init(router: AuthenticationRouter) {
+        self.router = router
+    }
     
     public var body: some View {
         ZStack {
@@ -14,12 +18,12 @@ public struct WelcomeView: View {
             .modifier(VStackTopOffsetModifier(topOffsetRatio: 0.39))
             
             VStack(spacing: 12) {
-                GradientButton(title: "Sing in", width: textWidth) {
-                    // TODO: do something later
+                GradientButton(title: "Sing up", width: 172) {
+                    router.navigateToEmail(for: .registration)
                 }
                 
                 Button {
-                    // TODO: do something later
+                    router.navigateToEmail(for: .login)
                 } label: {
                     Text("Have an account?")
                         .modifier(RoundFontModifier(size: 20, foregroundColor: UIComponentsAsset.lightPinkColor.swiftUIColor))
@@ -32,5 +36,6 @@ public struct WelcomeView: View {
 }
 
 #Preview {
-    WelcomeView()
+    let appRouter = AppRouter()
+    WelcomeView(router: .init(appRouter: appRouter))
 }

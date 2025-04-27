@@ -3,23 +3,28 @@ import UIComponents
 
 public struct CodeInputView: View {
     @State private var code: [String] = Array(repeating: "", count: 4)
-    @State private var focusedField: Int = 0
     
-    public init() { }
+    var router: AuthenticationRouter
+    
+    @Environment(\.dismiss)
+    private var dismiss
+    
+    public init(router: AuthenticationRouter) {
+        self.router = router
+    }
     
     public var body: some View {
         ZStack(alignment: .topLeading) {
-            BackButton(direction: .left) {
-                // TODO: do something later
+            RewindHeader {
+                RewindButton(type: .leftChevron) { dismiss() }
             }
-            .modifier(BackButtonPositionModifier())
             
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
                 Text("Enter code from email")
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
                 
-                CodeInputTextField(code: $code, error: nil) { _ in
-                    // TODO: Something when code is filled
+                CodeInputTextField(code: $code, error: nil) {
+                    router.navigateToPassword(for: .registration)
                 }
             }
             .modifier(VStackTopOffsetModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
@@ -30,5 +35,6 @@ public struct CodeInputView: View {
 }
 
 #Preview {
-    CodeInputView()
+    let router = AppRouter()
+    CodeInputView(router: .init(appRouter: router))
 }

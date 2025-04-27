@@ -67,7 +67,7 @@ public struct AccountView: View {
                 text: "flowykk"
             )
         } rightView: {
-            RewindButton(type: .empty) {}
+            RewindButton(type: .empty).hidden()
         }
     }
     

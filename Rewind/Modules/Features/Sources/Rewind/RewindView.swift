@@ -89,7 +89,6 @@ public struct RewindView: View {
             } onGlobeTap: {
                 // TODO: show map
             }
-            
         } rightView: {
             RoundImageView(image: UIComponentsAsset.avatar.image, size: 44)
                 .contentShape(Circle())

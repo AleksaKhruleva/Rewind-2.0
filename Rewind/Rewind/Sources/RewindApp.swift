@@ -10,7 +10,8 @@ struct RewindApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack(path: $appRouter.path) {
-                RewindView(router: .init(appRouter: appRouter))
+                WelcomeView(router: .init(appRouter: appRouter))
+//                RewindView(router: .init(appRouter: appRouter))
                     .setUpNavigation(appRouter: appRouter)
             }
             .setupToast(toastController: toastController)
@@ -40,6 +41,16 @@ extension View {
                     QuoteCreationView()
                 case let .mediaDetails(image):
                     MediaDetailsView(image: image)
+                case let .email(flow):
+                    EmailInputView(flow: flow, router: .init(appRouter: appRouter))
+                case .code:
+                    CodeInputView(router: .init(appRouter: appRouter))
+                case let .password(flow):
+                    PasswordInputView(flow: flow, router: .init(appRouter: appRouter))
+                case .name:
+                    NameInputView(router: .init(appRouter: appRouter))
+                case .rewind:
+                    RewindView(router: .init(appRouter: appRouter))
                 }
             }
             .toolbar(.hidden)
