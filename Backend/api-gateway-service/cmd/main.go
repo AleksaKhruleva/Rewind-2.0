@@ -1,12 +1,14 @@
 package main
 
 import (
-	"Rewind-api-gateway-service/internal/app/di"
-	"Rewind-api-gateway-service/internal/server"
 	"log"
 
-	_ "Rewind-api-gateway-service/docs"
+	"Rewind-api-gateway-service/internal/app/di"
+	"Rewind-api-gateway-service/internal/server"
+
 	"github.com/joho/godotenv"
+
+	_ "Rewind-api-gateway-service/docs"
 )
 
 // @title Rewind API Gateway

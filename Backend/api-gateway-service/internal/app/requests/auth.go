@@ -16,8 +16,8 @@ type SetPasswordAndUsernameRequest struct {
 }
 
 type LoginRequest struct {
-	Identifier string `json:"identifier"`
-	Password   string `json:"password"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type RefreshTokenRequest struct {
