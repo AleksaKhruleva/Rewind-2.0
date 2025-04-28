@@ -435,7 +435,7 @@ const docTemplate = `{
         "requests.LoginRequest": {
             "type": "object",
             "properties": {
-                "identifier": {
+                "email": {
                     "type": "string"
                 },
                 "password": {

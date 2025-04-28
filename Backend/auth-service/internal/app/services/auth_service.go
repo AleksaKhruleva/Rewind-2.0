@@ -1,27 +1,30 @@
 package services
 
 import (
-	"Rewind-auth-service/internal/app/models"
-	"Rewind-auth-service/internal/app/repositories"
-	"Rewind-auth-service/internal/utils"
-	"Rewind-auth-service/pkg/rabbitmq"
 	"context"
 	"errors"
 	"fmt"
-	"github.com/go-redis/redis/v8"
-	"golang.org/x/crypto/bcrypt"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"gorm.io/gorm"
 	"log"
 	"math/rand"
 	"net/url"
 	"os"
 	"time"
 
-	pb "Rewind-auth-service/pkg/proto"
+	"github.com/go-redis/redis/v8"
+	"golang.org/x/crypto/bcrypt"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
+
+	"Rewind-auth-service/internal/app/models"
+	"Rewind-auth-service/internal/app/repositories"
+	"Rewind-auth-service/internal/utils"
+	"Rewind-auth-service/pkg/rabbitmq"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
+
+	pb "Rewind-auth-service/pkg/proto"
 )
 
 type AuthService struct {
@@ -51,7 +54,7 @@ func (s *AuthService) StartRegistration(ctx context.Context, req *pb.StartRegist
 	}
 	registrationID := uuid.New().String()
 
-	verificationCode := fmt.Sprintf("%06d", rand.Intn(1000000)) // Генерирует случайное число от 000000 до 999999
+	verificationCode := fmt.Sprintf("%04d", rand.Intn(10000)) // Генерирует случайное число от 0000 до 9999
 
 	redisKey := fmt.Sprintf("registration:%s", registrationID)
 	expiryTime := time.Minute * 15 // Код действителен в течение 15 минут (настройте по необходимости)
@@ -180,36 +183,28 @@ func (s *AuthService) SetPasswordAndUsername(ctx context.Context, req *pb.SetPas
 }
 
 func (s *AuthService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
-	identifier := req.GetIdentifier()
+	email := req.GetEmail()
 	password := req.GetPassword()
 
 	if err := s.validator.Var(password, "required"); err != nil {
 		return nil, fmt.Errorf("password is required")
 	}
-	if err := s.validator.Var(identifier, "required"); err != nil {
-		return nil, fmt.Errorf("email or username is required")
+	if err := s.validator.Var(email, "required,email"); err != nil {
+		return nil, fmt.Errorf("email is required")
 	}
 
 	var user *models.User
 	var err error
 
 	// Попытка найти пользователя по email
-	if err = s.validator.Var(identifier, "email"); err == nil {
-		user, err = s.userRepo.GetUserByEmail(nil, identifier)
+	if err = s.validator.Var(email, "email"); err == nil {
+		user, err = s.userRepo.GetUserByEmail(nil, email)
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("failed to query user by email: %w", err)
 		}
 	}
 
-	// Если по email не найден или формат не email, пытаемся найти по username
-	if user == nil {
-		user, err = s.userRepo.GetUserByUsername(nil, identifier)
-		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("failed to query user by username: %w", err)
-		}
-	}
-
-	// Если пользователь не найден ни по email, ни по username
+	// Если пользователь не найден по email
 	if user == nil {
 		return nil, fmt.Errorf("invalid credentials")
 	}

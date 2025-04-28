@@ -3,10 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"io"
 	"net/http"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"Rewind-api-gateway-service/internal/app/requests"
 	"Rewind-api-gateway-service/internal/app/services"
@@ -134,7 +135,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := h.authService.Login(r.Context(), req.Identifier, req.Password)
+	resp, err := h.authService.Login(r.Context(), req.Email, req.Password)
 	if err != nil {
 		respondError(w, http.StatusInternalServerError, fmt.Sprintf("Auth service error: %v", err))
 		return

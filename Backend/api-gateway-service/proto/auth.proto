@@ -45,7 +45,7 @@ message SetPasswordAndUsernameResponse {
 }
 
 message LoginRequest {
-  string identifier = 1; // Может быть email или username
+  string email = 1;
   string password = 2;
 }
 

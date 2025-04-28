@@ -6,7 +6,7 @@ definitions:
     type: object
   requests.LoginRequest:
     properties:
-      identifier:
+      email:
         type: string
       password:
         type: string

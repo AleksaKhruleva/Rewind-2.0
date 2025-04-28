@@ -12,7 +12,7 @@ type AuthServiceInterface interface {
 	StartRegistration(ctx context.Context, email string) (*pb.StartRegistrationResponse, error)
 	VerifyEmailCode(ctx context.Context, registrationID, verificationCode string) (*pb.VerifyEmailCodeResponse, error)
 	SetPasswordAndUsername(ctx context.Context, registrationID, password, username string) (*pb.SetPasswordAndUsernameResponse, error)
-	Login(ctx context.Context, identifier, password string) (*pb.LoginResponse, error)
+	Login(ctx context.Context, email, password string) (*pb.LoginResponse, error)
 	RefreshToken(ctx context.Context, refreshToken string) (*pb.RefreshTokenResponse, error)
 	ForgotPassword(ctx context.Context, email string) (*pb.ForgotPasswordResponse, error)
 	ResetPassword(ctx context.Context, token, newPassword string) (*pb.ResetPasswordResponse, error)
@@ -45,8 +45,8 @@ func (s *AuthService) SetPasswordAndUsername(ctx context.Context, registrationID
 }
 
 // Login вызывает метод Login сервиса аутентификации.
-func (s *AuthService) Login(ctx context.Context, identifier, password string) (*pb.LoginResponse, error) {
-	return s.authClient.Login(ctx, &pb.LoginRequest{Identifier: identifier, Password: password})
+func (s *AuthService) Login(ctx context.Context, email, password string) (*pb.LoginResponse, error) {
+	return s.authClient.Login(ctx, &pb.LoginRequest{Email: email, Password: password})
 }
 
 // RefreshToken вызывает метод RefreshToken сервиса аутентификации.
