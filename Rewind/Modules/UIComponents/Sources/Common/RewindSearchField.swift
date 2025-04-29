@@ -3,10 +3,16 @@ import SwiftUI
 public struct RewindSearchField: View {
     @Binding var text: String
     private let placeholder: String
+    private let backgroundColor: Color
     
-    public init(text: Binding<String>, placeholder: String) {
+    public init(
+        text: Binding<String>,
+        placeholder: String,
+        backgroundColor: Color = UIComponentsAsset.tableBackgroundColor.swiftUIColor
+    ) {
         self._text = text
         self.placeholder = placeholder
+        self.backgroundColor = backgroundColor
     }
     
     public var body: some View {
@@ -22,7 +28,7 @@ public struct RewindSearchField: View {
         }
         .padding()
         .frame(height: 50)
-        .background(UIComponentsAsset.tableBackgroundColor.swiftUIColor)
+        .background(backgroundColor)
         .cornerRadius(20)
     }
 }

@@ -4,7 +4,7 @@ import UIComponents
 public struct RewindView: View {
     @State private var rolls = 0
     @State private var currentIndex = 0
-    @State private var showImage = true
+    @State private var isSelectGroupPresented = false
     
     var router: RewindRouter
     
@@ -14,7 +14,7 @@ public struct RewindView: View {
     public init(router: RewindRouter) {
         self.router = router
     }
-        
+    
     // Временно, пока не появится ViewModel
     private let mediaImages: [UIImage] = [
         UIComponentsAsset.media21.image,
@@ -71,6 +71,13 @@ public struct RewindView: View {
             }
             .safeAreaPadding(20)
         }
+        .ignoresSafeArea(.keyboard)
+        .sheet(isPresented: $isSelectGroupPresented) {
+            SelectGroupView()
+                .presentationCornerRadius(30)
+                .presentationDragIndicator(.visible)
+                .presentationDetents([.height(450)])
+        }
     }
     
     private var header: some View {
@@ -78,7 +85,7 @@ public struct RewindView: View {
             RoundImageView(image: UIComponentsAsset.media5.image, size: 44)
         } centerView: {
             GroupsAndLocationHeader(groupCount: 8) {
-                // TODO: show groups
+                isSelectGroupPresented = true
             } onGlobeTap: {
                 // TODO: show map
             }
