@@ -36,10 +36,16 @@ public struct RewindButton: View {
     }
     
     private let type: ButtonType
+    private let tint: Color
     private let action: () -> Void
     
-    public init(type: ButtonType, action: @escaping () -> Void) {
+    public init(
+        type: ButtonType,
+        tint: Color = UIComponentsAsset.primaryColor.swiftUIColor,
+        action: @escaping () -> Void
+    ) {
         self.type = type
+        self.tint = tint
         self.action = action
     }
     
@@ -48,7 +54,7 @@ public struct RewindButton: View {
             Image(systemName: type.rawValue)
                 .font(.system(size: 20, weight: .black))
                 .frame(width: 40, height: 40)
-                .tint(UIComponentsAsset.primaryColor.swiftUIColor)
+                .tint(tint)
                 .opacity(type == .empty ? 0 : 1)
         }
     }

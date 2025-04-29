@@ -15,7 +15,7 @@ extension Project {
                     destinations: .iOS,
                     product: .framework,
                     bundleId: "io.tuist.\(name)",
-                    deploymentTargets: .iOS("17.0"),
+                    deploymentTargets: .iOS("18.0"),
                     infoPlist: infoPlist,
                     sources: ["Sources/**"],
                     resources: resources,

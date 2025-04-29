@@ -1,15 +1,18 @@
 import SwiftUI
 
 public struct RewindHeader<LeftContent: View, CenterContent: View, RightContent: View>: View {
+    private let backgroundColor: Color
     private let leftView: LeftContent
     private let centerView: CenterContent
     private let rightView: RightContent
 
     public init(
+        backgroundColor: Color = .white,
         @ViewBuilder leftView: () -> LeftContent,
         @ViewBuilder centerView: () -> CenterContent,
         @ViewBuilder rightView: () -> RightContent
     ) {
+        self.backgroundColor = backgroundColor
         self.leftView = leftView()
         self.centerView = centerView()
         self.rightView = rightView()
@@ -24,7 +27,7 @@ public struct RewindHeader<LeftContent: View, CenterContent: View, RightContent:
             rightView
         }
         .padding([.bottom, .horizontal])
-        .background(Color.white)
+        .background(backgroundColor)
     }
 }
 
