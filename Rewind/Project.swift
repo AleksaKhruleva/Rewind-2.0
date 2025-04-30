@@ -3,7 +3,7 @@ import ProjectDescription
 let project = Project(
     name: "Rewind",
     settings: .settings(
-        base: ["IPHONEOS_DEPLOYMENT_TARGET": "17.0"]
+        base: ["IPHONEOS_DEPLOYMENT_TARGET": "18.0"]
     ),
     targets: [
         .target(
