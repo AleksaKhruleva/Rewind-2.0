@@ -83,3 +83,8 @@ func (c *AuthServiceClient) ResetPassword(ctx context.Context, req *pb.ResetPass
 func (c *AuthServiceClient) Logout(ctx context.Context, req *pb.LogoutRequest) (*pb.LogoutResponse, error) {
 	return c.client.Logout(ctx, req)
 }
+
+// DeleteUser вызывает метод DeleteUser сервиса аутентификации.
+func (c *AuthServiceClient) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*pb.DeleteUserResponse, error) {
+	return c.client.DeleteUser(ctx, req)
+}

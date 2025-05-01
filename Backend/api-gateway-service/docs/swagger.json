@@ -8,6 +8,58 @@
     },
     "host": "rewindapp.ru",
     "paths": {
+        "/api/auth/delete-user": {
+            "post": {
+                "description": "Deletes a user account by email.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Delete user account",
+                "parameters": [
+                    {
+                        "description": "User email to delete",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.DeleteUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.DeleteUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/auth/finish-register": {
             "post": {
                 "description": "Sets the user's password and username after email verification.",
@@ -417,6 +469,14 @@
         }
     },
     "definitions": {
+        "requests.DeleteUserRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
         "requests.ForgotPasswordRequest": {
             "type": "object",
             "properties": {
@@ -493,6 +553,14 @@
                 },
                 "verification_code": {
                     "type": "string"
+                }
+            }
+        },
+        "responses.DeleteUserResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
                 }
             }
         },

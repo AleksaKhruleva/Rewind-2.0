@@ -17,6 +17,7 @@ type AuthServiceInterface interface {
 	ForgotPassword(ctx context.Context, email string) (*pb.ForgotPasswordResponse, error)
 	ResetPassword(ctx context.Context, token, newPassword string) (*pb.ResetPasswordResponse, error)
 	Logout(ctx context.Context, refreshToken string) (*pb.LogoutResponse, error)
+	DeleteUser(ctx context.Context, email string) (*pb.DeleteUserResponse, error)
 }
 
 // AuthService представляет сервис для аутентификации.
@@ -67,4 +68,8 @@ func (s *AuthService) ResetPassword(ctx context.Context, token, newPassword stri
 // Logout вызывает метод Logout сервиса аутентификации.
 func (s *AuthService) Logout(ctx context.Context, refreshToken string) (*pb.LogoutResponse, error) {
 	return s.authClient.Logout(ctx, &pb.LogoutRequest{RefreshToken: refreshToken})
+}
+
+func (s *AuthService) DeleteUser(ctx context.Context, email string) (*pb.DeleteUserResponse, error) {
+	return s.authClient.DeleteUser(ctx, &pb.DeleteUserRequest{Email: email})
 }

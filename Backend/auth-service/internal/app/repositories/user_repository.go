@@ -1,9 +1,11 @@
 package repositories
 
 import (
-	"Rewind-auth-service/internal/app/models"
 	"fmt"
+
 	"gorm.io/gorm"
+
+	"Rewind-auth-service/internal/app/models"
 )
 
 type UserRepositoryInterface interface {
@@ -15,6 +17,9 @@ type UserRepositoryInterface interface {
 	Save(tx *gorm.DB, user *models.User) error
 	GetRefreshToken(tx *gorm.DB, refreshToken string) (*models.RefreshToken, error)
 	DeleteRefreshToken(tx *gorm.DB, id uint) error
+	GetDeletedUserByEmail(tx *gorm.DB, email string) (*models.User, error)
+	SaveDeleted(tx *gorm.DB, user *models.User) error
+	DeleteUser(tx *gorm.DB, email string) error
 }
 
 type UserRepository struct {
@@ -93,5 +98,28 @@ func (r *UserRepository) DeleteRefreshToken(tx *gorm.DB, id uint) error {
 	if tx == nil {
 		tx = r.db
 	}
-	return tx.Delete(models.RefreshToken{}, "id = ?", id).Error
+	return tx.Unscoped().Delete(&models.RefreshToken{}, "id = ?", id).Error
+}
+
+func (r *UserRepository) GetDeletedUserByEmail(tx *gorm.DB, email string) (*models.User, error) {
+	if tx == nil {
+		tx = r.db
+	}
+	var user models.User
+	result := tx.Unscoped().Where("email = ?", email).First(&user)
+	return &user, result.Error
+}
+
+func (r *UserRepository) SaveDeleted(tx *gorm.DB, user *models.User) error {
+	if tx == nil {
+		tx = r.db
+	}
+	return tx.Unscoped().Save(user).Error
+}
+
+func (r *UserRepository) DeleteUser(tx *gorm.DB, email string) error {
+	if tx == nil {
+		tx = r.db
+	}
+	return tx.Delete(&models.User{}, "email = ?", email).Error
 }
