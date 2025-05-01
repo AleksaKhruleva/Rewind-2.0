@@ -1,6 +1,12 @@
 import Moya
 import Foundation
 
+public enum HTTPError: Error {
+    case conflict
+    
+    case error // temporary
+}
+
 final class NetworkProvider<T: TargetType> {
     private let provider: MoyaProvider<T>
 
@@ -13,6 +19,15 @@ final class NetworkProvider<T: TargetType> {
             provider.request(target) { result in
                 switch result {
                 case .success(let response):
+                    if response.statusCode == 409 {
+                        continuation.resume(throwing: HTTPError.conflict)
+                        return
+                    }
+                    
+//                    guard response.statusCode >= 200, response.statusCode < 300 else {
+//                        continuation.resume(throwing: HTTPError.error)
+//                    }
+                    
                     do {
                         let decoded = try JSONDecoder().decode(D.self, from: response.data)
                         continuation.resume(returning: decoded)

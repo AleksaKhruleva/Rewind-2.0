@@ -3,13 +3,13 @@ import UIComponents
 
 // vremenno
 let generalData = [
-    ("photo.fill", "Change image", true),
-    ("pencil", "Change name", true)
+    ("photo.fill", "Change image", {}),
+    ("pencil", "Change name", {})
 ]
 
 let riskyData = [
-    ("rectangle.portrait.and.arrow.right.fill", "Leave group", true),
-    ("trash.fill", "Delete group", true)
+    ("rectangle.portrait.and.arrow.right.fill", "Leave group", {}),
+    ("trash.fill", "Delete group", {})
 ]
 
 public struct GroupSettingsView: View {

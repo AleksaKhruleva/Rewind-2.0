@@ -25,7 +25,9 @@ let project = Project(
             dependencies: [
                 .project(target: "UIComponents", path: "Modules/UIComponents"),
                 .project(target: "Features", path: "Modules/Features"),
-                .project(target: "Networking", path: "Modules/Networking")
+                .project(target: "Networking", path: "Modules/Networking"),
+                .project(target: "Domain", path: "Modules/Domain"),
+                .project(target: "Base", path: "Modules/Base")
             ],
             settings: .settings(
                 base: [

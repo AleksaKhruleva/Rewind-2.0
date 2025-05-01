@@ -2,15 +2,14 @@ import SwiftUI
 import UIComponents
 
 public struct CodeInputView: View {
+    @State var viewModel: CodeInputViewModel
     @State private var code: [String] = Array(repeating: "", count: 4)
-    
-    var router: AuthenticationRouter
     
     @Environment(\.dismiss)
     private var dismiss
     
-    public init(router: AuthenticationRouter) {
-        self.router = router
+    public init(router: AuthenticationRouter, registrationID: String) {
+        viewModel = .init(router: router, registrationID: registrationID)
     }
     
     public var body: some View {
@@ -24,10 +23,22 @@ public struct CodeInputView: View {
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
                 
                 CodeInputTextField(code: $code, error: nil) {
-                    router.navigateToPassword(for: .registration)
+                    Task {
+                        await viewModel.dispatch(.submitCode(code: code.joined()))
+                    }
+                }
+                
+                if viewModel.state == .loading {
+                    ProgressView()
+                } else if case let .error(error) = viewModel.state {
+                    RewindNoteTextView(text: error.errorDescription)
+                        .multilineTextAlignment(.center)
                 }
             }
             .modifier(VStackTopOffsetModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
+        }
+        .onAppear {
+            print(viewModel.registrationID)
         }
         .hideKeyboardOnTap()
         .hideKeyboardOnDrag()
@@ -36,5 +47,5 @@ public struct CodeInputView: View {
 
 #Preview {
     let router = AppRouter()
-    CodeInputView(router: .init(appRouter: router))
+    CodeInputView(router: .init(appRouter: router), registrationID: "123")
 }

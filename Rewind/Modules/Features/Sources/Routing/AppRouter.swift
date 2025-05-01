@@ -1,11 +1,14 @@
 import SwiftUI
 
-public final class AppRouter: ObservableObject {
+@MainActor @Observable
+public final class AppRouter {
     public enum Route: Hashable {
+        case welcome
+        
         case email(AuthFlow)
-        case code
-        case password(AuthFlow)
-        case name
+        case code(registrationID: String)
+        case password(AuthFlow, registrationID: String?)
+        case name(password: String, registrationID: String)
         
         case rewind
         
@@ -15,7 +18,7 @@ public final class AppRouter: ObservableObject {
         case mediaDetails(UIImage)
     }
     
-    @Published public var path = NavigationPath()
+    public var path = NavigationPath()
     
     public init() {}
     

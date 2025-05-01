@@ -1,15 +1,65 @@
 import SwiftUI
 import UIComponents
 
+import Networking
+import Base
+
+@MainActor @Observable
+final class AccountViewModel {
+    enum Intent {
+        case signOut
+    }
+    
+    var router: AccountRouter
+    
+    private let backend: NetworkServiceProtocol
+    
+    init(router: AccountRouter) {
+        self.router = router
+        backend = NetworkService()
+    }
+    
+    func dispatch(_ intent: Intent) async {
+        switch intent {
+        case .signOut:
+            if let refreshToken = KeychainService.shared.read(for: .refreshToken) {
+                do {
+                    let response = try await backend.logout(refreshToken: refreshToken)
+                    KeychainService.shared.clearAll()
+                    router.navigateToWelcome()
+                } catch {
+                    print(1231231)
+                }
+            }
+        }
+    }
+}
+
+@MainActor
+public final class AccountRouter {
+    private weak var appRouter: AppRouter?
+    
+    public init(appRouter: AppRouter) {
+        self.appRouter = appRouter
+    }
+    
+    func navigateToWelcome() {
+        appRouter?.navigate(to: .welcome)
+    }
+}
+
 public struct AccountView: View {
     // TODO: Take viewModel from Assemmbly/Builder/Container
     @StateObject private var appIconsViewModel = AppIconsViewModel()
+    @State private var viewModel: AccountViewModel
     @State private var isBlurredAvatarPresented = false
 
     @Environment(\.dismiss)
     private var dismiss
     
-    public init() {}
+    public init(router: AccountRouter) {
+        viewModel = AccountViewModel(router: router)
+    }
     
     public var body: some View {
         VStack {
@@ -98,10 +148,22 @@ public struct AccountView: View {
     }
     
     var riskyTable: some View {
-        InformationTable(title: "Risky Zone", data: AccountConstants.risky, isRisky: true)
+        InformationTable(
+            title: "Risky Zone",
+            data: [
+                ("rectangle.portrait.and.arrow.right.fill", "Sign out", {
+                    Task {
+                        await viewModel.dispatch(.signOut)
+                    }
+                }),
+                ("trash.fill", "Delete account", {})
+            ],
+            isRisky: true
+        )
     }
 }
 
 #Preview {
-    AccountView()
+    let router = AppRouter()
+    AccountView(router: .init(appRouter: router))
 }

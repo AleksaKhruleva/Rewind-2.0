@@ -1,5 +1,6 @@
 import SwiftUI
 import UIComponents
+import Base
 
 public struct RewindView: View {
     @State private var rolls = 0
@@ -77,6 +78,9 @@ public struct RewindView: View {
                 .presentationCornerRadius(30)
                 .presentationDragIndicator(.visible)
                 .presentationDetents([.height(450)])
+        .onAppear {
+            print(KeychainService.shared.read(for: .accessToken))
+            print(KeychainService.shared.read(for: .refreshToken))
         }
     }
     
