@@ -42,3 +42,8 @@ type ResetPasswordResponse struct {
 type LogoutResponse struct {
 	Success bool `json:"success"`
 }
+
+// DeleteUserResponse represents the response for the DeleteUser endpoint.
+type DeleteUserResponse struct {
+	Success bool `json:"success"`
+}

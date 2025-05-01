@@ -1,16 +1,18 @@
 package server
 
 import (
-	_ "Rewind-api-gateway-service/docs"
 	"context"
 	"fmt"
-	httpSwagger "github.com/swaggo/http-swagger/v2"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	httpSwagger "github.com/swaggo/http-swagger/v2"
+
+	_ "Rewind-api-gateway-service/docs"
 
 	"Rewind-api-gateway-service/internal/app/di"
 )
@@ -31,8 +33,9 @@ func NewServer(dependencies *di.Dependencies) *Server {
 	mux.HandleFunc("/api/auth/forgot-password", dependencies.AuthHandler.ForgotPassword)
 	mux.HandleFunc("/api/auth/reset-password", dependencies.AuthHandler.ResetPassword)
 	mux.HandleFunc("/api/auth/logout", dependencies.AuthHandler.Logout)
+	mux.HandleFunc("/api/auth/delete-user", dependencies.AuthHandler.DeleteUser)
 
-	// Добавление обработчика для Swagger UI (обрати внимание, что Handle, а не HandleFunc)
+	// Добавление обработчика для Swagger UI
 	mux.Handle("/swagger/", httpSwagger.Handler(func(config *httpSwagger.Config) {
 		config.URL = "/swagger/doc.json"
 	}))

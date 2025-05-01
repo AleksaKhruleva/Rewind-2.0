@@ -251,6 +251,33 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, resp)
 }
 
+// DeleteUser обработчик для POST /api/auth/delete-user
+// @Summary Delete user account
+// @Description Deletes a user account by email.
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param body body requests.DeleteUserRequest true "User email to delete"
+// @Success 200 {object} responses.DeleteUserResponse
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /api/auth/delete-user [post]
+func (h *AuthHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	var req requests.DeleteUserRequest
+	if err := decodeJSONBody(r, &req); err != nil {
+		respondError(w, http.StatusBadRequest, fmt.Sprintf("Invalid request body: %v", err))
+		return
+	}
+
+	resp, err := h.authService.DeleteUser(r.Context(), req.Email)
+	if err != nil {
+		respondError(w, http.StatusInternalServerError, fmt.Sprintf("Auth service error: %v", err))
+		return
+	}
+
+	respondJSON(w, http.StatusOK, resp)
+}
+
 // Вспомогательные функции (decodeJSONBody, respondJSON, respondError) остаются без изменений
 
 // Вспомогательные функции

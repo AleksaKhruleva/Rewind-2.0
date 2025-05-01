@@ -1,4 +1,9 @@
 definitions:
+  requests.DeleteUserRequest:
+    properties:
+      email:
+        type: string
+    type: object
   requests.ForgotPasswordRequest:
     properties:
       email:
@@ -49,6 +54,11 @@ definitions:
       verification_code:
         type: string
     type: object
+  responses.DeleteUserResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
   responses.ForgotPasswordResponse:
     properties:
       success:
@@ -96,13 +106,47 @@ definitions:
       success:
         type: boolean
     type: object
-host: rewindapp.ru
+host: localhost:8080
 info:
   contact: {}
   description: This is the API Gateway for the Rewind application.
   title: Rewind API Gateway
   version: "1.0"
 paths:
+  /api/auth/delete-user:
+    post:
+      consumes:
+      - application/json
+      description: Deletes a user account by email.
+      parameters:
+      - description: User email to delete
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.DeleteUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.DeleteUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete user account
+      tags:
+      - auth
   /api/auth/finish-register:
     post:
       consumes:

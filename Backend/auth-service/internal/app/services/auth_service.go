@@ -149,9 +149,22 @@ func (s *AuthService) SetPasswordAndUsername(ctx context.Context, req *pb.SetPas
 		Username: username,
 	}
 
-	err = s.userRepo.CreateUser(nil, newUser)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create user in database: %w", err)
+	// TODO delete delete method
+	user, err := s.userRepo.GetDeletedUserByEmail(nil, email)
+	if err == nil {
+		log.Printf("Warning: user with email %s already existed, but was deleted, recreating", email)
+		newUser.ID = user.ID
+		err = s.userRepo.SaveDeleted(nil, newUser)
+		if err != nil {
+			return nil, fmt.Errorf("failed to save new user: %w", err)
+		}
+	} else {
+
+		err = s.userRepo.CreateUser(nil, newUser)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create user in database: %w", err)
+		}
+
 	}
 
 	err = s.redisRepo.Del(ctx, verifiedKey).Err()
@@ -402,4 +415,28 @@ func (s *AuthService) Logout(ctx context.Context, req *pb.LogoutRequest) (*pb.Lo
 
 	// 3. Возвращение успешного ответа
 	return &pb.LogoutResponse{Success: true}, nil
+}
+
+func (s *AuthService) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*pb.DeleteUserResponse, error) {
+	email := req.GetEmail()
+	err := s.validator.Var(email, "required,email")
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid email format")
+	}
+
+	// 1. Получение пользователя по email
+	user, err := s.userRepo.GetUserByEmail(nil, email)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, status.Errorf(codes.NotFound, "user not found")
+		}
+		return nil, status.Errorf(codes.Internal, "failed to query user by email: %v", err)
+	}
+
+	// 2. Удаление пользователя из базы данных
+	err = s.userRepo.DeleteUser(nil, user.Email)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to delete user from database: %v", err)
+	}
+	return &pb.DeleteUserResponse{Success: true}, nil
 }
