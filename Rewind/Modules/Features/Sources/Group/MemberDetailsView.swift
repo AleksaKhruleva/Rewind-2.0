@@ -5,11 +5,12 @@ import UIComponents
 let memberName = "Matthew"
 let memberAvatar = UIComponentsAsset.matthewMcConaughey.image
 
-let groupsData = [("person.2.fill", "8 group", false)]
+let nilAction: (() -> Void)? = nil // temporary
+let groupsData = [("person.2.fill", "8 group", nilAction)]
 let activitiesData = [
-    ("photo.fill.on.rectangle.fill", "124 added Rewinds", false),
-    ("person.fill", "3 invited people", false),
-    ("forward.fill", "245 rewind rolls", false)
+    ("photo.fill.on.rectangle.fill", "124 added Rewinds", nilAction),
+    ("person.fill", "3 invited people", nil),
+    ("forward.fill", "245 rewind rolls", nil)
 ]
 
 public struct MemberDetailsView: View {

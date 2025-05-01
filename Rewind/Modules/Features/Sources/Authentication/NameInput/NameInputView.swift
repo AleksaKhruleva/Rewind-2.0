@@ -1,19 +1,16 @@
 import SwiftUI
 import UIComponents
 
-public struct EmailInputView: View {
-    @State private var email: String = ""
+public struct NameInputView: View {
+    @State var viewModel: NameInputViewModel
+    @State private var name: String = ""
     @FocusState private var isFocused: Bool
-    private let flow: AuthFlow
-    
-    var router: AuthenticationRouter
     
     @Environment(\.dismiss)
     private var dismiss
     
-    public init(flow: AuthFlow, router: AuthenticationRouter) {
-        self.flow = flow
-        self.router = router
+    public init(router: AuthenticationRouter, password: String, registrationID: String) {
+        viewModel = .init(router: router, password: password, registrationID: registrationID)
     }
     
     public var body: some View {
@@ -23,23 +20,26 @@ public struct EmailInputView: View {
             }
             
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
-                Text("What's your email?")
+                Text("What's your name?")
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
                 
                 StyledTextField(
-                    text: $email,
-                    placeholder: "email@email.ru",
-                    keyboardType: .emailAddress
+                    text: $name,
+                    placeholder: "name"
                 )
                 .multilineTextAlignment(.center)
                 .focused($isFocused)
                 .onSubmit {
-                    switch flow {
-                    case .registration:
-                        router.navigateToCode()
-                    case .login:
-                        router.navigateToPassword(for: flow)
+                    Task {
+                        await viewModel.dispatch(.submitName(name))
                     }
+                }
+                
+                if viewModel.state == .loading {
+                    ProgressView()
+                } else if case let .error(error) = viewModel.state {
+                    RewindNoteTextView(text: error.errorDescription)
+                        .multilineTextAlignment(.center)
                 }
             }
             .modifier(VStackTopOffsetModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
@@ -54,5 +54,5 @@ public struct EmailInputView: View {
 
 #Preview {
     let router = AppRouter()
-    EmailInputView(flow: .registration, router: .init(appRouter: router))
+    NameInputView(router: .init(appRouter: router), password: "123", registrationID: "123")
 }

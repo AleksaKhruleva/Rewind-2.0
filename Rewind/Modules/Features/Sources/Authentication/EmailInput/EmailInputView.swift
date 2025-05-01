@@ -1,17 +1,15 @@
 import SwiftUI
 import UIComponents
 
-public struct NameInputView: View {
-    @State private var name: String = ""
+public struct EmailInputView: View {
+    @State var viewModel: EmailInputViewModel
     @FocusState private var isFocused: Bool
-    
-    var router: AuthenticationRouter
     
     @Environment(\.dismiss)
     private var dismiss
     
-    public init(router: AuthenticationRouter) {
-        self.router = router
+    public init(flow: AuthFlow, router: AuthenticationRouter) {
+        viewModel = .init(flow: flow, router: router)
     }
     
     public var body: some View {
@@ -21,17 +19,27 @@ public struct NameInputView: View {
             }
             
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
-                Text("What's your name?")
+                Text("What's your email?")
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
                 
                 StyledTextField(
-                    text: $name,
-                    placeholder: "name"
+                    text: $viewModel.email,
+                    placeholder: "email@email.ru",
+                    keyboardType: .emailAddress
                 )
                 .multilineTextAlignment(.center)
                 .focused($isFocused)
                 .onSubmit {
-                    router.navigateToRewind()
+                    Task {
+                        await viewModel.dispatch(.submitEmail)
+                    }
+                }
+                
+                if viewModel.state == .loading {
+                    ProgressView()
+                } else if case let .error(error) = viewModel.state {
+                    RewindNoteTextView(text: error.errorDescription)
+                        .multilineTextAlignment(.center)
                 }
             }
             .modifier(VStackTopOffsetModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
@@ -46,5 +54,5 @@ public struct NameInputView: View {
 
 #Preview {
     let router = AppRouter()
-    NameInputView(router: .init(appRouter: router))
+    EmailInputView(flow: .registration, router: .init(appRouter: router))
 }

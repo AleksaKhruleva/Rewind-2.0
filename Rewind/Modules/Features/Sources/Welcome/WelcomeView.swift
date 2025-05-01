@@ -1,10 +1,11 @@
 import SwiftUI
 import UIComponents
+import Base
 
 public struct WelcomeView: View {
     @State private var textWidth: CGFloat = 0
     
-    var router: AuthenticationRouter
+    let router: AuthenticationRouter
     
     public init(router: AuthenticationRouter) {
         self.router = router
@@ -23,7 +24,7 @@ public struct WelcomeView: View {
                 }
                 
                 Button {
-                    router.navigateToEmail(for: .login)
+                    router.navigateToEmail(for: .login())
                 } label: {
                     Text("Have an account?")
                         .modifier(RoundFontModifier(size: 20, foregroundColor: UIComponentsAsset.lightPinkColor.swiftUIColor))
@@ -31,6 +32,10 @@ public struct WelcomeView: View {
                 }
             }
             .modifier(VStackTopOffsetModifier(topOffsetRatio: 0.87))
+        }
+        .onAppear {
+            print(KeychainService.shared.read(for: .accessToken))
+            print(KeychainService.shared.read(for: .refreshToken))
         }
     }
 }

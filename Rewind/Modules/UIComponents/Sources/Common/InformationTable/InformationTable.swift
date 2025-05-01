@@ -2,10 +2,14 @@ import SwiftUI
 
 public struct InformationTable: View {
     private let title: String
-    private let data: [(String, String, Bool)]
+    private let data: [(icon: String, title: String, action: (() -> Void)?)]
     private let isRisky: Bool
     
-    public init(title: String, data: [(String, String, Bool)], isRisky: Bool) {
+    public init(
+        title: String,
+        data: [(String, String, (() -> Void)?)],
+        isRisky: Bool
+    ) {
         self.title = title
         self.data = data
         self.isRisky = isRisky
@@ -29,12 +33,12 @@ public struct InformationTable: View {
             VStack(alignment: .leading, spacing: 0) {
                 ForEach(data, id: \.1) { item in
                     InformationTableCell(
-                        icon: item.0,
-                        text: item.1,
-                        needChevron: item.2,
+                        icon: item.icon,
+                        text: item.title,
+                        needChevron: item.action != nil,
                         isRisky: isRisky,
                         action: {
-                            print(item.1)
+                            item.action?()
                         }
                     )
                 }
@@ -54,19 +58,19 @@ public struct InformationTable: View {
         InformationTable(
             title: "Risky Zone",
             data: [
-                ("star.fill", "Chevron there", true),
-                ("star.fill", "Chevron there", true)
+                ("star.fill", "Chevron there", {}),
+                ("star.fill", "Chevron there", {})
             ],
             isRisky: true
         )
         
-        InformationTable(title: "Table", data: [("person.fill", "Smth", false)], isRisky: false)
+        InformationTable(title: "Table", data: [("person.fill", "Smth", nil)], isRisky: false)
         
         InformationTable(
             title: "Table",
             data: [
-                ("star.fill", "Chevron there", true),
-                ("star.fill", "Chevron there", true)
+                ("star.fill", "Chevron there", {}),
+                ("star.fill", "Chevron there", {})
             ],
             isRisky: false
         )

@@ -1,12 +1,13 @@
 import SwiftUI
 import UIComponents
+import Base
 
 public struct RewindView: View {
     @State private var rolls = 0
     @State private var currentIndex = 0
     @State private var isSelectGroupPresented = false
     
-    var router: RewindRouter
+    let router: RewindRouter
     
     @Environment(\.showToast)
     private var showToast
