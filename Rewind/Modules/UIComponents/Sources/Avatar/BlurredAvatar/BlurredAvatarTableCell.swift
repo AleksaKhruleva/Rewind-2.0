@@ -14,7 +14,7 @@ struct BlurredAvatarTableCell: View {
             Text(title)
                 .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .bold))
         }
-        .foregroundColor(UIComponentsAsset.textPrimary.swiftUIColor)
+        .foregroundColor(.textPrimary)
         .onTapGesture {
             action()
         }

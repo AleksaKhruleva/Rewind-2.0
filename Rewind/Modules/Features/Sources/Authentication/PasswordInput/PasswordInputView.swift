@@ -15,7 +15,7 @@ public struct PasswordInputView: View {
     
     public var body: some View {
         ZStack(alignment: .topLeading) {
-            UIComponentsAsset.background.swiftUIColor.ignoresSafeArea()
+            Color.background.ignoresSafeArea()
             
             RewindHeader {
                 RewindButton(type: .leftChevron) {
@@ -73,7 +73,7 @@ public struct PasswordInputView: View {
             startTimer()
         } label: {
             Text("Forgot password?")
-                .modifier(RoundFontModifier(size: 13, foregroundColor: UIComponentsAsset.pinkPrimaryLight.swiftUIColor))
+                .modifier(RoundFontModifier(size: 13, foregroundColor: .pinkPrimaryLight))
         }
     }
     
@@ -82,7 +82,7 @@ public struct PasswordInputView: View {
             VStack {
                 Text("We’ve sent a password reset link to")
                 Text(verbatim: "aleksa.khruleva@yandex.ru")
-                    .foregroundStyle(UIComponentsAsset.pinkPrimaryLight.swiftUIColor)
+                    .foregroundStyle(Color.pinkPrimaryLight)
             }
             .modifier(RoundFontModifier(size: 13))
             
@@ -108,7 +108,7 @@ public struct PasswordInputView: View {
             startTimer()
         } label: {
             Text("Resend")
-                .modifier(RoundFontModifier(size: 13, foregroundColor: UIComponentsAsset.pinkPrimaryLight.swiftUIColor))
+                .modifier(RoundFontModifier(size: 13, foregroundColor: .pinkPrimaryLight))
         }
     }
     

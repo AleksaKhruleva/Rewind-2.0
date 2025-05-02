@@ -16,7 +16,7 @@ public struct MediaTopButtons: View {
                     .modifier(RoundFontModifier(size: 15))
                     .padding(.horizontal, 20)
                     .padding(.vertical, 10)
-                    .background(UIComponentsAsset.backgroundSecondary.swiftUIColor)
+                    .background(Color.backgroundSecondary)
                     .clipShape(Capsule())
             }
             
@@ -25,13 +25,13 @@ public struct MediaTopButtons: View {
                     Image(systemName: "gearshape.fill")
                         .font(.system(size: 20))
                         .frame(width: 36, height: 36)
-                        .background(UIComponentsAsset.backgroundSecondary.swiftUIColor)
+                        .background(Color.backgroundSecondary)
                         .clipShape(Circle())
                 }
                 .padding(.trailing, 180)
             }
         }
-        .foregroundStyle(UIComponentsAsset.textPrimary.swiftUIColor)
+        .foregroundStyle(Color.textPrimary)
     }
 }
 

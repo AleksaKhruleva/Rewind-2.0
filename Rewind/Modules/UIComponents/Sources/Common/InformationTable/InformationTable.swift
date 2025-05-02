@@ -22,11 +22,7 @@ public struct InformationTable: View {
                     RoundFontModifier(
                         size: AccountConstants.defaultFontSize,
                         weight: .black,
-                        foregroundColor:
-                            isRisky ?
-                            UIComponentsAsset.riskySecondary.swiftUIColor :
-                            UIComponentsAsset.textSecondary.swiftUIColor
-                        )
+                        foregroundColor: isRisky ? .riskySecondary : .textSecondary)
                     )
                 .padding(.leading, 15)
             
@@ -43,11 +39,7 @@ public struct InformationTable: View {
                     )
                 }
             }
-            .background(
-                isRisky ?
-                UIComponentsAsset.riskyBackground.swiftUIColor :
-                UIComponentsAsset.backgroundSecondary.swiftUIColor
-            )
+            .background(isRisky ? Color.riskyBackground : Color.backgroundSecondary)
             .cornerRadius(24)
         }
     }

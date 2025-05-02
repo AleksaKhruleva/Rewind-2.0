@@ -37,7 +37,7 @@ struct PodiumBadgeView: View {
                 .padding(.top, 4)
             
             Text("\(count) \(counterType)")
-                .modifier(RoundFontModifier(size: 12, foregroundColor: UIComponentsAsset.textTertiary.swiftUIColor))
+                .modifier(RoundFontModifier(size: 12, foregroundColor: .textTertiary))
         }
         .padding()
     }

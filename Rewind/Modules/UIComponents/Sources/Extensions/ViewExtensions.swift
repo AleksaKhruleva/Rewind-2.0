@@ -28,6 +28,5 @@ extension View {
             self
         }
     }
-    
 }
 

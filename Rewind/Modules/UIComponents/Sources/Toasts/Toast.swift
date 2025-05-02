@@ -29,14 +29,14 @@ public struct ToastView: View {
     private var content: some View {
         HStack(alignment: .center, spacing: 8) {
             Text(title)
-                .modifier(RoundFontModifier(size: 14, weight: .black, foregroundColor: UIComponentsAsset.textPrimaryInverted.swiftUIColor))
+                .modifier(RoundFontModifier(size: 14, weight: .black, foregroundColor: .textPrimaryInverted))
                 .padding(.vertical)
             
             Spacer()
         }
         .padding(.leading)
         .padding(.trailing)
-        .background(UIComponentsAsset.backgroundInverted.swiftUIColor)
+        .background(Color.backgroundInverted)
         .cornerRadius(16)
     }
 }

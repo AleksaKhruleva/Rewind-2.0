@@ -8,9 +8,7 @@ public struct BlurredTableCell: View {
     private var action: () -> Void = {}
     
     private var foregroundColor: Color {
-        isRisky ?
-        UIComponentsAsset.riskyPrimary.swiftUIColor :
-        UIComponentsAsset.textPrimary.swiftUIColor
+        isRisky ? .riskyPrimary : .textPrimary
     }
     
     public init(

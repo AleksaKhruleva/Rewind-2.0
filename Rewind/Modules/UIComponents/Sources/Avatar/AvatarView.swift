@@ -18,7 +18,7 @@ public struct AvatarView: View {
                 .cornerRadius(65)
             
             Text(text)
-                .foregroundColor(UIComponentsAsset.textPrimary.swiftUIColor)
+                .foregroundColor(.textPrimary)
                 .modifier(RoundFontModifier(size: AccountConstants.avatarTextFontSize, weight: .black))
         }
     }

@@ -20,7 +20,7 @@ public struct GroupView: View {
     
     public var body: some View {
         ZStack {
-            UIComponentsAsset.background.swiftUIColor.ignoresSafeArea()
+            Color.background.ignoresSafeArea()
             
             VStack {
                 header
@@ -87,7 +87,7 @@ public struct GroupView: View {
     private var activityTable: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text("Activity")
-                .modifier(RoundFontModifier(size: 17, foregroundColor: UIComponentsAsset.textSecondary.swiftUIColor))
+                .modifier(RoundFontModifier(size: 17, foregroundColor: .textSecondary))
                 .padding(.leading, 15)
             VStack(alignment: .leading, spacing: 5) {
                 MembersTableButton(
@@ -105,7 +105,7 @@ public struct GroupView: View {
                     }
             }
             .padding(.vertical, 5)
-            .background(UIComponentsAsset.backgroundSecondary.swiftUIColor)
+            .background(Color.backgroundSecondary)
             .cornerRadius(24)
         }
     }

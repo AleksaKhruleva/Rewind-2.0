@@ -10,7 +10,7 @@ public struct RewindHeader<LeftContent: View, CenterContent: View, RightContent:
     private var dismiss
 
     public init(
-        backgroundColor: Color = UIComponentsAsset.background.swiftUIColor,
+        backgroundColor: Color = Color.background,
         @ViewBuilder leftView: () -> LeftContent,
         @ViewBuilder centerView: () -> CenterContent = { EmptyView() },
         @ViewBuilder rightView: () -> RightContent = { EmptyView() }

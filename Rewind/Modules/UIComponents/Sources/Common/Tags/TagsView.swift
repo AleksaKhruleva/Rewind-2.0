@@ -58,7 +58,7 @@ struct TagsView: View {
             Image(systemName: "plus")
                 .font(.system(size: 18, weight: .black))
                 .frame(width: 38, height: 38)
-                .background(UIComponentsAsset.backgroundSecondary.swiftUIColor)
+                .background(Color.backgroundSecondary)
                 .clipShape(Circle())
                 .padding([.vertical, .trailing], 4)
                 .alignmentGuide(.leading) { d in
@@ -86,7 +86,7 @@ struct TagsView: View {
     private func item(for text: String) -> some View {
         HStack {
             Text(text)
-                .foregroundColor(UIComponentsAsset.textPrimary.swiftUIColor)
+                .foregroundColor(.textPrimary)
                 .modifier(RoundFontModifier(size: 16, weight: .bold))
                 .padding(.leading, 8)
 
@@ -102,7 +102,7 @@ struct TagsView: View {
                 }
         }
         .padding(4)
-        .background(UIComponentsAsset.backgroundSecondary.swiftUIColor)
+        .background(Color.backgroundSecondary)
         .cornerRadius(20)
     }
 }

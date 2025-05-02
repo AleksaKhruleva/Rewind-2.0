@@ -8,7 +8,7 @@ public struct RewindSearchField: View {
     public init(
         text: Binding<String>,
         placeholder: String,
-        backgroundColor: Color = UIComponentsAsset.backgroundSecondary.swiftUIColor
+        backgroundColor: Color = Color.backgroundSecondary
     ) {
         self._text = text
         self.placeholder = placeholder

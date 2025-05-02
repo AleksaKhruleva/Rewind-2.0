@@ -13,12 +13,12 @@ public struct GalleryScrollPreview: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text("Gallery")
-                .modifier(RoundFontModifier(size: 17, foregroundColor: UIComponentsAsset.textSecondary.swiftUIColor))
+                .modifier(RoundFontModifier(size: 17, foregroundColor: .textSecondary))
                 .padding(.leading, 16)
             
             ZStack(alignment: .trailing) {
                 RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .fill(UIComponentsAsset.backgroundSecondary.swiftUIColor)
+                    .fill(Color.backgroundSecondary)
                 
                 HStack(spacing: 0) {
                     ScrollView(.horizontal, showsIndicators: false) {

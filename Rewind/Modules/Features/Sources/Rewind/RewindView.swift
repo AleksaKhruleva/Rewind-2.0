@@ -31,7 +31,7 @@ public struct RewindView: View {
     
     public var body: some View {
         ZStack {
-            UIComponentsAsset.background.swiftUIColor.ignoresSafeArea()
+            Color.background.ignoresSafeArea()
             
             VStack(spacing: 10) {
                 MediaTopButtons {
