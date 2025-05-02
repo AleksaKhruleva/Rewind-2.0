@@ -26,7 +26,7 @@ public struct MembersTableButton: View {
                     .frame(width: 34, height: 34)
                 
                 Text(title)
-                    .modifier(RoundFontModifier(size: 16, foregroundColor: UIComponentsAsset.primaryColor.swiftUIColor))
+                    .modifier(RoundFontModifier(size: 16, foregroundColor: UIComponentsAsset.textPrimary.swiftUIColor))
                 
                 Spacer()
                 

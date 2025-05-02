@@ -19,18 +19,22 @@ public struct MembersListView: View {
     public init() {}
     
     public var body: some View {
-        VStack {
-            header
+        ZStack {
+            UIComponentsAsset.background.swiftUIColor.ignoresSafeArea()
             
-            ScrollView {
-                VStack(spacing: 15) {
-                    searchField
-                    
-                    membersTable
+            VStack {
+                header
+                
+                ScrollView {
+                    VStack(spacing: 15) {
+                        searchField
+                        
+                        membersTable
+                    }
+                    .padding(.horizontal, 16)
                 }
-                .padding(.horizontal, 16)
+                .scrollIndicators(.hidden)
             }
-            .scrollIndicators(.hidden)
         }
     }
     

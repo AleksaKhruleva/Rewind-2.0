@@ -37,7 +37,7 @@ struct SelectGroupView: View {
     
     var body: some View {
         ZStack {
-            UIComponentsAsset.tableBackgroundColor.swiftUIColor
+            UIComponentsAsset.backgroundSecondary.swiftUIColor
                 .ignoresSafeArea()
             
             VStack(spacing: 20) {
@@ -65,7 +65,7 @@ struct SelectGroupView: View {
     private var groupsScroll: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text("\(images.count) groups")
-                .modifier(RoundFontModifier(size: 17, foregroundColor: UIComponentsAsset.tableNameTextColor.swiftUIColor))
+                .modifier(RoundFontModifier(size: 17, foregroundColor: UIComponentsAsset.textSecondary.swiftUIColor))
                 .padding(.leading, 16)
             
             ZStack(alignment: .trailing) {
@@ -88,7 +88,7 @@ struct SelectGroupView: View {
                 .modifier(
                     RoundFontModifier(
                         size: AccountConstants.defaultFontSize,
-                        foregroundColor: UIComponentsAsset.tableNameTextColor.swiftUIColor
+                        foregroundColor: UIComponentsAsset.textSecondary.swiftUIColor
                     )
                 )
                 .padding(.leading, 15)
@@ -118,7 +118,7 @@ struct SelectGroupView: View {
                 .modifier(RoundFontModifier(size: 17))
                 .frame(width: 30, height: 30)
         }
-        .foregroundColor(UIComponentsAsset.primaryColor.swiftUIColor)
+        .foregroundColor(UIComponentsAsset.textPrimary.swiftUIColor)
         .contentShape(Rectangle())
         .frame(height: 50)
         .padding(.horizontal)

@@ -9,8 +9,8 @@ struct InformationTableCell: View {
     
     var foregroundColor: Color {
         isRisky ?
-        UIComponentsAsset.riskyTableTextColor.swiftUIColor :
-        UIComponentsAsset.primaryColor.swiftUIColor
+        UIComponentsAsset.riskyPrimary.swiftUIColor :
+        UIComponentsAsset.textPrimary.swiftUIColor
     }
     
     var body: some View {

@@ -124,7 +124,7 @@ public final class Cell: UICollectionViewCell {
         titleLabel.lineBreakMode = .byTruncatingTail
         let font = UIFont.systemFont(ofSize: Constants.fontSize, weight: .bold)
         titleLabel.font = UIFont(descriptor: font.fontDescriptor.withDesign(.rounded) ?? font.fontDescriptor, size: Constants.fontSize)
-        titleLabel.textColor = UIComponentsAsset.primaryColor.color
+        titleLabel.textColor = UIComponentsAsset.textPrimary.color
         
         contentView.addSubview(imageView)
         contentView.addSubview(titleLabel)

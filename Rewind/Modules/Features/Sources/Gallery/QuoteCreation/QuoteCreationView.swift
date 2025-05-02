@@ -16,31 +16,35 @@ public struct QuoteCreationView: View {
     public init() {}
     
     public var body: some View {
-        VStack(spacing: 0) {
-            header
+        ZStack {
+            UIComponentsAsset.background.swiftUIColor.ignoresSafeArea()
             
-            ScrollView {
-                VStack(spacing: 16) {
-                    quoteContent
-                        .cornerRadius(40)
-                        .onTapGesture {
-                            viewModel.dispatch(.presentQuoteInput)
-                        }
-                    
-                    generalTable
-                    
-                    TagsSectionView(tags: $viewModel.tags)
+            VStack(spacing: 0) {
+                header
+                
+                ScrollView {
+                    VStack(spacing: 16) {
+                        quoteContent
+                            .cornerRadius(40)
+                            .onTapGesture {
+                                viewModel.dispatch(.presentQuoteInput)
+                            }
+                        
+                        generalTable
+                        
+                        TagsSectionView(tags: $viewModel.tags)
+                    }
                 }
+                .scrollIndicators(.hidden)
+                .modifier(MeasureWidthModifier(width: $quoteWidth))
+                .padding(.horizontal, 8)
             }
-            .scrollIndicators(.hidden)
-            .modifier(MeasureWidthModifier(width: $quoteWidth))
-            .padding(.horizontal, 8)
-        }
-        .safeAreaInset(edge: .bottom) {
-            continueButton
-        }
-        .sheet(isPresented: $viewModel.quoteInputPresented) {
-            quoteInputContent
+            .safeAreaInset(edge: .bottom) {
+                continueButton
+            }
+            .sheet(isPresented: $viewModel.quoteInputPresented) {
+                quoteInputContent
+            }
         }
     }
     
@@ -64,7 +68,7 @@ public struct QuoteCreationView: View {
             .frame(width: quoteWidth, height: quoteWidth)
             .foregroundColor(
                 viewModel.quoteState == .empty ?
-                UIComponentsAsset.tableBackgroundColor.swiftUIColor : backgroundColor
+                UIComponentsAsset.backgroundSecondary.swiftUIColor : backgroundColor
             )
             .overlay {
                 switch viewModel.quoteState {
@@ -79,7 +83,7 @@ public struct QuoteCreationView: View {
         VStack {
             Image(systemName: "quote.bubble.fill")
                 .font(.system(size: 130))
-                .foregroundColor(UIComponentsAsset.tableNameTextColor.swiftUIColor)
+                .foregroundColor(UIComponentsAsset.textSecondary.swiftUIColor)
             
             Text("Tap here to enter your quote")
                 .modifier(RoundFontModifier(size: 15, weight: .bold))
@@ -122,7 +126,7 @@ public struct QuoteCreationView: View {
                     RoundFontModifier(
                         size: AccountConstants.defaultFontSize,
                         weight: .black,
-                        foregroundColor: UIComponentsAsset.tableNameTextColor.swiftUIColor
+                        foregroundColor: UIComponentsAsset.textSecondary.swiftUIColor
                     )
                 )
                 .padding(.leading, 15)
@@ -131,7 +135,7 @@ public struct QuoteCreationView: View {
                 ColorPickerTableCell(text: "Background color", color: $backgroundColor)
                 ColorPickerTableCell(text: "Text color", color: $textColor)
             }
-            .background(UIComponentsAsset.tableBackgroundColor.swiftUIColor)
+            .background(UIComponentsAsset.backgroundSecondary.swiftUIColor)
             .cornerRadius(24)
         }
         .disabledWithOpacity(viewModel.quoteState == .empty)

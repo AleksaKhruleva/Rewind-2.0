@@ -19,36 +19,40 @@ public struct GroupView: View {
     public init() {}
     
     public var body: some View {
-        VStack {
-            header
+        ZStack {
+            UIComponentsAsset.background.swiftUIColor.ignoresSafeArea()
             
-            ScrollView {
-                VStack(spacing: 15) {
-                    avatar
-                        .onTapGesture {
-                            withAnimation {
-                                isBlurredAvatarPresented.toggle()
+            VStack {
+                header
+                
+                ScrollView {
+                    VStack(spacing: 15) {
+                        avatar
+                            .onTapGesture {
+                                withAnimation {
+                                    isBlurredAvatarPresented.toggle()
+                                }
                             }
-                        }
-                    
-                    membersTable
-                    
-                    activityTable
-                    
-                    galleryPreview
-                    
-                    groupExistenceNote
+                        
+                        membersTable
+                        
+                        activityTable
+                        
+                        galleryPreview
+                        
+                        groupExistenceNote
+                    }
+                    .padding(.horizontal, 16)
                 }
-                .padding(.horizontal, 16)
+                .scrollIndicators(.hidden)
             }
-            .scrollIndicators(.hidden)
-        }
-        .overlay {
-            if isBlurredAvatarPresented {
-                BlurredAvatarView(
-                    image: UIComponentsAsset.groupAvatar.image,
-                    isPresented: $isBlurredAvatarPresented
-                )
+            .overlay {
+                if isBlurredAvatarPresented {
+                    BlurredAvatarView(
+                        image: UIComponentsAsset.groupAvatar.image,
+                        isPresented: $isBlurredAvatarPresented
+                    )
+                }
             }
         }
     }
@@ -83,7 +87,7 @@ public struct GroupView: View {
     private var activityTable: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text("Activity")
-                .modifier(RoundFontModifier(size: 17, foregroundColor: UIComponentsAsset.tableNameTextColor.swiftUIColor))
+                .modifier(RoundFontModifier(size: 17, foregroundColor: UIComponentsAsset.textSecondary.swiftUIColor))
                 .padding(.leading, 15)
             VStack(alignment: .leading, spacing: 5) {
                 MembersTableButton(
@@ -101,7 +105,7 @@ public struct GroupView: View {
                     }
             }
             .padding(.vertical, 5)
-            .background(UIComponentsAsset.tableBackgroundColor.swiftUIColor)
+            .background(UIComponentsAsset.backgroundSecondary.swiftUIColor)
             .cornerRadius(24)
         }
     }

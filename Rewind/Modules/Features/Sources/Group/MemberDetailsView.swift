@@ -17,22 +17,26 @@ public struct MemberDetailsView: View {
     public init() {}
     
     public var body: some View {
-        VStack {
-            header
+        ZStack {
+            UIComponentsAsset.background.swiftUIColor.ignoresSafeArea()
             
-            ScrollView {
-                VStack(spacing: 15) {
-                    avatar
-                    
-                    groupsTable
-                    
-                    activityTable
-                    
-                    userExistenceNote
+            VStack {
+                header
+                
+                ScrollView {
+                    VStack(spacing: 15) {
+                        avatar
+                        
+                        groupsTable
+                        
+                        activityTable
+                        
+                        userExistenceNote
+                    }
+                    .padding(.horizontal, 16)
                 }
-                .padding(.horizontal, 16)
+                .scrollIndicators(.hidden)
             }
-            .scrollIndicators(.hidden)
         }
     }
     

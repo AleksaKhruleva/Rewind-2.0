@@ -24,8 +24,8 @@ public struct InformationTable: View {
                         weight: .black,
                         foregroundColor:
                             isRisky ?
-                            UIComponentsAsset.riskyTableNameTextColor.swiftUIColor :
-                            UIComponentsAsset.tableNameTextColor.swiftUIColor
+                            UIComponentsAsset.riskySecondary.swiftUIColor :
+                            UIComponentsAsset.textSecondary.swiftUIColor
                         )
                     )
                 .padding(.leading, 15)
@@ -45,8 +45,8 @@ public struct InformationTable: View {
             }
             .background(
                 isRisky ?
-                UIComponentsAsset.riskyTableBackgroundColor.swiftUIColor :
-                UIComponentsAsset.tableBackgroundColor.swiftUIColor
+                UIComponentsAsset.riskyBackground.swiftUIColor :
+                UIComponentsAsset.backgroundSecondary.swiftUIColor
             )
             .cornerRadius(24)
         }
