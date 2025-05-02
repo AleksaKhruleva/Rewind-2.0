@@ -30,7 +30,7 @@ public struct TagInputView: View {
             }
         }
         .modifier(VStackTopOffsetModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
-        .background(UIComponentsAsset.backgroundSecondary.swiftUIColor)
+        .background(Color.backgroundSecondary)
         .onAppear {
             isFocused = true
         }

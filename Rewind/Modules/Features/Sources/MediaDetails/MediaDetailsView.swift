@@ -13,7 +13,7 @@ public struct MediaDetailsView: View {
     
     public var body: some View {
         ZStack {
-            UIComponentsAsset.background.swiftUIColor.ignoresSafeArea()
+            Color.background.ignoresSafeArea()
             
             VStack {
                 header
@@ -44,7 +44,7 @@ public struct MediaDetailsView: View {
         } centerView: {
             Text("Media details")
                 .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .bold))
-                .foregroundColor(UIComponentsAsset.textPrimary.swiftUIColor)
+                .foregroundColor(.textPrimary)
         } rightView: {
             RewindButton(type: .leftChevron).hidden()
         }

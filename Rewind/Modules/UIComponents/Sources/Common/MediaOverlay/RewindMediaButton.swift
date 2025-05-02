@@ -23,7 +23,7 @@ public struct RewindMediaButton: View {
         fontSize: CGFloat = 22,
         type: ButtonType,
         fillable: Bool = false,
-        filledColor: Color = UIComponentsAsset.pinkPrimary.swiftUIColor,
+        filledColor: Color = .pinkPrimary,
         action: @escaping () -> Void = {}
     ) {
         self.size = size

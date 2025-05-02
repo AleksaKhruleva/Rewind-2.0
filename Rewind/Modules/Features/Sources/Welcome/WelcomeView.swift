@@ -13,7 +13,7 @@ public struct WelcomeView: View {
     
     public var body: some View {
         ZStack {
-            UIComponentsAsset.background.swiftUIColor.ignoresSafeArea()
+            Color.background.ignoresSafeArea()
             
             VStack {
                 GradientTitle(text: "Rewind", fontSize: 80)
@@ -29,7 +29,7 @@ public struct WelcomeView: View {
                     router.navigateToEmail(for: .login())
                 } label: {
                     Text("Have an account?")
-                        .modifier(RoundFontModifier(size: 20, foregroundColor: UIComponentsAsset.pinkPrimaryLight.swiftUIColor))
+                        .modifier(RoundFontModifier(size: 20, foregroundColor: .pinkPrimaryLight))
                         .modifier(MeasureWidthModifier(width: $textWidth))
                 }
             }

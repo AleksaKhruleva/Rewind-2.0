@@ -8,9 +8,7 @@ struct InformationTableCell: View {
     var action: () -> Void
     
     var foregroundColor: Color {
-        isRisky ?
-        UIComponentsAsset.riskyPrimary.swiftUIColor :
-        UIComponentsAsset.textPrimary.swiftUIColor
+        isRisky ? .riskyPrimary : .textPrimary
     }
     
     var body: some View {

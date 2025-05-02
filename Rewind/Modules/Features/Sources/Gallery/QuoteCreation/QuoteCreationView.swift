@@ -17,7 +17,7 @@ public struct QuoteCreationView: View {
     
     public var body: some View {
         ZStack {
-            UIComponentsAsset.background.swiftUIColor.ignoresSafeArea()
+            Color.background.ignoresSafeArea()
             
             VStack(spacing: 0) {
                 header
@@ -68,7 +68,7 @@ public struct QuoteCreationView: View {
             .frame(width: quoteWidth, height: quoteWidth)
             .foregroundColor(
                 viewModel.quoteState == .empty ?
-                UIComponentsAsset.backgroundSecondary.swiftUIColor : backgroundColor
+                .backgroundSecondary : backgroundColor
             )
             .overlay {
                 switch viewModel.quoteState {
@@ -83,7 +83,7 @@ public struct QuoteCreationView: View {
         VStack {
             Image(systemName: "quote.bubble.fill")
                 .font(.system(size: 130))
-                .foregroundColor(UIComponentsAsset.textSecondary.swiftUIColor)
+                .foregroundColor(.textSecondary)
             
             Text("Tap here to enter your quote")
                 .modifier(RoundFontModifier(size: 15, weight: .bold))
@@ -120,13 +120,13 @@ public struct QuoteCreationView: View {
     }
     
     private var generalTable: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("Customizing")
                 .modifier(
                     RoundFontModifier(
                         size: AccountConstants.defaultFontSize,
                         weight: .black,
-                        foregroundColor: UIComponentsAsset.textSecondary.swiftUIColor
+                        foregroundColor: .textSecondary
                     )
                 )
                 .padding(.leading, 15)
@@ -135,7 +135,7 @@ public struct QuoteCreationView: View {
                 ColorPickerTableCell(text: "Background color", color: $backgroundColor)
                 ColorPickerTableCell(text: "Text color", color: $textColor)
             }
-            .background(UIComponentsAsset.backgroundSecondary.swiftUIColor)
+            .background(Color.backgroundSecondary)
             .cornerRadius(24)
         }
         .disabledWithOpacity(viewModel.quoteState == .empty)

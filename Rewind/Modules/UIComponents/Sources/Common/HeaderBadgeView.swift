@@ -19,7 +19,7 @@ public struct HeaderBadgeView: View {
             
             Text(text)
                 .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .bold))
-                .foregroundColor(UIComponentsAsset.textPrimary.swiftUIColor)
+                .foregroundColor(.textPrimary)
         }
     }
 }

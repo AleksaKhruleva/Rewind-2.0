@@ -10,15 +10,15 @@ public struct TagsSectionView: View {
     }
     
     public var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text("Tags")
-                    .foregroundColor(UIComponentsAsset.textSecondary.swiftUIColor)
+                    .foregroundColor(.textSecondary)
                     .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .black))
                     .padding(.leading, 16)
                 
                 Text("\(tags.count)/\(maxTags)")
-                    .foregroundColor(UIComponentsAsset.textTertiary.swiftUIColor)
+                    .foregroundColor(.textTertiary)
                     .modifier(RoundFontModifier(size: 14, weight: .black))
                     .padding(.leading, 4)
                 
@@ -28,7 +28,7 @@ public struct TagsSectionView: View {
                     withAnimation { tags.shuffle() }
                 }
                 .buttonStyle(.plain)
-                .foregroundColor(UIComponentsAsset.pinkPrimary.swiftUIColor)
+                .foregroundColor(.pinkPrimary)
                 .modifier(RoundFontModifier(size: 14, weight: .black))
                 .padding(.trailing, 16)
                 .disabledWithOpacity(tags.isEmpty)

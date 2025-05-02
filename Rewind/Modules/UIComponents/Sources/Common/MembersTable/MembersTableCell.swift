@@ -25,15 +25,12 @@ struct MembersTableCell: View {
                     .clipShape(Circle())
                 
                 Text(member.name)
-                    .modifier(RoundFontModifier(size: 16, foregroundColor: UIComponentsAsset.textPrimary.swiftUIColor))
+                    .modifier(RoundFontModifier(size: 16, foregroundColor: .textPrimary))
                 
                 if member.isUser {
                     Text("(You)")
                         .modifier(
-                            RoundFontModifier(
-                                size: 14,
-                                foregroundColor: UIComponentsAsset.textTertiary.swiftUIColor
-                            )
+                            RoundFontModifier(size: 14, foregroundColor: .textTertiary)
                         )
                         .padding(.leading, -8)
                 }
@@ -47,7 +44,7 @@ struct MembersTableCell: View {
             
             if member.isOwner {
                 Image(systemName: "star.fill")
-                    .modifier(RoundFontModifier(size: 14, foregroundColor: UIComponentsAsset.pinkPrimary.swiftUIColor))
+                    .modifier(RoundFontModifier(size: 14, foregroundColor: .pinkPrimary))
             } else {
                 Button(action: onRemove) {
                     Image(systemName: "xmark")

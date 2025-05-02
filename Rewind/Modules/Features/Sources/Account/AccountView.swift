@@ -18,7 +18,7 @@ public struct AccountView: View {
     
     public var body: some View {
         ZStack {
-            UIComponentsAsset.background.swiftUIColor.ignoresSafeArea()
+            Color.background.ignoresSafeArea()
             
             VStack(spacing: 0) {
                 header
@@ -40,7 +40,7 @@ public struct AccountView: View {
                         
                         VStack(alignment: .leading, spacing: 5) {
                             Text("App Icons")
-                                .foregroundColor(UIComponentsAsset.textSecondary.swiftUIColor)
+                                .foregroundColor(.textSecondary)
                                 .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .black))
                                 .padding(.leading, 15)
                             
@@ -93,7 +93,7 @@ public struct AccountView: View {
                 .padding(.vertical, 8)
                 .padding(.horizontal, 8)
         }
-        .background(UIComponentsAsset.backgroundSecondary.swiftUIColor)
+        .background(Color.backgroundSecondary)
         .cornerRadius(23)
     }
     

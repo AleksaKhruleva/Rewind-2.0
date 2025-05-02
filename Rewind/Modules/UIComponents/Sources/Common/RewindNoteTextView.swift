@@ -9,12 +9,7 @@ public struct RewindNoteTextView: View {
     
     public var body: some View {
         Text(text)
-            .modifier(RoundFontModifier(
-                    size: 14,
-                    weight: .bold,
-                    foregroundColor: UIComponentsAsset.textTertiary.swiftUIColor
-                )
-            )
+            .modifier(RoundFontModifier(size: 14, weight: .bold, foregroundColor: .textTertiary))
     }
 }
 

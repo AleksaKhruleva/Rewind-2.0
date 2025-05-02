@@ -16,7 +16,7 @@ public struct GalleryView: View {
     
     public var body: some View {
         ZStack {
-            UIComponentsAsset.background.swiftUIColor.ignoresSafeArea()
+            Color.background.ignoresSafeArea()
             
             VStack(spacing: 0) {
                 GalleryHeader(

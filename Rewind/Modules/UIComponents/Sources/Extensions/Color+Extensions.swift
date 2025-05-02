@@ -16,3 +16,20 @@ public extension Color {
         }
     }
 }
+
+public extension Color {
+    static let background = UIComponentsAsset.background.swiftUIColor
+    static let backgroundInverted = UIComponentsAsset.backgroundInverted.swiftUIColor
+    static let backgroundSecondary = UIComponentsAsset.backgroundSecondary.swiftUIColor
+    static let iconsBorder = UIComponentsAsset.iconsBorder.swiftUIColor
+    static let pinkPrimary = UIComponentsAsset.pinkPrimary.swiftUIColor
+    static let pinkPrimaryLight = UIComponentsAsset.pinkPrimaryLight.swiftUIColor
+    static let riskyBackground = UIComponentsAsset.riskyBackground.swiftUIColor
+    static let riskyPrimary = UIComponentsAsset.riskyPrimary.swiftUIColor
+    static let riskySecondary = UIComponentsAsset.riskySecondary.swiftUIColor
+    static let textPrimary = UIComponentsAsset.textPrimary.swiftUIColor
+    static let textPrimaryInverted = UIComponentsAsset.textPrimaryInverted.swiftUIColor
+    static let textSecondary = UIComponentsAsset.textSecondary.swiftUIColor
+    static let textTertiary = UIComponentsAsset.textTertiary.swiftUIColor
+    static let textTertiaryLight = UIComponentsAsset.textTertiaryLight.swiftUIColor
+}
