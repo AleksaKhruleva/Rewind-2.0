@@ -1,7 +1,8 @@
 import Foundation
 import SwiftUI
 
-public class AppIconViewModel: Identifiable, ObservableObject {
+@MainActor @Observable
+public final class AppIconViewModel: Identifiable {
     enum Event {
         case change
     }
@@ -9,8 +10,8 @@ public class AppIconViewModel: Identifiable, ObservableObject {
     let name: String
     let task: String
     let needTitle: Bool
-    @Published var selected: Bool
-    @Published var locked: Bool
+    var selected: Bool
+    var locked: Bool
 
     public init(appIcon: String, task: String, locked: Bool = true, needTitle: Bool = true) {
         self.name = appIcon

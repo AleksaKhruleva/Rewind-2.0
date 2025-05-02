@@ -1,14 +1,24 @@
 import SwiftUI
 
-public final class AppRouter: ObservableObject {
+@MainActor @Observable
+public final class AppRouter {
     public enum Route: Hashable {
+        case welcome
+        
+        case email(AuthFlow)
+        case code(registrationID: String)
+        case password(AuthFlow, registrationID: String?)
+        case name(password: String, registrationID: String)
+        
+        case rewind
+        
         case account
         case gallery
         case quote
         case mediaDetails(UIImage)
     }
     
-    @Published public var path = NavigationPath()
+    public var path = NavigationPath()
     
     public init() {}
     
@@ -18,6 +28,10 @@ public final class AppRouter: ObservableObject {
     
     func pop() {
         path.removeLast()
+    }
+    
+    func pop(by count: Int) {
+        path.removeLast(count)
     }
     
     func popToRoot() {

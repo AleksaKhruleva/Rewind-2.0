@@ -47,8 +47,6 @@ public struct QuoteCreationView: View {
     private var header: some View {
         RewindHeader {
             RewindButton(type: .leftChevron) { dismiss() }
-        } centerView: {
-            EmptyView()
         } rightView: {
             RewindButton(type: .trash) {
                 guard viewModel.quoteState != .empty else { return }

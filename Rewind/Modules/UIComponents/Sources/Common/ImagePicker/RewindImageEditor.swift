@@ -37,9 +37,7 @@ struct RewindImageEditor: View {
     
     var header: some View {
         RewindHeader {
-            RewindButton(type: .leftChevron) {
-                dismiss()
-            }
+            RewindButton(type: .leftChevron) { dismiss() }
         } centerView: {
             Text("Image Editor")
                 .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .bold))

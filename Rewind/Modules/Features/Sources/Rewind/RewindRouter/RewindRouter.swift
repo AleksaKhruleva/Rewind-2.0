@@ -1,5 +1,6 @@
 import SwiftUI
 
+@MainActor
 public final class RewindRouter {
     private weak var appRouter: AppRouter?
     

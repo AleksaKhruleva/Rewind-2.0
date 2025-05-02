@@ -2,38 +2,52 @@ import SwiftUI
 import UIComponents
 
 public struct PasswordInputView: View {
-    @State private var password = ""
+    @State var viewModel: PasswordInputViewModel
     @State private var showNotice = false
     @State private var canResend = false
     @State private var timer: Timer? = nil
     @State private var secondsLeft = 60
     @FocusState private var isFocused: Bool
-    private let flow: AuthFlow
     
-    public init(flow: AuthFlow) {
-        self.flow = flow
+    public init(flow: AuthFlow, router: AuthenticationRouter, registrationID: String?) {
+        viewModel = PasswordInputViewModel(flow: flow, router: router, registrationID: registrationID)
     }
     
     public var body: some View {
         ZStack(alignment: .topLeading) {
-            BackButton(direction: .left) {
-                // TODO: do something later
+            RewindHeader {
+                RewindButton(type: .leftChevron) {
+                    Task {
+                        await viewModel.dispatch(.dismiss)
+                    }
+                }
             }
-            .modifier(BackButtonPositionModifier())
             
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
                 Text("Enter your password")
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
                 
                 StyledTextField(
-                    text: $password,
+                    text: $viewModel.password,
                     placeholder: "password",
                     isSecure: true
                 )
                 .multilineTextAlignment(.center)
                 .focused($isFocused)
+                .onSubmit {
+                    Task {
+                        await viewModel.dispatch(.submitPassword)
+                    }
+                }
                 
-                if flow == .login {
+                if viewModel.state == .loading {
+                    ProgressView()
+                } else if case let .error(error) = viewModel.state {
+                    RewindNoteTextView(text: error.errorDescription)
+                        .multilineTextAlignment(.center)
+                }
+                
+                if case .login = viewModel.flow {
                     if showNotice {
                         notice
                             .transition(.opacity)
@@ -44,10 +58,9 @@ public struct PasswordInputView: View {
             }
             .modifier(VStackTopOffsetModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
         }
-        // TODO: fix constraint warning later and uncomment
-        //        .onAppear {
-        //            isFocused = true
-        //        }
+        .onAppear {
+            isFocused = true
+        }
         .hideKeyboardOnTap()
         .hideKeyboardOnDrag()
     }
@@ -113,5 +126,6 @@ public struct PasswordInputView: View {
 }
 
 #Preview {
-    PasswordInputView(flow: .login)
+    let router = AppRouter()
+    PasswordInputView(flow: .login(), router: .init(appRouter: router), registrationID: "123")
 }

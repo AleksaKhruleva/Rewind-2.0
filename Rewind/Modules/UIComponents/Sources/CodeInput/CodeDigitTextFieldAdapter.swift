@@ -98,7 +98,7 @@ public struct CodeDigitTextFieldAdapter: UIViewRepresentable {
     }
 }
 
-public class CodeDigitTextField: UITextField {
+public final class CodeDigitTextField: UITextField {
     var onBackspace: ((Bool) -> Void)?
     
     public override func deleteBackward() {

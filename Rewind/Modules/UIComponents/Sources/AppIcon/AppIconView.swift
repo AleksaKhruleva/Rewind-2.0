@@ -1,7 +1,7 @@
 import SwiftUI
 
 public struct AppIconView: View {
-    @ObservedObject var viewModel: AppIconViewModel
+    @State var viewModel: AppIconViewModel
 
     public init(viewModel: AppIconViewModel) {
         self.viewModel = viewModel

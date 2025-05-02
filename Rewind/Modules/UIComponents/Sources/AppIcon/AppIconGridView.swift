@@ -1,9 +1,11 @@
 import SwiftUI
 
 public struct AppIconsGridView: View {
-    @StateObject private var viewModel = AppIconsViewModel()
+    @State private var viewModel: AppIconsViewModel
 
-    public init() {}
+    public init() {
+        viewModel = AppIconsViewModel()
+    }
     
     public var body: some View {
         let columns = [

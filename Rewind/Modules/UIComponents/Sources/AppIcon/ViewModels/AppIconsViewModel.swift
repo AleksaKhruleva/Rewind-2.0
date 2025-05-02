@@ -1,11 +1,12 @@
 import SwiftUI
 
-public class AppIconsViewModel: ObservableObject, Identifiable {
+@MainActor @Observable
+public final class AppIconsViewModel: Identifiable {
     enum Intent {
         case change(icon: AppIconViewModel)
     }
     
-    @Published var appIcons: [AppIconViewModel]
+    var appIcons: [AppIconViewModel]
     
     public init() {
         self.appIcons = [

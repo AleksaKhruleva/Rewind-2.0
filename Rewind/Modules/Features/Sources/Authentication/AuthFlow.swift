@@ -1,5 +1,5 @@
 
-public enum AuthFlow {
+public enum AuthFlow: Hashable {
     case registration
-    case login
+    case login(email: String = "")
 }

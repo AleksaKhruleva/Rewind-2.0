@@ -1,12 +1,13 @@
 import SwiftUI
 import UIComponents
+import Base
 
 public struct RewindView: View {
     @State private var rolls = 0
     @State private var currentIndex = 0
     @State private var isSelectGroupPresented = false
     
-    var router: RewindRouter
+    let router: RewindRouter
     
     @Environment(\.showToast)
     private var showToast
@@ -77,6 +78,10 @@ public struct RewindView: View {
                 .presentationCornerRadius(30)
                 .presentationDragIndicator(.visible)
                 .presentationDetents([.height(450)])
+                .onAppear {
+                    print(KeychainService.shared.read(for: .accessToken))
+                    print(KeychainService.shared.read(for: .refreshToken))
+                }
         }
     }
     
@@ -89,7 +94,6 @@ public struct RewindView: View {
             } onGlobeTap: {
                 // TODO: show map
             }
-            
         } rightView: {
             RoundImageView(image: UIComponentsAsset.avatar.image, size: 44)
                 .contentShape(Circle())

@@ -2,14 +2,19 @@ import SwiftUI
 import UIComponents
 
 public struct AccountView: View {
-    // TODO: Take viewModel from Assemmbly/Builder/Container
-    @StateObject private var appIconsViewModel = AppIconsViewModel()
+    @State private var appIconsViewModel: AppIconsViewModel
+    @State private var viewModel: AccountViewModel
     @State private var isBlurredAvatarPresented = false
 
     @Environment(\.dismiss)
     private var dismiss
+    @Environment(\.showToast)
+    private var showToast
     
-    public init() {}
+    public init(router: AccountRouter) {
+        appIconsViewModel = AppIconsViewModel()
+        viewModel = AccountViewModel(router: router)
+    }
     
     public var body: some View {
         VStack {
@@ -48,6 +53,9 @@ public struct AccountView: View {
             }
             .scrollIndicators(.hidden)
         }
+        .onAppear {
+            viewModel.set(showToast: showToast)
+        }
         .overlay {
             if isBlurredAvatarPresented {
                 BlurredAvatarView(
@@ -67,7 +75,7 @@ public struct AccountView: View {
                 text: "flowykk"
             )
         } rightView: {
-            RewindButton(type: .empty) {}
+            RewindButton(type: .empty).hidden()
         }
     }
     
@@ -98,10 +106,20 @@ public struct AccountView: View {
     }
     
     var riskyTable: some View {
-        InformationTable(title: "Risky Zone", data: AccountConstants.risky, isRisky: true)
+        InformationTable(
+            title: "Risky Zone",
+            data: [
+                ("rectangle.portrait.and.arrow.right.fill", "Sign out", {
+                    Task { await viewModel.dispatch(.signOut) }
+                }),
+                ("trash.fill", "Delete account", {})
+            ],
+            isRisky: true
+        )
     }
 }
 
 #Preview {
-    AccountView()
+    let router = AppRouter()
+    AccountView(router: .init(appRouter: router))
 }
