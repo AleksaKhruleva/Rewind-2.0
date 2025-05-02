@@ -26,19 +26,24 @@ final class AccountViewModel {
     func dispatch(_ intent: Intent) async {
         switch intent {
         case .signOut:
-            if let refreshToken = KeychainService.shared.read(for: .refreshToken) {
+            if let refreshToken = KeychainService.shared.read(for: .refreshToken),
+               let refreshToken = KeychainService.shared.read(for: .accessToken) {
                 do {
                     let response = try await backend.logout(refreshToken: refreshToken)
                     if response.success {
                         KeychainService.shared.clearAll()
                         router.navigateToWelcome()
                     } else {
-                        showToast("Something went wrong, please try again 😩")
+                        showErrorToast()
                     }
                 } catch {
-                    showToast("Something went wrong, please try again 😩")
+                    showErrorToast()
                 }
             }
         }
+    }
+    
+    private func showErrorToast() {
+        showToast("Something went wrong, please try again 😩")
     }
 }

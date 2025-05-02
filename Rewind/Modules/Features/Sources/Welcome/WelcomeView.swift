@@ -33,10 +33,6 @@ public struct WelcomeView: View {
             }
             .modifier(VStackTopOffsetModifier(topOffsetRatio: 0.87))
         }
-        .onAppear {
-            print(KeychainService.shared.read(for: .accessToken))
-            print(KeychainService.shared.read(for: .refreshToken))
-        }
     }
 }
 

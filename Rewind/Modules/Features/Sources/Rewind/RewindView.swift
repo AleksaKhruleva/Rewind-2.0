@@ -78,9 +78,10 @@ public struct RewindView: View {
                 .presentationCornerRadius(30)
                 .presentationDragIndicator(.visible)
                 .presentationDetents([.height(450)])
-        .onAppear {
-            print(KeychainService.shared.read(for: .accessToken))
-            print(KeychainService.shared.read(for: .refreshToken))
+                .onAppear {
+                    print(KeychainService.shared.read(for: .accessToken))
+                    print(KeychainService.shared.read(for: .refreshToken))
+                }
         }
     }
     

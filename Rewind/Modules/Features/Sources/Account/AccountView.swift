@@ -1,53 +1,6 @@
 import SwiftUI
 import UIComponents
 
-import Networking
-import Base
-
-@MainActor @Observable
-final class AccountViewModel {
-    enum Intent {
-        case signOut
-    }
-    
-    var router: AccountRouter
-    
-    private let backend: NetworkServiceProtocol
-    
-    init(router: AccountRouter) {
-        self.router = router
-        backend = NetworkService()
-    }
-    
-    func dispatch(_ intent: Intent) async {
-        switch intent {
-        case .signOut:
-            if let refreshToken = KeychainService.shared.read(for: .refreshToken) {
-                do {
-                    let response = try await backend.logout(refreshToken: refreshToken)
-                    KeychainService.shared.clearAll()
-                    router.navigateToWelcome()
-                } catch {
-                    print(1231231)
-                }
-            }
-        }
-    }
-}
-
-@MainActor
-public final class AccountRouter {
-    private weak var appRouter: AppRouter?
-    
-    public init(appRouter: AppRouter) {
-        self.appRouter = appRouter
-    }
-    
-    func navigateToWelcome() {
-        appRouter?.navigate(to: .welcome)
-    }
-}
-
 public struct AccountView: View {
     @State private var appIconsViewModel: AppIconsViewModel
     @State private var viewModel: AccountViewModel
@@ -157,9 +110,7 @@ public struct AccountView: View {
             title: "Risky Zone",
             data: [
                 ("rectangle.portrait.and.arrow.right.fill", "Sign out", {
-                    Task {
-                        await viewModel.dispatch(.signOut)
-                    }
+                    Task { await viewModel.dispatch(.signOut) }
                 }),
                 ("trash.fill", "Delete account", {})
             ],

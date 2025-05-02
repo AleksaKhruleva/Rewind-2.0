@@ -30,10 +30,6 @@ final class NetworkProvider<T: TargetType> {
                         return
                     }
                     
-//                    guard response.statusCode >= 200, response.statusCode < 300 else {
-//                        continuation.resume(throwing: HTTPError.error)
-//                    }
-                    
                     do {
                         let decoded = try JSONDecoder().decode(D.self, from: response.data)
                         continuation.resume(returning: decoded)
