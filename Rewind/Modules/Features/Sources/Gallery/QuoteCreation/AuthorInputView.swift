@@ -22,7 +22,7 @@ struct AuthorInputView: View {
         }
         .modifier(VStackTopOffsetModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
         .padding(.horizontal)
-        .background(UIComponentsAsset.tableBackgroundColor.swiftUIColor)
+        .background(UIComponentsAsset.backgroundSecondary.swiftUIColor)
         .onAppear {
             isFocused = true
         }

@@ -24,14 +24,14 @@ public struct AuthorBadgeView: View {
                     .modifier(RoundFontModifier(
                             size: 14,
                             weight: .black,
-                            foregroundColor: UIComponentsAsset.primaryColor.swiftUIColor
+                            foregroundColor: UIComponentsAsset.textPrimary.swiftUIColor
                         ))
                 
                 Text(date)
                     .modifier(RoundFontModifier(
                             size: 10,
                             weight: .black,
-                            foregroundColor: UIComponentsAsset.secondaryColor.swiftUIColor
+                            foregroundColor: UIComponentsAsset.textTertiary.swiftUIColor
                         ))
             }
         }

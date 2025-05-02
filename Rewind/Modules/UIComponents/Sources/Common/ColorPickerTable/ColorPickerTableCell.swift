@@ -20,7 +20,7 @@ public struct ColorPickerTableCell: View {
                     RoundFontModifier(
                         size: AccountConstants.defaultFontSize,
                         weight: .bold,
-                        foregroundColor: UIComponentsAsset.primaryColor.swiftUIColor
+                        foregroundColor: UIComponentsAsset.textPrimary.swiftUIColor
                     )
                 )
                 .padding(.leading, 5)
@@ -34,7 +34,7 @@ public struct ColorPickerTableCell: View {
                 .fontWeight(.bold)
                 .frame(width: 30, height: 30)
         }
-        .foregroundColor(UIComponentsAsset.primaryColor.swiftUIColor)
+        .foregroundColor(UIComponentsAsset.textPrimary.swiftUIColor)
         .contentShape(Rectangle())
         .onTapGesture { showColorPicker = true }
         .frame(height: 42)

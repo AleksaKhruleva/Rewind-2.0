@@ -12,25 +12,29 @@ public struct MediaDetailsView: View {
     }
     
     public var body: some View {
-        VStack {
-            header
+        ZStack {
+            UIComponentsAsset.background.swiftUIColor.ignoresSafeArea()
             
-            ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    rewind
-                    
-                    author
-                        .padding(.leading)
-                    
-                    TagsSectionView(tags: $tags)
-                    
-                    riskyTable
+            VStack {
+                header
+                
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        rewind
+                        
+                        author
+                            .padding(.leading)
+                        
+                        TagsSectionView(tags: $tags)
+                        
+                        riskyTable
+                    }
+                    .ignoresSafeArea()
                 }
-                .ignoresSafeArea()
+                .scrollIndicators(.hidden)
+                .scrollBounceBehavior(.basedOnSize)
+                .padding(.horizontal, 8)
             }
-            .scrollIndicators(.hidden)
-            .scrollBounceBehavior(.basedOnSize)
-            .padding(.horizontal, 8)
         }
     }
     
@@ -40,7 +44,7 @@ public struct MediaDetailsView: View {
         } centerView: {
             Text("Media details")
                 .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .bold))
-                .foregroundColor(UIComponentsAsset.primaryColor.swiftUIColor)
+                .foregroundColor(UIComponentsAsset.textPrimary.swiftUIColor)
         } rightView: {
             RewindButton(type: .leftChevron).hidden()
         }

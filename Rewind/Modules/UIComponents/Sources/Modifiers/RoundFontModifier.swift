@@ -8,7 +8,7 @@ public struct RoundFontModifier: ViewModifier {
     public init(
         size: CGFloat,
         weight: Font.Weight = .heavy,
-        foregroundColor: Color = UIComponentsAsset.primaryColor.swiftUIColor
+        foregroundColor: Color = UIComponentsAsset.textPrimary.swiftUIColor
     ) {
         self.size = size
         self.weight = weight

@@ -18,7 +18,7 @@ public struct RewindButton: View {
     
     public init(
         type: ButtonType,
-        tint: Color = UIComponentsAsset.primaryColor.swiftUIColor,
+        tint: Color = UIComponentsAsset.textPrimary.swiftUIColor,
         action: @escaping () -> Void = {}
     ) {
         self.type = type

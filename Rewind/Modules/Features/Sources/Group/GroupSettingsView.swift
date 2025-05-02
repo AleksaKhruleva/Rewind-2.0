@@ -18,27 +18,31 @@ public struct GroupSettingsView: View {
     public init() {}
     
     public var body: some View {
-        VStack {
-            header
+        ZStack {
+            UIComponentsAsset.background.swiftUIColor.ignoresSafeArea()
             
-            ScrollView {
-                VStack(spacing: 15) {
-                    avatar
-                    
-                    generalTable
-                    
-                    riskyTable
+            VStack {
+                header
+                
+                ScrollView {
+                    VStack(spacing: 15) {
+                        avatar
+                        
+                        generalTable
+                        
+                        riskyTable
+                    }
+                    .padding(.horizontal, 16)
                 }
-                .padding(.horizontal, 16)
+                .scrollIndicators(.hidden)
             }
-            .scrollIndicators(.hidden)
-        }
-        .overlay {
-            if isBlurredAvatarPresented {
-                BlurredAvatarView(
-                    image: UIComponentsAsset.groupAvatar.image,
-                    isPresented: $isBlurredAvatarPresented
-                )
+            .overlay {
+                if isBlurredAvatarPresented {
+                    BlurredAvatarView(
+                        image: UIComponentsAsset.groupAvatar.image,
+                        isPresented: $isBlurredAvatarPresented
+                    )
+                }
             }
         }
     }

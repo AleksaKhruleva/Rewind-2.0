@@ -13,12 +13,12 @@ public struct TagsSectionView: View {
         VStack(alignment: .leading) {
             HStack {
                 Text("Tags")
-                    .foregroundColor(UIComponentsAsset.tableNameTextColor.swiftUIColor)
+                    .foregroundColor(UIComponentsAsset.textSecondary.swiftUIColor)
                     .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .black))
                     .padding(.leading, 16)
                 
                 Text("\(tags.count)/\(maxTags)")
-                    .foregroundColor(UIComponentsAsset.secondaryColor.swiftUIColor)
+                    .foregroundColor(UIComponentsAsset.textTertiary.swiftUIColor)
                     .modifier(RoundFontModifier(size: 14, weight: .black))
                     .padding(.leading, 4)
                 
@@ -28,7 +28,7 @@ public struct TagsSectionView: View {
                     withAnimation { tags.shuffle() }
                 }
                 .buttonStyle(.plain)
-                .foregroundColor(UIComponentsAsset.pinkColor.swiftUIColor)
+                .foregroundColor(UIComponentsAsset.pinkPrimary.swiftUIColor)
                 .modifier(RoundFontModifier(size: 14, weight: .black))
                 .padding(.trailing, 16)
                 .disabledWithOpacity(tags.isEmpty)

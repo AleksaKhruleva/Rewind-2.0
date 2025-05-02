@@ -33,19 +33,19 @@ public struct StyledTextField: View {
                 SecureField(
                     "",
                     text: $text,
-                    prompt: Text(placeholder).foregroundStyle(Color(UIColor.systemGray5))
+                    prompt: Text(placeholder).foregroundStyle(UIComponentsAsset.textTertiaryLight.swiftUIColor)
                 )
             } else {
                 TextField(
                     "",
                     text: $text,
-                    prompt: Text(placeholder).foregroundStyle(Color(UIColor.systemGray5))
+                    prompt: Text(placeholder).foregroundStyle(UIComponentsAsset.textTertiaryLight.swiftUIColor)
                 )
             }
         }
         .font(.system(size: 22, weight: .semibold, design: .monospaced))
-        .foregroundStyle(UIComponentsAsset.primaryColor.swiftUIColor)
-        .tint(UIComponentsAsset.pinkColor.swiftUIColor)
+        .foregroundStyle(UIComponentsAsset.textPrimary.swiftUIColor)
+        .tint(UIComponentsAsset.pinkPrimary.swiftUIColor)
         .keyboardType(keyboardType)
         .textInputAutocapitalization(.never)
         .autocorrectionDisabled(true)

@@ -31,6 +31,8 @@ public struct RewindView: View {
     
     public var body: some View {
         ZStack {
+            UIComponentsAsset.background.swiftUIColor.ignoresSafeArea()
+            
             VStack(spacing: 10) {
                 MediaTopButtons {
                     router.navigateToMediaDetails(mediaImages[currentIndex])
@@ -78,10 +80,6 @@ public struct RewindView: View {
                 .presentationCornerRadius(30)
                 .presentationDragIndicator(.visible)
                 .presentationDetents([.height(450)])
-                .onAppear {
-                    print(KeychainService.shared.read(for: .accessToken))
-                    print(KeychainService.shared.read(for: .refreshToken))
-                }
         }
     }
     

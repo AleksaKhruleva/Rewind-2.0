@@ -98,7 +98,7 @@ public struct BlurredMediaView: View {
                 // TODO: smth
             }
         )
-        .background(UIComponentsAsset.riskyTableBackgroundColor.swiftUIColor)
+        .background(UIComponentsAsset.riskyBackground.swiftUIColor)
         .modifier(BlurredMediaTableModifier())
     }
     

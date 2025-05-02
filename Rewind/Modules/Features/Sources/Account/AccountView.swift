@@ -17,51 +17,55 @@ public struct AccountView: View {
     }
     
     public var body: some View {
-        VStack {
-            header
+        ZStack {
+            UIComponentsAsset.background.swiftUIColor.ignoresSafeArea()
             
-            ScrollView {
-                VStack(spacing: 15) {
-                    avatar
-                        .onTapGesture {
-                            withAnimation(.spring(response: 0.2)) {
-                                isBlurredAvatarPresented = true
+            VStack(spacing: 0) {
+                header
+                
+                ScrollView {
+                    VStack(spacing: 15) {
+                        avatar
+                            .onTapGesture {
+                                withAnimation(.spring(response: 0.2)) {
+                                    isBlurredAvatarPresented = true
+                                }
                             }
-                        }
-                    
-                    groupsTable
-                    
-                    activityTable
-                    
-                    generalTable
-                    
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text("App Icons")
-                            .foregroundColor(UIComponentsAsset.tableNameTextColor.swiftUIColor)
-                            .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .black))
-                            .padding(.leading, 15)
                         
-                        appIconsTable
+                        groupsTable
+                        
+                        activityTable
+                        
+                        generalTable
+                        
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text("App Icons")
+                                .foregroundColor(UIComponentsAsset.textSecondary.swiftUIColor)
+                                .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .black))
+                                .padding(.leading, 15)
+                            
+                            appIconsTable
+                        }
+                        
+                        riskyTable
+                        
+                        RewindNoteTextView(text: "✨  You are already 100 days with Rewind!")
+                            .padding(.vertical, 4)
                     }
-                    
-                    riskyTable
-                    
-                    RewindNoteTextView(text: "✨  You are already 100 days with Rewind!")
-                        .padding(.vertical, 4)
+                    .padding(.horizontal, 16)
                 }
-                .padding(.horizontal, 16)
+                .scrollIndicators(.hidden)
             }
-            .scrollIndicators(.hidden)
-        }
-        .onAppear {
-            viewModel.set(showToast: showToast)
-        }
-        .overlay {
-            if isBlurredAvatarPresented {
-                BlurredAvatarView(
-                    image: UIComponentsAsset.avatar.image,
-                    isPresented: $isBlurredAvatarPresented
-                )
+            .onAppear {
+                viewModel.set(showToast: showToast)
+            }
+            .overlay {
+                if isBlurredAvatarPresented {
+                    BlurredAvatarView(
+                        image: UIComponentsAsset.avatar.image,
+                        isPresented: $isBlurredAvatarPresented
+                    )
+                }
             }
         }
     }
@@ -89,7 +93,7 @@ public struct AccountView: View {
                 .padding(.vertical, 8)
                 .padding(.horizontal, 8)
         }
-        .background(UIComponentsAsset.tableBackgroundColor.swiftUIColor)
+        .background(UIComponentsAsset.backgroundSecondary.swiftUIColor)
         .cornerRadius(23)
     }
     

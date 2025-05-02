@@ -31,7 +31,7 @@ public struct GroupsAndLocationHeader: View {
                 }
                 .padding(.horizontal, 10)
                 .frame(height: 44)
-                .background(UIComponentsAsset.tableBackgroundColor.swiftUIColor)
+                .background(UIComponentsAsset.backgroundSecondary.swiftUIColor)
                 .clipShape(Capsule())
             }
             
@@ -41,10 +41,10 @@ public struct GroupsAndLocationHeader: View {
                 Image(systemName: "globe.asia.australia.fill")
                     .font(.system(size: 26))
                     .frame(width: 44, height: 44)
-                    .background(UIComponentsAsset.tableBackgroundColor.swiftUIColor)
+                    .background(UIComponentsAsset.backgroundSecondary.swiftUIColor)
                     .clipShape(Circle())
             }
         }
-        .foregroundStyle(UIComponentsAsset.primaryColor.swiftUIColor)
+        .foregroundStyle(UIComponentsAsset.textPrimary.swiftUIColor)
     }
 }

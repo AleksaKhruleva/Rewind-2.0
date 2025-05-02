@@ -15,7 +15,7 @@ public struct MembersTable: View {
         VStack(alignment: .leading, spacing: 5) {
             Text(title)
                 .modifier(
-                    RoundFontModifier(size: 17, foregroundColor: UIComponentsAsset.tableNameTextColor.swiftUIColor))
+                    RoundFontModifier(size: 17, foregroundColor: UIComponentsAsset.textSecondary.swiftUIColor))
                 .padding(.leading, 15)
             
             VStack(alignment: .leading, spacing: 0) {
@@ -48,7 +48,7 @@ public struct MembersTable: View {
                 }
             }
             .padding(.vertical, 5)
-            .background(UIComponentsAsset.tableBackgroundColor.swiftUIColor)
+            .background(UIComponentsAsset.backgroundSecondary.swiftUIColor)
             .cornerRadius(24)
         }
     }

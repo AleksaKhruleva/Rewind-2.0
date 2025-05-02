@@ -21,8 +21,8 @@ public struct CodeDigitTextFieldAdapter: UIViewRepresentable {
         textField.textAlignment = .center
         textField.keyboardType = .numberPad
         textField.font = UIFont.monospacedSystemFont(ofSize: 22, weight: .semibold)
-        textField.backgroundColor = UIComponentsAsset.tableBackgroundColor.color
-        textField.tintColor = UIComponentsAsset.pinkColor.color
+        textField.backgroundColor = UIComponentsAsset.backgroundSecondary.color
+        textField.tintColor = UIComponentsAsset.pinkPrimary.color
         textField.layer.cornerRadius = 14
         textField.delegate = context.coordinator
         textField.addTarget(context.coordinator, action: #selector(Coordinator.textChanged), for: .editingChanged)

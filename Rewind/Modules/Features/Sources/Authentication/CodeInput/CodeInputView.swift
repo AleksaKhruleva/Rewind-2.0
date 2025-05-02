@@ -14,6 +14,8 @@ public struct CodeInputView: View {
     
     public var body: some View {
         ZStack(alignment: .topLeading) {
+            UIComponentsAsset.background.swiftUIColor.ignoresSafeArea()
+            
             RewindHeader {
                 RewindButton(type: .leftChevron) { dismiss() }
             }
