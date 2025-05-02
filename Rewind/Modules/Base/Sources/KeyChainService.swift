@@ -3,6 +3,7 @@ import Security
 
 public final class KeychainService {
     public static let shared = KeychainService()
+    
     private init() {}
 
     public enum Key: String {
