@@ -10,25 +10,23 @@ public struct MediaTopButtons: View {
     }
     
     public var body: some View {
-        ZStack {
+        HStack {
+            Button(action: onSettingsTap) {
+                Image(systemName: "gearshape.fill")
+                    .font(.system(size: 20))
+                    .frame(width: 36, height: 36)
+                    .background(Color.backgroundSecondary)
+                    .clipShape(Circle())
+            }
+            
             Button(action: onDetailsTap) {
-                Text("View details")
+                Text(UIComponentsStrings.Rewind.details)
+                    .multilineTextAlignment(.center)
                     .modifier(RoundFontModifier(size: 15))
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, 10)
                     .padding(.vertical, 10)
                     .background(Color.backgroundSecondary)
                     .clipShape(Capsule())
-            }
-            
-            HStack {
-                Button(action: onSettingsTap) {
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 20))
-                        .frame(width: 36, height: 36)
-                        .background(Color.backgroundSecondary)
-                        .clipShape(Circle())
-                }
-                .padding(.trailing, 180)
             }
         }
         .foregroundStyle(Color.textPrimary)

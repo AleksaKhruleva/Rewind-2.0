@@ -1,0 +1,209 @@
+"app.title" = "Rewind";
+
+// MARK: - Account strings
+
+"account.appicons" = "Иконки";
+
+"account.groups" = "Группы";
+
+"account.groups.count" = "%@ групп";
+
+"account.activity" = "Твоя активность";
+
+"account.activity.rewinds" = "Ты добавил %@ воспоминаний";
+
+"account.activity.people" = "Ты пригласил %@ человек";
+
+"account.activity.rolls" = "%@ прокруток воспоминаний";
+
+"account.general" = "Общее";
+
+"account.general.image" = "Сменить картинку";
+
+"account.general.name" = "Сменить имя";
+
+"account.general.password" = "Сменить пароль";
+
+"account.general.email" = "Сменить email";
+
+"account.general.widget" = "Установить виджет";
+
+"account.general.help" = "Нужна помощь?";
+
+"account.general.share" = "Поделиться с друзьями";
+
+"account.risky" = "Зона риска";
+
+"account.risky.signout" = "Выйти из аккаунта";
+
+"account.risky.delete" = "Удалить аккаунт";
+
+"account.note.you" = "✨ Ты уже %@ дней с Rewind!";
+
+"account.note.stranger" = "✨ %@ уже %@ дней с Rewind!";
+
+// MARK: - Auth strings
+
+"welcome.sign_up" = "Зарегистрироваться";
+
+"welcome.sign_in" = "Уже есть аккаунт?";
+
+"code.title" = "Введи код из письма";
+
+"email.title" = "Введи свой email";
+
+"email.placeholder" = "email@email.ru";
+
+"name.title" = "Как тебя зовут?";
+
+"name.placeholder" = "имя";
+
+"password.title" = "Введи пароль";
+
+"password.placeholder" = "пароль";
+
+"password.forgot" = "Забыл(а) пароль?";
+
+"password.forgot.sent" = "Мы отправили ссылку для сброса на";
+
+"password.resend_in" = "Отправить снова через";
+
+"password.resend_in.seconds" = "с";
+
+"password.resend" = "Отправить ещё раз";
+
+// MARK: - Quote creation strings
+
+"quote.author.title" = "Введи автора цитаты";
+
+"quote.author.placeholder" = "автор";
+
+"quote.quote.title" = "Введи новую цитату";
+
+"quote.quote.placeholder" = "цитата";
+
+"quote.hint" = "Нажми сюда, чтобы создать цитату";
+
+"quote.customizing" = "Настройка";
+
+"quote.customizing.background" = "Цвет фона";
+
+"quote.customizing.text" = "Цвет текста";
+
+"quote.save" = "Сохранить цитату";
+
+"quote.toast.empty" = "Нельзя продолжить с пустой цитатой 👺";
+
+"quote.toast.success" = "Твоя цитата успешно сохранена! 💬";
+
+// MARK: - Group strings
+
+"group.activity" = "Активность";
+
+"group.stand.rewinds" = "Добавленные воспоминания";
+
+"group.stand.rolls" = "Прокрутки воспоминаний";
+
+"group.settings.general" = "Общее";
+
+"group.settings.general.image" = "Сменить картинку";
+
+"group.settings.general.name" = "Сменить имя";
+
+"group.settings.risky" = "Зона риска";
+
+"group.settings.risky.leave" = "Покинуть группу";
+
+"group.settings.risky.delete" = "Удалить группу";
+
+"group.note" = "✨ Эта группа существует уже %@ дней!";
+
+"members.title" = "Участники %@";
+
+"group.members" = "Участники";
+
+"group.members.count" = "%@ участников";
+
+"group.members.add" = "Добавить участника";
+
+"group.members.you" = "(Ты)";
+
+"group.members.search.placeholder" = "Имя участника";
+
+"group.members.search.result" = "%@ участников";
+
+"group.gallery" = "Галерея";
+
+"group.select.title" = "Выбери группу";
+
+"group.select.search.placeholder" = "Название группы";
+
+"group.select.count" = "%@ групп";
+
+"group.select.add" = "Добавить группу";
+
+"group.select.suggestions" = "Рекомендации";
+
+"group.select.suggestions.add" = "Добавить рекомендации";
+
+"group.select.suggestions.count" = "%@ групп";
+
+// MARK: Media strings
+
+"media_details.title" = "Детали медиа";
+
+"media_details.risky" = "Зона риска";
+
+"media.blurred.title" = "Детали медиа";
+
+"media.blurred.save" = "Сохранить";
+
+"media.blurred.delete" = "Удалить медиа";
+
+// MARK: - Blurred Avatar strings
+
+"blurred_avatar.set_image" = "Установить новое изображение";
+
+"blurred_avatar.save_image" = "Сохранить изображение";
+
+// MARK: - Image Editor strings
+
+"image_editor.title" = "Редактор изображений";
+
+// MARK: - Tags strings
+
+"tags.title" = "Введи новый тег";
+
+"tags.placeholder" = "тег";
+
+"tags.section.title" = "Теги";
+
+"tags.section.autogenerate" = "сгенерировать";
+
+// MARK: - Gallery strings
+
+"gallery.media.count" = "%@ медиа";
+
+"gallery.new_media" = "Новое фото или видео";
+
+"gallery.new_quote" = "Новая цитата";
+
+"gallery.note" = "🙀 Это конец!";
+
+// MARK: - Rewind screen strings
+
+"rewind.groups.count" = "%@ групп";
+
+"rewind.details" = "Детали";
+
+"rewind.rolls" = "Прокруок\nсегодня!";
+
+// MARK: - Stands strings
+
+"stand.rank" = "Твой ранг: %@";
+
+// MARK: - Toasts strings
+
+"toast.image_saving.success" = "Изображение успешно сохранено 🤗";
+
+"toast.image_saving.failure" = "Не удалось сохранить изображение 😢";

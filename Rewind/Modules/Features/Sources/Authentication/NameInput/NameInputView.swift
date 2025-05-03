@@ -22,12 +22,12 @@ public struct NameInputView: View {
             }
             
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
-                Text("What's your name?")
+                Text(UIComponentsStrings.Name.title)
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
                 
                 StyledTextField(
                     text: $name,
-                    placeholder: "name"
+                    placeholder: UIComponentsStrings.Name.placeholder
                 )
                 .multilineTextAlignment(.center)
                 .focused($isFocused)

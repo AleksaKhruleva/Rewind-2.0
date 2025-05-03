@@ -72,14 +72,14 @@ public struct BlurredMediaView: View {
         VStack(alignment: .leading, spacing: -8) {
             BlurredTableCell(
                 icon: "gearshape.fill",
-                title: "Media details",
+                title: UIComponentsStrings.Media.Blurred.title,
                 needChevron: true,
                 action: { showMediaDetails(image) }
             )
             
             BlurredTableCell(
                 icon: "square.and.arrow.down.fill",
-                title: "Save Image",
+                title: UIComponentsStrings.Media.Blurred.save,
                 needChevron: true,
                 action: { saveImage(image: image) }
             )
@@ -91,7 +91,7 @@ public struct BlurredMediaView: View {
     private var riskyCell: some View {
         BlurredTableCell(
             icon: "trash.fill",
-            title: "Delete media",
+            title: UIComponentsStrings.Media.Blurred.delete,
             needChevron: true,
             isRisky: true,
             action: {

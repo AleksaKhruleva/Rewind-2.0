@@ -86,20 +86,20 @@ public struct GroupView: View {
     // чтобы код в activityTable тоже можно было в эту таблицу обернуть, короче позже переделаю
     private var activityTable: some View {
         VStack(alignment: .leading, spacing: 5) {
-            Text("Activity")
+            Text(UIComponentsStrings.Group.activity)
                 .modifier(RoundFontModifier(size: 17, foregroundColor: .textSecondary))
                 .padding(.leading, 15)
             VStack(alignment: .leading, spacing: 5) {
                 MembersTableButton(
                     systemImageName: "photo.on.rectangle",
-                    title: "Added Rewinds stand",
+                    title: UIComponentsStrings.Group.Stand.rewinds,
                     imageSize: 20) {
                         // TODO: show stand
                     }
                 
                 MembersTableButton(
                     systemImageName: "forward.fill",
-                    title: "Rewind rolls stand",
+                    title: UIComponentsStrings.Group.Stand.rolls,
                     imageSize: 15) {
                         // TODO: show stand
                     }
@@ -115,7 +115,7 @@ public struct GroupView: View {
     }
     
     private var groupExistenceNote: some View {
-        RewindNoteTextView(text: "✨ This group exists for 100 days!")
+        RewindNoteTextView(text: UIComponentsStrings.Group.note(100))
             .padding(.vertical, 4)
     }
 }

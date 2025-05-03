@@ -46,7 +46,7 @@ public struct ToastView: View {
         controller: .init(
             state: .init(
                 isPresented: true,
-                title: "Пост сохранен в избранное"
+                title: "saved"
             )
         )
     )

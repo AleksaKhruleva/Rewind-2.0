@@ -5,7 +5,7 @@ public struct AccountView: View {
     @State private var appIconsViewModel: AppIconsViewModel
     @State private var viewModel: AccountViewModel
     @State private var isBlurredAvatarPresented = false
-
+    
     @Environment(\.dismiss)
     private var dismiss
     @Environment(\.showToast)
@@ -39,7 +39,7 @@ public struct AccountView: View {
                         generalTable
                         
                         VStack(alignment: .leading, spacing: 5) {
-                            Text("App Icons")
+                            Text(UIComponentsStrings.Account.appicons)
                                 .foregroundColor(.textSecondary)
                                 .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .black))
                                 .padding(.leading, 15)
@@ -49,7 +49,7 @@ public struct AccountView: View {
                         
                         riskyTable
                         
-                        RewindNoteTextView(text: "✨  You are already 100 days with Rewind!")
+                        RewindNoteTextView(text: UIComponentsStrings.Account.Note.you(100))
                             .padding(.vertical, 4)
                     }
                     .padding(.horizontal, 16)
@@ -98,25 +98,25 @@ public struct AccountView: View {
     }
     
     var groupsTable: some View {
-        InformationTable(title: "Groups", data: AccountConstants.groups, isRisky: false)
+        InformationTable(title: UIComponentsStrings.Account.groups, data: AccountConstants.groups, isRisky: false)
     }
     
     var activityTable: some View {
-        InformationTable(title: "Activity", data: AccountConstants.activities, isRisky: false)
+        InformationTable(title: UIComponentsStrings.Account.activity, data: AccountConstants.activities, isRisky: false)
     }
     
     var generalTable: some View {
-        InformationTable(title: "General", data: AccountConstants.general, isRisky: false)
+        InformationTable(title: UIComponentsStrings.Account.general, data: AccountConstants.general, isRisky: false)
     }
     
     var riskyTable: some View {
         InformationTable(
-            title: "Risky Zone",
+            title: UIComponentsStrings.Account.risky,
             data: [
-                ("rectangle.portrait.and.arrow.right.fill", "Sign out", {
+                ("rectangle.portrait.and.arrow.right.fill", UIComponentsStrings.Account.Risky.signout, {
                     Task { await viewModel.dispatch(.signOut) }
                 }),
-                ("trash.fill", "Delete account", {})
+                ("trash.fill", UIComponentsStrings.Account.Risky.delete, {})
             ],
             isRisky: true
         )

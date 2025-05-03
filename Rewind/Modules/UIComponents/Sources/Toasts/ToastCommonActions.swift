@@ -1,23 +1,18 @@
 import SwiftUI
 
-enum ToastActionMessages: String {
-    case imageSavingSuccess = "Your image was saved successfully 🤗"
-    case imageSavingFailure = "Failed to save your image 😢"
-}
-
 // Saving image
 public func saveImageWithToast(image: UIImage?, toastAction: @escaping (String) -> Void) {
     guard let image else {
-        toastAction(ToastActionMessages.imageSavingFailure.rawValue)
+        toastAction(UIComponentsStrings.Toast.ImageSaving.failure)
         return
     }
     
     ImageSaver.shared.writeToPhotoAlbum(image: image) { result in
         switch result {
         case .success:
-            toastAction(ToastActionMessages.imageSavingSuccess.rawValue)
+            toastAction(UIComponentsStrings.Toast.ImageSaving.success)
         case .failure:
-            toastAction(ToastActionMessages.imageSavingFailure.rawValue)
+            toastAction(UIComponentsStrings.Toast.ImageSaving.failure)
         }
     }
 }

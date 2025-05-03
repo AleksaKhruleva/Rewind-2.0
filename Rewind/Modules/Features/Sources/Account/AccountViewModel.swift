@@ -27,7 +27,7 @@ final class AccountViewModel {
         switch intent {
         case .signOut:
             if let refreshToken = KeychainService.shared.read(for: .refreshToken),
-               let refreshToken = KeychainService.shared.read(for: .accessToken) {
+               let _ = KeychainService.shared.read(for: .accessToken) {
                 do {
                     let response = try await backend.logout(refreshToken: refreshToken)
                     if response.success {

@@ -21,7 +21,7 @@ public struct CodeInputView: View {
             }
             
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
-                Text("Enter code from email")
+                Text(UIComponentsStrings.Code.title)
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
                 
                 CodeInputTextField(code: $code, error: nil) {

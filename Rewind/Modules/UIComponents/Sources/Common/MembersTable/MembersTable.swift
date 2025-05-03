@@ -21,7 +21,7 @@ public struct MembersTable: View {
             VStack(alignment: .leading, spacing: 0) {
                 MembersTableButton(
                     systemImageName: "person.fill.badge.plus",
-                    title: "Add member",
+                    title: UIComponentsStrings.Group.Members.add,
                     imageSize: 25
                 ) {
                     print("Add members plz")
@@ -40,7 +40,7 @@ public struct MembersTable: View {
                 if isShortened {
                     MembersTableButton(
                         systemImageName: "eye.fill",
-                        title: "\(membersForTest.count) members",
+                        title: UIComponentsStrings.Group.Members.count(membersForTest.count),
                         imageSize: 20
                     ) {
                         print("Show all members")

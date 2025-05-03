@@ -12,7 +12,7 @@ public struct GalleryScrollPreview: View {
     
     public var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            Text("Gallery")
+            Text(UIComponentsStrings.Group.gallery)
                 .modifier(RoundFontModifier(size: 17, foregroundColor: .textSecondary))
                 .padding(.leading, 16)
             

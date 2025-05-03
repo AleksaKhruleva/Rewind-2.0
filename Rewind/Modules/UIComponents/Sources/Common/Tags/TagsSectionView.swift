@@ -12,7 +12,7 @@ public struct TagsSectionView: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Tags")
+                Text(UIComponentsStrings.Tags.Section.title)
                     .foregroundColor(.textSecondary)
                     .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .black))
                     .padding(.leading, 16)
@@ -24,7 +24,7 @@ public struct TagsSectionView: View {
                 
                 Spacer()
                 
-                Button("autogenerate") {
+                Button(UIComponentsStrings.Tags.Section.autogenerate) {
                     withAnimation { tags.shuffle() }
                 }
                 .buttonStyle(.plain)

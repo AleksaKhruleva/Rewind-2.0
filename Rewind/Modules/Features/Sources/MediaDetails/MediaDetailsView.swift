@@ -42,7 +42,7 @@ public struct MediaDetailsView: View {
         RewindHeader {
             RewindButton(type: .leftChevron) { dismiss() }
         } centerView: {
-            Text("Media details")
+            Text(UIComponentsStrings.MediaDetails.title)
                 .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .bold))
                 .foregroundColor(.textPrimary)
         } rightView: {
@@ -63,7 +63,7 @@ public struct MediaDetailsView: View {
     }
     
     private var riskyTable: some View {
-        InformationTable(title: "Risky Zone", data: AccountConstants.risky, isRisky: true)
+        InformationTable(title: UIComponentsStrings.MediaDetails.risky, data: AccountConstants.risky, isRisky: true)
     }
 }
 

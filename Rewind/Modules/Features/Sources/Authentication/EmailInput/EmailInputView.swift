@@ -21,12 +21,12 @@ public struct EmailInputView: View {
             }
             
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
-                Text("What's your email?")
+                Text(UIComponentsStrings.Email.title)
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
                 
                 StyledTextField(
                     text: $viewModel.email,
-                    placeholder: "email@email.ru",
+                    placeholder: UIComponentsStrings.Email.placeholder,
                     keyboardType: .emailAddress
                 )
                 .multilineTextAlignment(.center)

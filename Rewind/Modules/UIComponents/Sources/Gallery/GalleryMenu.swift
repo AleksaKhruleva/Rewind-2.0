@@ -20,13 +20,13 @@ public struct GalleryMenu<Content: View>: View {
             Button {
                 onAddingMedia()
             } label: {
-                Label("Новое фото или видео", systemImage: "photo.fill")
+                Label(UIComponentsStrings.Gallery.newMedia, systemImage: "photo.fill")
             }
             
             Button {
                 onAddingQuote()
             } label: {
-                Label("Новая цитата", systemImage: "quote.bubble.fill")
+                Label(UIComponentsStrings.Gallery.newQuote, systemImage: "quote.bubble.fill")
             }
         } label: {
             label
