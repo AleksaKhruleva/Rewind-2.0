@@ -9,12 +9,12 @@ struct QuoteInputView: View {
     
     public var body: some View {
         VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
-            Text("Enter new quote")
+            Text(UIComponentsStrings.Quote.Quote.title)
                 .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
             
             StyledTextField(
                 text: $quote,
-                placeholder: "quote"
+                placeholder: UIComponentsStrings.Quote.Quote.placeholder
             )
             .multilineTextAlignment(.center)
             .focused($isFocused)

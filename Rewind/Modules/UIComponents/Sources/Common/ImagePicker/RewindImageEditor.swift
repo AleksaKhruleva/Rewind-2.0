@@ -39,7 +39,7 @@ struct RewindImageEditor: View {
         RewindHeader {
             RewindButton(type: .leftChevron) { dismiss() }
         } centerView: {
-            Text("Image Editor")
+            Text(UIComponentsStrings.ImageEditor.title)
                 .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .bold))
                 .foregroundColor(.textPrimary)
         } rightView: {

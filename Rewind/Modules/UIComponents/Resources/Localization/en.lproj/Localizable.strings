@@ -1,0 +1,209 @@
+"app.title" = "Rewind";
+
+// MARK: - Account strings
+
+"account.appicons" = "App Icons";
+
+"account.groups" = "Groups";
+
+"account.groups.count" = "%@ groups";
+
+"account.activity" = "Activity";
+
+"account.activity.rewinds" = "%@ added Rewinds";
+
+"account.activity.people" = "%@ invited people";
+
+"account.activity.rolls" = "%@ rewind rolls";
+
+"account.general" = "General";
+
+"account.general.image" = "Change image";
+
+"account.general.name" = "Change name";
+
+"account.general.password" = "Change password";
+
+"account.general.email" = "Change email";
+
+"account.general.widget" = "Set a widget";
+
+"account.general.help" = "Get help";
+
+"account.general.share" = "Share with friends";
+
+"account.risky" = "Risky Zone";
+
+"account.risky.signout" = "Sign out";
+
+"account.risky.delete" = "Delete account";
+
+"account.note.you" = "✨ You are already %@ days with Rewind!";
+
+"account.note.stranger" = "✨ %@ is already %@ days with Rewind!";
+
+// MARK: - Auth strings
+
+"welcome.sign_up" = "Sign up";
+
+"welcome.sign_in" = "Have an account?";
+
+"code.title" = "Enter code from email";
+
+"email.title" = "What's your email?";
+
+"email.placeholder" = "email@email.ru";
+
+"name.title" = "What's your name?";
+
+"name.placeholder" = "name";
+
+"password.title" = "Enter your password";
+
+"password.placeholder" = "password";
+
+"password.forgot" = "Forgot password?";
+
+"password.forgot.sent" = "We’ve sent a password reset link to";
+
+"password.resend_in" = "Resend in";
+
+"password.resend_in.seconds" = "s";
+
+"password.resend" = "Resend";
+
+// MARK: - Quote creation strings
+
+"quote.author.title" = "Enter quote's author";
+
+"quote.author.placeholder" = "author";
+
+"quote.quote.title" = "Enter new quote";
+
+"quote.quote.placeholder" = "quote";
+
+"quote.hint" = "Tap here to enter your quote";
+
+"quote.customizing" = "Customizing";
+
+"quote.customizing.background" = "Background color";
+
+"quote.customizing.text" = "Text color";
+
+"quote.save" = "Save quote";
+
+"quote.toast.empty" = "You cannot continue with empty quote 👺";
+
+"quote.toast.success" = "Your quote was saved successfully! 💬";
+
+// MARK: - Group strings
+
+"group.activity" = "Activity";
+
+"group.stand.rewinds" = "Added Rewinds stand";
+
+"group.stand.rolls" = "Rewind rolls stand";
+
+"group.settings.general" = "General";
+
+"group.settings.general.image" = "Change image";
+
+"group.settings.general.name" = "Change name";
+
+"group.settings.risky" = "Risky zone";
+
+"group.settings.risky.leave" = "Leave group";
+
+"group.settings.risky.delete" = "Delete group";
+
+"group.note" = "✨ This group exists for %@ days!";
+
+"members.title" = "%@ Members";
+
+"group.members" = "Members";
+
+"group.members.count" = "%@ members";
+
+"group.members.add" = "Add member";
+
+"group.members.you" = "(You)";
+
+"group.members.search.placeholder" = "Member's name";
+
+"group.members.search.result" = "%@ members";
+
+"group.gallery" = "Gallery";
+
+"group.select.title" = "Select group";
+
+"group.select.search.placeholder" = "Group's name";
+
+"group.select.count" = "%@ groups";
+
+"group.select.add" = "Add group";
+
+"group.select.suggestions" = "Suggestions";
+
+"group.select.suggestions.add" = "Suggestions";
+
+"group.select.suggestions.count" = "%@ groups";
+
+// MARK: Media strings
+
+"media_details.title" = "Media details";
+
+"media_details.risky" = "Riksy zone";
+
+"media.blurred.title" = "Media details";
+
+"media.blurred.save" = "Save";
+
+"media.blurred.delete" = "Delete media";
+
+// MARK: - Blurred Avatar strings
+
+"blurred_avatar.set_image" = "Set new image";
+
+"blurred_avatar.save_image" = "Save image";
+
+// MARK: - Image Editor strings
+
+"image_editor.title" = "Image Editor";
+
+// MARK: - Tags strings
+
+"tags.title" = "Enter new tag";
+
+"tags.placeholder" = "tag";
+
+"tags.section.title" = "Tags";
+
+"tags.section.autogenerate" = "autogenerate";
+
+// MARK: - Gallery strings
+
+"gallery.media.count" = "%@ media";
+
+"gallery.new_media" = "New photo or video";
+
+"gallery.new_quote" = "New quote";
+
+"gallery.note" = "🙀 The end";
+
+// MARK: - Rewind screen strings
+
+"rewind.groups.count" = "%@ Groups";
+
+"rewind.details" = "View details";
+
+"rewind.rolls" = "Rewind\nrolls today!";
+
+// MARK: - Stands strings
+
+"stand.rank" = "Your rank: %@";
+
+// MARK: - Toasts strings
+
+"toast.image_saving.success" = "Your image was saved successfully 🤗";
+
+"toast.image_saving.failure" = "Failed to save your image 😢";

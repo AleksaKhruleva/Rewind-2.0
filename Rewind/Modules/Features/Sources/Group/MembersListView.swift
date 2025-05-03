@@ -42,7 +42,7 @@ public struct MembersListView: View {
         RewindHeader {
             RewindButton(type: .empty)
         } centerView: {
-            HeaderBadgeView(image: UIComponentsAsset.groupAvatar.image, text: "Friends' Members")
+            HeaderBadgeView(image: UIComponentsAsset.groupAvatar.image, text: UIComponentsStrings.Members.title("Friends'"))
         } rightView: {
             RewindButton(type: .rightChevron) {
                 // TODO: go back
@@ -51,12 +51,12 @@ public struct MembersListView: View {
     }
     
     private var searchField: some View {
-        RewindSearchField(text: $searchText, placeholder: "Member's name")
+        RewindSearchField(text: $searchText, placeholder: UIComponentsStrings.Group.Members.Search.placeholder)
     }
     
     private var membersTable: some View {
         MembersTable(
-            title: "\(filteredMembers.count) \(filteredMembers.count > 1 ? "members" : "member")",
+            title: UIComponentsStrings.Group.Members.count(filteredMembers.count),
             members: filteredMembers,
             isShortened: false
         )

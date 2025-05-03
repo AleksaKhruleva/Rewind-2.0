@@ -20,7 +20,7 @@ public struct RewindRollsStat: View {
                 )
                 .padding(.vertical, -10)
             
-            Text("Rewind\nrolls today!")
+            Text(UIComponentsStrings.Rewind.rolls)
                 .modifier(RoundFontModifier(size: 15))
         }
     }

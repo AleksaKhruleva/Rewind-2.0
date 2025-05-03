@@ -16,19 +16,19 @@ public struct WelcomeView: View {
             Color.background.ignoresSafeArea()
             
             VStack {
-                GradientTitle(text: "Rewind", fontSize: 80)
+                GradientTitle(text: UIComponentsStrings.App.title, fontSize: 80)
             }
             .modifier(VStackTopOffsetModifier(topOffsetRatio: 0.39))
             
             VStack(spacing: 12) {
-                GradientButton(title: "Sing up", width: 172) {
+                GradientButton(title: UIComponentsStrings.Welcome.signUp, width: .generic) {
                     router.navigateToEmail(for: .registration)
                 }
                 
                 Button {
                     router.navigateToEmail(for: .login())
                 } label: {
-                    Text("Have an account?")
+                    Text(UIComponentsStrings.Welcome.signIn)
                         .modifier(RoundFontModifier(size: 20, foregroundColor: .pinkPrimaryLight))
                         .modifier(MeasureWidthModifier(width: $textWidth))
                 }

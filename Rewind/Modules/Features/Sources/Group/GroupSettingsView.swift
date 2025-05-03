@@ -3,13 +3,13 @@ import UIComponents
 
 // vremenno
 let generalData = [
-    ("photo.fill", "Change image", {}),
-    ("pencil", "Change name", {})
+    ("photo.fill", UIComponentsStrings.Group.Settings.General.name, {}),
+    ("pencil", UIComponentsStrings.Group.Settings.General.image, {})
 ]
 
 let riskyData = [
-    ("rectangle.portrait.and.arrow.right.fill", "Leave group", {}),
-    ("trash.fill", "Delete group", {})
+    ("rectangle.portrait.and.arrow.right.fill", UIComponentsStrings.Group.Settings.Risky.leave, {}),
+    ("trash.fill", UIComponentsStrings.Group.Settings.Risky.delete, {})
 ]
 
 public struct GroupSettingsView: View {
@@ -67,11 +67,11 @@ public struct GroupSettingsView: View {
     }
     
     private var generalTable: some View {
-        InformationTable(title: "General", data: generalData, isRisky: false)
+        InformationTable(title: UIComponentsStrings.Group.Settings.general, data: generalData, isRisky: false)
     }
     
     private var riskyTable: some View {
-        InformationTable(title: "Risky Zone", data: riskyData, isRisky: true)
+        InformationTable(title: UIComponentsStrings.Group.Settings.risky, data: riskyData, isRisky: true)
     }
 }
 

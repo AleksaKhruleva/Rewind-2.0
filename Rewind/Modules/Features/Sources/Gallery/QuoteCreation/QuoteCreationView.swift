@@ -85,7 +85,7 @@ public struct QuoteCreationView: View {
                 .font(.system(size: 130))
                 .foregroundColor(.textSecondary)
             
-            Text("Tap here to enter your quote")
+            Text(UIComponentsStrings.Quote.hint)
                 .modifier(RoundFontModifier(size: 15, weight: .bold))
         }
     }
@@ -121,7 +121,7 @@ public struct QuoteCreationView: View {
     
     private var generalTable: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Customizing")
+            Text(UIComponentsStrings.Quote.customizing)
                 .modifier(
                     RoundFontModifier(
                         size: AccountConstants.defaultFontSize,
@@ -132,8 +132,8 @@ public struct QuoteCreationView: View {
                 .padding(.leading, 15)
             
             VStack(alignment: .leading, spacing: 0) {
-                ColorPickerTableCell(text: "Background color", color: $backgroundColor)
-                ColorPickerTableCell(text: "Text color", color: $textColor)
+                ColorPickerTableCell(text: UIComponentsStrings.Quote.Customizing.background, color: $backgroundColor)
+                ColorPickerTableCell(text: UIComponentsStrings.Quote.Customizing.text, color: $textColor)
             }
             .background(Color.backgroundSecondary)
             .cornerRadius(24)
@@ -142,15 +142,15 @@ public struct QuoteCreationView: View {
     }
     
     private var continueButton: some View {
-        GradientButton(title: "Save quote", width: 200) {
+        GradientButton(title: UIComponentsStrings.Quote.save, width: .given(200)) {
             guard viewModel.quoteState == .ready else {
-                showToast("You cannot continue with empty quote 👺")
+                showToast(UIComponentsStrings.Quote.Toast.empty)
                 return
             }
             
             viewModel.dispatch(.saveQuote(AnyView(quoteContent)))
             
-            showToast("Your quote was saved successfully! 💬")
+            showToast(UIComponentsStrings.Quote.Toast.success)
             dismiss()
         }
         .disabledWithOpacity(viewModel.quoteState == .empty)

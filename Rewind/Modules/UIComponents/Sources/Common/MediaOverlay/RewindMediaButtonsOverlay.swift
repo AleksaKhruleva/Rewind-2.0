@@ -15,17 +15,10 @@ public struct RewindMediaButtonsOverlay: View {
     public var body: some View {
         VStack {
             Spacer()
-            
             HStack {
-                RewindMediaButton(type: .save) {
-                    saveAction()
-                }
-                
+                RewindMediaButton(type: .save) { saveAction() }
                 Spacer()
-                
-                RewindMediaButton(type: .like, fillable: true) {
-                    likeAction()
-                }
+                RewindMediaButton(type: .like, fillable: true) { likeAction() }
             }
         }
         .padding(8 * 1.5)

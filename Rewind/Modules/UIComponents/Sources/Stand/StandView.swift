@@ -15,7 +15,9 @@ let podiumMembers = [
 public struct StandView: View {
     private let title: String
     private let counterType: CounterType
-    @Environment(\.dismiss) private var dismiss
+    
+    @Environment(\.dismiss)
+    private var dismiss
     
     public init(title: String, counterType: CounterType) {
         self.title = title
@@ -33,7 +35,7 @@ public struct StandView: View {
                     Text(title)
                         .modifier(RoundFontModifier(size: 22, foregroundColor: .white))
                     
-                    Text("Your rank: 5")
+                    Text(UIComponentsStrings.Stand.rank(3))
                         .modifier(RoundFontModifier(size: 16, foregroundColor: .white))
                 }
                 

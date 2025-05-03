@@ -26,12 +26,12 @@ public struct PasswordInputView: View {
             }
             
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
-                Text("Enter your password")
+                Text(UIComponentsStrings.Password.title)
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
                 
                 StyledTextField(
                     text: $viewModel.password,
-                    placeholder: "password",
+                    placeholder: UIComponentsStrings.Password.placeholder,
                     isSecure: true
                 )
                 .multilineTextAlignment(.center)
@@ -72,7 +72,7 @@ public struct PasswordInputView: View {
             showNotice = true
             startTimer()
         } label: {
-            Text("Forgot password?")
+            Text(UIComponentsStrings.Password.forgot)
                 .modifier(RoundFontModifier(size: 13, foregroundColor: .pinkPrimaryLight))
         }
     }
@@ -80,7 +80,7 @@ public struct PasswordInputView: View {
     private var notice: some View {
         VStack(spacing: 8) {
             VStack {
-                Text("We’ve sent a password reset link to")
+                Text(UIComponentsStrings.Password.Forgot.sent)
                 Text(verbatim: "aleksa.khruleva@yandex.ru")
                     .foregroundStyle(Color.pinkPrimaryLight)
             }
@@ -91,10 +91,10 @@ public struct PasswordInputView: View {
                     resendButton
                 } else {
                     HStack(spacing: 0) {
-                        Text("Resend in")
+                        Text(UIComponentsStrings.Password.resendIn)
                         Text(String(format: "%02d", secondsLeft))
                             .frame(width: 20, alignment: .trailing)
-                        Text("s")
+                        Text(UIComponentsStrings.Password.ResendIn.seconds)
                     }
                     .modifier(RoundFontModifier(size: 13))
                 }
@@ -107,7 +107,7 @@ public struct PasswordInputView: View {
             // TODO: send reset link to email later
             startTimer()
         } label: {
-            Text("Resend")
+            Text(UIComponentsStrings.Password.resend)
                 .modifier(RoundFontModifier(size: 13, foregroundColor: .pinkPrimaryLight))
         }
     }

@@ -6,11 +6,11 @@ let memberName = "Matthew"
 let memberAvatar = UIComponentsAsset.matthewMcConaughey.image
 
 let nilAction: (() -> Void)? = nil // temporary
-let groupsData = [("person.2.fill", "8 group", nilAction)]
+let groupsData = [("person.2.fill", UIComponentsStrings.Account.Groups.count(8), nilAction)]
 let activitiesData = [
-    ("photo.fill.on.rectangle.fill", "124 added Rewinds", nilAction),
-    ("person.fill", "3 invited people", nil),
-    ("forward.fill", "245 rewind rolls", nil)
+    ("photo.fill.on.rectangle.fill", UIComponentsStrings.Account.Activity.rewinds(245), nilAction),
+    ("person.fill", UIComponentsStrings.Account.Activity.people(15), nil),
+    ("forward.fill", UIComponentsStrings.Account.Activity.rolls(92), nil)
 ]
 
 public struct MemberDetailsView: View {
@@ -60,15 +60,15 @@ public struct MemberDetailsView: View {
     }
     
     private var groupsTable: some View {
-        InformationTable(title: "Groups", data: groupsData, isRisky: false)
+        InformationTable(title: UIComponentsStrings.Account.groups, data: groupsData, isRisky: false)
     }
     
     private var activityTable: some View {
-        InformationTable(title: "Activity", data: activitiesData, isRisky: false)
+        InformationTable(title: UIComponentsStrings.Account.activity, data: activitiesData, isRisky: false)
     }
     
     private var userExistenceNote: some View {
-        RewindNoteTextView(text: "✨  \(memberName) is already 100 days with Rewind!")
+        RewindNoteTextView(text: UIComponentsStrings.Account.Note.stranger(memberName, 100))
             .padding(.vertical, 4)
     }
 }

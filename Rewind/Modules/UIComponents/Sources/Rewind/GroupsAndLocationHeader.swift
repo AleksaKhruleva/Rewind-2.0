@@ -22,7 +22,7 @@ public struct GroupsAndLocationHeader: View {
                     Image(systemName: "person.2.fill")
                         .font(.system(size: 17))
                     
-                    Text("\(groupCount) Groups")
+                    Text(UIComponentsStrings.Rewind.Groups.count(groupCount))
                         .modifier(RoundFontModifier(size: 15))
                     
                     Image(systemName: "chevron.right")

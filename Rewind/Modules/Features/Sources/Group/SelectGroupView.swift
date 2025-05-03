@@ -40,7 +40,7 @@ struct SelectGroupView: View {
             Color.backgroundSecondary.ignoresSafeArea()
             
             VStack(spacing: 20) {
-                Text("Select group")
+                Text(UIComponentsStrings.Group.Select.title)
                     .modifier(RoundFontModifier(size: 21))
                 
                 searchField
@@ -56,14 +56,14 @@ struct SelectGroupView: View {
     private var searchField: some View {
         RewindSearchField(
             text: $searchText,
-            placeholder: "Group's name",
+            placeholder: UIComponentsStrings.Group.Select.Search.placeholder,
             backgroundColor: .white
         )
     }
     
     private var groupsScroll: some View {
         VStack(alignment: .leading, spacing: 5) {
-            Text("\(images.count) groups")
+            Text(UIComponentsStrings.Group.Select.count(images.count))
                 .modifier(RoundFontModifier(size: 17, foregroundColor: .textSecondary))
                 .padding(.leading, 16)
             
@@ -83,7 +83,7 @@ struct SelectGroupView: View {
     // временно
     private var suggestionsTable: some View {
         VStack(alignment: .leading, spacing: 5) {
-            Text("Suggestions")
+            Text(UIComponentsStrings.Group.Select.suggestions)
                 .modifier(
                     RoundFontModifier(
                         size: AccountConstants.defaultFontSize,
@@ -93,8 +93,8 @@ struct SelectGroupView: View {
                 .padding(.leading, 15)
             
             VStack(alignment: .leading, spacing: 0) {
-                suggestionRow(icon: "plus", title: "Add group")
-                suggestionRow(icon: "person.2.fill", title: "\(images.count) groups")
+                suggestionRow(icon: "plus", title: UIComponentsStrings.Group.Select.add)
+                suggestionRow(icon: "person.2.fill", title: UIComponentsStrings.Group.Select.count(images.count))
             }
             .background(.white)
             .cornerRadius(20)

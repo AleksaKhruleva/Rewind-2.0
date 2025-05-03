@@ -8,7 +8,7 @@ struct BlurredAvatarTable: View {
         VStack(alignment: .leading, spacing: -8) {
             BlurredTableCell(
                 icon: "photo",
-                title: "Set new image",
+                title: UIComponentsStrings.BlurredAvatar.setImage,
                 action: {
                     showPicker = true
                 }
@@ -16,7 +16,7 @@ struct BlurredAvatarTable: View {
             
             BlurredTableCell(
                 icon: "square.and.arrow.down.fill",
-                title: "Save Image",
+                title: UIComponentsStrings.BlurredAvatar.saveImage,
                 action: saveImage
             )
         }

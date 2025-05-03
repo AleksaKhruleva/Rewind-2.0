@@ -28,7 +28,7 @@ struct MembersTableCell: View {
                     .modifier(RoundFontModifier(size: 16, foregroundColor: .textPrimary))
                 
                 if member.isUser {
-                    Text("(You)")
+                    Text(UIComponentsStrings.Group.Members.you)
                         .modifier(
                             RoundFontModifier(size: 14, foregroundColor: .textTertiary)
                         )

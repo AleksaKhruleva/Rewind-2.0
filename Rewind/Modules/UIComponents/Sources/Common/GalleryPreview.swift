@@ -11,7 +11,7 @@ public struct GalleryPreview: View {
     
     public var body: some View {
         VStack(spacing: 5) {
-            Text("\(gallerySize) media")
+            Text(UIComponentsStrings.Gallery.Media.count(gallerySize))
                 .modifier(RoundFontModifier(size: 17))
             
             if !images.isEmpty {

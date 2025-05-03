@@ -9,12 +9,12 @@ struct AuthorInputView: View {
     
     public var body: some View {
         VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
-            Text("Enter quote's author")
+            Text(UIComponentsStrings.Quote.Author.title)
                 .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
             
             StyledTextField(
                 text: $author,
-                placeholder: "author"
+                placeholder: UIComponentsStrings.Quote.Author.placeholder
             )
             .multilineTextAlignment(.center)
             .focused($isFocused)

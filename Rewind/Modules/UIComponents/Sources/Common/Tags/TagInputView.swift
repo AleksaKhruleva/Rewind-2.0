@@ -15,12 +15,12 @@ public struct TagInputView: View {
     
     public var body: some View {
         VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
-            Text("Enter new tag")
+            Text(UIComponentsStrings.Tags.title)
                 .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
             
             StyledTextField(
                 text: $tag,
-                placeholder: "tag"
+                placeholder: UIComponentsStrings.Tags.placeholder
             )
             .multilineTextAlignment(.center)
             .focused($isFocused)
