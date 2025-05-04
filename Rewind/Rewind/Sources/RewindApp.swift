@@ -14,9 +14,11 @@ struct RewindApp: App {
             let hasRefreshToken = KeychainService.shared.read(for: .refreshToken) != nil
             let isAuthorized = hasAccessToken && hasRefreshToken
             
+            let testingAuth = CommandLine.arguments.contains("-testingAuth")
+            
             NavigationStack(path: $appRouter.path) {
                 Group {
-                    if isAuthorized {
+                    if isAuthorized, !testingAuth {
                         RewindView(router: .init(appRouter: appRouter))
                     } else {
                         WelcomeView(router: .init(appRouter: appRouter))

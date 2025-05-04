@@ -23,7 +23,7 @@ public struct WelcomeView: View {
             VStack(spacing: 12) {
                 GradientButton(title: UIComponentsStrings.Welcome.signUp, width: .generic) {
                     router.navigateToEmail(for: .registration)
-                }
+                }.rewindAccessibilityIdentifier(.auth(.button(.signup)))
                 
                 Button {
                     router.navigateToEmail(for: .login())
@@ -31,7 +31,7 @@ public struct WelcomeView: View {
                     Text(UIComponentsStrings.Welcome.signIn)
                         .modifier(RoundFontModifier(size: 20, foregroundColor: .pinkPrimaryLight))
                         .modifier(MeasureWidthModifier(width: $textWidth))
-                }
+                }.rewindAccessibilityIdentifier(.auth(.button(.signin)))
             }
             .modifier(VStackTopOffsetModifier(topOffsetRatio: 0.87))
         }

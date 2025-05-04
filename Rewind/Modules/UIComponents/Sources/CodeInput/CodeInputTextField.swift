@@ -1,4 +1,5 @@
 import SwiftUI
+import AccessibilitySupport
 
 public struct CodeInputTextField: View {
     @Binding
@@ -28,6 +29,7 @@ public struct CodeInputTextField: View {
             ForEach(0..<4, id: \.self) { index in
                 CodeDigitTextFieldAdapter(code: $code, focusedField: $focusedField, tag: index)
                     .frame(width: 60, height: 75)
+                    .rewindAccessibilityIdentifier(.auth(.input(.code(index))))
             }
         }
         .onChange(of: code) { _, newValue in focusedField = newValue.count }

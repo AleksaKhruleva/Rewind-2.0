@@ -27,7 +27,8 @@ let project = Project(
                 .project(target: "Features", path: "Modules/Features"),
                 .project(target: "Networking", path: "Modules/Networking"),
                 .project(target: "Domain", path: "Modules/Domain"),
-                .project(target: "Base", path: "Modules/Base")
+                .project(target: "Base", path: "Modules/Base"),
+                .project(target: "AccessibilitySupport", path: "Modules/AccessibilitySupport")
             ],
             settings: .settings(
                 base: [
@@ -45,6 +46,19 @@ let project = Project(
             sources: ["Rewind/Tests/**"],
             resources: [],
             dependencies: [.target(name: "Rewind")]
+        ),
+        .target(
+            name: "RewindUITests",
+            destinations: .iOS,
+            product: .uiTests,
+            bundleId: "io.tuist.RewindUITests",
+            infoPlist: .default,
+            sources: ["Rewind/UITests/**"],
+            resources: [],
+            dependencies: [
+                .target(name: "Rewind"),
+                .external(name: "Vapor")
+            ]
         ),
     ]
 )
