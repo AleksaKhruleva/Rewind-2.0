@@ -49,8 +49,10 @@ final class NameInputViewModel {
             do {
                 let response = try await backend.finishRegister(password: password, registrationID: registrationID, username: name)
                 animateState(to: .ready)
-                KeychainService.shared.save(response.accessToken, for: .accessToken)
-                KeychainService.shared.save(response.refreshToken, for: .refreshToken)
+                if !CommandLine.arguments.contains("-testingAuth") {
+                    KeychainService.shared.save(response.accessToken, for: .accessToken)
+                    KeychainService.shared.save(response.refreshToken, for: .refreshToken)
+                }
             } catch {
                 animateState(to: .error(.responseError))
             }

@@ -11,7 +11,10 @@ enum APIService {
 
 extension APIService: TargetType {
     var baseURL: URL {
-        URL(string: "https://rewindapp.ru/api")!
+        if CommandLine.arguments.contains("-useLocalhost") {
+            return URL(string: "http://localhost:8080")!
+        }
+        return URL(string: "https://rewindapp.ru/api")!
     }
     
     var path: String {

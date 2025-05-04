@@ -10,6 +10,7 @@ let uiComponentsProject = Project.featureFramework(
         ]
     ]),
     dependencies: [
-        .project(target: "Base", path: "../Base")
+        .project(target: "Base", path: "../Base"),
+        .project(target: "AccessibilitySupport", path: "../AccessibilitySupport"),
     ]
 )

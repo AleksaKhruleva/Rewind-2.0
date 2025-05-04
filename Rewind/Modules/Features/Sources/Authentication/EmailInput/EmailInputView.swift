@@ -1,5 +1,6 @@
 import SwiftUI
 import UIComponents
+import AccessibilitySupport
 
 public struct EmailInputView: View {
     @State var viewModel: EmailInputViewModel
@@ -29,6 +30,7 @@ public struct EmailInputView: View {
                     placeholder: UIComponentsStrings.Email.placeholder,
                     keyboardType: .emailAddress
                 )
+                .rewindAccessibilityIdentifier(.auth(.input(.email)))
                 .multilineTextAlignment(.center)
                 .focused($isFocused)
                 .onSubmit {
