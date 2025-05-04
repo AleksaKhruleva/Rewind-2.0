@@ -157,16 +157,6 @@ public struct QuoteCreationView: View {
     }
 }
 
-extension Color {
-    fileprivate static var random: Self {
-        Color(
-            red: .random(in: 0...1),
-            green: .random(in: 0...1),
-            blue: .random(in: 0...1)
-        )
-    }
-}
-
 #Preview {
     QuoteCreationView()
 }

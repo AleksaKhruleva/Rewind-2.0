@@ -90,7 +90,7 @@ public struct RewindView: View {
             GroupsAndLocationHeader(groupCount: 8) {
                 isSelectGroupPresented = true
             } onGlobeTap: {
-                // TODO: show map
+                router.navigateToMap()
             }
         } rightView: {
             RoundImageView(image: UIComponentsAsset.avatar.image, size: 44)

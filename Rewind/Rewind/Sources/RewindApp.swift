@@ -63,6 +63,8 @@ extension View {
                     RewindView(router: .init(appRouter: appRouter))
                 case .welcome:
                     WelcomeView(router: .init(appRouter: appRouter))
+                case .map:
+                    RewindsMap()
                 }
             }
             .toolbar(.hidden)

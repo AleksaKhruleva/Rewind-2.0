@@ -1,9 +1,15 @@
 import SwiftUI
 
-struct ViewBorder {
+public struct ViewBorder {
     var color: Color
     var width: CGFloat
     var cornerRadius: CGFloat
+    
+    public init(color: Color, width: CGFloat, cornerRadius: CGFloat) {
+        self.color = color
+        self.width = width
+        self.cornerRadius = cornerRadius
+    }
 }
 
 extension View {
@@ -14,7 +20,7 @@ extension View {
     }
     
     @ViewBuilder @MainActor
-    func border(_ border: ViewBorder?) -> some View {
+    public func border(_ border: ViewBorder?) -> some View {
         if let border {
             overlay {
                 RoundedRectangle(cornerRadius: border.cornerRadius)
@@ -27,6 +33,10 @@ extension View {
         } else {
             self
         }
+    }
+    
+    public func frame(_ size: CGFloat) -> some View {
+        self.frame(width: size, height: size)
     }
 }
 
