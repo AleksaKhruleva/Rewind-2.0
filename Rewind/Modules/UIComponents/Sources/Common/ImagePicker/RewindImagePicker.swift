@@ -1,5 +1,6 @@
 import SwiftUI
 import PhotosUI
+import Base
 
 struct RewindImagePicker<Content: View>: View {
     var content: Content
@@ -26,6 +27,7 @@ struct RewindImagePicker<Content: View>: View {
             .onChange(of: pickerItem) { _, newValue in
                 guard let newValue else { return }
                 Task {
+                    print(await MetaDataExtractor.shared.extractCoordinates(from: newValue))
                     if let imageData = try? await newValue.loadTransferable(type: Data.self),
                        let image = UIImage(data: imageData) {
                         await MainActor.run {

@@ -50,7 +50,7 @@ public struct GalleryView: View {
                             }
                         }
                         
-                        RewindNoteTextView(text: UIComponentsStrings.Gallery.note)
+                        RewindNoteTextView(text: UIComponentsStrings.Note.end)
                             .padding(.vertical, 4)
                     }
                 }

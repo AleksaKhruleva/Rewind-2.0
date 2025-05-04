@@ -11,6 +11,7 @@ public final class AppRouter {
         case name(password: String, registrationID: String)
         
         case rewind
+        case map
         
         case account
         case gallery

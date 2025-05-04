@@ -19,4 +19,8 @@ public final class RewindRouter {
     func navigateToMediaDetails(_ image: UIImage) {
         appRouter?.navigate(to: .mediaDetails(image))
     }
+    
+    func navigateToMap() {
+        appRouter?.navigate(to: .map)
+    }
 }

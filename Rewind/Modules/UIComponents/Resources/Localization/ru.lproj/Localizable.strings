@@ -188,7 +188,8 @@
 
 "gallery.new_quote" = "Новая цитата";
 
-"gallery.note" = "🙀 Это конец!";
+// MARK: - End note string
+"note.end" = "🙀 Это конец!";
 
 // MARK: - Rewind screen strings
 
@@ -207,3 +208,15 @@
 "toast.image_saving.success" = "Изображение успешно сохранено 🤗";
 
 "toast.image_saving.failure" = "Не удалось сохранить изображение 😢";
+
+// MARK: - Map strings
+
+"map.rewinds_list.title" = "Список воспоминаний";
+
+"map.rewinds_list.group" = "Для группы %@";
+
+"map.rewinds_list.author" = "Автор";
+
+"map.rewinds_list.all" = "Все";
+
+"map.rewinds_list.visible" = "Видимые";

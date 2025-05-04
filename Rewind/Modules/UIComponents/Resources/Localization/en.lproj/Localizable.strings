@@ -188,7 +188,8 @@
 
 "gallery.new_quote" = "New quote";
 
-"gallery.note" = "🙀 The end";
+// MARK: - End note string
+"note.end" = "🙀 The end!";
 
 // MARK: - Rewind screen strings
 
@@ -207,3 +208,15 @@
 "toast.image_saving.success" = "Your image was saved successfully 🤗";
 
 "toast.image_saving.failure" = "Failed to save your image 😢";
+
+// MARK: - Map strings
+
+"map.rewinds_list.title" = "Rewinds list";
+
+"map.rewinds_list.group" = "For %@ group";
+
+"map.rewinds_list.author" = "Taken by";
+
+"map.rewinds_list.all" = "All";
+
+"map.rewinds_list.visible" = "Visible";

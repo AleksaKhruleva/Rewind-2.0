@@ -8,5 +8,8 @@ let uiComponentsProject = Project.featureFramework(
         "UIAppFonts": [
             "Fonts/AdvertisingScriptBold.ttf",
         ]
-    ])
+    ]),
+    dependencies: [
+        .project(target: "Base", path: "../Base")
+    ]
 )
