@@ -29,6 +29,7 @@ public struct NameInputView: View {
                     text: $name,
                     placeholder: UIComponentsStrings.Name.placeholder
                 )
+                .rewindAccessibilityIdentifier(.auth(.input(.name)))
                 .multilineTextAlignment(.center)
                 .focused($isFocused)
                 .onSubmit {

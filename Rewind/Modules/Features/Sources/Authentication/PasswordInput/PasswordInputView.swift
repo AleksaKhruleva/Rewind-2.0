@@ -34,6 +34,7 @@ public struct PasswordInputView: View {
                     placeholder: UIComponentsStrings.Password.placeholder,
                     isSecure: true
                 )
+                .rewindAccessibilityIdentifier(.auth(.input(.password)))
                 .multilineTextAlignment(.center)
                 .focused($isFocused)
                 .onSubmit {
