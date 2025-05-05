@@ -42,6 +42,10 @@
 
 "account.note.stranger" = "✨ %@ is already %@ days with Rewind!";
 
+"account.sign_out.alert.title" = "Are you sure you want to log out?";
+
+"account.delete_account.alert.title" = "Are you sure you want to delete your account? You will not be able to undo this action.";
+
 // MARK: - Auth strings
 
 "welcome.sign_up" = "Sign up";
@@ -209,6 +213,12 @@
 
 "toast.image_saving.failure" = "Failed to save your image 😢";
 
+"toast.sign_out.success" = "You have successfully logged out 🚪";
+
+"toast.delete_account.success" = "Your account was successfully deleted 🗑️ 💔";
+
+"toast.error" = "Something went wrong, please try again later 😩";
+
 // MARK: - Map strings
 
 "map.rewinds_list.title" = "Rewinds list";
@@ -220,3 +230,9 @@
 "map.rewinds_list.all" = "All";
 
 "map.rewinds_list.visible" = "Visible";
+
+// MARK: - Default buttons strings
+
+"buttons.continue" = "Continue";
+
+"buttons.cancel" = "Cancel";

@@ -31,12 +31,14 @@ final class NameInputViewModel {
     var state: NameState = .empty
     let router: AuthenticationRouter
     
+    private let email: String
     private let password: String
     private let registrationID: String
     private let backend: NetworkServiceProtocol
     
-    init(router: AuthenticationRouter, password: String, registrationID: String) {
+    init(router: AuthenticationRouter, email: String, password: String, registrationID: String) {
         self.router = router
+        self.email = email
         self.password = password
         self.registrationID = registrationID
         backend = NetworkService()
@@ -52,6 +54,7 @@ final class NameInputViewModel {
                 if !CommandLine.arguments.contains("-testingAuth") {
                     KeychainService.shared.save(response.accessToken, for: .accessToken)
                     KeychainService.shared.save(response.refreshToken, for: .refreshToken)
+                    UserStorage.currentUser = User(name: name, email: email)
                 }
             } catch {
                 animateState(to: .error(.responseError))

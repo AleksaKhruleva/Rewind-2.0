@@ -9,8 +9,8 @@ public struct NameInputView: View {
     @Environment(\.dismiss)
     private var dismiss
     
-    public init(router: AuthenticationRouter, password: String, registrationID: String) {
-        viewModel = .init(router: router, password: password, registrationID: registrationID)
+    public init(router: AuthenticationRouter, email: String, password: String, registrationID: String) {
+        viewModel = .init(router: router, email: email, password: password, registrationID: registrationID)
     }
     
     public var body: some View {
@@ -57,5 +57,5 @@ public struct NameInputView: View {
 
 #Preview {
     let router = AppRouter()
-    NameInputView(router: .init(appRouter: router), password: "123", registrationID: "123")
+    NameInputView(router: .init(appRouter: router), email: "", password: "123", registrationID: "123")
 }

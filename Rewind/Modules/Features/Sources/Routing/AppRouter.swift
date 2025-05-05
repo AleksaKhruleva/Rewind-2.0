@@ -6,9 +6,9 @@ public final class AppRouter {
         case welcome
         
         case email(AuthFlow)
-        case code(registrationID: String)
+        case code(email: String, registrationID: String)
         case password(AuthFlow, registrationID: String?)
-        case name(password: String, registrationID: String)
+        case name(email: String, password: String, registrationID: String)
         
         case rewind
         case map

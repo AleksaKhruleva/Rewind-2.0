@@ -8,6 +8,7 @@ public protocol NetworkServiceProtocol {
     func finishRegister(password: String, registrationID: String, username: String) async throws -> UserTokensResponse
     func login(email: String, password: String) async throws -> UserTokensResponse
     func logout(refreshToken: String) async throws -> SuccessResponse
+    func deleteUser(email: String) async throws -> SuccessResponse
 }
 
 public final class NetworkService: NetworkServiceProtocol {
@@ -59,6 +60,15 @@ public final class NetworkService: NetworkServiceProtocol {
         try await provider.request(
             .logout(
                 refreshToken: refreshToken
+            ),
+            type: SuccessResponse.self
+        )
+    }
+    
+    public func deleteUser(email: String) async throws -> SuccessResponse {
+        try await provider.request(
+            .deleteUser(
+                email: email
             ),
             type: SuccessResponse.self
         )

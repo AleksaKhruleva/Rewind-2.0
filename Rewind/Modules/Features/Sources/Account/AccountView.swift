@@ -1,10 +1,14 @@
 import SwiftUI
 import UIComponents
+import Base
 
 public struct AccountView: View {
     @State private var appIconsViewModel: AppIconsViewModel
     @State private var viewModel: AccountViewModel
+    
     @State private var isBlurredAvatarPresented = false
+    @State private var signOutAlertPresented = false
+    @State private var deleteAccountAlertPresented = false
     
     @Environment(\.dismiss)
     private var dismiss
@@ -25,8 +29,7 @@ public struct AccountView: View {
                 
                 ScrollView {
                     VStack(spacing: 15) {
-                        avatar
-                            .onTapGesture {
+                        avatar.onTapGesture {
                                 withAnimation(.spring(response: 0.2)) {
                                     isBlurredAvatarPresented = true
                                 }
@@ -58,6 +61,7 @@ public struct AccountView: View {
             }
             .onAppear {
                 viewModel.set(showToast: showToast)
+                Task { await viewModel.dispatch(.fetchUser) }
             }
             .overlay {
                 if isBlurredAvatarPresented {
@@ -65,6 +69,22 @@ public struct AccountView: View {
                         image: UIComponentsAsset.avatar.image,
                         isPresented: $isBlurredAvatarPresented
                     )
+                }
+            }
+            .alert(UIComponentsStrings.Account.SignOut.Alert.title, isPresented: $signOutAlertPresented) {
+                VStack {
+                    Button(UIComponentsStrings.Buttons.continue, role: .cancel) {
+                        Task { await viewModel.dispatch(.signOut) }
+                    }
+                    Button(UIComponentsStrings.Buttons.cancel, role: .destructive) { }
+                }
+            }
+            .alert(UIComponentsStrings.Account.DeleteAccount.Alert.title, isPresented: $deleteAccountAlertPresented) {
+                VStack {
+                    Button(UIComponentsStrings.Buttons.continue, role: .cancel) {
+                        Task { await viewModel.dispatch(.deleteAccount) }
+                    }
+                    Button(UIComponentsStrings.Buttons.cancel, role: .destructive) { }
                 }
             }
         }
@@ -76,7 +96,7 @@ public struct AccountView: View {
         } centerView: {
             HeaderBadgeView(
                 image: UIComponentsAsset.avatar.image,
-                text: "flowykk"
+                text: viewModel.user.name
             )
         } rightView: {
             RewindButton(type: .empty).hidden()
@@ -84,7 +104,7 @@ public struct AccountView: View {
     }
     
     var avatar: some View {
-      AvatarView(image: UIComponentsAsset.avatar.image, text: "flowykk")
+      AvatarView(image: UIComponentsAsset.avatar.image, text: viewModel.user.name)
     }
     
     var appIconsTable: some View {
@@ -114,9 +134,11 @@ public struct AccountView: View {
             title: UIComponentsStrings.Account.risky,
             data: [
                 ("rectangle.portrait.and.arrow.right.fill", UIComponentsStrings.Account.Risky.signout, {
-                    Task { await viewModel.dispatch(.signOut) }
+                    signOutAlertPresented = true
                 }),
-                ("trash.fill", UIComponentsStrings.Account.Risky.delete, {})
+                ("trash.fill", UIComponentsStrings.Account.Risky.delete, {
+                    deleteAccountAlertPresented = true
+                })
             ],
             isRisky: true
         )

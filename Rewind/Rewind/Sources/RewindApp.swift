@@ -13,12 +13,13 @@ struct RewindApp: App {
             let hasAccessToken = KeychainService.shared.read(for: .accessToken) != nil
             let hasRefreshToken = KeychainService.shared.read(for: .refreshToken) != nil
             let isAuthorized = hasAccessToken && hasRefreshToken
+            let isUserSaved = UserStorage.currentUser != nil
             
             let testingAuth = CommandLine.arguments.contains("-testingAuth")
             
             NavigationStack(path: $appRouter.path) {
                 Group {
-                    if isAuthorized, !testingAuth {
+                    if isAuthorized, isUserSaved, !testingAuth {
                         RewindView(router: .init(appRouter: appRouter))
                     } else {
                         WelcomeView(router: .init(appRouter: appRouter))
@@ -55,12 +56,12 @@ extension View {
                     MediaDetailsView(image: image)
                 case let .email(flow):
                     EmailInputView(flow: flow, router: .init(appRouter: appRouter))
-                case let .code(registrationID):
-                    CodeInputView(router: .init(appRouter: appRouter), registrationID: registrationID)
+                case let .code(email, registrationID):
+                    CodeInputView(router: .init(appRouter: appRouter), email: email, registrationID: registrationID)
                 case let .password(flow, registrationID):
                     PasswordInputView(flow: flow, router: .init(appRouter: appRouter), registrationID: registrationID)
-                case let .name(password, registrationID):
-                    NameInputView(router: .init(appRouter: appRouter), password: password, registrationID: registrationID)
+                case let .name(email, password, registrationID):
+                    NameInputView(router: .init(appRouter: appRouter), email: email, password: password, registrationID: registrationID)
                 case .rewind:
                     RewindView(router: .init(appRouter: appRouter))
                 case .welcome:

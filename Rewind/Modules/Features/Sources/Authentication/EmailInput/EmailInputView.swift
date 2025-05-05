@@ -58,5 +58,5 @@ public struct EmailInputView: View {
 
 #Preview {
     let router = AppRouter()
-    EmailInputView(flow: .registration, router: .init(appRouter: router))
+    EmailInputView(flow: .registration(), router: .init(appRouter: router))
 }
