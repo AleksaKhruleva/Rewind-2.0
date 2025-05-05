@@ -67,7 +67,7 @@ final class EmailInputViewModel {
                 }
                 
                 if case let .ready(registrationID) = state {
-                    router.navigateToCode(registrationID: registrationID)
+                    router.navigateToCode(email: email, registrationID: registrationID)
                 }
             case .login:
                 router.navigateToPassword(for: .login(email: email))

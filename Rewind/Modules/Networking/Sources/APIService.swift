@@ -7,6 +7,7 @@ enum APIService {
     case finishRegister(password: String, registrationID: String, username: String)
     case login(email: String, password: String)
     case logout(refreshToken: String)
+    case deleteUser(email: String)
 }
 
 extension APIService: TargetType {
@@ -29,6 +30,8 @@ extension APIService: TargetType {
             "/auth/login"
         case .logout:
             "/auth/logout"
+        case .deleteUser:
+            "/auth/delete-user"
         }
     }
     
@@ -38,7 +41,8 @@ extension APIService: TargetType {
             .verifyEmail,
             .finishRegister,
             .login,
-            .logout:
+            .logout,
+            .deleteUser:
             return .post
         }
     }
@@ -63,6 +67,9 @@ extension APIService: TargetType {
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
         case let .logout(refreshToken):
             let parameters = ["refresh_token": refreshToken]
+            return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+        case let .deleteUser(email):
+            let parameters = ["email": email]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
         }
     }

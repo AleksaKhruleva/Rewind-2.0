@@ -42,6 +42,10 @@
 
 "account.note.stranger" = "✨ %@ уже %@ дней с Rewind!";
 
+"account.sign_out.alert.title" = "Ты уверен, что хочешь выйти?";
+
+"account.delete_account.alert.title" = "Ты уверен, что хочешь удалить аккаунт? Это действие необратимо.";
+
 // MARK: - Auth strings
 
 "welcome.sign_up" = "Зарегистрироваться";
@@ -209,6 +213,12 @@
 
 "toast.image_saving.failure" = "Не удалось сохранить изображение 😢";
 
+"toast.sign_out.success" = "Выход из аккаунта успешно выполнен 🚪";
+
+"toast.delete_account.success" = "Ты удалил свой аккаунт 🗑️ 💔";
+
+"toast.error" = "Что-то пошло не так! Попробуйте позже 😩";
+
 // MARK: - Map strings
 
 "map.rewinds_list.title" = "Список воспоминаний";
@@ -220,3 +230,9 @@
 "map.rewinds_list.all" = "Все";
 
 "map.rewinds_list.visible" = "Видимые";
+
+// MARK: - Default buttons strings
+
+"buttons.continue" = "Продолжить";
+
+"buttons.cancel" = "Отмена";

@@ -8,8 +8,8 @@ public struct CodeInputView: View {
     @Environment(\.dismiss)
     private var dismiss
     
-    public init(router: AuthenticationRouter, registrationID: String) {
-        viewModel = .init(router: router, registrationID: registrationID)
+    public init(router: AuthenticationRouter, email: String, registrationID: String) {
+        viewModel = .init(router: router, email: email, registrationID: registrationID)
     }
     
     public var body: some View {
@@ -49,5 +49,5 @@ public struct CodeInputView: View {
 
 #Preview {
     let router = AppRouter()
-    CodeInputView(router: .init(appRouter: router), registrationID: "123")
+    CodeInputView(router: .init(appRouter: router), email: "", registrationID: "123")
 }

@@ -31,12 +31,14 @@ final class CodeInputViewModel {
      
     var state: CodeState = .empty
     let router: AuthenticationRouter
+    let email: String
     let registrationID: String
     
     private let backend: NetworkServiceProtocol
     
-    init(router: AuthenticationRouter, registrationID: String) {
+    init(router: AuthenticationRouter, email: String, registrationID: String) {
         self.router = router
+        self.email = email
         self.registrationID = registrationID
         backend = NetworkService()
     }
@@ -53,7 +55,7 @@ final class CodeInputViewModel {
             }
             
             if state == .ready {
-                router.navigateToPassword(for: .registration, registrationID: registrationID)
+                router.navigateToPassword(for: .registration(email: email), registrationID: registrationID)
             }
         }
     }

@@ -12,16 +12,16 @@ public final class AuthenticationRouter {
         appRouter?.navigate(to: .email(flow))
     }
     
-    func navigateToCode(registrationID: String) {
-        appRouter?.navigate(to: .code(registrationID: registrationID))
+    func navigateToCode(email: String, registrationID: String) {
+        appRouter?.navigate(to: .code(email: email, registrationID: registrationID))
     }
     
     func navigateToPassword(for flow: AuthFlow, registrationID: String? = nil) {
         appRouter?.navigate(to: .password(flow, registrationID: registrationID))
     }
     
-    func navigateToName(password: String, registrationID: String) {
-        appRouter?.navigate(to: .name(password: password, registrationID: registrationID))
+    func navigateToName(email: String, password: String, registrationID: String) {
+        appRouter?.navigate(to: .name(email: email, password: password, registrationID: registrationID))
     }
     
     func navigateToMediaDetails(_ image: UIImage) {

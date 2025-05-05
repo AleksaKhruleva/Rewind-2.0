@@ -51,8 +51,8 @@ final class PasswordInputViewModel {
         switch intent {
         case .submitPassword:
             switch flow {
-            case .registration:
-                router.navigateToName(password: password, registrationID: registrationID ?? "")
+            case let .registration(email):
+                router.navigateToName(email: email, password: password, registrationID: registrationID ?? "")
             case let .login(email):
                 state = .loading
                 do {
@@ -61,6 +61,7 @@ final class PasswordInputViewModel {
                     if !CommandLine.arguments.contains("-testingAuth") {
                         KeychainService.shared.save(response.accessToken, for: .accessToken)
                         KeychainService.shared.save(response.refreshToken, for: .refreshToken)
+                        UserStorage.currentUser = User(name: "", email: email)
                     }
                 } catch {
                     animateState(to: .error(.responseError))
