@@ -1,0 +1,38 @@
+{
+  "configurations" : [
+    {
+      "id" : "D969D41F-F002-421B-BE13-A96740EE1C14",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : {
+      "targets" : [
+        {
+          "containerPath" : "container:Modules\/Features\/Features.xcodeproj",
+          "identifier" : "C2829F0E3A10F31ED8B78458",
+          "name" : "Features"
+        },
+        {
+          "containerPath" : "container:Modules\/UIComponents\/UIComponents.xcodeproj",
+          "identifier" : "C61B68C4BB691B5A1C6B0D1E",
+          "name" : "UIComponents"
+        }
+      ]
+    },
+    "distributor" : "com.apple.TestFlight"
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Rewind.xcodeproj",
+        "identifier" : "C8E1B605D4D11B28FEA526DE",
+        "name" : "RewindUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

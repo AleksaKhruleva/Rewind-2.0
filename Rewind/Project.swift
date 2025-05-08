@@ -60,5 +60,17 @@ let project = Project(
                 .external(name: "Vapor")
             ]
         ),
+    ],
+    schemes: [
+        .scheme(
+            name: "Rewind",
+            shared: true,
+            buildAction: .buildAction(targets: ["Rewind"]),
+            testAction: .testPlans(["Rewind/UITests/RewindUITestsPlan.xctestplan"]),
+            runAction: .runAction(executable: "Rewind")
+        )
+    ],
+    additionalFiles: [
+        "Rewind/UITests/RewindUITestsPlan.xctestplan",
     ]
 )
