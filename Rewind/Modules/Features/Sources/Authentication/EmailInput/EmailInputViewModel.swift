@@ -60,7 +60,7 @@ final class EmailInputViewModel {
                 do {
                     let response = try await backend.register(email: email)
                     animateState(to: .ready(registrationID: response.registrationID))
-                } catch let httpError as HTTPError where httpError == .conflict {
+                } catch let httpError as HTTPError where httpError == HTTPError.conflict {
                     animateState(to: .error(.existing))
                 } catch {
                     animateState(to: .error(.responseError))
