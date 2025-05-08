@@ -8,7 +8,6 @@ public struct RewindButton: View {
         case xmark
         case checkmark
         case plus
-        case empty
         case gearshape = "gearshape.fill"
     }
     
@@ -32,7 +31,6 @@ public struct RewindButton: View {
                 .font(.system(size: 20, weight: .black))
                 .frame(width: 40, height: 40)
                 .tint(tint)
-                .opacity(type == .empty ? 0 : 1)
         }
     }
 }

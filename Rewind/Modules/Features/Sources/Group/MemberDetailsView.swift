@@ -39,7 +39,7 @@ public struct MemberDetailsView: View {
     
     private var header: some View {
         RewindHeader {
-            RewindButton(type: .empty) {}
+            RewindButton(type: .rightChevron).hidden()
         } centerView: {
             HeaderBadgeView(
                 image: memberAvatar,
