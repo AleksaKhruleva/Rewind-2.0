@@ -118,6 +118,10 @@
 
 "quote.toast.success" = "Your quote was saved successfully! 💬";
 
+// MARK: - Video creation strings
+
+"video.hint" = "Tap here to choose video";
+
 // MARK: - Group strings
 
 "group.activity" = "Activity";

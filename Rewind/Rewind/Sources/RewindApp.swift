@@ -12,18 +12,19 @@ struct RewindApp: App {
         WindowGroup {
             let hasAccessToken = KeychainService.shared.read(for: .accessToken) != nil
             let hasRefreshToken = KeychainService.shared.read(for: .refreshToken) != nil
-            let isAuthorized = hasAccessToken && hasRefreshToken
-            let isUserSaved = UserStorage.currentUser != nil
-            
-            let testingAuth = CommandLine.arguments.contains("-testingAuth")
+//            let isAuthorized = hasAccessToken && hasRefreshToken
+//            let isUserSaved = UserStorage.currentUser != nil
+//            
+//            let testingAuth = CommandLine.arguments.contains("-testingAuth")
             
             NavigationStack(path: $appRouter.path) {
                 Group {
-                    if isAuthorized, isUserSaved, !testingAuth {
-                        RewindView(router: .init(appRouter: appRouter))
-                    } else {
-                        WelcomeView(router: .init(appRouter: appRouter))
-                    }
+                    VideoUploadingView()
+//                    if isAuthorized, isUserSaved, !testingAuth {
+//                        RewindView(router: .init(appRouter: appRouter))
+//                    } else {
+//                        WelcomeView(router: .init(appRouter: appRouter))
+//                    }
                 }
                 .setUpNavigation(appRouter: appRouter)
             }

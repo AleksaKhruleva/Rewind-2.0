@@ -118,6 +118,10 @@
 
 "quote.toast.success" = "Твоя цитата успешно сохранена! 💬";
 
+// MARK: - Video creation strings
+
+"video.hint" = "Нажми сюда, чтобы выбрать видео";
+
 // MARK: - Group strings
 
 "group.activity" = "Активность";
