@@ -98,7 +98,7 @@ struct TagsView: View {
             Image(systemName: "minus")
                 .font(.system(size: 16, weight: .black))
                 .frame(width: 30, height: 30)
-                .background(.white)
+                .background(Color.background)
                 .clipShape(Circle())
                 .onTapGesture {
                     withAnimation {
