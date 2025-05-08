@@ -57,7 +57,7 @@ struct SelectGroupView: View {
         RewindSearchField(
             text: $searchText,
             placeholder: UIComponentsStrings.Group.Select.Search.placeholder,
-            backgroundColor: .white
+            backgroundColor: Color.background
         )
     }
     
@@ -69,7 +69,7 @@ struct SelectGroupView: View {
             
             ZStack(alignment: .trailing) {
                 RoundedRectangle(cornerRadius: 35, style: .continuous)
-                    .fill(.white)
+                    .fill(Color.background)
                 
                 GroupsScrollView(groups: filteredGroups, imageSize: imageSize)
                     .frame(height: imageSize + 20)
