@@ -60,7 +60,7 @@ public struct BlurredMediaView: View {
         )
         .frame(width: 220)
         .padding(.vertical, 4)
-        .background(.white)
+        .background(Color.background)
         .cornerRadius(14)
     }
     
@@ -84,7 +84,7 @@ public struct BlurredMediaView: View {
                 action: { saveImage(image: image) }
             )
         }
-        .background(.white)
+        .background(Color.background)
         .modifier(BlurredMediaTableModifier())
     }
     

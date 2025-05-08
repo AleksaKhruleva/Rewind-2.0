@@ -10,6 +10,8 @@ final class AccountViewModel {
         case signOut
         case deleteAccount
         case fetchUser
+        case deleteImage
+        case setImage(UIImage?)
     }
     
     var showToast: (String) -> Void
@@ -17,7 +19,9 @@ final class AccountViewModel {
     
     private let backend: NetworkServiceProtocol
     
-    var user: User
+    var user: User {
+        didSet { UserStorage.currentUser = user }
+    }
     
     init(router: AccountRouter) {
         self.router = router
@@ -78,6 +82,21 @@ final class AccountViewModel {
             if user.name.isEmpty {
                 self.user.name = "fake name"
             }
+        case .deleteImage:
+            guard user.imageData == nil else {
+                showToast(UIComponentsStrings.Account.Edit.Image.Delete.success)
+                return
+            }
+            withAnimation {
+                user.imageData = nil
+            }
+            showToast(UIComponentsStrings.Account.Edit.Image.Delete.success)
+        case let .setImage(newImage):
+            guard let newImage else {
+                showToast(UIComponentsStrings.Account.Edit.Image.Set.failure)
+                return
+            }
+            user.image = newImage
         }
     }
     

@@ -4,6 +4,8 @@ import AccessibilitySupport
 public struct CodeInputTextField: View {
     @Binding
     var code: [String]
+    var backgroundColor: UIColor
+    // TODO: use error for borders
     var error: Error?
     var onCodeFilled: () -> Void
     
@@ -13,10 +15,12 @@ public struct CodeInputTextField: View {
     public init(
         code: Binding<[String]>,
         error: Error? = nil,
+        backgroundColor: UIColor,
         onCodeFilled: @escaping () -> Void
     ) {
         self._code = code
         self.error = error
+        self.backgroundColor = backgroundColor
         self.onCodeFilled = onCodeFilled
     }
     
@@ -27,7 +31,12 @@ public struct CodeInputTextField: View {
     public var body: some View {
         HStack(spacing: 10) {
             ForEach(0..<4, id: \.self) { index in
-                CodeDigitTextFieldAdapter(code: $code, focusedField: $focusedField, tag: index)
+                CodeDigitTextFieldAdapter(
+                    code: $code,
+                    focusedField: $focusedField,
+                    backgroundColor: backgroundColor,
+                    tag: index
+                )
                     .frame(width: 60, height: 75)
                     .rewindAccessibilityIdentifier(.auth(.input(.code(index))))
             }

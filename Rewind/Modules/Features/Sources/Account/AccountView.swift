@@ -6,9 +6,13 @@ public struct AccountView: View {
     @State private var appIconsViewModel: AppIconsViewModel
     @State private var viewModel: AccountViewModel
     
-    @State private var isBlurredAvatarPresented = false
-    @State private var signOutAlertPresented = false
-    @State private var deleteAccountAlertPresented = false
+    @State private var imageEditingDialogShown = false
+    @State private var photoPickerShown = false
+    @State private var blurredAvatarShown = false
+    @State private var signOutAlertShown = false
+    @State private var deleteAccountAlertShown = false
+    
+    @State private var genericSheetItem: GenericInputSheetItem?
     
     @Environment(\.dismiss)
     private var dismiss
@@ -21,71 +25,111 @@ public struct AccountView: View {
     }
     
     public var body: some View {
-        ZStack {
-            Color.background.ignoresSafeArea()
+        VStack(spacing: 0) {
+            header
             
-            VStack(spacing: 0) {
-                header
-                
-                ScrollView {
-                    VStack(spacing: 15) {
-                        avatar.onTapGesture {
-                                withAnimation(.spring(response: 0.2)) {
-                                    isBlurredAvatarPresented = true
+            ScrollView {
+                VStack(spacing: 15) {
+                    avatar.onTapGesture {
+                            withAnimation(.spring(response: 0.2)) {
+                                guard viewModel.user.imageData != nil else {
+                                    photoPickerShown = true
+                                    return
                                 }
+                                blurredAvatarShown = true
                             }
-                        
-                        groupsTable
-                        
-                        activityTable
-                        
-                        generalTable
-                        
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(UIComponentsStrings.Account.appicons)
-                                .foregroundColor(.textSecondary)
-                                .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .black))
-                                .padding(.leading, 15)
-                            
-                            appIconsTable
                         }
+                    
+                    groupsTable
+                    
+                    activityTable
+                    
+                    generalTable
+                    
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text(UIComponentsStrings.Account.appicons)
+                            .foregroundColor(.textSecondary)
+                            .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .black))
+                            .padding(.leading, 15)
                         
-                        riskyTable
-                        
-                        RewindNoteTextView(text: UIComponentsStrings.Account.Note.you(100))
-                            .padding(.vertical, 4)
+                        appIconsTable
                     }
-                    .padding(.horizontal, 16)
+                    
+                    riskyTable
+                    
+                    RewindNoteTextView(text: UIComponentsStrings.Account.Note.you(100))
+                        .padding(.vertical, 4)
                 }
-                .scrollIndicators(.hidden)
+                .padding(.horizontal, 16)
             }
-            .onAppear {
-                viewModel.set(showToast: showToast)
-                Task { await viewModel.dispatch(.fetchUser) }
+            .scrollIndicators(.hidden)
+        }
+        .background(Color.background)
+        .confirmationDialog(
+            UIComponentsStrings.Account.Edit.Image.Dialog.title,
+            isPresented: $imageEditingDialogShown,
+            titleVisibility: .visible
+        ) {
+            Button(UIComponentsStrings.Account.Edit.Image.Dialog.setNew) {
+                photoPickerShown = true
             }
-            .overlay {
-                if isBlurredAvatarPresented {
-                    BlurredAvatarView(
-                        image: UIComponentsAsset.avatar.image,
-                        isPresented: $isBlurredAvatarPresented
-                    )
+            Button(UIComponentsStrings.Account.Edit.Image.Dialog.delete, role: .destructive) {
+                Task {
+                    await viewModel.dispatch(.deleteImage)
                 }
             }
-            .alert(UIComponentsStrings.Account.SignOut.Alert.title, isPresented: $signOutAlertPresented) {
-                VStack {
-                    Button(UIComponentsStrings.Buttons.continue, role: .cancel) {
-                        Task { await viewModel.dispatch(.signOut) }
-                    }
-                    Button(UIComponentsStrings.Buttons.cancel, role: .destructive) { }
+        }
+        .customImagePicker(show: $photoPickerShown, croppedImage: Binding {
+            return viewModel.user.image
+        } set: { newImage in
+            Task { await viewModel.dispatch(.setImage(newImage)) }
+        }) {
+            showToast(UIComponentsStrings.Account.Edit.Image.Set.success)
+        }
+        .sheet(item: $genericSheetItem) { item in
+            switch item {
+            case .name:
+                AccountNameEditingFlow() {
+                    Task { await viewModel.dispatch(.fetchUser) }
+                    showToast(UIComponentsStrings.Account.Edit.Name.success)
                 }
+            case .password:
+                AccountPasswordEditingFlow() {
+                    showToast(UIComponentsStrings.Account.Edit.Password.success)
+                }
+            case .email:
+                AccountEmailEditingFlow() {
+                    showToast(UIComponentsStrings.Account.Edit.Email.success)
+                }
+            default: EmptyView()
             }
-            .alert(UIComponentsStrings.Account.DeleteAccount.Alert.title, isPresented: $deleteAccountAlertPresented) {
-                VStack {
-                    Button(UIComponentsStrings.Buttons.continue, role: .cancel) {
-                        Task { await viewModel.dispatch(.deleteAccount) }
-                    }
-                    Button(UIComponentsStrings.Buttons.cancel, role: .destructive) { }
+        }
+        .onAppear {
+            viewModel.set(showToast: showToast)
+            Task { await viewModel.dispatch(.fetchUser) }
+        }
+        .overlay {
+            if blurredAvatarShown {
+                BlurredAvatarView(
+                    image: viewModel.user.image,
+                    isPresented: $blurredAvatarShown
+                )
+            }
+        }
+        .alert(UIComponentsStrings.Account.SignOut.Alert.title, isPresented: $signOutAlertShown) {
+            VStack {
+                Button(UIComponentsStrings.Buttons.continue, role: .cancel) {
+                    Task { await viewModel.dispatch(.signOut) }
                 }
+                Button(UIComponentsStrings.Buttons.cancel, role: .destructive) { }
+            }
+        }
+        .alert(UIComponentsStrings.Account.DeleteAccount.Alert.title, isPresented: $deleteAccountAlertShown) {
+            VStack {
+                Button(UIComponentsStrings.Buttons.continue, role: .cancel) {
+                    Task { await viewModel.dispatch(.deleteAccount) }
+                }
+                Button(UIComponentsStrings.Buttons.cancel, role: .destructive) { }
             }
         }
     }
@@ -95,7 +139,7 @@ public struct AccountView: View {
             RewindButton(type: .leftChevron) { dismiss() }
         } centerView: {
             HeaderBadgeView(
-                image: UIComponentsAsset.avatar.image,
+                image: viewModel.user.image,
                 text: viewModel.user.name
             )
         } rightView: {
@@ -104,7 +148,7 @@ public struct AccountView: View {
     }
     
     var avatar: some View {
-      AvatarView(image: UIComponentsAsset.avatar.image, text: viewModel.user.name)
+      AvatarView(image: viewModel.user.image, text: viewModel.user.name)
     }
     
     var appIconsTable: some View {
@@ -126,7 +170,27 @@ public struct AccountView: View {
     }
     
     var generalTable: some View {
-        InformationTable(title: UIComponentsStrings.Account.general, data: AccountConstants.general, isRisky: false)
+        InformationTable(
+            title: UIComponentsStrings.Account.general,
+            data: [
+                ("photo.fill", UIComponentsStrings.Account.General.image, {
+                    imageEditingDialogShown = true
+                }),
+                ("pencil", UIComponentsStrings.Account.General.name, {
+                    genericSheetItem = .name
+                }),
+                ("key.fill", UIComponentsStrings.Account.General.password, {
+                    genericSheetItem = .password
+                }),
+                ("envelope.fill", UIComponentsStrings.Account.General.email, {
+                    genericSheetItem = .email
+                }),
+                ("gift.fill", UIComponentsStrings.Account.General.widget, {}),
+                ("questionmark.circle.fill", UIComponentsStrings.Account.General.help, {}),
+                ("link.circle.fill", UIComponentsStrings.Account.General.share, {})
+            ],
+            isRisky: false
+        )
     }
     
     var riskyTable: some View {
@@ -134,10 +198,10 @@ public struct AccountView: View {
             title: UIComponentsStrings.Account.risky,
             data: [
                 ("rectangle.portrait.and.arrow.right.fill", UIComponentsStrings.Account.Risky.signout, {
-                    signOutAlertPresented = true
+                    signOutAlertShown = true
                 }),
                 ("trash.fill", UIComponentsStrings.Account.Risky.delete, {
-                    deleteAccountAlertPresented = true
+                    deleteAccountAlertShown = true
                 })
             ],
             isRisky: true

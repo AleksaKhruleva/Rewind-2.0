@@ -90,7 +90,7 @@ public struct BlurredTableCell: View {
             )
         }
         .frame(width: 380)
-        .background(.white)
+        .background(Color.background)
         .cornerRadius(18)
     }
 }

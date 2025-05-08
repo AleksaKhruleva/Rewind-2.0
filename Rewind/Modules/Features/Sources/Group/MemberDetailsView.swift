@@ -17,27 +17,24 @@ public struct MemberDetailsView: View {
     public init() {}
     
     public var body: some View {
-        ZStack {
-            Color.background.ignoresSafeArea()
+        VStack {
+            header
             
-            VStack {
-                header
-                
-                ScrollView {
-                    VStack(spacing: 15) {
-                        avatar
-                        
-                        groupsTable
-                        
-                        activityTable
-                        
-                        userExistenceNote
-                    }
-                    .padding(.horizontal, 16)
+            ScrollView {
+                VStack(spacing: 15) {
+                    avatar
+                    
+                    groupsTable
+                    
+                    activityTable
+                    
+                    userExistenceNote
                 }
-                .scrollIndicators(.hidden)
+                .padding(.horizontal, 16)
             }
+            .scrollIndicators(.hidden)
         }
+        .background(Color.background)
     }
     
     private var header: some View {

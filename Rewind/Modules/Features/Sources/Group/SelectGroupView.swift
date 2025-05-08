@@ -96,7 +96,7 @@ struct SelectGroupView: View {
                 suggestionRow(icon: "plus", title: UIComponentsStrings.Group.Select.add)
                 suggestionRow(icon: "person.2.fill", title: UIComponentsStrings.Group.Select.count(images.count))
             }
-            .background(.white)
+            .background(Color.background)
             .cornerRadius(20)
         }
     }

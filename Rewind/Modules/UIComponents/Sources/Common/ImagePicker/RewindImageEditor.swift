@@ -31,7 +31,7 @@ struct RewindImageEditor: View {
 
                 header
             }
-            .background(.white)
+            .background(Color.background)
         }
     }
     
@@ -59,7 +59,7 @@ struct RewindImageEditor: View {
     var imageMask: some View {
         GeometryReader { geometry in
             let width = geometry.size.width
-            Color.white.opacity(0.8)
+            Color.background.opacity(0.8)
                 .overlay(
                     Rectangle()
                         .frame(width: width, height: width)

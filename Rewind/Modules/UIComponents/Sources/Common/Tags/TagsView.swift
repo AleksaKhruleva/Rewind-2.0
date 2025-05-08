@@ -13,8 +13,13 @@ struct TagsView: View {
             .frame(height: totalHeight)
         }
         .sheet(isPresented: $tagInputPresented) {
-            TagInputView() { tag in
+            GenericInputSheetView(
+                item: .tag,
+                title: UIComponentsStrings.GenericInput.NewTag.title,
+                placeholder: UIComponentsStrings.GenericInput.NewTag.placeholder
+            ) { tag in
                 tags.append(tag)
+                tagInputPresented = false
             }
         }
     }
