@@ -34,44 +34,41 @@ struct RewindsList: View {
     }
     
     var body: some View {
-        ZStack {
-            Color.background.ignoresSafeArea()
+        VStack(spacing: 0) {
+            Text(UIComponentsStrings.Map.RewindsList.title)
+                .modifier(RoundFontModifier(size: 21))
             
-            VStack(spacing: 0) {
-                Text(UIComponentsStrings.Map.RewindsList.title)
-                    .modifier(RoundFontModifier(size: 21))
-                
-                Text(UIComponentsStrings.Map.RewindsList.group(group))
-                    .modifier(RoundFontModifier(size: 16, weight: .semibold, foregroundColor: .textSecondary))
-                    .padding(.top, 4)
-                
-                SegmentedPicker(selection: $option, items: [.visible, .all])
-                    .opacity(allRewinds.count == visibleRewinds.count ? 0.4 : 1)
-                    .disabled(allRewinds.count == visibleRewinds.count)
-                    .padding()
-                
-                ScrollView {
-                    ForEach(listRewinds) { rewind in
-                        RewindsListCell(rewind: rewind)
-                            .onTapGesture {
-                                onSelect(rewind.id)
-                            }
-                        
-                        if let last = listRewinds.last, rewind != last {
-                            Divider()
-                                .frame(height: 2)
-                                .padding(.horizontal, 16)
+            Text(UIComponentsStrings.Map.RewindsList.group(group))
+                .modifier(RoundFontModifier(size: 16, weight: .semibold, foregroundColor: .textSecondary))
+                .padding(.top, 4)
+            
+            SegmentedPicker(selection: $option, items: [.visible, .all])
+                .opacity(allRewinds.count == visibleRewinds.count ? 0.4 : 1)
+                .disabled(allRewinds.count == visibleRewinds.count)
+                .padding()
+            
+            ScrollView {
+                ForEach(listRewinds) { rewind in
+                    RewindsListCell(rewind: rewind)
+                        .onTapGesture {
+                            onSelect(rewind.id)
                         }
-                    }
                     
-                    RewindNoteTextView(text: UIComponentsStrings.Note.end)
-                        .padding(.top, 4)
+                    if let last = listRewinds.last, rewind != last {
+                        Divider()
+                            .frame(height: 2)
+                            .padding(.horizontal, 16)
+                    }
                 }
-                .scrollIndicators(.hidden)
+                
+                RewindNoteTextView(text: UIComponentsStrings.Note.end)
+                    .padding(.top, 4)
             }
-            .padding(.horizontal, 8)
-            .padding(.top, 20)
+            .scrollIndicators(.hidden)
         }
+        .background(Color.background)
+        .padding(.horizontal, 8)
+        .padding(.top, 20)
     }
 }
 

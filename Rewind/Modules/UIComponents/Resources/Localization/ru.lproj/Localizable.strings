@@ -46,6 +46,24 @@
 
 "account.delete_account.alert.title" = "Ты уверен, что хочешь удалить аккаунт? Это действие необратимо.";
 
+"account.edit.image.dialog.title" = "Что ты хочешь сделать с фото профиля?";
+
+"account.edit.image.dialog.set_new" = "Установить новое изображение";
+
+"account.edit.image.dialog.delete" = "Удалить изображение";
+
+"account.edit.image.delete.success" = "Фото! 🗑️";
+
+"account.edit.image.set.success" = "Изображение успешно изменено! 📸";
+
+"account.edit.image.set.failure" = "Не получилось изменить изображение! 😭";
+
+"account.edit.name.success" = "Имя успешно изменено! ✍️";
+
+"account.edit.password.success" = "Пароль успешно изменён! 🔐";
+
+"account.edit.email.success" = "Почта успешно изменена! 💌";
+
 // MARK: - Auth strings
 
 "welcome.sign_up" = "Зарегистрироваться";
@@ -236,3 +254,27 @@
 "buttons.continue" = "Продолжить";
 
 "buttons.cancel" = "Отмена";
+
+// MARK: - Generic input sheet
+
+"generic_input.your_password.title" = "Введит свой пароль";
+
+"generic_input.your_password.placeholder" = "пароль";
+
+"generic_input.new_password.title" = "Введи новый пароль";
+
+"generic_input.new_password.placeholder" = "новый пароль";
+
+"generic_input.new_email.title" = "Введи новый email";
+
+"generic_input.new_email.placeholder" = "новый email";
+
+"generic_input.new_name.title" = "Введи новое имя";
+
+"generic_input.new_name.placeholder" = "новое имя";
+
+"generic_input.new_tag.title" = "Введи новый тэг";
+
+"generic_input.new_tag.placeholder" = "новый тэг";
+
+"generic_input.verification_code.title" = "Введи код потдверждения";

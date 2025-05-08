@@ -25,7 +25,9 @@ public struct BlurredAvatarView: View {
                   isPresented = false
               }
           }
-          .customImagePicker(show: $showPicker, croppedImage: $image)
+          .customImagePicker(show: $showPicker, croppedImage: $image) {
+              showToast(UIComponentsStrings.Account.Edit.Image.Set.success)
+          }
     }
     
     public var content: some View {

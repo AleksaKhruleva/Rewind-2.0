@@ -12,30 +12,27 @@ public struct MediaDetailsView: View {
     }
     
     public var body: some View {
-        ZStack {
-            Color.background.ignoresSafeArea()
+        VStack {
+            header
             
-            VStack {
-                header
-                
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        rewind
-                        
-                        author
-                            .padding(.leading)
-                        
-                        TagsSectionView(tags: $tags)
-                        
-                        riskyTable
-                    }
-                    .ignoresSafeArea()
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    rewind
+                    
+                    author
+                        .padding(.leading)
+                    
+                    TagsSectionView(tags: $tags)
+                    
+                    riskyTable
                 }
-                .scrollIndicators(.hidden)
-                .scrollBounceBehavior(.basedOnSize)
-                .padding(.horizontal, 8)
+                .ignoresSafeArea()
             }
+            .scrollIndicators(.hidden)
+            .scrollBounceBehavior(.basedOnSize)
+            .padding(.horizontal, 8)
         }
+        .background(Color.background)
     }
     
     private var header: some View {

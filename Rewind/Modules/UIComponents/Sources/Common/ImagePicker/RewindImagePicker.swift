@@ -6,6 +6,7 @@ struct RewindImagePicker<Content: View>: View {
     var content: Content
     @Binding var show: Bool
     @Binding var cropedImage: UIImage?
+    var onSuccess: () -> Void
     
     @State private var pickerItem: PhotosPickerItem?
     @State private var selectedImage: UIImage?
@@ -14,16 +15,18 @@ struct RewindImagePicker<Content: View>: View {
     init(
         show: Binding<Bool>,
         croppedImage: Binding<UIImage?>,
+        onSuccess: @escaping () -> Void,
         @ViewBuilder content: @escaping () -> Content
     ) {
         self._show = show
         self._cropedImage = croppedImage
+        self.onSuccess = onSuccess
         self.content = content()
     }
     
     var body: some View {
         content
-            .photosPicker(isPresented: $show, selection: $pickerItem)
+            .photosPicker(isPresented: $show, selection: $pickerItem, matching: .images)
             .onChange(of: pickerItem) { _, newValue in
                 guard let newValue else { return }
                 Task {
@@ -38,11 +41,13 @@ struct RewindImagePicker<Content: View>: View {
                 }
             }
             .fullScreenCover(isPresented: $isImageEditorPresented) {
+                pickerItem = nil
                 selectedImage = nil
             } content: {
                 RewindImageEditor(image: $selectedImage, cropType: .circle) { croppedImage, status in
                     guard let croppedImage else { return }
                     self.cropedImage = croppedImage
+                    if status { onSuccess() }
                 }
             }
     }

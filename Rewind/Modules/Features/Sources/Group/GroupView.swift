@@ -19,40 +19,37 @@ public struct GroupView: View {
     public init() {}
     
     public var body: some View {
-        ZStack {
-            Color.background.ignoresSafeArea()
+        VStack {
+            header
             
-            VStack {
-                header
-                
-                ScrollView {
-                    VStack(spacing: 15) {
-                        avatar
-                            .onTapGesture {
-                                withAnimation {
-                                    isBlurredAvatarPresented.toggle()
-                                }
+            ScrollView {
+                VStack(spacing: 15) {
+                    avatar
+                        .onTapGesture {
+                            withAnimation {
+                                isBlurredAvatarPresented.toggle()
                             }
-                        
-                        membersTable
-                        
-                        activityTable
-                        
-                        galleryPreview
-                        
-                        groupExistenceNote
-                    }
-                    .padding(.horizontal, 16)
+                        }
+                    
+                    membersTable
+                    
+                    activityTable
+                    
+                    galleryPreview
+                    
+                    groupExistenceNote
                 }
-                .scrollIndicators(.hidden)
+                .padding(.horizontal, 16)
             }
-            .overlay {
-                if isBlurredAvatarPresented {
-                    BlurredAvatarView(
-                        image: UIComponentsAsset.groupAvatar.image,
-                        isPresented: $isBlurredAvatarPresented
-                    )
-                }
+            .scrollIndicators(.hidden)
+        }
+        .background(Color.background)
+        .overlay {
+            if isBlurredAvatarPresented {
+                BlurredAvatarView(
+                    image: UIComponentsAsset.groupAvatar.image,
+                    isPresented: $isBlurredAvatarPresented
+                )
             }
         }
     }

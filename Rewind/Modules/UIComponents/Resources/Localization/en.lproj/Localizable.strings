@@ -46,6 +46,24 @@
 
 "account.delete_account.alert.title" = "Are you sure you want to delete your account? You will not be able to undo this action.";
 
+"account.edit.image.dialog.title" = "What to do with your profile image?";
+
+"account.edit.image.dialog.set_new" = "Set new image from gallery";
+
+"account.edit.image.dialog.delete" = "Delete current image";
+
+"account.edit.image.delete.success" = "Image was successfully deleted! 🗑️";
+
+"account.edit.image.set.success" = "Image was successfully changed! 📸";
+
+"account.edit.image.set.failure" = "Failed editing your image! 😭";
+
+"account.edit.name.success" = "Name was successfully changed! ✍️";
+
+"account.edit.password.success" = "Password was successfully changed! 🔐";
+
+"account.edit.email.success" = "Email was successfully changed! 💌";
+
 // MARK: - Auth strings
 
 "welcome.sign_up" = "Sign up";
@@ -236,3 +254,27 @@
 "buttons.continue" = "Continue";
 
 "buttons.cancel" = "Cancel";
+
+// MARK: - Generic input sheet
+
+"generic_input.your_password.title" = "Enter your password";
+
+"generic_input.your_password.placeholder" = "password";
+
+"generic_input.new_password.title" = "Enter new password";
+
+"generic_input.new_password.placeholder" = "new password";
+
+"generic_input.new_email.title" = "Enter new email";
+
+"generic_input.new_email.placeholder" = "new email";
+
+"generic_input.new_name.title" = "Enter new name";
+
+"generic_input.new_name.placeholder" = "new name";
+
+"generic_input.new_tag.title" = "Enter new tag";
+
+"generic_input.new_tag.placeholder" = "new tag";
+
+"generic_input.verification_code.title" = "Enter verification code";

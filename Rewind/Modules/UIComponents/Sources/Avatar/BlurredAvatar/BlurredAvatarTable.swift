@@ -21,7 +21,7 @@ struct BlurredAvatarTable: View {
             )
         }
         .frame(width: 200)
-        .background(.white)
+        .background(Color.background)
         .cornerRadius(18)
     }
 }

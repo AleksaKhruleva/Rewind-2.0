@@ -16,35 +16,32 @@ public struct QuoteCreationView: View {
     public init() {}
     
     public var body: some View {
-        ZStack {
-            Color.background.ignoresSafeArea()
+        VStack(spacing: 0) {
+            header
             
-            VStack(spacing: 0) {
-                header
-                
-                ScrollView {
-                    VStack(spacing: 16) {
-                        quoteContent
-                            .cornerRadius(40)
-                            .onTapGesture {
-                                viewModel.dispatch(.presentQuoteInput)
-                            }
-                        
-                        generalTable
-                        
-                        TagsSectionView(tags: $viewModel.tags)
-                    }
+            ScrollView {
+                VStack(spacing: 16) {
+                    quoteContent
+                        .cornerRadius(40)
+                        .onTapGesture {
+                            viewModel.dispatch(.presentQuoteInput)
+                        }
+                    
+                    generalTable
+                    
+                    TagsSectionView(tags: $viewModel.tags)
                 }
-                .scrollIndicators(.hidden)
-                .modifier(MeasureWidthModifier(width: $quoteWidth))
-                .padding(.horizontal, 8)
             }
-            .safeAreaInset(edge: .bottom) {
-                continueButton
-            }
-            .sheet(isPresented: $viewModel.quoteInputPresented) {
-                quoteInputContent
-            }
+            .scrollIndicators(.hidden)
+            .modifier(MeasureWidthModifier(width: $quoteWidth))
+            .padding(.horizontal, 8)
+        }
+        .background(Color.background)
+        .safeAreaInset(edge: .bottom) {
+            continueButton
+        }
+        .sheet(isPresented: $viewModel.quoteInputPresented) {
+            quoteInputContent
         }
     }
     

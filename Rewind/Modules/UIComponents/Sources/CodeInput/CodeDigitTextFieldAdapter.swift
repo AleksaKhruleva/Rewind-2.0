@@ -4,16 +4,19 @@ import UIKit
 public struct CodeDigitTextFieldAdapter: UIViewRepresentable {
     @Binding var code: [String]
     @Binding var focusedField: Int
-    var tag: Int
+    var backgroundColor: UIColor
+    var index: Int
     
     public init(
         code: Binding<[String]>,
         focusedField: Binding<Int>,
+        backgroundColor: UIColor,
         tag: Int
     ) {
         self._code = code
         self._focusedField = focusedField
-        self.tag = tag
+        self.backgroundColor = backgroundColor
+        self.index = tag
     }
     
     public func makeUIView(context: Context) -> CodeDigitTextField {
@@ -21,7 +24,7 @@ public struct CodeDigitTextFieldAdapter: UIViewRepresentable {
         textField.textAlignment = .center
         textField.keyboardType = .numberPad
         textField.font = UIFont.monospacedSystemFont(ofSize: 22, weight: .semibold)
-        textField.backgroundColor = UIComponentsAsset.backgroundSecondary.color
+        textField.backgroundColor = backgroundColor
         textField.tintColor = UIComponentsAsset.pinkPrimary.color
         textField.layer.cornerRadius = 14
         textField.delegate = context.coordinator
@@ -30,14 +33,14 @@ public struct CodeDigitTextFieldAdapter: UIViewRepresentable {
             if isEmpty {
                 context.coordinator.stepBackward()
             }
-            code[isEmpty ? max(0, tag - 1) : tag] = ""
+            code[isEmpty ? max(0, index - 1) : index] = ""
         }
         return textField
     }
     
     public func updateUIView(_ uiView: CodeDigitTextField, context _: Context) {
-        uiView.text = code[tag]
-        if focusedField == tag, !uiView.isFirstResponder {
+        uiView.text = code[index]
+        if focusedField == index, !uiView.isFirstResponder {
             DispatchQueue.main.async {
                 uiView.becomeFirstResponder()
             }
@@ -45,7 +48,7 @@ public struct CodeDigitTextFieldAdapter: UIViewRepresentable {
     }
     
     public func makeCoordinator() -> Coordinator {
-        Coordinator(code: $code, focusedField: $focusedField, tag: tag)
+        Coordinator(code: $code, focusedField: $focusedField, tag: index)
     }
     
     public final class Coordinator: NSObject, UITextFieldDelegate {

@@ -24,7 +24,7 @@ public struct CodeInputView: View {
                 Text(UIComponentsStrings.Code.title)
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
                 
-                CodeInputTextField(code: $code, error: nil) {
+                CodeInputTextField(code: $code, error: nil, backgroundColor: UIComponentsAsset.backgroundSecondary.color) {
                     Task {
                         await viewModel.dispatch(.submitCode(code: code.joined()))
                     }
