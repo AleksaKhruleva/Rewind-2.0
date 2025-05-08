@@ -11,7 +11,7 @@ public struct RewindHeader<LeftContent: View, CenterContent: View, RightContent:
 
     public init(
         backgroundColor: Color = Color.background,
-        @ViewBuilder leftView: () -> LeftContent,
+        @ViewBuilder leftView: () -> LeftContent = { EmptyView() },
         @ViewBuilder centerView: () -> CenterContent = { EmptyView() },
         @ViewBuilder rightView: () -> RightContent = { EmptyView() }
     ) {

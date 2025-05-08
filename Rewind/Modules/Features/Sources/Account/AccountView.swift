@@ -143,7 +143,7 @@ public struct AccountView: View {
                 text: viewModel.user.name
             )
         } rightView: {
-            RewindButton(type: .empty).hidden()
+            RewindButton(type: .leftChevron).hidden()
         }
     }
     

@@ -86,15 +86,11 @@ public struct StandView: View {
     }
     
     private var header: some View {
-        RewindHeader(backgroundColor: .clear) {
-            RewindButton(type: .empty) {}
-        } centerView: {
-            RewindButton(type: .empty) {}
-        } rightView: {
+        RewindHeader(backgroundColor: .clear, rightView: {
             RewindButton(type: .rightChevron, tint: .white) {
                 dismiss()
             }
-        }
+        })
     }
 }
 

@@ -46,7 +46,7 @@ public struct GroupSettingsView: View {
     
     private var header: some View {
         RewindHeader {
-            RewindButton(type: .empty) {}
+            RewindButton(type: .rightChevron).hidden()
         } centerView: {
             HeaderBadgeView(
                 image: UIComponentsAsset.groupAvatar.image,
