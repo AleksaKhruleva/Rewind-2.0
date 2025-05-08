@@ -59,7 +59,6 @@ struct ClusterView: View {
             .overlay {
                 Text("\(count)")
                     .modifier(RoundFontModifier(size: 15, foregroundColor: .textPrimaryInverted))
-                    .foregroundColor(.white)
                     .padding(6)
             }
     }
