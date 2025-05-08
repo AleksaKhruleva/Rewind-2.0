@@ -199,32 +199,32 @@ public struct VideoUploadingView: View {
     private func loadVideoAsset(from asset: PHAsset) {
         let options = PHVideoRequestOptions()
         options.isNetworkAccessAllowed = true
-
+        
         PHImageManager.default().requestAVAsset(forVideo: asset, options: options) { avAsset, _, _ in
             guard let urlAsset = avAsset as? AVURLAsset else { return }
-
+            
             Task { @MainActor in
                 do {
                     let videoDuration = try await urlAsset.load(.duration)
                     let clampedDuration = CMTimeMinimum(videoDuration, maxVideoDuration)
-
+                    
                     self.videoAsset = urlAsset
                     self.timelineID = UUID()
                     self.currentTime = 0
                     self.startTime = .zero
                     self.endTime = clampedDuration
                     self.duration = CMTimeGetSeconds(videoDuration)
-
+                    
                     // ✅ создаём AVPlayerItem вручную
                     let item = AVPlayerItem(asset: urlAsset)
                     self.playerItem = item // <-- предполагаем, что у тебя есть @State var playerItem
-
+                    
                     // ✅ создаём AVPlayer с этим item
                     let newPlayer = AVPlayer(playerItem: item)
                     await newPlayer.seek(to: .zero)
                     self.player = newPlayer
                     self.isPlaying = false
-
+                    
                     NotificationCenter.default.addObserver(
                         forName: .AVPlayerItemDidPlayToEndTime,
                         object: item,
@@ -293,47 +293,45 @@ public struct VideoUploadingView: View {
     @MainActor
     private func applyCropToCurrentVideo() async {
         guard let playerItem = playerItem, let asset = videoAsset else { return }
-
+        
         do {
             let tracks = try await asset.loadTracks(withMediaType: .video)
             guard let videoTrack = tracks.first else { return }
-
+            
             let naturalSize = try await videoTrack.load(.naturalSize)
             let duration = try await asset.load(.duration)
-
-            // Переводим cropOffset из экранных координат в координаты видео
+            let preferredTransform = try await videoTrack.load(.preferredTransform)
+            
             let screenSize = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width)
             let scaleRatio = naturalSize.width / screenSize.width
-
+            
             let transformedOffset = CGSize(
                 width: cropOffset.width * scaleRatio,
                 height: cropOffset.height * scaleRatio
             )
-
+            
+            let epsilon: CGFloat = 0.002
+            let adjustedScale = cropScale + epsilon
+            
+            // 🔧 Применяем preferredTransform первым
+            let transform = preferredTransform
+                .concatenating(CGAffineTransform(translationX: transformedOffset.width, y: transformedOffset.height))
+                .concatenating(CGAffineTransform(scaleX: adjustedScale, y: adjustedScale))
+            
             let composition = AVMutableVideoComposition()
             composition.renderSize = naturalSize
             composition.frameDuration = CMTime(value: 1, timescale: 30)
-
+            
             let instruction = AVMutableVideoCompositionInstruction()
             instruction.timeRange = CMTimeRange(start: .zero, duration: duration)
-
+            
             let layerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoTrack)
-
-            // 🔍 Едва заметное увеличение масштаба для устранения черных полос
-            let epsilon: CGFloat = 0.002
-            let adjustedScale = cropScale + epsilon
-
-            // 🧠 Сначала сдвиг, потом масштаб — соответствует редактору
-            let transform = CGAffineTransform.identity
-                .translatedBy(x: transformedOffset.width, y: transformedOffset.height)
-                .scaledBy(x: adjustedScale, y: adjustedScale)
-
             layerInstruction.setTransform(transform, at: .zero)
+            
             instruction.layerInstructions = [layerInstruction]
             composition.instructions = [instruction]
-
+            
             playerItem.videoComposition = composition
-
         } catch {
             print("❌ Ошибка при применении кропа: \(error)")
         }
