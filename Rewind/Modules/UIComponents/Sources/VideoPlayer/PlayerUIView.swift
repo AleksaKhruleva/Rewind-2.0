@@ -42,18 +42,7 @@ public final class PlayerUIView: UIView {
     public override func layoutSubviews() {
         super.layoutSubviews()
         
-        let offsetX: CGFloat = -50
-        let offsetY: CGFloat = 30
-        let scale: CGFloat = 1.2
-        
-        let scaledWidth = bounds.width * scale
-        let scaledHeight = bounds.height * scale
-        playerLayer.frame = CGRect(
-            x: offsetX,
-            y: offsetY,
-            width: scaledWidth,
-            height: scaledHeight
-        )
+        playerLayer.frame = bounds
         overlayButton.frame = bounds
     }
     
