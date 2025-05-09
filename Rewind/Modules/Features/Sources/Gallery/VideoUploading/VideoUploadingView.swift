@@ -215,11 +215,9 @@ public struct VideoUploadingView: View {
                     self.endTime = clampedDuration
                     self.duration = CMTimeGetSeconds(videoDuration)
                     
-                    // ✅ создаём AVPlayerItem вручную
                     let item = AVPlayerItem(asset: urlAsset)
-                    self.playerItem = item // <-- предполагаем, что у тебя есть @State var playerItem
+                    self.playerItem = item
                     
-                    // ✅ создаём AVPlayer с этим item
                     let newPlayer = AVPlayer(playerItem: item)
                     await newPlayer.seek(to: .zero)
                     self.player = newPlayer
@@ -302,31 +300,61 @@ public struct VideoUploadingView: View {
             let duration = try await asset.load(.duration)
             let preferredTransform = try await videoTrack.load(.preferredTransform)
             
-            let screenSize = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width)
-            let scaleRatio = naturalSize.width / screenSize.width
+            let isPortrait = abs(preferredTransform.b) == 1 && abs(preferredTransform.c) == 1
+            let renderSize = isPortrait
+            ? CGSize(width: naturalSize.height, height: naturalSize.width)
+            : naturalSize
+            
+            let cropFrameSize = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width)
+            
+            let fittingScale = max(
+                cropFrameSize.width / renderSize.width,
+                cropFrameSize.height / renderSize.height
+            )
+            
+            let renderedVideoSize = CGSize(
+                width: renderSize.width * fittingScale,
+                height: renderSize.height * fittingScale
+            )
+            
+            let scaleRatio = renderSize.width / renderedVideoSize.width
+            
+            let minimalOffset: CGFloat = 0.5
+            let adjustedCropOffset = CGSize(
+                width: abs(cropOffset.width) < minimalOffset ? 0 : cropOffset.width,
+                height: abs(cropOffset.height) < minimalOffset ? 0 : cropOffset.height
+            )
             
             let transformedOffset = CGSize(
-                width: cropOffset.width * scaleRatio,
-                height: cropOffset.height * scaleRatio
+                width: round(adjustedCropOffset.width * scaleRatio),
+                height: round(adjustedCropOffset.height * scaleRatio)
             )
             
             let epsilon: CGFloat = 0.002
             let adjustedScale = cropScale + epsilon
             
-            // 🔧 Применяем preferredTransform первым
-            let transform = preferredTransform
-                .concatenating(CGAffineTransform(translationX: transformedOffset.width, y: transformedOffset.height))
-                .concatenating(CGAffineTransform(scaleX: adjustedScale, y: adjustedScale))
+            let anchor = CGPoint(x: renderSize.width / 2, y: renderSize.height / 2)
+            
+            let scaleTransform = CGAffineTransform.identity
+                .translatedBy(x: anchor.x, y: anchor.y)
+                .scaledBy(x: adjustedScale, y: adjustedScale)
+                .translatedBy(x: -anchor.x, y: -anchor.y)
+            
+            let offsetTransform = CGAffineTransform(translationX: transformedOffset.width, y: transformedOffset.height)
+            
+            let cropTransform = scaleTransform.concatenating(offsetTransform)
+            
+            let finalTransform = preferredTransform.concatenating(cropTransform)
             
             let composition = AVMutableVideoComposition()
-            composition.renderSize = naturalSize
+            composition.renderSize = renderSize
             composition.frameDuration = CMTime(value: 1, timescale: 30)
             
             let instruction = AVMutableVideoCompositionInstruction()
             instruction.timeRange = CMTimeRange(start: .zero, duration: duration)
             
             let layerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoTrack)
-            layerInstruction.setTransform(transform, at: .zero)
+            layerInstruction.setTransform(finalTransform, at: .zero)
             
             instruction.layerInstructions = [layerInstruction]
             composition.instructions = [instruction]
