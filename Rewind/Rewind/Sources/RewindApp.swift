@@ -5,8 +5,8 @@ import Base
 
 @main
 struct RewindApp: App {
-    @State var toastController = ToastController()
-    @State private var appRouter = AppRouter()
+    @StateObject private var coordinator = NavigationCoordinator()
+    @State private var toastController = ToastController()
     
     var body: some Scene {
         WindowGroup {
@@ -17,60 +17,35 @@ struct RewindApp: App {
             
             let testingAuth = CommandLine.arguments.contains("-testingAuth")
             
-            NavigationStack(path: $appRouter.path) {
-                Group {
-                    if isAuthorized, isUserSaved, !testingAuth {
-                        RewindView(router: .init(appRouter: appRouter))
-                    } else {
-                        WelcomeView(router: .init(appRouter: appRouter))
-                    }
-                }
-                .setUpNavigation(appRouter: appRouter)
-            }
-            .setupToast(toastController: toastController)
-            .environment(\.showToast, {
-                toastController.present(with: $0)
-            })
+            let initialRoute: AppRouter.Route = (isAuthorized && isUserSaved && !testingAuth) ? .rewind : .rewind
+            
+            UIKitNavigationContainer(coordinator: coordinator, initialRoute: initialRoute)
+                .setupToast(toastController: toastController)
+                .environment(\.showToast, {
+                    toastController.present(with: $0)
+                })
         }
     }
+}
+
+struct UIKitNavigationContainer: UIViewControllerRepresentable {
+    let coordinator: NavigationCoordinator
+    let initialRoute: AppRouter.Route
+    
+    func makeUIViewController(context: Context) -> UINavigationController {
+        let navigationController = UINavigationController()
+        navigationController.setNavigationBarHidden(true, animated: false)
+        coordinator.start(with: navigationController, initialRoute: initialRoute)
+        return navigationController
+    }
+    
+    func updateUIViewController(_ uiViewController: UINavigationController, context: Context) {}
 }
 
 extension View {
     fileprivate func setupToast(toastController: ToastController) -> some View {
         self.overlay {
             ToastView(controller: toastController)
-        }
-    }
-    
-    fileprivate func setUpNavigation(appRouter: AppRouter) -> some View {
-        self.navigationDestination(for: AppRouter.Route.self) { route in
-            Group {
-                switch route {
-                case .account:
-                    AccountView(router: .init(appRouter: appRouter))
-                case .gallery:
-                    GalleryView(router: .init(appRouter: appRouter))
-                case .quote:
-                    QuoteCreationView()
-                case let .mediaDetails(image):
-                    MediaDetailsView(image: image)
-                case let .email(flow):
-                    EmailInputView(flow: flow, router: .init(appRouter: appRouter))
-                case let .code(email, registrationID):
-                    CodeInputView(router: .init(appRouter: appRouter), email: email, registrationID: registrationID)
-                case let .password(flow, registrationID):
-                    PasswordInputView(flow: flow, router: .init(appRouter: appRouter), registrationID: registrationID)
-                case let .name(email, password, registrationID):
-                    NameInputView(router: .init(appRouter: appRouter), email: email, password: password, registrationID: registrationID)
-                case .rewind:
-                    RewindView(router: .init(appRouter: appRouter))
-                case .welcome:
-                    WelcomeView(router: .init(appRouter: appRouter))
-                case .map:
-                    RewindsMap()
-                }
-            }
-            .toolbar(.hidden)
         }
     }
 }
