@@ -16,9 +16,9 @@ public struct CodeInputView: View {
         ZStack(alignment: .topLeading) {
             Color.background.ignoresSafeArea()
             
-            RewindHeader {
+            RewindHeader(leftView: {
                 RewindButton(type: .leftChevron) { dismiss() }
-            }
+            })
             
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
                 Text(UIComponentsStrings.Code.title)

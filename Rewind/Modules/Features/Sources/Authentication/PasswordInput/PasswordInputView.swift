@@ -17,13 +17,13 @@ public struct PasswordInputView: View {
         ZStack(alignment: .topLeading) {
             Color.background.ignoresSafeArea()
             
-            RewindHeader {
+            RewindHeader(leftView: {
                 RewindButton(type: .leftChevron) {
                     Task {
                         await viewModel.dispatch(.dismiss)
                     }
                 }
-            }
+            })
             
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
                 Text(UIComponentsStrings.Password.title)
