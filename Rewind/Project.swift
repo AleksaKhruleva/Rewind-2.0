@@ -66,11 +66,11 @@ let project = Project(
             name: "Rewind",
             shared: true,
             buildAction: .buildAction(targets: ["Rewind"]),
-            testAction: .testPlans(["Rewind/UITests/RewindUITestsPlan.xctestplan"]),
+            testAction: .testPlans(["Rewind/UITests/UITestPlan.xctestplan"]),
             runAction: .runAction(executable: "Rewind")
         )
     ],
     additionalFiles: [
-        "Rewind/UITests/RewindUITestsPlan.xctestplan",
+        "Rewind/UITests/UITestPlan.xctestplan",
     ]
 )
