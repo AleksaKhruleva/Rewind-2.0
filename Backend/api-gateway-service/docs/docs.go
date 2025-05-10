@@ -47,19 +47,25 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request - Invalid email format or request body\" // Обрабатываем codes.InvalidArgument",
+                        "description": "Bad Request - Invalid email format or request body",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
                     "404": {
-                        "description": "Not Found - User not found\" // Обрабатываем codes.NotFound",
+                        "description": "Not Found - User not found",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -110,8 +116,20 @@ const docTemplate = `{
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
+                    "409": {
+                        "description": "Conflict - User with this email or username already exists",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -145,25 +163,25 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Password reset link sent (success is true even if user not found to prevent enumeration)\" // Добавлено уточнение про success",
+                        "description": "Password reset link sent (success is true even if user not found to prevent enumeration)",
                         "schema": {
                             "$ref": "#/definitions/responses.ForgotPasswordResponse"
                         }
                     },
                     "400": {
-                        "description": "Bad Request - Invalid email format or request body\" // Обрабатываем codes.InvalidArgument",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found - User with this email not found\" // В текущей реализации сервиса этот код не возвращается для user not found, но может быть возвращен сервисом в других случаях. Оставляем для полноты документации.",
+                        "description": "Bad Request - Invalid email format or request body",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -209,19 +227,19 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "Unauthorized - Invalid credentials\" // Обрабатываем codes.Unauthenticated",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found - User not found\" // Хотя сервис теперь возвращает 401 для \"не найден\", оставим в документации как возможное для ясности или будущих изменений",
+                        "description": "Unauthorized - Invalid credentials",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -255,31 +273,25 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "User successfully logged out (success is true even if token not found)\" // Добавлено уточнение про success",
+                        "description": "User successfully logged out (success is true even if token not found)",
                         "schema": {
                             "$ref": "#/definitions/responses.LogoutResponse"
                         }
                     },
                     "400": {
-                        "description": "Bad Request - Invalid refresh token format or request body\" // Обрабатываем codes.InvalidArgument",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized - Invalid or expired refresh token\" // Этот код в текущей реализации сервиса не возвращается для token not found, т.к. там успех. Оставляем для полноты документации.",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found - Refresh token not found\" // Этот код в текущей реализации сервиса не возвращается для token not found, т.к. там успех. Оставляем для полноты документации.",
+                        "description": "Bad Request - Invalid refresh token format or request body",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -319,25 +331,25 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request - Invalid refresh token format\" // Обрабатываем codes.InvalidArgument",
+                        "description": "Bad Request - Invalid refresh token format",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
                     "401": {
-                        "description": "Unauthorized - Invalid or expired refresh token\" // Обрабатываем codes.Unauthenticated",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found - Refresh token not found\" // Хотя сервис возвращает 401, оставим для полноты документации",
+                        "description": "Unauthorized - Invalid or expired refresh token",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -393,6 +405,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -429,19 +447,25 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request - Invalid password format or request body\" // Обрабатываем codes.InvalidArgument",
+                        "description": "Bad Request - Invalid password format or request body",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
                     "404": {
-                        "description": "Not Found - Invalid or expired reset token\" // Обрабатываем codes.NotFound",
+                        "description": "Not Found - Invalid or expired reset token",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -492,8 +516,20 @@ const docTemplate = `{
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
+                    "409": {
+                        "description": "Conflict - Registration ID or code already used",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -686,7 +722,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
+	Host:             "rewindapp.ru",
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Rewind API Gateway",

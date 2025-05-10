@@ -36,6 +36,7 @@ func NewAuthHandler(authService services.AuthServiceInterface) *AuthHandler {
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid email format or request body"
 // @Failure 409 {object} responses.ErrorResponse "Conflict - User with this email already exists"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
+// @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Router /api/auth/register [post]
 func (h *AuthHandler) StartRegistration(w http.ResponseWriter, r *http.Request) {
 	var req requests.StartRegistrationRequest
@@ -55,11 +56,22 @@ func (h *AuthHandler) StartRegistration(w http.ResponseWriter, r *http.Request) 
 			case codes.AlreadyExists:
 				respondError(w, http.StatusConflict, st.Message())
 				return
+			case codes.Internal:
+				log.Printf("Auth-Service internal error during StartRegistration: %v", st.Message())
+				respondError(w, http.StatusInternalServerError, "Internal Server Error.")
+				return
+			case codes.Unavailable:
+				log.Printf("Auth-Service unavailable during StartRegistration: %v", st.Message())
+				respondError(w, http.StatusServiceUnavailable, "Auth-Service is unavailable.")
+				return
 			default:
-				respondError(w, http.StatusInternalServerError, st.Message())
+				log.Printf("Unknown gRPC error from Auth-Service during StartRegistration (code %s): %v", st.Code().String(), st.Message())
+				respondError(w, http.StatusInternalServerError, "Unknown Error during Auth-Service StartRegistration call.")
+				return
 			}
 		} else {
-			respondError(w, http.StatusInternalServerError, fmt.Sprintf("Auth service error: %v", err))
+			log.Printf("Non-gRPC error during Auth-Service StartRegistration call: %v", err)
+			respondError(w, http.StatusInternalServerError, "Internal Server Error.")
 		}
 		return
 	}
@@ -77,8 +89,9 @@ func (h *AuthHandler) StartRegistration(w http.ResponseWriter, r *http.Request) 
 // @Success 200 {object} responses.VerifyEmailCodeResponse "Email code successfully verified"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid registration ID or verification code format"
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Registration ID not found or expired"
+// @Failure 409 {object} responses.ErrorResponse "Conflict - Registration ID or code already used"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
-// @Failure 503 {object} responses.ErrorResponse "Service Unavailable - Auth-Service is unavailable"
+// @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Router /api/auth/verify-email [post]
 func (h *AuthHandler) VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	var req requests.VerifyEmailCodeRequest
@@ -133,7 +146,9 @@ func (h *AuthHandler) VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} responses.SetPasswordAndUsernameResponse "Password and username successfully set"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid format or request body"
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Registration ID not found or expired"
+// @Failure 409 {object} responses.ErrorResponse "Conflict - User with this email or username already exists"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
+// @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Router /api/auth/finish-register [post]
 func (h *AuthHandler) SetPasswordAndUsername(w http.ResponseWriter, r *http.Request) {
 	var req requests.SetPasswordAndUsernameRequest
@@ -146,18 +161,14 @@ func (h *AuthHandler) SetPasswordAndUsername(w http.ResponseWriter, r *http.Requ
 	if err != nil {
 		st, ok := status.FromError(err)
 		if ok {
-			// Ошибка является статусом gRPC
 			switch st.Code() {
 			case codes.InvalidArgument:
-				// Неверный ввод (например, формат пароля/логина)
 				respondError(w, http.StatusBadRequest, st.Message())
 				return
 			case codes.NotFound:
-				// Ресурс не найден (ID регистрации)
 				respondError(w, http.StatusNotFound, st.Message())
 				return
 			case codes.AlreadyExists:
-				// Конфликт (например, имя пользователя уже занято)
 				respondError(w, http.StatusConflict, st.Message())
 				return
 			case codes.Internal:
@@ -180,7 +191,6 @@ func (h *AuthHandler) SetPasswordAndUsername(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	// Успешный ответ
 	respondJSON(w, http.StatusOK, resp)
 }
 
@@ -210,11 +220,9 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		if ok {
 			switch st.Code() {
 			case codes.InvalidArgument:
-				// Неверный формат email/пароля
 				respondError(w, http.StatusBadRequest, st.Message())
 				return
 			case codes.Unauthenticated:
-				// Неверные учетные данные (пользователь не найден или пароль неверный)
 				respondError(w, http.StatusUnauthorized, st.Message())
 				return
 			case codes.Internal:
@@ -237,7 +245,6 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Успешный ответ
 	respondJSON(w, http.StatusOK, resp)
 }
 
@@ -267,25 +274,20 @@ func (h *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 		if ok {
 			switch st.Code() {
 			case codes.InvalidArgument:
-				// Неверный формат токена
 				respondError(w, http.StatusBadRequest, st.Message())
 				return
 			case codes.Unauthenticated:
-				// Неверный или истекший токен
 				respondError(w, http.StatusUnauthorized, st.Message())
 				return
 			case codes.Internal:
-				// Внутренняя ошибка сервиса
 				log.Printf("Auth-Service internal error during RefreshToken: %v", st.Message())
 				respondError(w, http.StatusInternalServerError, "Internal Server Error.")
 				return
 			case codes.Unavailable:
-				// Сервис недоступен
 				log.Printf("Auth-Service unavailable during RefreshToken: %v", st.Message())
 				respondError(w, http.StatusServiceUnavailable, "Auth-Service is unavailable.")
 				return
 			default:
-				// Неизвестный статус gRPC
 				log.Printf("Unknown gRPC error from Auth-Service during RefreshToken (code %s): %v", st.Code().String(), st.Message())
 				respondError(w, http.StatusInternalServerError, "Unknown error from Auth-Service.")
 				return
@@ -297,7 +299,6 @@ func (h *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Успешный ответ
 	respondJSON(w, http.StatusOK, resp)
 }
 
@@ -326,21 +327,17 @@ func (h *AuthHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		if ok {
 			switch st.Code() {
 			case codes.InvalidArgument:
-				// Неверный формат email
 				respondError(w, http.StatusBadRequest, st.Message())
 				return
 			case codes.Internal:
-				// Внутренняя ошибка сервиса
 				log.Printf("Auth-Service internal error during ForgotPassword: %v", st.Message())
 				respondError(w, http.StatusInternalServerError, "Internal Server Error.")
 				return
 			case codes.Unavailable:
-				// Сервис недоступен
 				log.Printf("Auth-Service unavailable during ForgotPassword: %v", st.Message())
 				respondError(w, http.StatusServiceUnavailable, "Auth-Service is unavailable.")
 				return
 			default:
-				// Неизвестный статус gRPC
 				log.Printf("Unknown gRPC error from Auth-Service during ForgotPassword (code %s): %v", st.Code().String(), st.Message())
 				respondError(w, http.StatusInternalServerError, "Unknown error from Auth-Service.")
 				return
@@ -352,7 +349,6 @@ func (h *AuthHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Успешный ответ (Success: true даже если пользователь не найден)
 	respondJSON(w, http.StatusOK, resp)
 }
 
@@ -367,6 +363,7 @@ func (h *AuthHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid password format or request body"
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Invalid or expired reset token"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
+// @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Router /api/auth/reset-password [post]
 func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	var req requests.ResetPasswordRequest
@@ -381,25 +378,20 @@ func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		if ok {
 			switch st.Code() {
 			case codes.InvalidArgument:
-				// Неверный формат нового пароля
 				respondError(w, http.StatusBadRequest, st.Message())
 				return
 			case codes.NotFound:
-				// Токен не найден или истек
 				respondError(w, http.StatusNotFound, st.Message())
 				return
 			case codes.Internal:
-				// Внутренняя ошибка сервиса
 				log.Printf("Auth-Service internal error during ResetPassword: %v", st.Message())
 				respondError(w, http.StatusInternalServerError, "Internal Server Error.")
 				return
 			case codes.Unavailable:
-				// Сервис недоступен
 				log.Printf("Auth-Service unavailable during ResetPassword: %v", st.Message())
 				respondError(w, http.StatusServiceUnavailable, "Auth-Service is unavailable.")
 				return
 			default:
-				// Неизвестный статус gRPC
 				log.Printf("Unknown gRPC error from Auth-Service during ResetPassword (code %s): %v", st.Code().String(), st.Message())
 				respondError(w, http.StatusInternalServerError, "Unknown error from Auth-Service.")
 				return
@@ -411,7 +403,6 @@ func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Успешный ответ
 	respondJSON(w, http.StatusOK, resp)
 }
 
@@ -425,6 +416,7 @@ func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} responses.LogoutResponse "User successfully logged out (success is true even if token not found)"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid refresh token format or request body"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
+// @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Router /api/auth/logout [post]
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	var req requests.LogoutRequest
@@ -439,21 +431,17 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 		if ok {
 			switch st.Code() {
 			case codes.InvalidArgument:
-				// Неверный формат токена
 				respondError(w, http.StatusBadRequest, st.Message())
 				return
 			case codes.Internal:
-				// Внутренняя ошибка сервиса
 				log.Printf("Auth-Service internal error during Logout: %v", st.Message())
 				respondError(w, http.StatusInternalServerError, "Internal Server Error.")
 				return
 			case codes.Unavailable:
-				// Сервис недоступен
 				log.Printf("Auth-Service unavailable during Logout: %v", st.Message())
 				respondError(w, http.StatusServiceUnavailable, "Auth-Service is unavailable.")
 				return
 			default:
-				// Неизвестный статус gRPC
 				log.Printf("Unknown gRPC error from Auth-Service during Logout (code %s): %v", st.Code().String(), st.Message())
 				respondError(w, http.StatusInternalServerError, "Unknown error from Auth-Service.")
 				return
@@ -465,7 +453,6 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Успешный ответ
 	respondJSON(w, http.StatusOK, resp)
 }
 
@@ -480,6 +467,7 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid email format or request body"
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
+// @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Router /api/auth/delete-user [post]
 func (h *AuthHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	var req requests.DeleteUserRequest
@@ -494,25 +482,20 @@ func (h *AuthHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		if ok {
 			switch st.Code() {
 			case codes.InvalidArgument:
-				// Неверный формат email
 				respondError(w, http.StatusBadRequest, st.Message())
 				return
 			case codes.NotFound:
-				// Пользователь не найден
 				respondError(w, http.StatusNotFound, st.Message())
 				return
 			case codes.Internal:
-				// Внутренняя ошибка сервиса
 				log.Printf("Auth-Service internal error during DeleteUser: %v", st.Message())
 				respondError(w, http.StatusInternalServerError, "Internal Server Error.")
 				return
 			case codes.Unavailable:
-				// Сервис недоступен
 				log.Printf("Auth-Service unavailable during DeleteUser: %v", st.Message())
 				respondError(w, http.StatusServiceUnavailable, "Auth-Service is unavailable.")
 				return
 			default:
-				// Неизвестный статус gRPC
 				log.Printf("Unknown gRPC error from Auth-Service during DeleteUser (code %s): %v", st.Code().String(), st.Message())
 				respondError(w, http.StatusInternalServerError, "Unknown error from Auth-Service.")
 				return
@@ -524,7 +507,6 @@ func (h *AuthHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Успешное удаление
 	respondJSON(w, http.StatusOK, resp)
 }
 
