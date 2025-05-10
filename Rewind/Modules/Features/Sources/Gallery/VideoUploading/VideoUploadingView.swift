@@ -28,6 +28,7 @@ public struct VideoUploadingView: View {
                         }
                         
                         musicSection
+                        
                         tagsSection
                         
                         continueButton
