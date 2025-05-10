@@ -111,7 +111,7 @@ definitions:
       success:
         type: boolean
     type: object
-host: localhost:8080
+host: rewindapp.ru
 info:
   contact: {}
   description: This is the API Gateway for the Rewind application.
