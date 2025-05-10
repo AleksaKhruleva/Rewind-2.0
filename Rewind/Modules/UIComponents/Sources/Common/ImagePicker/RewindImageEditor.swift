@@ -1,15 +1,16 @@
 import SwiftUI
 import PhotosUI
 
-enum CropType {
+public enum CropType {
     case rectangle
     case circle
 }
 
-struct RewindImageEditor: View {
+public struct RewindImageEditor: View {
     @Binding var image: UIImage?
     var cropType: CropType
     var onCrop: (UIImage?, Bool) -> ()
+    var onVideoCrop: ((CGFloat, CGSize) -> Void)?
     
     @State private var scale: CGFloat = 1
     @State private var lastScale: CGFloat = 0
@@ -20,7 +21,19 @@ struct RewindImageEditor: View {
     @Environment(\.dismiss)
     private var dismiss
     
-    var body: some View {
+    public init(
+        image: Binding<UIImage?>,
+        cropType: CropType,
+        onCrop: @escaping (UIImage?, Bool) -> Void,
+        onVideoCrop: ((CGFloat, CGSize) -> Void)? = nil
+    ) {
+        self._image = image
+        self.cropType = cropType
+        self.onCrop = onCrop
+        self.onVideoCrop = onVideoCrop
+    }
+    
+    public var body: some View {
         NavigationStack {
             ZStack(alignment: .top) {
                 ZStack {
@@ -28,7 +41,7 @@ struct RewindImageEditor: View {
                     imageMask
                 }
                 .ignoresSafeArea()
-
+                
                 header
             }
             .background(Color.background)
@@ -46,6 +59,9 @@ struct RewindImageEditor: View {
             RewindButton(type: .checkmark) {
                 let renderer = ImageRenderer(content: imageView)
                 renderer.proposedSize = .init(CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width))
+                
+                onVideoCrop?(scale, offset)
+                
                 if let image = renderer.uiImage {
                     onCrop(image, true)
                 } else {

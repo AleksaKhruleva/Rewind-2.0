@@ -94,6 +94,12 @@
 
 "password.resend" = "Отправить ещё раз";
 
+// MARK: - Music
+
+"music.section_title" = "Музыка";
+
+"music.addMusic" = "Добавить музыку";
+
 // MARK: - Quote creation strings
 
 "quote.author.title" = "Введи автора цитаты";
@@ -117,6 +123,14 @@
 "quote.toast.empty" = "Нельзя продолжить с пустой цитатой 👺";
 
 "quote.toast.success" = "Твоя цитата успешно сохранена! 💬";
+
+// MARK: - Video uploading strings
+
+"video.hint" = "Нажми сюда, чтобы выбрать видео";
+
+"video.save" = "Сохранить видео";
+
+"video.crop_video.failure" = "Не получилось обрезать видео! 😭";
 
 // MARK: - Group strings
 
