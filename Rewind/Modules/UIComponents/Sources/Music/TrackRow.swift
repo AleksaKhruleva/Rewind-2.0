@@ -47,12 +47,21 @@ public struct TrackRow: View {
                 Text(track.title)
                     .modifier(RoundFontModifier(size: 15))
                     .lineLimit(1)
+                    .truncationMode(.tail)
+                    .frame(
+                        maxWidth: UIScreen.main.bounds.width / 1.5,
+                        alignment: .leading
+                    )
                 
                 HStack {
                     Text(track.artist)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                    
                     Image(systemName: "circle.fill")
                         .font(.system(size: 3))
                         .frame(width: 1)
+                    
                     Text(track.durationString)
                 }
                 .modifier(RoundFontModifier(size: 13, foregroundColor: .textTertiary.opacity(0.6)))
@@ -67,7 +76,7 @@ public struct TrackRow: View {
                     onPlayTap()
                 } label: {
                     Image(systemName: isPlaying ? "stop.fill" : "play.fill")
-                        .modifier(RoundFontModifier(size: 20))
+                        .modifier(RoundFontModifier(size: 18))
                 }
             }
         }
