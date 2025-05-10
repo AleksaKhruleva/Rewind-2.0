@@ -48,10 +48,17 @@ func (s *AuthService) StartRegistration(ctx context.Context, req *pb.StartRegist
 	if err := s.validator.Var(email, "required,email"); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid email format: %v", err)
 	}
+
 	_, err := s.userRepo.GetUserByEmail(nil, email)
 	if err == nil {
 		return nil, status.Errorf(codes.AlreadyExists, "user with email %s already exists", email)
 	}
+
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		log.Printf("Error querying user by email %s during registration check: %v", email, err)
+		return nil, status.Errorf(codes.Internal, "Failed to check user existence")
+	}
+
 	registrationID := uuid.New().String()
 
 	verificationCode := fmt.Sprintf("%04d", rand.Intn(10000)) // Генерирует случайное число от 0000 до 9999
@@ -59,25 +66,30 @@ func (s *AuthService) StartRegistration(ctx context.Context, req *pb.StartRegist
 	redisKey := fmt.Sprintf("registration:%s", registrationID)
 	expiryTime := time.Minute * 15 // Код действителен в течение 15 минут (настройте по необходимости)
 
+	// Сохранение данных регистрации в Redis
 	err = s.redisRepo.HSet(ctx, redisKey, map[string]interface{}{
 		"email": email,
 		"code":  verificationCode,
 	}).Err()
 	if err != nil {
-		return nil, fmt.Errorf("failed to store verification code in Redis: %w", err)
+		log.Printf("Error saving registration data to Redis for ID %s: %v", registrationID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to store registration data")
 	}
 
+	// Установка времени жизни ключа в Redis (ошибка не блокирует основную операцию, логируем как warning)
 	err = s.redisRepo.Expire(ctx, redisKey, expiryTime).Err()
 	if err != nil {
 		log.Printf("Warning: failed to set expiry for Redis key %s: %v\n", redisKey, err)
 	}
 
+	// Публикация события для отправки email
 	err = rabbitmq.PublishVerificationCode(email, verificationCode)
 	if err != nil {
-		log.Printf("Error publishing verification code to RabbitMQ: %v", err)
-		return nil, fmt.Errorf("failed to publish verification code: %w", err)
+		log.Printf("Error publishing verification code to RabbitMQ for email %s: %v", email, err)
+		return nil, status.Errorf(codes.Internal, "Failed to send verification email")
 	}
 
+	// Успешное начало регистрации
 	return &pb.StartRegistrationResponse{RegistrationId: registrationID, Success: true}, nil
 }
 
@@ -89,18 +101,26 @@ func (s *AuthService) VerifyEmailCode(ctx context.Context, req *pb.VerifyEmailCo
 
 	registrationData, err := s.redisRepo.HGetAll(ctx, redisKey).Result()
 	if err != nil {
-		return nil, fmt.Errorf("invalid or expired registration ID: %w", err)
+		log.Printf("Error getting registration data from Redis for ID %s: %v", registrationID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to retrieve registration data")
+	}
+
+	// Если данные пусты, это тоже может означать, что ID не найден или истек
+	if len(registrationData) == 0 {
+		// Возвращаем статус gRPC с кодом NotFound
+		return nil, status.Errorf(codes.NotFound, "Invalid or expired registration ID")
 	}
 
 	storedEmail, okEmail := registrationData["email"]
 	storedCode, okCode := registrationData["code"]
 
 	if !okEmail || !okCode {
-		return nil, fmt.Errorf("registration data incomplete for ID: %s", registrationID)
+		log.Printf("Internal error: registration data incomplete for ID %s. Data: %+v", registrationID, registrationData)
+		return nil, status.Errorf(codes.Internal, "Failed to process registration data")
 	}
 
 	if verificationCode != storedCode {
-		return &pb.VerifyEmailCodeResponse{Success: false}, fmt.Errorf("invalid verification code")
+		return &pb.VerifyEmailCodeResponse{Success: false}, status.Errorf(codes.InvalidArgument, "Invalid verification code")
 	}
 
 	verifiedKey := fmt.Sprintf("verified:%s", registrationID)
@@ -108,7 +128,8 @@ func (s *AuthService) VerifyEmailCode(ctx context.Context, req *pb.VerifyEmailCo
 
 	err = s.redisRepo.SetEX(ctx, verifiedKey, storedEmail, expiryTime).Err()
 	if err != nil {
-		return nil, fmt.Errorf("failed to mark email as verified in Redis: %w", err)
+		log.Printf("Error marking email as verified in Redis for ID %s: %v", registrationID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to finalize verification")
 	}
 
 	err = s.redisRepo.Del(ctx, redisKey).Err()
@@ -124,23 +145,32 @@ func (s *AuthService) SetPasswordAndUsername(ctx context.Context, req *pb.SetPas
 	password := req.GetPassword()
 	username := req.GetUsername()
 
+	// Валидация пароля
 	if err := s.validator.Var(password, "required,min=6"); err != nil {
-		return nil, fmt.Errorf("invalid password: %w", err)
+		return nil, status.Errorf(codes.InvalidArgument, "invalid password: %v", err)
 	}
+	// Валидация имени пользователя
 	if err := s.validator.Var(username, "required,min=3,max=50"); err != nil {
-		return nil, fmt.Errorf("invalid username: %w", err)
+		return nil, status.Errorf(codes.InvalidArgument, "invalid username: %v", err)
 	}
 
 	verifiedKey := fmt.Sprintf("verified:%s", registrationID)
 
+	// Получение email из Redis по registrationID
 	email, err := s.redisRepo.Get(ctx, verifiedKey).Result()
 	if err != nil {
-		return nil, fmt.Errorf("invalid or expired registration ID: %w", err)
+		// Ошибка получения из Redis, скорее всего, ID не найден или истек
+		log.Printf("Error getting verified email from Redis for ID %s: %v", registrationID, err)
+		// Возвращаем NotFound статус
+		return nil, status.Errorf(codes.NotFound, "Invalid or expired registration ID")
 	}
 
+	// Хеширование пароля
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, fmt.Errorf("failed to hash password: %w", err)
+		// Внутренняя ошибка хеширования
+		log.Printf("Failed to hash password: %v", err)
+		return nil, status.Errorf(codes.Internal, "Failed to process password")
 	}
 
 	newUser := &models.User{
@@ -149,49 +179,80 @@ func (s *AuthService) SetPasswordAndUsername(ctx context.Context, req *pb.SetPas
 		Username: username,
 	}
 
-	// TODO delete delete method
+	// Поиск удаленного пользователя по email для "восстановления"
 	user, err := s.userRepo.GetDeletedUserByEmail(nil, email)
-	if err == nil {
-		log.Printf("Warning: user with email %s already existed, but was deleted, recreating", email)
-		newUser.ID = user.ID
-		err = s.userRepo.SaveDeleted(nil, newUser)
+
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		// Если ошибка не nil и НЕ ErrRecordNotFound, это другая ошибка БД
+		log.Printf("Error querying deleted user by email %s: %v", email, err)
+		return nil, status.Errorf(codes.Internal, "Failed to check for deleted user")
+	}
+
+	if err == nil { // Если err == nil, значит пользователь найден (был мягко удален)
+		// Пользователь найден (был мягко удален) - "восстанавливаем" его
+		log.Printf("User with email %s already existed and was deleted, undeleting and updating", email)
+		newUser.ID = user.ID                       // Сохраняем старый ID
+		err = s.userRepo.SaveDeleted(nil, newUser) // SaveDeleted установит deleted_at = NULL
 		if err != nil {
-			return nil, fmt.Errorf("failed to save new user: %w", err)
+			// Ошибка сохранения/обновления в БД
+			log.Printf("Failed to save (undelete/update) user with ID %d: %v", newUser.ID, err)
+			return nil, status.Errorf(codes.Internal, "Failed to finalize user registration")
 		}
-	} else {
+	} else { // Если err == gorm.ErrRecordNotFound (пользователь не найден)
+		// Пользователь не найден (ни активный, ни удаленный) - создаем нового
 
 		err = s.userRepo.CreateUser(nil, newUser)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create user in database: %w", err)
-		}
 
+			if errors.Is(err, gorm.ErrDuplicatedKey) {
+				log.Printf("Conflict creating new user with email %s or username %s: %v", email, username, err)
+				return nil, status.Errorf(codes.AlreadyExists, "User with this email or username already exists")
+			}
+
+			// Если это не ошибка уникального ключа, это другая ошибка БД
+			log.Printf("Failed to create new user with email %s: %v", email, err)
+			return nil, status.Errorf(codes.Internal, "Failed to finalize user registration")
+		}
 	}
 
+	// Удаляем запись о верификации из Redis (ошибка не блокирует основную операцию, логируем как warning)
 	err = s.redisRepo.Del(ctx, verifiedKey).Err()
 	if err != nil {
 		log.Printf("Warning: failed to delete verification record from Redis for ID %s: %v\n", registrationID, err)
 	}
 
+	// Получение секретного ключа JWT из переменных окружения
 	secretKey := os.Getenv("JWT_SECRET_KEY")
 	if secretKey == "" {
-		return nil, fmt.Errorf("JWT_SECRET_KEY environment variable not found")
+		// Ошибка конфигурации - внутренняя ошибка
+		log.Println("JWT_SECRET_KEY environment variable not found")
+		return nil, status.Errorf(codes.Internal, "Server configuration error")
 	}
 
+	// Генерация токенов
 	accessToken, err := utils.GenerateAccessToken(newUser.ID, username, secretKey)
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate access token")
+		// Внутренняя ошибка генерации токена
+		log.Printf("Failed to generate access token for user ID %d: %v", newUser.ID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to generate access token")
 	}
 
 	refreshToken, err := utils.GenerateRefreshToken()
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate refresh token")
+		// Внутренняя ошибка генерации токена
+		log.Printf("Failed to generate refresh token for user ID %d: %v", newUser.ID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to generate refresh token")
 	}
 
+	// Добавление сессии в БД
 	err = s.userRepo.AddSession(nil, newUser.ID, refreshToken)
 	if err != nil {
-		return nil, fmt.Errorf("failed to add refresh token to database")
+		// Ошибка сохранения сессии в БД
+		log.Printf("Failed to add refresh token to database for user ID %d: %v", newUser.ID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to save user session")
 	}
 
+	// Успешное завершение регистрации и логин
 	return &pb.SetPasswordAndUsernameResponse{AccessToken: accessToken, RefreshToken: refreshToken}, nil
 }
 
@@ -199,55 +260,61 @@ func (s *AuthService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Logi
 	email := req.GetEmail()
 	password := req.GetPassword()
 
-	if err := s.validator.Var(password, "required"); err != nil {
-		return nil, fmt.Errorf("password is required")
-	}
+	// Валидация email и пароля
 	if err := s.validator.Var(email, "required,email"); err != nil {
-		return nil, fmt.Errorf("email is required")
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid email format: %v", err)
+	}
+	if err := s.validator.Var(password, "required"); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Password is required")
 	}
 
 	var user *models.User
-	var err error
+	user, err := s.userRepo.GetUserByEmail(nil, email)
 
-	// Попытка найти пользователя по email
-	if err = s.validator.Var(email, "email"); err == nil {
-		user, err = s.userRepo.GetUserByEmail(nil, email)
-		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("failed to query user by email: %w", err)
-		}
+	// Обработка ошибки поиска в репозитории, исключая ErrRecordNotFound
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, status.Errorf(codes.Internal, "Failed to retrieve user data")
 	}
 
-	// Если пользователь не найден по email
-	if user == nil {
-		return nil, fmt.Errorf("invalid credentials")
+	// Если пользователь не найден (user == nil) или ошибка была ErrRecordNotFound
+	if user == nil || errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, status.Errorf(codes.Unauthenticated, "Invalid credentials")
 	}
 
 	// Проверка пароля
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-		return nil, fmt.Errorf("invalid credentials")
+		return nil, status.Errorf(codes.Unauthenticated, "Invalid credentials")
 	}
 
+	// Получение секретного ключа JWT
 	secretKey := os.Getenv("JWT_SECRET_KEY")
 	if secretKey == "" {
-		return nil, fmt.Errorf("JWT_SECRET_KEY environment variable not found")
+		log.Println("JWT_SECRET_KEY environment variable not found")
+		return nil, status.Errorf(codes.Internal, "Server configuration error")
 	}
 
+	// Генерация токенов
 	accessToken, err := utils.GenerateAccessToken(user.ID, user.Username, secretKey)
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate access token")
+		log.Printf("Failed to generate access token for user ID %d: %v", user.ID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to generate access token")
 	}
 
 	refreshToken, err := utils.GenerateRefreshToken()
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate refresh token")
+		log.Printf("Failed to generate refresh token for user ID %d: %v", user.ID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to generate refresh token")
 	}
 
+	// Добавление сессии в БД
 	err = s.userRepo.AddSession(nil, user.ID, refreshToken)
 	if err != nil {
-		return nil, fmt.Errorf("failed to add refresh token to database")
+		log.Printf("Failed to add refresh token to database for user ID %d: %v", user.ID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to save user session")
 	}
 
+	// Успешный логин
 	return &pb.LoginResponse{AccessToken: accessToken, RefreshToken: refreshToken}, nil
 }
 
@@ -255,35 +322,42 @@ func (s *AuthService) RefreshToken(ctx context.Context, req *pb.RefreshTokenRequ
 	refreshToken := req.GetRefreshToken()
 
 	if refreshToken == "" {
-		return nil, fmt.Errorf("refresh token is required")
+		return nil, status.Errorf(codes.InvalidArgument, "Refresh token is required")
 	}
 
+	// Получение записи токена обновления из БД
 	refreshTokenRecord, err := s.userRepo.GetRefreshToken(nil, refreshToken)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("invalid refresh token")
+			return nil, status.Errorf(codes.Unauthenticated, "Invalid refresh token")
 		}
-		return nil, fmt.Errorf("failed to query refresh token: %w", err)
+		log.Printf("Failed to query refresh token %s: %v", refreshToken, err)
+		return nil, status.Errorf(codes.Internal, "Failed to retrieve refresh token data")
 	}
 
+	// Получение пользователя, связанного с токеном
 	user, err := s.userRepo.GetUserByID(nil, refreshTokenRecord.UserID)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("user associated with refresh token not found")
-		}
-		return nil, fmt.Errorf("failed to query user: %w", err)
+		// Если пользователь не найден, связанный с токеном, это внутренняя проблема.
+		log.Printf("Failed to query user by ID %d associated with refresh token %s: %v", refreshTokenRecord.UserID, refreshToken, err)
+		return nil, status.Errorf(codes.Internal, "Failed to retrieve user data for refresh token")
 	}
 
+	// Получение секретного ключа JWT
 	secretKey := os.Getenv("JWT_SECRET_KEY")
 	if secretKey == "" {
-		return nil, fmt.Errorf("JWT_SECRET_KEY environment variable not found")
+		log.Println("JWT_SECRET_KEY environment variable not found")
+		return nil, status.Errorf(codes.Internal, "Server configuration error")
 	}
 
+	// Генерация нового access токена
 	newAccessToken, err := utils.GenerateAccessToken(user.ID, user.Username, secretKey)
 	if err != nil {
-		return nil, fmt.Errorf("failed to generate new access token")
+		log.Printf("Failed to generate new access token for user ID %d: %v", user.ID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to generate access token")
 	}
 
+	// Успешное обновление access токена
 	return &pb.RefreshTokenResponse{AccessToken: newAccessToken}, nil
 }
 
@@ -292,20 +366,18 @@ func (s *AuthService) ForgotPassword(ctx context.Context, req *pb.ForgotPassword
 
 	// 1. Валидация email
 	if err := s.validator.Var(email, "required,email"); err != nil {
-		return nil, fmt.Errorf("invalid email format: %w", err)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid email format")
 	}
 
 	// 2. Проверка существования пользователя с таким email
 	_, err := s.userRepo.GetUserByEmail(nil, email)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			log.Printf("ForgotPassword: user with email %s not found\n", email)
-			// Важно решить, стоит ли сообщать пользователю, что email не найден,
-			// чтобы избежать утечки информации о существовании email в системе.
-			// Часто в таких случаях просто возвращают успех, чтобы не давать подсказок злоумышленникам.
+			log.Printf("ForgotPassword: user with email %s not found", email)
 			return &pb.ForgotPasswordResponse{Success: true}, nil
 		}
-		return nil, fmt.Errorf("failed to query user by email: %w", err)
+		log.Printf("Failed to query user by email %s: %v", email, err)
+		return nil, status.Errorf(codes.Internal, "Failed to retrieve user data")
 	}
 
 	// 3. Генерация уникального токена для сброса пароля
@@ -316,22 +388,26 @@ func (s *AuthService) ForgotPassword(ctx context.Context, req *pb.ForgotPassword
 	expirationTime := time.Hour * 2 // Например, токен действует 2 часа
 	err = s.redisRepo.SetEX(ctx, resetTokenKey, email, expirationTime).Err()
 	if err != nil {
-		return nil, fmt.Errorf("failed to save reset token to Redis: %w", err)
+		log.Printf("Failed to save reset token to Redis for email %s: %v", email, err)
+		return nil, status.Errorf(codes.Internal, "Failed to store reset token")
 	}
 
 	// 5. Формирование ссылки для сброса пароля
 	frontendURL := os.Getenv("FRONTEND_URL")
 	if frontendURL == "" {
-		return nil, fmt.Errorf("FRONTEND_URL environment variable not found")
+		log.Println("FRONTEND_URL environment variable not found")
+		return nil, status.Errorf(codes.Internal, "Server configuration error")
 	}
 	resetLink := fmt.Sprintf("%s/reset-password?token=%s", frontendURL, url.QueryEscape(resetToken))
 
 	// 6. Отправка ссылки для сброса пароля в сервис уведомлений
 	err = rabbitmq.PublishForgotPasswordEmail(email, resetLink)
 	if err != nil {
-		return nil, fmt.Errorf("failed to send email reset password: %w", err)
+		log.Printf("Failed to publish forgot password email for email %s: %v", email, err)
+		return nil, status.Errorf(codes.Internal, "Failed to send password reset email")
 	}
 
+	// Успех (даже если пользователь не найден, для предотвращения user enumeration)
 	return &pb.ForgotPasswordResponse{Success: true}, nil
 }
 
@@ -341,7 +417,7 @@ func (s *AuthService) ResetPassword(ctx context.Context, req *pb.ResetPasswordRe
 
 	// 1. Валидация нового пароля
 	if err := s.validator.Var(newPassword, "required,min=6"); err != nil {
-		return nil, fmt.Errorf("invalid new password: %w", err)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid new password format")
 	}
 
 	// 2. Формирование ключа Redis для поиска email по токену
@@ -351,34 +427,35 @@ func (s *AuthService) ResetPassword(ctx context.Context, req *pb.ResetPasswordRe
 	email, err := s.redisRepo.Get(ctx, resetTokenKey).Result()
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
-			return nil, fmt.Errorf("invalid or expired reset token")
+			return nil, status.Errorf(codes.NotFound, "Invalid or expired reset token")
 		}
-		return nil, fmt.Errorf("failed to get email from Redis: %w", err)
+		log.Printf("Failed to get email from Redis for token %s: %v", token, err)
+		return nil, status.Errorf(codes.Internal, "Failed to retrieve reset token data")
 	}
 
 	// 4. Поиск пользователя в базе данных по email
 	user, err := s.userRepo.GetUserByEmail(nil, email)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("user associated with this token not found")
-		}
-		return nil, fmt.Errorf("failed to query user by email: %w", err)
+		log.Printf("Failed to query user by email %s associated with token %s: %v", email, token, err)
+		return nil, status.Errorf(codes.Internal, "Failed to retrieve user data for token")
 	}
 
 	// 5. Хеширование нового пароля
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, fmt.Errorf("failed to hash new password: %w", err)
+		log.Printf("Failed to hash new password: %v", err)
+		return nil, status.Errorf(codes.Internal, "Failed to process password")
 	}
 
 	// 6. Обновление пароля пользователя в базе данных
 	user.Password = string(hashedPassword)
 	err = s.userRepo.Save(nil, user)
 	if err != nil {
-		return nil, fmt.Errorf("failed to update user password in database: %w", err)
+		log.Printf("Failed to update user password in database for user ID %d: %v", user.ID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to update user password")
 	}
 
-	// 7. Удаление использованного токена из Redis
+	// 7. Удаление использованного токена из Redis (ошибка не блокирует основную операцию, логируем как warning)
 	err = s.redisRepo.Del(ctx, resetTokenKey).Err()
 	if err != nil {
 		log.Printf("Warning: failed to delete reset token %s from Redis: %v\n", token, err)
@@ -392,25 +469,25 @@ func (s *AuthService) Logout(ctx context.Context, req *pb.LogoutRequest) (*pb.Lo
 	refreshToken := req.GetRefreshToken()
 
 	if refreshToken == "" {
-		return nil, fmt.Errorf("refresh token is required")
+		return nil, status.Errorf(codes.InvalidArgument, "Refresh token is required")
 	}
 
 	// 1. Поиск refresh токена в базе данных
 	refreshTokenRecord, err := s.userRepo.GetRefreshToken(nil, refreshToken)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			log.Printf("Logout: refresh token %s not found\n", refreshToken)
-			// В данном случае можно считать, что пользователь уже вышел из системы,
-			// поэтому можно вернуть успешный ответ.
-			return &pb.LogoutResponse{Success: true}, nil
+			log.Printf("Logout: refresh token %s not found, treating as successful logout", refreshToken)
+			return &pb.LogoutResponse{Success: true}, nil // Успешный ответ
 		}
-		return nil, fmt.Errorf("failed to query refresh token: %w", err)
+		log.Printf("Failed to query refresh token %s: %v", refreshToken, err)
+		return nil, status.Errorf(codes.Internal, "Failed to retrieve refresh token data")
 	}
 
 	// 2. Удаление refresh токена из базы данных
 	err = s.userRepo.DeleteRefreshToken(nil, refreshTokenRecord.ID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to delete refresh token from database: %w", err)
+		log.Printf("Failed to delete refresh token with ID %d: %v", refreshTokenRecord.ID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to delete refresh token")
 	}
 
 	// 3. Возвращение успешного ответа
@@ -419,8 +496,11 @@ func (s *AuthService) Logout(ctx context.Context, req *pb.LogoutRequest) (*pb.Lo
 
 func (s *AuthService) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*pb.DeleteUserResponse, error) {
 	email := req.GetEmail()
+
+	// Валидация email
 	err := s.validator.Var(email, "required,email")
 	if err != nil {
+		// Клиентская ошибка - неверный ввод
 		return nil, status.Errorf(codes.InvalidArgument, "invalid email format")
 	}
 
@@ -430,13 +510,17 @@ func (s *AuthService) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest)
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, status.Errorf(codes.NotFound, "user not found")
 		}
-		return nil, status.Errorf(codes.Internal, "failed to query user by email: %v", err)
+		log.Printf("Failed to query user by email %s: %v", email, err)
+		return nil, status.Errorf(codes.Internal, "Failed to retrieve user data")
 	}
 
 	// 2. Удаление пользователя из базы данных
 	err = s.userRepo.DeleteUser(nil, user.Email)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to delete user from database: %v", err)
+		log.Printf("Failed to delete user with email %s: %v", user.Email, err)
+		return nil, status.Errorf(codes.Internal, "Failed to delete user")
 	}
+
+	// Успешное удаление
 	return &pb.DeleteUserResponse{Success: true}, nil
 }
