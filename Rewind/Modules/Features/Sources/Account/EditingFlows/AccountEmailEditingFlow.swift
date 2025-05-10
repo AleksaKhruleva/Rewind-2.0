@@ -49,7 +49,7 @@ final class AccountEmailEditingFlowViewModel {
 }
 
 struct AccountEmailEditingFlow: View {
-    var viewModel: AccountEmailEditingFlowViewModel
+    @State var viewModel: AccountEmailEditingFlowViewModel
     var onSuccess: (() -> Void)?
     
     @Environment(\.dismiss)
