@@ -15,21 +15,20 @@ struct RewindApp: App {
     
     var body: some Scene {
         WindowGroup {
-            //            let hasAccessToken = KeychainService.shared.read(for: .accessToken) != nil
-            //            let hasRefreshToken = KeychainService.shared.read(for: .refreshToken) != nil
-            //            let isAuthorized = hasAccessToken && hasRefreshToken
-            //            let isUserSaved = UserStorage.currentUser != nil
-            //
-            //            let testingAuth = CommandLine.arguments.contains("-testingAuth")
+            let hasAccessToken = KeychainService.shared.read(for: .accessToken) != nil
+            let hasRefreshToken = KeychainService.shared.read(for: .refreshToken) != nil
+            let isAuthorized = hasAccessToken && hasRefreshToken
+            let isUserSaved = UserStorage.currentUser != nil
+            
+            let testingAuth = CommandLine.arguments.contains("-testingAuth")
             
             NavigationStack(path: $appRouter.path) {
                 Group {
-                    VideoUploadingView()
-                    //                    if isAuthorized, isUserSaved, !testingAuth {
-                    //                        RewindView(router: .init(appRouter: appRouter))
-                    //                    } else {
-                    //                        WelcomeView(router: .init(appRouter: appRouter))
-                    //                    }
+                    if isAuthorized, isUserSaved, !testingAuth {
+                        RewindView(router: .init(appRouter: appRouter))
+                    } else {
+                        WelcomeView(router: .init(appRouter: appRouter))
+                    }
                 }
                 .setUpNavigation(appRouter: appRouter)
             }

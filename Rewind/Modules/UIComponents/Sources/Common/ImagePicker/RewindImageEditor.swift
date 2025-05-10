@@ -79,7 +79,7 @@ public struct RewindImageEditor: View {
                 .overlay(
                     Rectangle()
                         .frame(width: width, height: width)
-                    // TODO: 40 to constants
+                        // TODO: 40 to constants
                         .cornerRadius(cropType == .circle ? width / 2 : 40)
                         .blendMode(.destinationOut)
                 )
