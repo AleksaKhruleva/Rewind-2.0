@@ -5,10 +5,12 @@ public final class PlayerUIView: UIView {
     private let playerLayer = AVPlayerLayer()
     private let overlayButton = UIButton(type: .custom)
     private let playIcon = UIImageView(image: UIImage(systemName: "play.fill"))
+    private let muteButton = UIButton(type: .system)
     
     var player: AVPlayer? {
         didSet {
             playerLayer.player = player
+            player?.isMuted = isMuted
         }
     }
     
@@ -20,17 +22,28 @@ public final class PlayerUIView: UIView {
         }
     }
     
+    private var isMuted = false {
+        didSet {
+            player?.isMuted = isMuted
+            let imageName = isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill"
+            let image = UIImage(systemName: imageName)
+            muteButton.setImage(image, for: .normal)
+        }
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupPlayerLayer()
         setupOverlayButton()
         setupPlayIcon()
+        setupMuteButton()
     }
     
     convenience init(player: AVPlayer) {
         self.init(frame: .zero)
         self.player = player
         self.playerLayer.player = player
+        self.player?.isMuted = isMuted
     }
     
     private func setupPlayerLayer() {
@@ -44,6 +57,7 @@ public final class PlayerUIView: UIView {
         
         playerLayer.frame = bounds
         overlayButton.frame = bounds
+        muteButton.frame = CGRect(x: bounds.maxX - 44 - 12, y: 12, width: 44, height: 44)
     }
     
     private func setupOverlayButton() {
@@ -66,10 +80,18 @@ public final class PlayerUIView: UIView {
         ])
     }
     
+    private func setupMuteButton() {
+        muteButton.tintColor = .white
+        muteButton.setImage(UIImage(systemName: "speaker.wave.2.fill"), for: .normal)
+        muteButton.addTarget(self, action: #selector(toggleMute), for: .touchUpInside)
+        addSubview(muteButton)
+    }
+    
     @objc private func togglePlay() {
         guard let player = player else { return }
         
         isPlaying.toggle()
+        
         if isPlaying {
             player.play()
         } else {
@@ -77,6 +99,10 @@ public final class PlayerUIView: UIView {
         }
         
         onToggle?()
+    }
+    
+    @objc private func toggleMute() {
+        isMuted.toggle()
     }
     
     func setPlaying(_ playing: Bool) {

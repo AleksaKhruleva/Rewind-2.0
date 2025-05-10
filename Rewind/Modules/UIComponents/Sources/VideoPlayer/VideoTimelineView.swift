@@ -111,7 +111,7 @@ public struct VideoTimelineView: View {
                     self.thumbnails = Array(repeating: square, count: frameCount)
                 }
             } catch {
-                print("Ошибка генерации первого кадра: \(error)")
+                //                print("Ошибка генерации первого кадра: \(error)")
             }
         }
     }
@@ -132,7 +132,7 @@ public struct VideoTimelineView: View {
                     let square = try await generateThumbnail(at: time)
                     images.append(square)
                 } catch {
-                    print("Ошибка генерации кадра: \(error)")
+                    
                 }
             }
             
@@ -161,7 +161,7 @@ public struct VideoTimelineView: View {
         }
         
         guard let cgImage = optionalCGImage else {
-            throw NSError(domain: "CGImageNil", code: 0, userInfo: [NSLocalizedDescriptionKey: "Не удалось получить CGImage"])
+            throw NSError(domain: "CGImageNil", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unable to get CGImage"])
         }
         
         let uiImage = UIImage(cgImage: cgImage, scale: UIScreen.main.scale, orientation: .up)

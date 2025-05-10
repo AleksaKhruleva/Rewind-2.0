@@ -94,6 +94,12 @@
 
 "password.resend" = "Resend";
 
+// MARK: - Music
+
+"music.section_title" = "Music";
+
+"music.addMusic" = "Add music";
+
 // MARK: - Quote creation strings
 
 "quote.author.title" = "Enter quote's author";
@@ -118,9 +124,13 @@
 
 "quote.toast.success" = "Your quote was saved successfully! 💬";
 
-// MARK: - Video creation strings
+// MARK: - Video uploading strings
 
 "video.hint" = "Tap here to choose video";
+
+"video.save" = "Save video";
+
+"video.crop_video.failure" = "Failed cropping your video! 😭";
 
 // MARK: - Group strings
 
