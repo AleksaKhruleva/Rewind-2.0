@@ -1,5 +1,6 @@
 import UIComponents
 import SwiftUI
+import Domain
 
 public struct FindTrackView: View {
     @StateObject private var viewModel = FindTrackViewModel()
@@ -8,33 +9,15 @@ public struct FindTrackView: View {
     
     public var body: some View {
         VStack {
-            header
-            
-            Group {
+            if viewModel.tracks.isEmpty {
+                progressView
+            } else {
                 searchField
                     .padding(.bottom, 2)
+                    .padding(.horizontal)
                 
-                if viewModel.tracks.isEmpty {
-                    VStack {
-                        Spacer()
-                        ProgressView()
-                        Spacer()
-                    }
-                } else {
-                    ScrollView(.vertical, showsIndicators: false) {
-                        ForEach(viewModel.tracks) { track in
-                            TrackRow(
-                                track: track,
-                                isPlaying: viewModel.currentlyPlayingTrackID == track.id,
-                                isLoading: viewModel.currentlyLoadingTrackID == track.id
-                            ) {
-                                viewModel.dispatch(.togglePlayback(track: track))
-                            }
-                        }
-                    }
-                }
+                infiniteList
             }
-            .padding(.horizontal)
         }
         .background(Color.background)
         .onAppear {
@@ -42,10 +25,12 @@ public struct FindTrackView: View {
         }
     }
     
-    private var header: some View {
-        RewindHeader(leftView: {
-            RewindButton(type: .leftChevron) {}
-        })
+    @ViewBuilder
+    private var progressView: some View {
+        Spacer()
+        ProgressView("Loading top tracks")
+            .modifier(RoundFontModifier(size: 15))
+        Spacer()
     }
     
     private var searchField: some View {
@@ -53,5 +38,49 @@ public struct FindTrackView: View {
             text: $viewModel.searchText,
             placeholder: "Search music"
         )
+    }
+    
+    private func trackList(onTrackAppear: ((Track) -> Void)? = nil) -> some View {
+        LazyVStack(spacing: 0) {
+            ForEach(viewModel.tracks) { track in
+                TrackRow(
+                    track: track,
+                    isPlaying: viewModel.currentlyPlayingTrackID == track.id,
+                    isLoading: viewModel.currentlyLoadingTrackID == track.id
+                ) {
+                    viewModel.dispatch(.togglePlayback(track: track))
+                }
+                .onAppear {
+                    onTrackAppear?(track)
+                }
+            }
+        }
+    }
+    
+    private var infiniteList: some View {
+        VStack(alignment: .leading) {
+            ScrollView(.vertical, showsIndicators: false) {
+                trackList { track in
+                    viewModel.dispatch(.loadMoreTracks(currentTrack: track))
+                }
+                
+                if viewModel.isLoadingMore {
+                    loadingMoreProgressView
+                } else if viewModel.hasReachedEnd {
+                    endNote
+                }
+            }
+        }
+    }
+    
+    private var loadingMoreProgressView: some View {
+        ProgressView("Loading more...")
+            .modifier(RoundFontModifier(size: 15))
+            .padding(.vertical, 8)
+    }
+    
+    private var endNote: some View {
+        RewindNoteTextView(text: UIComponentsStrings.Note.end)
+            .padding(.vertical, 8)
     }
 }

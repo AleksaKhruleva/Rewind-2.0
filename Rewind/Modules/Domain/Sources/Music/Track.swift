@@ -8,6 +8,7 @@ public struct Track: Decodable, Identifiable {
     public let duration: TimeInterval
     public var durationString: String
     public let media: Media?
+    public var streamURL: URL?
     
     enum CodingKeys: String, CodingKey {
         case id, title, artwork_url, duration, user, media

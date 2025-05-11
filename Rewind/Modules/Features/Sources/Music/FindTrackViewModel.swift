@@ -9,17 +9,22 @@ final class FindTrackViewModel: ObservableObject {
     enum Intent {
         case loadTracks
         case togglePlayback(track: Track)
+        case loadMoreTracks(currentTrack: Track)
     }
     
     @Published var searchText = ""
     @Published private(set) var tracks = [Track]()
     @Published private(set) var currentlyPlayingTrackID: Int?
     @Published private(set) var currentlyLoadingTrackID: Int?
+    @Published private(set) var isLoadingMore = false
+    @Published private(set) var hasReachedEnd = false
     
     private var defaultTracks = [Track]()
     private var cancellables = Set<AnyCancellable>()
     private var player: AVPlayer? = nil
     private var endObserver: NSObjectProtocol?
+    private var nextHref: String?
+    
     private let backend: SoundCloudServiceProtocol
     
     init() {
@@ -31,19 +36,10 @@ final class FindTrackViewModel: ObservableObject {
         switch intent {
         case .loadTracks:
             loadDefaultTracks()
-        case let .togglePlayback(track):
+        case .togglePlayback(track: let track):
             toggleTrackPlayback(track)
-        }
-    }
-    
-    private func loadDefaultTracks() {
-        Task {
-            do {
-                defaultTracks = try await backend.fetchCharts(limit: 30)
-                tracks = defaultTracks
-            } catch {
-                // TODO: show error
-            }
+        case .loadMoreTracks(currentTrack: let currentTrack):
+            loadMoreTracksIfNeeded(currentTrack: currentTrack)
         }
     }
     
@@ -64,16 +60,58 @@ final class FindTrackViewModel: ObservableObject {
     private func search(for query: String) async {
         if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             tracks = defaultTracks
+            nextHref = nil
+            hasReachedEnd = true
             return
         }
         
-        tracks = []
-        
         do {
-            tracks = try await backend.searchTracks(query: query)
+            let response = try await backend.searchTracks(query: query, limit: 30)
+            self.tracks = response.collection
+            self.nextHref = response.next_href
+            self.hasReachedEnd = (response.next_href == nil)
         } catch {
-            print("ABOBA")
+            tracks = defaultTracks
+            nextHref = nil
+            hasReachedEnd = true
+            print(error)
             // TODO: show error
+        }
+    }
+    
+    private func loadDefaultTracks() {
+        Task {
+            do {
+                let response = try await backend.fetchCharts(limit: 30)
+                defaultTracks = response.collection.map(\.track)
+                tracks = defaultTracks
+            } catch {
+                // TODO: show error
+            }
+        }
+    }
+    
+    private func loadMoreTracksIfNeeded(currentTrack: Track) {
+        guard !isLoadingMore,
+              !hasReachedEnd,
+              currentTrack.id == tracks.last?.id,
+              let nextHref
+        else { return }
+        
+        isLoadingMore = true
+        
+        Task {
+            defer { isLoadingMore = false }
+            
+            do {
+                let response = try await backend.fetchNextPage(from: nextHref)
+                tracks.append(contentsOf: response.collection)
+                self.nextHref = response.next_href
+                hasReachedEnd = (response.next_href == nil)
+            } catch {
+                print(error)
+                // TODO: handle error
+            }
         }
     }
     
@@ -90,33 +128,46 @@ final class FindTrackViewModel: ObservableObject {
             defer { currentlyLoadingTrackID = nil }
             
             do {
-                if let streamURL = try await backend.fetchStreamURL(for: track) {
-                    player?.pause()
-                    
-                    let playerItem = AVPlayerItem(url: streamURL)
-                    
-                    if let endObserver {
-                        NotificationCenter.default.removeObserver(endObserver)
-                    }
-                    
-                    endObserver = NotificationCenter.default.addObserver(
-                        forName: .AVPlayerItemDidPlayToEndTime,
-                        object: playerItem,
-                        queue: .main
-                    ) { [weak self] _ in
-                        guard let self else { return }
-                        Task { @MainActor in
-                            self.currentlyPlayingTrackID = nil
-                        }
-                    }
-                    
-                    player = AVPlayer(playerItem: playerItem)
-                    player?.play()
-                    currentlyPlayingTrackID = track.id
+                let streamURL: URL
+                
+                if let cachedURL = track.streamURL {
+                    streamURL = cachedURL
                 } else {
-                    // TODO: show error
+                    guard let fetchedURL = try await backend.fetchStreamURL(for: track) else {
+                        // TODO: show error
+                        return
+                    }
+                    streamURL = fetchedURL
+                    
+                    if let index = tracks.firstIndex(where: { $0.id == track.id }) {
+                        tracks[index].streamURL = fetchedURL
+                    }
                 }
+                
+                player?.pause()
+                
+                let playerItem = AVPlayerItem(url: streamURL)
+                
+                if let endObserver {
+                    NotificationCenter.default.removeObserver(endObserver)
+                }
+                
+                endObserver = NotificationCenter.default.addObserver(
+                    forName: .AVPlayerItemDidPlayToEndTime,
+                    object: playerItem,
+                    queue: .main
+                ) { [weak self] _ in
+                    guard let self else { return }
+                    Task { @MainActor in
+                        self.currentlyPlayingTrackID = nil
+                    }
+                }
+                
+                player = AVPlayer(playerItem: playerItem)
+                player?.play()
+                currentlyPlayingTrackID = track.id
             } catch {
+                currentlyPlayingTrackID = nil
                 // TODO: show error
             }
         }

@@ -25,6 +25,17 @@ public struct RewindSearchField: View {
                 .textInputAutocapitalization(.never)
                 .disableAutocorrection(true)
                 .modifier(RoundFontModifier(size: 17))
+                .padding(.trailing, text.isEmpty ? 0 : 8)
+            
+            if !text.isEmpty {
+                Button {
+                    text = ""
+                } label: {
+                    Image(systemName: "xmark")
+                        .modifier(RoundFontModifier(size: 15))
+                        .frame(width: 20, height: 20)
+                }
+            }
         }
         .padding()
         .frame(height: 50)

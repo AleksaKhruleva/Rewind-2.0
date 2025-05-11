@@ -6,16 +6,16 @@ private let clientID = "ha0UP7nWZvg1nBR5ZfoRsMC7GXi4Qe6x"
 enum SoundCloudService {
     case fetchCharts(kind: String, genre: String, offset: Int, limit: Int)
     case fetchStreamURL(url: URL)
-    case searchTracks(query: String)
+    case searchTracks(query: String, limit: Int)
+    case fetchNextPage(from: URL)
 }
 
 extension SoundCloudService: TargetType {
     var baseURL: URL {
         switch self {
-        case .fetchCharts,
-                .searchTracks:
+        case .fetchCharts, .searchTracks:
             return URL(string: "https://api-v2.soundcloud.com")!
-        case let .fetchStreamURL(url):
+        case let .fetchStreamURL(url), let .fetchNextPage(url):
             return url.deletingLastPathComponent()
         }
     }
@@ -24,10 +24,10 @@ extension SoundCloudService: TargetType {
         switch self {
         case .fetchCharts:
             return "/charts"
-        case let .fetchStreamURL(url):
-            return url.lastPathComponent
         case .searchTracks:
             return "/search/tracks"
+        case let .fetchStreamURL(url), let .fetchNextPage(url):
+            return url.lastPathComponent
         }
     }
     
@@ -56,15 +56,19 @@ extension SoundCloudService: TargetType {
                 ],
                 encoding: URLEncoding.default
             )
-        case let .searchTracks(query):
+            
+        case let .searchTracks(query, limit):
             return .requestParameters(
                 parameters: [
                     "q": query,
-                    "limit": 30,
+                    "limit": limit,
                     "client_id": clientID
                 ],
                 encoding: URLEncoding.default
             )
+            
+        case .fetchNextPage:
+            return .requestPlain
         }
     }
     

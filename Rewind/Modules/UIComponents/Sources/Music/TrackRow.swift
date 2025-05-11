@@ -31,12 +31,12 @@ public struct TrackRow: View {
                         .scaledToFill()
                 default:
                     ZStack {
-                        Color.textSecondary
+                        Color.textTertiary
                         Image(systemName: "music.note")
                             .resizable()
                             .scaledToFit()
                             .padding(12)
-                            .foregroundColor(Color.textPrimary)
+                            .foregroundColor(Color.background)
                     }
                 }
             }
@@ -64,7 +64,7 @@ public struct TrackRow: View {
                     
                     Text(track.durationString)
                 }
-                .modifier(RoundFontModifier(size: 13, foregroundColor: .textTertiary.opacity(0.6)))
+                .modifier(RoundFontModifier(size: 13, foregroundColor: .textTertiary))
             }
             
             Spacer()
@@ -81,5 +81,9 @@ public struct TrackRow: View {
             }
         }
         .padding(.vertical, 4)
+        .padding(.horizontal)
+        .background(
+            isPlaying ? Color.backgroundSecondary : .clear
+        )
     }
 }
