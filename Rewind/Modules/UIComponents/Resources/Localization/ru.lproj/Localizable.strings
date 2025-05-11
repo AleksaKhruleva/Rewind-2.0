@@ -184,6 +184,16 @@
 
 "group.select.suggestions.count" = "%@ групп";
 
+"group.add_member.share_link" = "Поделиться ссылкой";
+
+"group.add_member.copy_link" = "Скопировать ссылку";
+
+"group.add_member.link_copied" = "Ссылка скопирована!";
+
+"group.add_member.join" = "Присоединяйся к %@!";
+
+"group.add_member.qrCodeGeneration.failure" = "Не удалось сгенерировать QR-код! 😭";
+
 // MARK: Media strings
 
 "media_details.title" = "Детали медиа";
