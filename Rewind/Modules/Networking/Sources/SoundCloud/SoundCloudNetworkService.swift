@@ -1,19 +1,24 @@
 import Domain
 import Foundation
 
+public enum TrackSource {
+    case charts
+    case search
+}
+
 public protocol SoundCloudServiceProtocol {
-    func fetchCharts(limit: Int) async throws -> ChartsResponse
+    func fetchCharts(limit: Int) async throws -> TracksResponse
     func fetchStreamURL(for track: Track) async throws -> URL?
     func searchTracks(query: String, limit: Int) async throws -> TracksResponse
-    func fetchNextPage(from href: String) async throws -> TracksResponse
+    func fetchNextPage(from href: String, for source: TrackSource) async throws -> TracksResponse
 }
 
 public final class SoundCloudNetworkService: SoundCloudServiceProtocol {
-    private let provider = NetworkProvider<SoundCloudService>()
+    private let provider = NetworkProvider<SoundCloudService>(timeout: 15)
     
     public init() {}
     
-    public func fetchCharts(limit: Int) async throws -> ChartsResponse {
+    public func fetchCharts(limit: Int) async throws -> TracksResponse {
         let response = try await provider.request(
             .fetchCharts(
                 kind: "top",
@@ -24,10 +29,8 @@ public final class SoundCloudNetworkService: SoundCloudServiceProtocol {
             type: ChartsResponse.self
         )
         
-        let filtered = response.collection.filter { isProgressive($0.track) }
-        
-        return ChartsResponse(
-            collection: filtered,
+        return TracksResponse(
+            collection: response.collection.map(\.track).filter(isProgressive),
             next_href: response.next_href
         )
     }
@@ -59,7 +62,7 @@ public final class SoundCloudNetworkService: SoundCloudServiceProtocol {
         )
     }
     
-    public func fetchNextPage(from href: String) async throws -> TracksResponse {
+    public func fetchNextPage(from href: String, for source: TrackSource) async throws -> TracksResponse {
         guard var components = URLComponents(string: href) else {
             throw URLError(.badURL)
         }
@@ -72,15 +75,27 @@ public final class SoundCloudNetworkService: SoundCloudServiceProtocol {
             throw URLError(.badURL)
         }
         
-        let response = try await provider.request(
-            .fetchNextPage(from: url),
-            type: TracksResponse.self
-        )
-        
-        return TracksResponse(
-            collection: response.collection.filter(isProgressive),
-            next_href: response.next_href
-        )
+        switch source {
+        case .charts:
+            let response = try await provider.request(
+                .fetchNextPage(from: url),
+                type: ChartsResponse.self
+            )
+            return TracksResponse(
+                collection: response.collection.map(\.track).filter(isProgressive),
+                next_href: response.next_href
+            )
+            
+        case .search:
+            let response = try await provider.request(
+                .fetchNextPage(from: url),
+                type: TracksResponse.self
+            )
+            return TracksResponse(
+                collection: response.collection.filter(isProgressive),
+                next_href: response.next_href
+            )
+        }
     }
     
     // MARK: - Helper
