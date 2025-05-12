@@ -9,7 +9,7 @@ type Group struct {
 	gorm.Model
 	Name        string `gorm:"not null"`
 	Image       string // URL изображения аватара группы (может быть null)
-	AdminUserID int64  `gorm:"not null;index"` // ID пользователя-администратора (ссылка на пользователя из Auth-Service)
+	AdminUserID uint   `gorm:"not null;index"` // ID пользователя-администратора (ссылка на пользователя из Auth-Service)
 
 	// Связь с участниками группы
 	Members []GroupMember `gorm:"foreignKey:GroupID"`

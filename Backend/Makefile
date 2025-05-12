@@ -73,6 +73,13 @@ mocks:
 proto-auth:
 	cd ./auth-service && protoc --go_out=./pkg --go-grpc_out=./pkg --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative proto/auth.proto
 
+# Генерация протофайлов для group-service из Backend
+.PHONY: proto-group
+proto-group:
+	cd ./group-service && protoc --go_out=./pkg --go-grpc_out=./pkg --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative proto/group.proto
+	cd ./group-service && mkdir -p pkg
+	cp ./auth-service/proto/auth.proto ./group-service/proto/clients
+	cd ./group-service && protoc --go_out=./pkg --go-grpc_out=./pkg --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative proto/clients/auth.proto
 
 # Генерация протофайлов для api-gateway-service из Backend
 .PHONY: proto-api-gateway
@@ -84,4 +91,5 @@ proto-api-gateway:
 .PHONY: proto
 proto:
 	make proto-auth
+	make proto-group
 	make proto-api-gateway
