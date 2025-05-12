@@ -25,7 +25,8 @@ struct RewindApp: App {
             NavigationStack(path: $appRouter.path) {
                 Group {
                     if isAuthorized, isUserSaved, !testingAuth {
-                        MediaLoadingView()
+//                        ImageUploadingView() { _ in }
+                        MediasUploadingView(router: .init(appRouter: appRouter))
 //                        RewindView(router: .init(appRouter: appRouter))
                     } else {
                         WelcomeView(router: .init(appRouter: appRouter))
@@ -69,7 +70,14 @@ extension View {
                 case .quoteCreation:
                     QuoteCreationView()
                 case .mediaLoading:
-                    MediaLoadingView()
+                    MediasUploadingView(router: .init(appRouter: appRouter))
+                case let .mediaLoadingSettings(media):
+                    switch media.content {
+                    case .image:
+                        ImageUploadingView(media: media) { _ in }
+                    case .video:
+                        VideoUploadingView(media: media)
+                    }
                 case let .mediaDetails(image):
                     MediaDetailsView(image: image)
                 case let .email(flow):
