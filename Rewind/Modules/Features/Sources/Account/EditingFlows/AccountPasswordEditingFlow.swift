@@ -49,7 +49,7 @@ final class AccountPasswordEditingFlowViewModel {
 }
 
 struct AccountPasswordEditingFlow: View {
-    var viewModel: AccountPasswordEditingFlowViewModel
+    @State var viewModel: AccountPasswordEditingFlowViewModel
     var afterSuccess: (() -> Void)?
     
     @Environment(\.dismiss)

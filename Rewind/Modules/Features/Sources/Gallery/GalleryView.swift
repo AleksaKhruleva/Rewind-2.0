@@ -19,10 +19,8 @@ public struct GalleryView: View {
             GalleryHeader(
                 image: UIComponentsAsset.media5.image,
                 groupName: "Group name",
-                onAddingQuote: router.navigateToQuote,
-                onAddingMedia: {
-                    // TODO: smth
-                }
+                onAddingQuote: router.navigateToQuoteCreation,
+                onAddingMedia: router.navigateToMediaLoading
             )
             
             ScrollView {
@@ -77,10 +75,8 @@ public struct GalleryView: View {
             HStack {
                 GalleryMenu(
                     label: { RewindMediaButton(size: 50, fontSize: 28, type: .plus) {} },
-                    onAddingQuote: router.navigateToQuote,
-                    onAddingMedia: {
-                        // TODO: smth
-                    }
+                    onAddingQuote: router.navigateToQuoteCreation,
+                    onAddingMedia: router.navigateToMediaLoading
                 )
                 
                 Spacer()

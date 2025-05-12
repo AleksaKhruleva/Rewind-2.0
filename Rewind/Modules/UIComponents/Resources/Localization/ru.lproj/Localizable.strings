@@ -132,6 +132,10 @@
 
 "video.crop_video.failure" = "Не получилось обрезать видео! 😭";
 
+// MARK: - Media uploading strings
+
+"media_upload.error" = "Не смогли загрузить некоторые твои медиа 🫥";
+
 // MARK: - Group strings
 
 "group.activity" = "Активность";

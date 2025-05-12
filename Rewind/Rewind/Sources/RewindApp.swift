@@ -65,8 +65,10 @@ extension View {
                     AccountView(router: .init(appRouter: appRouter))
                 case .gallery:
                     GalleryView(router: .init(appRouter: appRouter))
-                case .quote:
+                case .quoteCreation:
                     QuoteCreationView()
+                case .mediaLoading:
+                    MediasUploadingView()
                 case let .mediaDetails(image):
                     MediaDetailsView(image: image)
                 case let .email(flow):

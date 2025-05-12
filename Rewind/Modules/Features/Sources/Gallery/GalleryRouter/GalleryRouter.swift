@@ -8,8 +8,12 @@ public final class GalleryRouter {
         self.appRouter = appRouter
     }
     
-    func navigateToQuote() {
-        appRouter?.navigate(to: .quote)
+    func navigateToQuoteCreation() {
+        appRouter?.navigate(to: .quoteCreation)
+    }
+    
+    func navigateToMediaLoading() {
+        appRouter?.navigate(to: .mediaLoading)
     }
     
     func navigateToMediaDetails(_ image: UIImage) {

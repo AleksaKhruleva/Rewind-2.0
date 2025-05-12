@@ -8,11 +8,19 @@ public struct VideoUploadingView: View {
     @State private var viewModel = VideoUploadingViewModel()
     @State private var timerCancellable: Cancellable?
     
-    @Environment(\.showToast) private var showToast
+    @Environment(\.showToast)
+    private var showToast
+    @Environment(\.dismiss)
+    private var dismiss
+    
     
     private let timer = Timer.publish(every: 0.05, on: .main, in: .common)
     
-    public init() {}
+    public init(media: LoadedMedia) {
+        if case let .video(url, _) = media.content {
+            self.viewModel.dispatch(.initializePlayer(AVURLAsset(url: url)))
+        }
+    }
     
     public var body: some View {
         VStack(spacing: 0) {
@@ -30,8 +38,6 @@ public struct VideoUploadingView: View {
                         musicSection
                         
                         tagsSection
-                        
-                        continueButton
                     } else {
                         emptyVideoContent
                             .onTapGesture {
@@ -42,6 +48,11 @@ public struct VideoUploadingView: View {
             }
         }
         .padding(.horizontal, 8)
+        .safeAreaInset(edge: .bottom) {
+            if viewModel.player != nil {
+                continueButton
+            }
+        }
         .sheet(isPresented: $viewModel.videoPickerPresented) {
             VideoPicker { asset in
                 viewModel.dispatch(.selectVideoInGallery(asset))
@@ -49,7 +60,7 @@ public struct VideoUploadingView: View {
         }
         .fullScreenCover(item: $viewModel.cropPreviewImage) { identifiable in
             RewindImageEditor(
-                image: .constant(identifiable.image),
+                image: identifiable.image,
                 cropType: .rectangle,
                 onCrop: { _,_ in },
                 onVideoCrop: { scale, offset in
@@ -90,7 +101,7 @@ public struct VideoUploadingView: View {
     
     private var header: some View {
         RewindHeader {
-            RewindButton(type: .leftChevron) {}
+            RewindButton(type: .leftChevron) { dismiss() }
         } rightView: {
             if viewModel.player != nil {
                 HStack {
@@ -113,7 +124,8 @@ public struct VideoUploadingView: View {
             
             VStack {
                 Image(systemName: "plus")
-                    .modifier(RoundFontModifier(size: 80, foregroundColor: .textSecondary))
+                    .font(.system(size: 130))
+                    .foregroundColor(.textSecondary)
                 
                 Text(UIComponentsStrings.Video.hint)
                     .modifier(RoundFontModifier(size: 15, weight: .bold))

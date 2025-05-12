@@ -1,4 +1,5 @@
 import SwiftUI
+import Domain
 
 @MainActor @Observable
 public final class AppRouter {
@@ -15,7 +16,8 @@ public final class AppRouter {
         
         case account
         case gallery
-        case quote
+        case quoteCreation
+        case mediaLoading
         case mediaDetails(UIImage)
     }
     

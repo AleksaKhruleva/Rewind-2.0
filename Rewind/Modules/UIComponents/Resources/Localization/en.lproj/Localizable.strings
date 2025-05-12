@@ -132,6 +132,10 @@
 
 "video.crop_video.failure" = "Failed cropping your video! 😭";
 
+// MARK: - Media uploading strings
+
+"media_upload.error" = "Can't load some of your medias 🫥";
+
 // MARK: - Group strings
 
 "group.activity" = "Activity";
