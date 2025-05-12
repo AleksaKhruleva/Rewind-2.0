@@ -184,6 +184,16 @@
 
 "group.select.suggestions.count" = "%@ groups";
 
+"group.add_member.share_link" = "Share Link";
+
+"group.add_member.copy_link" = "Copy Link";
+
+"group.add_member.link_copied" = "Link copied!";
+
+"group.add_member.join" = "Join %@!";
+
+"group.add_member.qr_code_generation.failure" = "Couldn't generate QR code! 😭";
+
 // MARK: Media strings
 
 "media_details.title" = "Media details";

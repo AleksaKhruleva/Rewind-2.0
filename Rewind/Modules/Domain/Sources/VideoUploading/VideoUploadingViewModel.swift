@@ -229,7 +229,6 @@ public final class VideoUploadingViewModel {
         guard let playerItem = playerItem, let asset = videoAsset else { return }
         
         do {
-            throw Error
             let tracks = try await asset.loadTracks(withMediaType: .video)
             guard let videoTrack = tracks.first else { return }
             
@@ -298,7 +297,7 @@ public final class VideoUploadingViewModel {
             
             playerItem.videoComposition = composition
         } catch {
-            toastMessage = UIComponentsStrings.Video.CropVideo.failure
+            //            toastMessage = UIComponentsStrings.Video.CropVideo.failure
             print("Ошибка при применении кропа: \(error)")
         }
     }
