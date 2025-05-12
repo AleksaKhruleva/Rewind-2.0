@@ -12,12 +12,16 @@ final class ImageUploadingViewModel {
         case viewGallery
         case cropImage
         case changeImage(UIImage?, ChangeImageType = .soft)
+        case findTrack
+        case trackSelected(Track)
     }
     
     var loadedMedia: LoadedMedia?
     var initialImage: UIImage?
+    var selectedTrack: Track?
     var imagePickerPresented: Bool = false
     var imageEditorPresented: Bool = false
+    var findTrackViewPresented: Bool = false
     
     var image: UIImage? {
         guard let loadedMedia, case let .image(image) = loadedMedia.content else {
@@ -72,6 +76,10 @@ final class ImageUploadingViewModel {
                 }
                 loadedMedia?.content = .image(image)
             }
+        case .findTrack:
+            findTrackViewPresented = true
+        case let .trackSelected(track):
+            selectedTrack = track
         }
     }
 }

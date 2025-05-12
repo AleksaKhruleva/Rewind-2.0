@@ -49,13 +49,18 @@ public struct ImageUploadingView: View {
         } set: { newImage in
             viewModel.dispatch(.changeImage(newImage, .hard))
         }) {}
-        .fullScreenCover(isPresented: $viewModel.imageEditorPresented) {
-            RewindImageEditor(image: viewModel.initialImage, cropType: .rectangle) { croppedImage, status in
-                if status {
-                    viewModel.dispatch(.changeImage(croppedImage))
+            .fullScreenCover(isPresented: $viewModel.imageEditorPresented) {
+                RewindImageEditor(image: viewModel.initialImage, cropType: .rectangle) { croppedImage, status in
+                    if status {
+                        viewModel.dispatch(.changeImage(croppedImage))
+                    }
                 }
             }
-        }
+            .sheet(isPresented: $viewModel.findTrackViewPresented) {
+                FindTrackView { selectedTrack in
+                    viewModel.dispatch(.trackSelected(selectedTrack))
+                }
+            }
     }
     
     private var header: some View {
@@ -95,17 +100,32 @@ public struct ImageUploadingView: View {
             Text(UIComponentsStrings.Music.sectionTitle)
                 .modifier(RoundFontModifier(size: 17, foregroundColor: .textSecondary))
                 .padding(.leading, 15)
-            VStack(alignment: .leading, spacing: 5) {
-                MembersTableButton(
-                    systemImageName: "music.note.list",
-                    title: UIComponentsStrings.Music.addMusic,
-                    imageSize: 20) {
-                        // TODO: show add music view
+            
+            Group {
+                if let track = viewModel.selectedTrack {
+                    TrackRow(
+                        track: track,
+                        showPlayButton: false,
+                        isPlaying: false,
+                        isLoading: false,
+                        onPlayTap: {},
+                        onRowTap: { _ in
+                            viewModel.dispatch(.findTrack)
+                        }
+                    )
+                } else {
+                    MembersTableButton(
+                        systemImageName: "music.note.list",
+                        title: UIComponentsStrings.Music.addMusic,
+                        imageSize: 20
+                    ) {
+                        viewModel.dispatch(.findTrack)
                     }
+                }
             }
             .padding(.vertical, 5)
             .background(Color.backgroundSecondary)
-            .cornerRadius(24)
+            .cornerRadius(16)
         }
     }
     

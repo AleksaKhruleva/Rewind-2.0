@@ -1,5 +1,6 @@
 import SwiftUI
 
+// Выпилить позже
 public struct MusicCell: View {
     var cover: UIImage
     var trackName: String

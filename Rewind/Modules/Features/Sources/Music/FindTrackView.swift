@@ -2,18 +2,25 @@ import UIComponents
 import SwiftUI
 import Domain
 
-public struct FindTrackView: View {
+struct FindTrackView: View {
     @StateObject private var viewModel = FindTrackViewModel()
     
-    public init() {}
+    @Environment(\.dismiss)
+    private var dismiss
     
-    public var body: some View {
+    private let onTrackSelected: (Track) -> Void
+    
+    init(onTrackSelected: @escaping (Track) -> Void) {
+        self.onTrackSelected = onTrackSelected
+    }
+    
+    var body: some View {
         VStack {
             if viewModel.tracks.isEmpty {
                 progressView
             } else {
                 searchField
-                    .padding(.bottom, 2)
+                    .padding(.vertical)
                     .padding(.horizontal)
                 
                 infiniteList
@@ -46,10 +53,15 @@ public struct FindTrackView: View {
                 TrackRow(
                     track: track,
                     isPlaying: viewModel.currentlyPlayingTrackID == track.id,
-                    isLoading: viewModel.currentlyLoadingTrackID == track.id
-                ) {
-                    viewModel.dispatch(.togglePlayback(track: track))
-                }
+                    isLoading: viewModel.currentlyLoadingTrackID == track.id,
+                    onPlayTap: {
+                        viewModel.dispatch(.togglePlayback(track: track))
+                    },
+                    onRowTap: { track in
+                        onTrackSelected(track)
+                        dismiss()
+                    }
+                )
                 .onAppear {
                     onTrackAppear?(track)
                 }
