@@ -3,7 +3,6 @@ import UIComponents
 
 public struct QuoteCreationView: View {
     @State var viewModel = QuoteCreationViewModel()
-    @State var quoteWidth: CGFloat = .zero
     
     @State var backgroundColor: Color = .random
     @State var textColor: Color = .random
@@ -33,7 +32,6 @@ public struct QuoteCreationView: View {
                 }
             }
             .scrollIndicators(.hidden)
-            .modifier(MeasureWidthModifier(width: $quoteWidth))
             .padding(.horizontal, 8)
         }
         .background(Color.background)
@@ -64,7 +62,6 @@ public struct QuoteCreationView: View {
         RoundedRectangle(cornerRadius: 40)
             .fill(Color.backgroundSecondary)
             .aspectRatio(1, contentMode: .fit)
-//            .frame(width: quoteWidth, height: quoteWidth)
             .foregroundColor(
                 viewModel.quoteState == .empty ?
                 .backgroundSecondary : backgroundColor

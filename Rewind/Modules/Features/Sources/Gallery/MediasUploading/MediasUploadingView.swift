@@ -11,8 +11,8 @@ public struct MediasUploadingView: View {
     @Environment(\.showToast)
     private var showToast
     
-    public init(router: MediasUploadingRouter) {
-        viewModel = .init(router: router)
+    public init() {
+        viewModel = .init()
     }
     
     public var body: some View {

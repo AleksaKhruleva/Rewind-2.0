@@ -18,7 +18,6 @@ public final class AppRouter {
         case gallery
         case quoteCreation
         case mediaLoading
-        case mediaLoadingSettings(LoadedMedia)
         case mediaDetails(UIImage)
     }
     

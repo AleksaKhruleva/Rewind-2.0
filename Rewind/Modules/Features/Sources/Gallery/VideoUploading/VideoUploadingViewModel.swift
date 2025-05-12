@@ -141,7 +141,7 @@ final class VideoUploadingViewModel {
         }
     }
     
-    private func initializePlayer(for asset: AVURLAsset) async{
+    private func initializePlayer(for asset: AVURLAsset) async {
         do {
             let videoDuration = try await asset.load(.duration)
             let clampedDuration = CMTimeMinimum(videoDuration, Self.maxVideoDuration)

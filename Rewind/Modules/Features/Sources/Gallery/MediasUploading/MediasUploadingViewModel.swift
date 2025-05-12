@@ -1,6 +1,7 @@
 import SwiftUI
 import Base
 import PhotosUI
+import UIComponents
 import Domain
 
 @MainActor @Observable
@@ -20,11 +21,9 @@ final class MediasUploadingViewModel {
     
     var viewingMedia: LoadedMedia?
     
-    let router: MediasUploadingRouter
-    
     private let transformer: PhotosPickerItemTransformer
     
-    init(router: MediasUploadingRouter) {
+    init() {
         similarSettigns = false
         toggleDisabled = false
         tags = []
@@ -32,7 +31,6 @@ final class MediasUploadingViewModel {
         selection = []
         showToast = { _ in }
         transformer = PhotosPickerItemTransformer()
-        self.router = router
     }
     
     func dispatch(_ intent: Intent) async {
@@ -52,7 +50,7 @@ final class MediasUploadingViewModel {
                     }
                 }
             } catch {
-                showToast("Can't load some of your medias 🫥")
+                showToast(UIComponentsStrings.MediaUpload.error)
             }
         case let .removeMedia(item):
             if let needed = item.photosPickerItem,
@@ -67,7 +65,6 @@ final class MediasUploadingViewModel {
             }
         case let .showMediaSettings(media):
             viewingMedia = media
-//            router.navigateToMediaSettings(media: media)
         }
     }
     
