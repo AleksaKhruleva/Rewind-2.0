@@ -7,7 +7,7 @@ public enum CropType {
 }
 
 public struct RewindImageEditor: View {
-    @Binding var image: UIImage?
+    var image: UIImage?
     var cropType: CropType
     var onCrop: (UIImage?, Bool) -> ()
     var onVideoCrop: ((CGFloat, CGSize) -> Void)?
@@ -22,12 +22,12 @@ public struct RewindImageEditor: View {
     private var dismiss
     
     public init(
-        image: Binding<UIImage?>,
+        image: UIImage?,
         cropType: CropType,
         onCrop: @escaping (UIImage?, Bool) -> Void,
         onVideoCrop: ((CGFloat, CGSize) -> Void)? = nil
     ) {
-        self._image = image
+        self.image = image
         self.cropType = cropType
         self.onCrop = onCrop
         self.onVideoCrop = onVideoCrop

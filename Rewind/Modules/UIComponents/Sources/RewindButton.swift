@@ -11,6 +11,7 @@ public struct RewindButton: View {
         case gearshape = "gearshape.fill"
         case crop
         case selectVideo = "film.stack.fill"
+        case photo = "photo.fill"
     }
     
     private let type: ButtonType

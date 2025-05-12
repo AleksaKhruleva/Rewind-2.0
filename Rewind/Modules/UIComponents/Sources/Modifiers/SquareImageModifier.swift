@@ -24,7 +24,7 @@ struct SquareImageModifier: ViewModifier {
 }
 
 public extension View {
-    func toSquare(_ image: UIImage, cornerRadius: CGFloat) -> some View {
+    func toSquare(_ image: UIImage, cornerRadius: CGFloat = 0) -> some View {
         self.modifier(SquareImageModifier(cornerRadius: cornerRadius, image: image))
     }
 }

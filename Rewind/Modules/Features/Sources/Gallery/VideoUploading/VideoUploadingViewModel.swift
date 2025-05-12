@@ -1,16 +1,15 @@
 import AVFoundation
 import Photos
 import SwiftUI
-//import UIComponents
+import Domain
+import UIComponents
 
-@MainActor
-@Observable
-public final class VideoUploadingViewModel {
-    
+@MainActor @Observable
+final class VideoUploadingViewModel {
     // MARK: - Types
-    
-    public enum Intent {
+    enum Intent {
         case selectVideoInGallery(PHAsset)
+        case initializePlayer(AVURLAsset)
         case viewGallery
         case cropVideo
         case applyCrop(scale: CGFloat, offset: CGSize)
@@ -20,56 +19,56 @@ public final class VideoUploadingViewModel {
     }
     
     // MARK: - Constants
-    
     public static let frameCount = 11
     private static let maxVideoDuration: CMTime = CMTime(seconds: 15, preferredTimescale: 600)
     
     // MARK: - Init
-    
-    public init() {}
+    init() {}
     
     // MARK: - Published Properties
+    var toastMessage: String? = nil
     
-    public var toastMessage: String? = nil
+    var tags = [String]()
     
-    public var tags = [String]()
+    var videoPickerPresented = false
     
-    public var videoPickerPresented = false
+    var isPlaying = false
+    var player: AVPlayer?
+    var videoAsset: AVURLAsset?
     
-    public var isPlaying = false
-    public var player: AVPlayer?
-    public var videoAsset: AVURLAsset?
+    var shouldSeekToStartTime = false
+    var startTime: CMTime = .zero
+    var endTime: CMTime = .zero
+    var duration: TimeInterval = 1
+    var currentTime: TimeInterval = 0
+    var timelineID = UUID()
     
-    public var shouldSeekToStartTime = false
-    public var startTime: CMTime = .zero
-    public var endTime: CMTime = .zero
-    public var duration: TimeInterval = 1
-    public var currentTime: TimeInterval = 0
-    public var timelineID = UUID()
-    
-    public var trimStartAsSeconds: TimeInterval {
+    var trimStartAsSeconds: TimeInterval {
         get { startTime.seconds }
         set { startTime = CMTime(seconds: newValue, preferredTimescale: 600) }
     }
     
-    public var trimEndAsSeconds: TimeInterval {
+    var trimEndAsSeconds: TimeInterval {
         get { endTime.seconds }
         set { endTime = CMTime(seconds: newValue, preferredTimescale: 600) }
     }
     
-    public var cropPreviewImage: IdentifiableImage?
+    var cropPreviewImage: IdentifiableImage?
     
     // MARK: - Private State
-    
     private var playerItem: AVPlayerItem?
     
     // MARK: - Intents
-    
-    public func dispatch(_ intent: Intent) {
+    func dispatch(_ intent: Intent) {
         switch intent {
         case let .selectVideoInGallery(asset):
             resetPlayer()
             loadVideoAsset(from: asset)
+        case let .initializePlayer(asset):
+            resetPlayer()
+            Task {
+                await initializePlayer(for: asset)
+            }
         case .viewGallery:
             isPlaying = false
             videoPickerPresented = true
@@ -92,7 +91,6 @@ public final class VideoUploadingViewModel {
     }
     
     // MARK: - Private Methods
-    
     private func syncCurrentTime() {
         currentTime = startTime.seconds
     }
@@ -138,40 +136,44 @@ public final class VideoUploadingViewModel {
             guard let urlAsset = avAsset as? AVURLAsset else { return }
             
             Task { @MainActor in
-                do {
-                    let videoDuration = try await urlAsset.load(.duration)
-                    let clampedDuration = CMTimeMinimum(videoDuration, Self.maxVideoDuration)
-                    
-                    self.videoAsset = urlAsset
-                    self.timelineID = UUID()
-                    self.currentTime = 0
-                    self.startTime = .zero
-                    self.endTime = clampedDuration
-                    self.duration = CMTimeGetSeconds(videoDuration)
-                    
-                    let item = AVPlayerItem(asset: urlAsset)
-                    self.playerItem = item
-                    
-                    let newPlayer = AVPlayer(playerItem: item)
-                    await newPlayer.seek(to: .zero)
-                    self.player = newPlayer
+                await self.initializePlayer(for: urlAsset)
+            }
+        }
+    }
+    
+    private func initializePlayer(for asset: AVURLAsset) async{
+        do {
+            let videoDuration = try await asset.load(.duration)
+            let clampedDuration = CMTimeMinimum(videoDuration, Self.maxVideoDuration)
+            
+            self.videoAsset = asset
+            self.timelineID = UUID()
+            self.currentTime = 0
+            self.startTime = .zero
+            self.endTime = clampedDuration
+            self.duration = CMTimeGetSeconds(videoDuration)
+            
+            let item = AVPlayerItem(asset: asset)
+            self.playerItem = item
+            
+            let newPlayer = AVPlayer(playerItem: item)
+            await newPlayer.seek(to: .zero)
+            self.player = newPlayer
+            self.isPlaying = false
+            
+            NotificationCenter.default.addObserver(
+                forName: .AVPlayerItemDidPlayToEndTime,
+                object: item,
+                queue: .main
+            ) { [weak self] _ in
+                Task { @MainActor in
+                    guard let self else { return }
+                    self.player?.seek(to: self.startTime)
                     self.isPlaying = false
-                    
-                    NotificationCenter.default.addObserver(
-                        forName: .AVPlayerItemDidPlayToEndTime,
-                        object: item,
-                        queue: .main
-                    ) { [weak self] _ in
-                        Task { @MainActor in
-                            guard let self else { return }
-                            self.player?.seek(to: self.startTime)
-                            self.isPlaying = false
-                        }
-                    }
-                } catch {
-                    print("Failed to load video: \(error)")
                 }
             }
+        } catch {
+            print("Failed to load video: \(error)")
         }
     }
     

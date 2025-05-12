@@ -3,16 +3,16 @@ import UIComponents
 import PhotosUI
 import Domain
 
-public struct MediaLoadingView: View {
-    @State var viewModel: MediaLoadingViewModel
+public struct MediasUploadingView: View {
+    @State var viewModel: MediasUploadingViewModel
     
     @Environment(\.dismiss)
     private var dismiss
     @Environment(\.showToast)
     private var showToast
     
-    public init() {
-        viewModel = .init()
+    public init(router: MediasUploadingRouter) {
+        viewModel = .init(router: router)
     }
     
     public var body: some View {
@@ -28,6 +28,11 @@ public struct MediaLoadingView: View {
                                     Task {
                                         await viewModel.dispatch(.removeMedia(loadedMedia))
                                     }
+                                }
+                            }
+                            .onTapGesture {
+                                Task {
+                                    await viewModel.dispatch(.showMediaSettings(loadedMedia))
                                 }
                             }
                     }
@@ -50,9 +55,12 @@ public struct MediaLoadingView: View {
                     .padding(.bottom, 16)
                 
                 TagsSectionView(tags: $viewModel.tags)
-            }.disabledWithOpacity(viewModel.similarSettigns)
+            }.disabledWithOpacity(!viewModel.similarSettigns)
             
             Spacer()
+        }
+        .navigationDestination(item: $viewModel.viewingMedia) { media in
+            mediaSettings(for: media)
         }
         .onAppear {
             viewModel.set(showToast: showToast)
@@ -78,6 +86,7 @@ public struct MediaLoadingView: View {
                 .modifier(RoundFontModifier(size: 17, weight: .bold, foregroundColor: .textPrimary))
         }
         .toggleStyle(SwitchToggleStyle(tint: .pinkPrimaryLight))
+        .disabledWithOpacity(viewModel.toggleDisabled)
         .padding()
         .background(Color.backgroundSecondary)
         .cornerRadius(25)
@@ -113,6 +122,27 @@ public struct MediaLoadingView: View {
                         .foregroundColor(.textTertiary)
                 }
         }
+    }
+    
+    private func mediaSettings(for media: LoadedMedia) -> some View {
+        Group {
+            switch media.content {
+            case .image:
+                ImageUploadingView(media: media) { newMedia in
+                    if let index = viewModel.loadedMedias.firstIndex(where: { $0.id == newMedia.id }) {
+                        viewModel.loadedMedias[index] = newMedia
+                    }
+                    if let tags = newMedia.tags, !tags.isEmpty {
+                        viewModel.toggleDisabled = true
+                        viewModel.similarSettigns = false
+                    } else {
+                        viewModel.toggleDisabled = false
+                    }
+                }
+            case .video:
+                VideoUploadingView(media: media)
+            }
+        }.toolbar(.hidden)
     }
     
     private func badges(

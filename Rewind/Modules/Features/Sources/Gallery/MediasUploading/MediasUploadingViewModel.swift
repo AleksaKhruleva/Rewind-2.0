@@ -4,27 +4,35 @@ import PhotosUI
 import Domain
 
 @MainActor @Observable
-final class MediaLoadingViewModel {
+final class MediasUploadingViewModel {
     enum Intent {
         case importMedias([PhotosPickerItem])
         case removeMedia(LoadedMedia)
+        case showMediaSettings(LoadedMedia)
     }
     
     var similarSettigns: Bool
+    var toggleDisabled: Bool
     var tags: [String]
     var loadedMedias: [LoadedMedia]
     var selection: [PhotosPickerItem]
     var showToast: (String) -> Void
     
+    var viewingMedia: LoadedMedia?
+    
+    let router: MediasUploadingRouter
+    
     private let transformer: PhotosPickerItemTransformer
     
-    init() {
+    init(router: MediasUploadingRouter) {
         similarSettigns = false
+        toggleDisabled = false
         tags = []
         loadedMedias = []
         selection = []
         showToast = { _ in }
         transformer = PhotosPickerItemTransformer()
+        self.router = router
     }
     
     func dispatch(_ intent: Intent) async {
@@ -57,6 +65,9 @@ final class MediaLoadingViewModel {
                     loadedMedias.tryRemove(at: index)
                 }
             }
+        case let .showMediaSettings(media):
+            viewingMedia = media
+//            router.navigateToMediaSettings(media: media)
         }
     }
     

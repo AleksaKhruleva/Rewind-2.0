@@ -61,8 +61,10 @@ public struct QuoteCreationView: View {
     }
     
     private var quoteContent: some View {
-        Rectangle()
-            .frame(width: quoteWidth, height: quoteWidth)
+        RoundedRectangle(cornerRadius: 40)
+            .fill(Color.backgroundSecondary)
+            .aspectRatio(1, contentMode: .fit)
+//            .frame(width: quoteWidth, height: quoteWidth)
             .foregroundColor(
                 viewModel.quoteState == .empty ?
                 .backgroundSecondary : backgroundColor
@@ -75,15 +77,20 @@ public struct QuoteCreationView: View {
             }
     }
     
-    @ViewBuilder
     private var emptyQuoteContent: some View {
-        VStack {
-            Image(systemName: "quote.bubble.fill")
-                .font(.system(size: 130))
-                .foregroundColor(.textSecondary)
+        ZStack {
+            RoundedRectangle(cornerRadius: 40)
+                .fill(Color.backgroundSecondary)
+                .aspectRatio(1, contentMode: .fit)
             
-            Text(UIComponentsStrings.Quote.hint)
-                .modifier(RoundFontModifier(size: 15, weight: .bold))
+            VStack {
+                Image(systemName: "quote.bubble.fill")
+                    .font(.system(size: 130))
+                    .foregroundColor(.textSecondary)
+                
+                Text(UIComponentsStrings.Quote.hint)
+                    .modifier(RoundFontModifier(size: 15, weight: .bold))
+            }
         }
     }
     
