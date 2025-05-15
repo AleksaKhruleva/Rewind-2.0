@@ -19,17 +19,17 @@ public struct BlurredMediaView: View {
     }
     
     public var body: some View {
-      Color.black.opacity(0.05)
-          .background(BlurView())
-          .ignoresSafeArea()
-          .onTapGesture {
-              withAnimation {
-                  isPresented = false
-              }
-          }
-          .overlay(
-            content
-          )
+        Rectangle()
+            .fill(.ultraThinMaterial)
+            .ignoresSafeArea()
+            .onTapGesture {
+                withAnimation {
+                    isPresented = false
+                }
+            }
+            .overlay {
+                content
+            }
     }
     
     private var content: some View {

@@ -236,6 +236,12 @@
 
 "gallery.new_media" = "Новое фото или видео";
 
+"gallery.new_media.dialog.title" = "Сколько медиа ты хочешь загрузить?";
+
+"gallery.new_media.dialog.one" = "Одно медиа";
+
+"gallery.new_media.dialog.multiple" = "Несколько медиа";
+
 "gallery.new_quote" = "Новая цитата";
 
 // MARK: - End note string

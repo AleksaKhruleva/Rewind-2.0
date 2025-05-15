@@ -12,8 +12,8 @@ public final class GalleryRouter {
         appRouter?.navigate(to: .quoteCreation)
     }
     
-    func navigateToMediaLoading() {
-        appRouter?.navigate(to: .mediaLoading)
+    func navigateToMediasUploading() {
+        appRouter?.navigate(to: .mediasUploading)
     }
     
     func navigateToMediaDetails(_ image: UIImage) {
