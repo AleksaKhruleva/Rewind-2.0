@@ -3,30 +3,30 @@ import SwiftUI
 public struct GalleryMenu<Content: View>: View {
     private let label: Content
     private let onAddingQuote: () -> Void
-    private let onAddingMedia: () -> Void
+    private let onAddingMedias: () -> Void
     
     public init(
         @ViewBuilder label: () -> Content,
         onAddingQuote: @escaping () -> Void,
-        onAddingMedia: @escaping () -> Void
+        onAddingMedias: @escaping () -> Void
     ) {
         self.label = label()
         self.onAddingQuote = onAddingQuote
-        self.onAddingMedia = onAddingMedia
+        self.onAddingMedias = onAddingMedias
     }
     
     public var body: some View {
         Menu {
             Button {
-                onAddingMedia()
-            } label: {
-                Label(UIComponentsStrings.Gallery.newMedia, systemImage: "photo.fill")
-            }
-            
-            Button {
                 onAddingQuote()
             } label: {
                 Label(UIComponentsStrings.Gallery.newQuote, systemImage: "quote.bubble.fill")
+            }
+            
+            Button {
+                onAddingMedias()
+            } label: {
+                Label(UIComponentsStrings.Gallery.newMedia, systemImage: "photo.stack.fill")
             }
         } label: {
             label

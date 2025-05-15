@@ -67,7 +67,7 @@ extension View {
                     GalleryView(router: .init(appRouter: appRouter))
                 case .quoteCreation:
                     QuoteCreationView()
-                case .mediaLoading:
+                case .mediasUploading:
                     MediasUploadingView()
                 case let .mediaDetails(image):
                     MediaDetailsView(image: image)

@@ -236,6 +236,12 @@
 
 "gallery.new_media" = "New photo or video";
 
+"gallery.new_media.dialog.title" = "How many medias you want to upload?";
+
+"gallery.new_media.dialog.one" = "One media";
+
+"gallery.new_media.dialog.multiple" = "Multiple medias";
+
 "gallery.new_quote" = "New quote";
 
 // MARK: - End note string

@@ -4,7 +4,7 @@ public struct GalleryHeader: View {
     private let image: UIImage
     private let groupName: String
     private let onAddingQuote: () -> Void
-    private let onAddingMedia: () -> Void
+    private let onAddingMedias: () -> Void
     
     @Environment(\.dismiss)
     private var dismiss
@@ -13,12 +13,12 @@ public struct GalleryHeader: View {
         image: UIImage,
         groupName: String,
         onAddingQuote: @escaping () -> Void,
-        onAddingMedia: @escaping () -> Void
+        onAddingMedias: @escaping () -> Void
     ) {
         self.image = image
         self.groupName = groupName
         self.onAddingQuote = onAddingQuote
-        self.onAddingMedia = onAddingMedia
+        self.onAddingMedias = onAddingMedias
     }
     
     public var body: some View {
@@ -33,7 +33,7 @@ public struct GalleryHeader: View {
             GalleryMenu(
                 label: { RewindButton(type: .plus) {} },
                 onAddingQuote: onAddingQuote,
-                onAddingMedia: onAddingMedia
+                onAddingMedias: onAddingMedias
             )
         }
     }
