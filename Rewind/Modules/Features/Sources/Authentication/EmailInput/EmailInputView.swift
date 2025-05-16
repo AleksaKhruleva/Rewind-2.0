@@ -3,11 +3,8 @@ import UIComponents
 import AccessibilitySupport
 
 public struct EmailInputView: View {
-    @State var viewModel: EmailInputViewModel
+    @State private var viewModel: EmailInputViewModel
     @FocusState private var isFocused: Bool
-    
-    @Environment(\.dismiss)
-    private var dismiss
     
     public init(flow: AuthFlow, router: AuthenticationRouter) {
         viewModel = .init(flow: flow, router: router)
@@ -17,9 +14,14 @@ public struct EmailInputView: View {
         ZStack(alignment: .topLeading) {
             Color.background.ignoresSafeArea()
             
-            RewindHeader {
-                RewindButton(type: .leftChevron) { dismiss() }
-            }
+            RewindHeader(leftView: {
+                RewindButton(type: .leftChevron) {
+                    hideKeyboard()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + AuthConstants.keyboardHideDelay) {
+                        viewModel.router.dismiss()
+                    }
+                }
+            })
             
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
                 Text(UIComponentsStrings.Email.title)
@@ -49,7 +51,9 @@ public struct EmailInputView: View {
             .modifier(VStackTopOffsetModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
         }
         .onAppear {
-            isFocused = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + AuthConstants.keyboardFocusDelay) {
+                isFocused = true
+            }
         }
         .hideKeyboardOnTap()
         .hideKeyboardOnDrag()

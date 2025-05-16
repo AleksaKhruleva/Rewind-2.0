@@ -9,7 +9,7 @@ public final class RewindRouter {
     }
     
     func navigateToGallery() {
-        appRouter?.navigate(to: .gallery)
+        appRouter?.navigate(to: .gallery, with: .pushFromBottom)
     }
     
     func navigateToAccount() {

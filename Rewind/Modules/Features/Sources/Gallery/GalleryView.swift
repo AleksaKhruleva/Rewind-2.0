@@ -5,10 +5,7 @@ public struct GalleryView: View {
     @State private var isBlurredMediaPresented = false
     @State private var selectedMedia: UIImage?
     
-    let router: GalleryRouter
-    
-    @Environment(\.dismiss)
-    private var dismiss
+    private let router: GalleryRouter
     
     public init(router: GalleryRouter) {
         self.router = router
@@ -19,6 +16,11 @@ public struct GalleryView: View {
             GalleryHeader(
                 image: UIComponentsAsset.media5.image,
                 groupName: "Group name",
+                onDismiss: {
+                    DispatchQueue.main.async {
+                        router.dismiss()
+                    }
+                },
                 onAddingQuote: router.navigateToQuoteCreation,
                 onAddingMedia: router.navigateToMediaLoading
             )
@@ -81,7 +83,7 @@ public struct GalleryView: View {
                 
                 Spacer()
                 
-                RewindMediaButton(size: 60, fontSize: 28, type: .rewind) { dismiss() }
+                RewindMediaButton(size: 60, fontSize: 28, type: .rewind) { router.dismiss() }
                 
                 Spacer()
                 

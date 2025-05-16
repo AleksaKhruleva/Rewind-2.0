@@ -35,4 +35,8 @@ public final class AuthenticationRouter {
     func dismiss(by count: Int) {
         appRouter?.pop(by: count)
     }
+    
+    func dismiss() {
+        appRouter?.pop()
+    }
 }

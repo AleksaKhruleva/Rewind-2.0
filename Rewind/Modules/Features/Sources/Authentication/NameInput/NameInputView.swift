@@ -2,12 +2,9 @@ import SwiftUI
 import UIComponents
 
 public struct NameInputView: View {
-    @State var viewModel: NameInputViewModel
+    @State private var viewModel: NameInputViewModel
     @State private var name: String = ""
     @FocusState private var isFocused: Bool
-    
-    @Environment(\.dismiss)
-    private var dismiss
     
     public init(router: AuthenticationRouter, email: String, password: String, registrationID: String) {
         viewModel = .init(router: router, email: email, password: password, registrationID: registrationID)
@@ -17,9 +14,14 @@ public struct NameInputView: View {
         ZStack(alignment: .topLeading) {
             Color.background.ignoresSafeArea()
             
-            RewindHeader {
-                RewindButton(type: .leftChevron) { dismiss() }
-            }
+            RewindHeader(leftView: {
+                RewindButton(type: .leftChevron) {
+                    hideKeyboard()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + AuthConstants.keyboardHideDelay) {
+                        viewModel.router.dismiss()
+                    }
+                }
+            })
             
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
                 Text(UIComponentsStrings.Name.title)
@@ -48,7 +50,9 @@ public struct NameInputView: View {
             .modifier(VStackTopOffsetModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
         }
         .onAppear {
-            isFocused = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + AuthConstants.keyboardFocusDelay) {
+                isFocused = true
+            }
         }
         .hideKeyboardOnTap()
         .hideKeyboardOnDrag()

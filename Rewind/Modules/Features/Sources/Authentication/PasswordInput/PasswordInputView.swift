@@ -2,7 +2,7 @@ import SwiftUI
 import UIComponents
 
 public struct PasswordInputView: View {
-    @State var viewModel: PasswordInputViewModel
+    @State private var viewModel: PasswordInputViewModel
     @State private var showNotice = false
     @State private var canResend = false
     @State private var timer: Timer? = nil
@@ -17,8 +17,9 @@ public struct PasswordInputView: View {
         ZStack(alignment: .topLeading) {
             Color.background.ignoresSafeArea()
             
-            RewindHeader {
-                RewindButton(type: .leftChevron) {
+            RewindButton(type: .leftChevron) {
+                hideKeyboard()
+                DispatchQueue.main.asyncAfter(deadline: .now() + AuthConstants.keyboardHideDelay) {
                     Task {
                         await viewModel.dispatch(.dismiss)
                     }
@@ -62,7 +63,9 @@ public struct PasswordInputView: View {
             .modifier(VStackTopOffsetModifier(topOffsetRatio: AuthConstants.contentTopOffsetRatio))
         }
         .onAppear {
-            isFocused = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + AuthConstants.keyboardFocusDelay) {
+                isFocused = true
+            }
         }
         .hideKeyboardOnTap()
         .hideKeyboardOnDrag()

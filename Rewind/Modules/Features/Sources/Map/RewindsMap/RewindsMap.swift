@@ -3,16 +3,16 @@ import MapKit
 import UIComponents
 
 public struct RewindsMap: View {
-    @State var viewModel: RewindsMapViewModel
-    @State var badgeWidth: CGFloat = .zero
+    @State private var viewModel: RewindsMapViewModel
+    @State private var badgeWidth: CGFloat = .zero
     
     @State private var isRewindsListPresented = false
     
-    @Environment(\.dismiss)
-    private var dismiss
+    private let router: AppRouter
     
-    public init() {
+    public init(router: AppRouter) {
         viewModel = RewindsMapViewModel()
+        self.router = router
     }
     
     public var body: some View {
@@ -79,7 +79,7 @@ public struct RewindsMap: View {
                 .frame(maxWidth: .infinity, maxHeight: 70)
             
             HStack {
-                makeButton("chevron.left") { dismiss() }
+                makeButton("chevron.left") { router.pop() }
                 Spacer()
                 RoundedRectangle(cornerRadius: 15)
                     .frame(height: 54)
@@ -130,8 +130,4 @@ public struct RewindsMap: View {
                 }
         }
     }
-}
-
-#Preview {
-    RewindsMap()
 }

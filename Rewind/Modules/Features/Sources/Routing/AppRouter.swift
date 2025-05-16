@@ -3,6 +3,16 @@ import Domain
 
 @MainActor @Observable
 public final class AppRouter {
+    public struct RouteWrapper: Identifiable, Equatable {
+        public let id = UUID()
+        public let route: Route
+        public let transition: TransitionStyle
+    }
+    
+    public enum TransitionStyle {
+        case pushFromRight, pushFromLeft, pushFromBottom, none
+    }
+    
     public enum Route: Hashable {
         case welcome
         
@@ -21,23 +31,24 @@ public final class AppRouter {
         case mediaDetails(UIImage)
     }
     
-    public var path = NavigationPath()
+    public var stack: [RouteWrapper] = []
     
     public init() {}
     
-    func navigate(to route: Route) {
-        path.append(route)
+    public func setInitial(_ route: Route) {
+        stack = [.init(route: route, transition: .none)]
+    }
+    
+    func navigate(to route: Route, with transition: TransitionStyle = .pushFromRight) {
+        stack.append(.init(route: route, transition: transition))
     }
     
     func pop() {
-        path.removeLast()
+        pop(by: 1)
     }
     
     func pop(by count: Int) {
-        path.removeLast(count)
-    }
-    
-    func popToRoot() {
-        path.removeLast(path.count)
+        guard count > 0, count <= stack.count - 1 else { return }
+        stack.removeLast(count)
     }
 }

@@ -2,11 +2,8 @@ import SwiftUI
 import UIComponents
 
 public struct CodeInputView: View {
-    @State var viewModel: CodeInputViewModel
+    @State private var viewModel: CodeInputViewModel
     @State private var code: [String] = Array(repeating: "", count: 4)
-    
-    @Environment(\.dismiss)
-    private var dismiss
     
     public init(router: AuthenticationRouter, email: String, registrationID: String) {
         viewModel = .init(router: router, email: email, registrationID: registrationID)
@@ -16,9 +13,14 @@ public struct CodeInputView: View {
         ZStack(alignment: .topLeading) {
             Color.background.ignoresSafeArea()
             
-            RewindHeader {
-                RewindButton(type: .leftChevron) { dismiss() }
-            }
+            RewindHeader(leftView: {
+                RewindButton(type: .leftChevron) {
+                    hideKeyboard()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + AuthConstants.keyboardHideDelay) {
+                        viewModel.router.dismiss()
+                    }
+                }
+            })
             
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
                 Text(UIComponentsStrings.Code.title)

@@ -14,8 +14,6 @@ public struct AccountView: View {
     
     @State private var genericSheetItem: GenericInputSheetItem?
     
-    @Environment(\.dismiss)
-    private var dismiss
     @Environment(\.showToast)
     private var showToast
     
@@ -31,14 +29,14 @@ public struct AccountView: View {
             ScrollView {
                 VStack(spacing: 15) {
                     avatar.onTapGesture {
-                            withAnimation(.spring(response: 0.2)) {
-                                guard viewModel.user.imageData != nil else {
-                                    photoPickerShown = true
-                                    return
-                                }
-                                blurredAvatarShown = true
+                        withAnimation(.spring(response: 0.2)) {
+                            guard viewModel.user.imageData != nil else {
+                                photoPickerShown = true
+                                return
                             }
+                            blurredAvatarShown = true
                         }
+                    }
                     
                     groupsTable
                     
@@ -136,7 +134,7 @@ public struct AccountView: View {
     
     var header: some View {
         RewindHeader {
-            RewindButton(type: .leftChevron) { dismiss() }
+            RewindButton(type: .leftChevron) { viewModel.router.dismiss() }
         } centerView: {
             HeaderBadgeView(
                 image: viewModel.user.image,
@@ -148,7 +146,7 @@ public struct AccountView: View {
     }
     
     var avatar: some View {
-      AvatarView(image: viewModel.user.image, text: viewModel.user.name)
+        AvatarView(image: viewModel.user.image, text: viewModel.user.name)
     }
     
     var appIconsTable: some View {
