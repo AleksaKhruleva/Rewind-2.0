@@ -131,7 +131,13 @@ final class FindTrackViewModel: ObservableObject {
                     from: hrefToUse,
                     for: isShowingDefaultTracks ? .charts : .search
                 )
-                tracks.append(contentsOf: response.collection)
+                
+                if isShowingDefaultTracks {
+                    defaultTracks.append(contentsOf: response.collection)
+                    tracks = defaultTracks
+                } else {
+                    tracks.append(contentsOf: response.collection)
+                }
                 
                 self.nextHref = response.next_href
                 self.hasReachedEnd = (response.next_href == nil)

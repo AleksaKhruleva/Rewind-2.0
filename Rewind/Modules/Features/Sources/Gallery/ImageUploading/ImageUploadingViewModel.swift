@@ -14,6 +14,7 @@ final class ImageUploadingViewModel {
         case changeImage(UIImage?, ChangeImageType = .soft)
         case findTrack
         case trackSelected(Track)
+        case resumePlayback
     }
     
     var loadedMedia: LoadedMedia?
@@ -22,6 +23,7 @@ final class ImageUploadingViewModel {
     var imagePickerPresented: Bool = false
     var imageEditorPresented: Bool = false
     var findTrackViewPresented: Bool = false
+    var isSelectedTrackPlaying: Bool = true
     
     var image: UIImage? {
         guard let loadedMedia, case let .image(image) = loadedMedia.content else {
@@ -77,9 +79,12 @@ final class ImageUploadingViewModel {
                 loadedMedia?.content = .image(image)
             }
         case .findTrack:
+            isSelectedTrackPlaying = false
             findTrackViewPresented = true
         case let .trackSelected(track):
             selectedTrack = track
+        case .resumePlayback:
+            isSelectedTrackPlaying = true
         }
     }
 }

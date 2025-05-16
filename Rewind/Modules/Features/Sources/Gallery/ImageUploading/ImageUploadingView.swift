@@ -25,22 +25,33 @@ public struct ImageUploadingView: View {
                     if let image = viewModel.image {
                         Rectangle().toSquare(image)
                             .clipShape(RoundedRectangle(cornerRadius: 40))
+                            .padding(.horizontal, 8)
                     } else {
                         emptyImageContent
                             .onTapGesture {
                                 viewModel.dispatch(.viewGallery)
                             }
+                            .padding(.horizontal, 8)
                     }
                     
                     Group {
                         musicSection
+                            .padding(.horizontal, 8)
+                        
+                        if let selectedTrack = viewModel.selectedTrack {
+                            ChooseTrackPieceView(
+                                isSelectedTrackPlaying: $viewModel.isSelectedTrackPlaying,
+                                selectedTrack: selectedTrack
+                            )
+                            .id(selectedTrack.id)
+                        }
                         
                         TagsSectionView(tags: viewModel.loadedMediaTagsBinding)
+                            .padding(.horizontal, 8)
                     }.disabledWithOpacity(!viewModel.ready)
                 }
             }
         }
-        .padding(.horizontal, 8)
         .safeAreaInset(edge: .bottom) {
             continueButton
         }
@@ -56,11 +67,14 @@ public struct ImageUploadingView: View {
                     }
                 }
             }
-            .sheet(isPresented: $viewModel.findTrackViewPresented) {
-                FindTrackView { selectedTrack in
-                    viewModel.dispatch(.trackSelected(selectedTrack))
+            .sheet(
+                isPresented: $viewModel.findTrackViewPresented) {
+                    viewModel.dispatch(.resumePlayback)
+                } content: {
+                    FindTrackView { selectedTrack in
+                        viewModel.dispatch(.trackSelected(selectedTrack))
+                    }
                 }
-            }
     }
     
     private var header: some View {

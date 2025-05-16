@@ -1,11 +1,19 @@
 import SwiftUI
 
-let defaultCoefficient: [CGFloat] = (0..<100).map { $0 % 2 == 0 ? 0.5 : 1 }
+private let selectorWidth: CGFloat = 130
 
 public struct WaveformView: View {
+    private let trackDuration: Double
+    private let selectorDuration: Double
     private let sidePaddingWidth: CGFloat
     
-    public init(sidePaddingWidth: CGFloat) {
+    public init(
+        trackDuration: Double,
+        selectorDuration: Double,
+        sidePaddingWidth: CGFloat
+    ) {
+        self.trackDuration = trackDuration
+        self.selectorDuration = selectorDuration
         self.sidePaddingWidth = sidePaddingWidth
     }
     
@@ -15,7 +23,8 @@ public struct WaveformView: View {
                 .fill(Color.clear)
                 .frame(width: sidePaddingWidth)
             
-            ForEach(defaultCoefficient, id: \.self) { coef in
+            ForEach(0 ..< barCount, id: \.self) { i in
+                let coef: CGFloat = i % 2 == 0 ? 0.5 : 1
                 SoundBar(coefficient: coef, color: .pinkPrimaryLight)
             }
             
@@ -24,8 +33,22 @@ public struct WaveformView: View {
                 .frame(width: sidePaddingWidth)
         }
     }
+    
+    private var totalWidth: CGFloat {
+        selectorWidth * CGFloat(trackDuration / selectorDuration)
+    }
+    
+    private var barCount: Int {
+        Int(totalWidth / 11)
+    }
 }
 
 #Preview {
-    WaveformView(sidePaddingWidth: 6)
+    ScrollView(.horizontal, showsIndicators: false) {
+        WaveformView(
+            trackDuration: 30,
+            selectorDuration: 15,
+            sidePaddingWidth: 6
+        )
+    }
 }
