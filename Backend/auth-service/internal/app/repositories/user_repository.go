@@ -20,6 +20,7 @@ type UserRepositoryInterface interface {
 	GetDeletedUserByEmail(tx *gorm.DB, email string) (*models.User, error)
 	SaveDeleted(tx *gorm.DB, user *models.User) error
 	DeleteUser(tx *gorm.DB, email string) error
+	ListUsersByIDs(tx *gorm.DB, userIDs []uint) ([]*models.User, error)
 }
 
 type UserRepository struct {
@@ -122,4 +123,13 @@ func (r *UserRepository) DeleteUser(tx *gorm.DB, email string) error {
 		tx = r.db
 	}
 	return tx.Delete(&models.User{}, "email = ?", email).Error
+}
+
+func (r *UserRepository) ListUsersByIDs(tx *gorm.DB, userIDs []uint) ([]*models.User, error) {
+	if tx == nil {
+		tx = r.db
+	}
+	var users []*models.User
+	result := tx.Where("id IN (?)", userIDs).Find(&users)
+	return users, result.Error
 }

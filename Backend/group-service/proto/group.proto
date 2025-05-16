@@ -11,7 +11,6 @@ import "google/protobuf/duration.proto"; // Для Optional duration (если �
 service GroupService {
   rpc CreateGroup (CreateGroupRequest) returns (CreateGroupResponse);
   rpc GetGroup (GetGroupRequest) returns (GetGroupResponse);
-  rpc ListGroups (ListGroupsRequest) returns (ListGroupsResponse); // Может быть для публичных групп или всех, если нет user_id фильтра
   rpc UpdateGroup (UpdateGroupRequest) returns (UpdateGroupResponse);
   rpc DeleteGroup (DeleteGroupRequest) returns (DeleteGroupResponse);
 
@@ -85,23 +84,6 @@ message GetGroupRequest {
 message GetGroupResponse {
   Group group = 1;
   bool is_admin = 2;
-}
-
-// Запрос на получение списка групп
-// Этот метод может возвращать все группы (например, публичные) или группы, где пользователь состоит.
-// TODO: Продумать фильтрацию, пагинацию, сортировку
-message ListGroupsRequest {
-  // ID пользователя, для которого запрашивается список групп (для фильтрации "Мои группы")
-  // Если 0 или не установлен, возможно, возвращает публичные группы.
-  optional uint64 requesting_user_id = 1;
-
-  // Можно добавить поля для фильтрации, например:
-  // string filter_by_name = 2; // Поиск по имени
-}
-
-// Ответ на получение списка групп
-message ListGroupsResponse {
-  repeated Group groups = 1;
 }
 
 // Запрос на обновление группы

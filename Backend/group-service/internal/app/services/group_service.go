@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -431,11 +432,11 @@ func (s *GroupService) ListGroupMembers(ctx context.Context, req *pb.ListGroupMe
 
 	// 4. Получение информации о пользователях-участниках из Auth-Service
 	// Собираем все user_id участников
-	userIds := make([]int64, 0, len(memberModels))
+	userIds := make([]uint64, 0, len(memberModels))
 	// Маппинг memberModel по user_id для быстрого доступа
 	membersMap := make(map[uint]*models.GroupMember)
 	for _, memberModel := range memberModels {
-		userIds = append(userIds, int64(memberModel.UserID))
+		userIds = append(userIds, uint64(memberModel.UserID))
 		membersMap[memberModel.UserID] = &memberModel
 	}
 
@@ -444,57 +445,41 @@ func (s *GroupService) ListGroupMembers(ctx context.Context, req *pb.ListGroupMe
 		return &pb.ListGroupMembersResponse{Members: []*pb.ListGroupMembersResponse_MemberDetails{}}, nil
 	}
 
-	// Вызываем Auth-Service для получения данных пользователей по их ID
-	// TODO: Убедитесь, что у вашего AuthClient есть метод GetUsersByIDs,
-	//       и что структура запроса/ответа соответствует ожиданиям.
-	//       Предполагаем: GetUsersByIDsRequest{UserIds: []int64}, GetUsersByIDsResponse{Users: []User}
-	//       где User { Id: int64, Username: string, Image: string }
-	getUsersReq := &clients.GetUsersByIDsRequest{UserIds: userIds} // Используем сгенерированный тип из пакета clients
+	getUsersReq := &clients.GetUsersByIDsRequest{UserIds: userIds}
 	getUsersResp, err := s.authClient.GetUsersByIDs(ctx, getUsersReq)
 	if err != nil {
-		// Обработка ошибок от Auth-Service
 		st, ok := status.FromError(err)
 		if ok {
-			// Если Auth-Service вернул NotFound для какого-то ID,
-			// это может указывать на неконсистентность данных (участник есть, пользователя нет).
-			// Обрабатываем как внутреннюю ошибку.
 			if st.Code() == codes.NotFound {
 				log.Printf("ListGroupMembers: User ID from group member not found in Auth-Service: %v", st.Message())
 				return nil, status.Errorf(codes.Internal, "Failed to retrieve some user details")
 			}
-			// Другие ошибки Auth-Service - внутренние
 			log.Printf("ListGroupMembers: Error from Auth-Service GetUsersByIDs: %v", st.Message())
 			return nil, status.Errorf(codes.Internal, "Failed to retrieve user details")
 		}
-		// Не-gRPC ошибка при вызове Auth-Service
 		log.Printf("ListGroupMembers: Non-gRPC error calling Auth-Service GetUsersByIDs: %v", err)
 		return nil, status.Errorf(codes.Internal, "Failed to communicate with authentication service")
 	}
 
-	// Создаем маппинг user details по user_id для быстрого сопоставления
-	userDetailsMap := make(map[int64]*clients.User) // Используем сгенерированный тип clients.User
+	userDetailsMap := make(map[uint64]*clients.User)
 	if getUsersResp != nil {
 		for _, user := range getUsersResp.GetUsers() {
 			userDetailsMap[user.GetId()] = user
 		}
 	}
 
-	// 5. Формирование списка MemberDetails для ответа
 	responseMembers := make([]*pb.ListGroupMembersResponse_MemberDetails, 0, len(memberModels))
 	for _, memberModel := range memberModels {
 		userId := memberModel.UserID
-		userDetails, found := userDetailsMap[int64(userId)]
+		userDetails, found := userDetailsMap[uint64(userId)]
 
-		// Даже если пользователь не найден в userDetailsMap (редкий случай неконсистентности),
-		// включаем участника, но без данных пользователя. Логируем предупреждение.
-		username := "Unknown User"
+		username := "unknown"
 		userImage := ""
 		if !found {
 			log.Printf("ListGroupMembers: User details not found in Auth-Service for member user ID %d in group %d", memberModel.UserID, groupID)
-			// Можно пропустить этого участника или включить с заглушкой. Включаем с заглушкой.
 		} else {
-			username = userDetails.GetUsername() // Предполагаем, что у clients.User есть GetUsername()
-			userImage = userDetails.GetImage()   // Предполагаем, что у clients.User есть GetImage()
+			username = userDetails.GetUsername()
+			userImage = userDetails.GetImage()
 		}
 
 		responseMembers = append(responseMembers, &pb.ListGroupMembersResponse_MemberDetails{
@@ -502,8 +487,8 @@ func (s *GroupService) ListGroupMembers(ctx context.Context, req *pb.ListGroupMe
 			Username:            username,
 			UserImage:           userImage,
 			IsAdmin:             memberModel.IsAdmin,
-			MemoriesAddedCount:  uint64(memberModel.MemoriesAddedCount),  // Кастинг uint -> uint64
-			MemoriesViewedCount: uint64(memberModel.MemoriesViewedCount), // Кастинг uint -> uint64
+			MemoriesAddedCount:  uint64(memberModel.MemoriesAddedCount),
+			MemoriesViewedCount: uint64(memberModel.MemoriesViewedCount),
 			JoinedAt:            timestamppb.New(memberModel.CreatedAt),
 		})
 	}
@@ -755,7 +740,10 @@ func (s *GroupService) CreateGroupInvitation(ctx context.Context, req *pb.Create
 		return nil, status.Errorf(codes.Unauthenticated, "User ID is required")
 	}
 
-	// TODO: Валидация duration
+	if req.Duration != nil && req.GetDuration().AsDuration() < 0 {
+		log.Printf("CreateGroupInvitation: Invalid argument: Duration cannot be negative for group %d", groupID)
+		return nil, status.Errorf(codes.InvalidArgument, "Duration cannot be negative")
+	}
 
 	// 2. Проверка прав доступа: запрашивающий пользователь должен быть участником группы
 	_, err := s.groupRepo.GroupMember().GetMemberByGroupAndUser(ctx, nil, uint(groupID), uint(requestingUserID))
@@ -809,16 +797,31 @@ func (s *GroupService) CreateGroupInvitation(ctx context.Context, req *pb.Create
 		}
 	}()
 
-	// TODO: Реализовать логику генерации УНИКАЛЬНОГО кода приглашения.
-	//       Это может потребовать нескольких попыток в случае коллизии,
-	//       проверяя уникальность через репозиторий в цикле.
-	//       Например, генерировать UUID или случайную строку достаточной длины.
-	invitationCode := "TODO_GENERATE_UNIQUE_CODE" // Заглушка
+	const maxAttempts = 5
+	var invitationCode string
+	var isUnique bool
 
-	// TODO: Проверить уникальность сгенерированного кода через repo.GroupInvitation().CheckInvitationExistsByCode(ctx, tx, code)
-	//       Если код уже существует (даже неактивный, чтобы избежать переиспользования старых кодов),
-	//       генерировать новый код и повторять, пока не будет сгенерирован уникальный.
-	//       Нужно добавить соответствующий метод CheckInvitationExistsByCode в репозиторий.
+	for i := 0; i < maxAttempts; i++ {
+		invitationCode = uuid.New().String()
+
+		isUnique, err = s.groupRepo.GroupInvitation().CheckInvitationExistsByCode(ctx, tx, invitationCode)
+		if err != nil {
+			log.Printf("CreateGroupInvitation: Failed to check invitation code uniqueness: %v", err)
+			err = status.Errorf(codes.Internal, "Failed to generate unique invitation code")
+			return nil, err
+		}
+		if !isUnique {
+			break
+		}
+		log.Printf("CreateGroupInvitation: Generated invitation code %s is not unique, retrying...", invitationCode)
+		time.Sleep(50 * time.Millisecond)
+	}
+
+	if isUnique {
+		log.Printf("CreateGroupInvitation: Failed to generate unique invitation code after %d attempts", maxAttempts)
+		err = status.Errorf(codes.Internal, "Failed to generate unique invitation code")
+		return nil, err
+	}
 
 	invitationModel := &models.GroupInvitation{
 		GroupID:         uint(groupID),
@@ -827,18 +830,13 @@ func (s *GroupService) CreateGroupInvitation(ctx context.Context, req *pb.Create
 		ExpiresAt:       expiresAt,
 	}
 
-	// Создаем запись приглашения в базе данных (используем транзакционный tx)
 	err = s.groupRepo.GroupInvitation().CreateInvitation(ctx, tx, invitationModel)
 	if err != nil {
-		// Обработка специфичных ошибок БД, например, нарушение уникального ограничения на InvitationCode
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
-			// Этого не должно произойти при правильной логике генерации уникального кода,
-			// но на всякий случай обрабатываем как внутреннюю ошибку.
-			log.Printf("CreateGroupInvitation: Duplicate key error creating invitation: %v", err)
-			err = status.Errorf(codes.Internal, "Failed to create invitation code")
+			log.Printf("CreateGroupInvitation: Duplicate key error creating invitation (should not happen): %v", err)
+			err = status.Errorf(codes.Internal, "Failed to create invitation code (unique constraint violated)")
 			return nil, err
 		}
-		// Другие ошибки БД - внутренние
 		log.Printf("CreateGroupInvitation: Failed to create invitation in DB: %v", err)
 		err = status.Errorf(codes.Internal, "Failed to create group invitation")
 		return nil, err
@@ -852,6 +850,7 @@ func (s *GroupService) CreateGroupInvitation(ctx context.Context, req *pb.Create
 	}
 
 	// 5. Формирование успешного ответа
+	// Преобразуем модель БД в protobuf сообщение
 	responseInvitation := &pb.GroupInvitation{
 		Id:              uint64(invitationModel.ID),
 		GroupId:         uint64(invitationModel.GroupID),
@@ -860,6 +859,8 @@ func (s *GroupService) CreateGroupInvitation(ctx context.Context, req *pb.Create
 		CreatedAt:       timestamppb.New(invitationModel.CreatedAt),
 		ExpiresAt:       timestamppb.New(invitationModel.ExpiresAt),
 	}
+
+	log.Printf("CreateGroupInvitation: Successfully created invitation %s for group %d by user %d", invitationCode, groupID, requestingUserID)
 
 	return &pb.CreateGroupInvitationResponse{Invitation: responseInvitation}, nil
 }
@@ -1004,7 +1005,7 @@ func (s *GroupService) AcceptGroupInvitation(ctx context.Context, req *pb.Accept
 // ListUserGroups реализует RPC метод получения списка групп пользователя
 func (s *GroupService) ListUserGroups(ctx context.Context, req *pb.ListUserGroupsRequest) (*pb.ListUserGroupsResponse, error) {
 	// 1. Валидация входных данных
-	userID := req.GetUserId() // ID пользователя, чьи группы запрашиваем
+	userID := req.GetUserId()
 	if userID <= 0 {
 		log.Printf("ListUserGroups: Invalid argument: user_id is missing or invalid: %d", userID)
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid user ID")

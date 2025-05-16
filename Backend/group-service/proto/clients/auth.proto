@@ -19,7 +19,7 @@ service AuthService {
 }
 
 message User {
-  int64 id = 1;
+  uint64 id = 1;
   string username = 2;
   string email = 3;
   string image = 4;
@@ -107,7 +107,7 @@ message DeleteUserResponse {
 
 // Запрос для получения информации о пользователях по списку их ID
 message GetUsersByIDsRequest {
-  repeated int64 user_ids = 1; // Список ID пользователей, информацию о которых нужно получить
+  repeated uint64 user_ids = 1; // Список ID пользователей, информацию о которых нужно получить
 }
 
 // Ответ с информацией о пользователях

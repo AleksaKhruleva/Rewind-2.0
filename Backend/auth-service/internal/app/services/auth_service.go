@@ -524,3 +524,43 @@ func (s *AuthService) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest)
 	// Успешное удаление
 	return &pb.DeleteUserResponse{Success: true}, nil
 }
+
+// GetUsersByIDs реализует RPC метод для получения списка пользователей по их ID.
+func (s *AuthService) GetUsersByIDs(ctx context.Context, req *pb.GetUsersByIDsRequest) (*pb.GetUsersByIDsResponse, error) {
+	userIDs64 := req.GetUserIds()
+	if len(userIDs64) == 0 {
+		return &pb.GetUsersByIDsResponse{Users: []*pb.User{}}, nil
+	}
+
+	userIDs := make([]uint, len(userIDs64))
+	for i, id := range userIDs64 {
+		if id > uint64(^uint(0)) {
+			log.Printf("GetUsersByIDs: User ID %d exceeds maximum uint value", id)
+			return nil, status.Errorf(codes.InvalidArgument, "User ID %d is too large", id)
+		}
+		userIDs[i] = uint(id)
+	}
+
+	users, err := s.userRepo.ListUsersByIDs(nil, userIDs)
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("GetUsersByIDs: Couldn't find users: %v", err)
+			return nil, status.Errorf(codes.NotFound, "Couldn't find users")
+		}
+		log.Printf("GetUsersByIDs: Failed to list users by IDs from DB: %v", err)
+		return nil, status.Errorf(codes.Internal, "Failed to retrieve user data")
+	}
+
+	pbUsers := make([]*pb.User, 0, len(users))
+	for _, user := range users {
+		pbUsers = append(pbUsers, &pb.User{
+			Id:       uint64(user.ID),
+			Username: user.Username,
+			Email:    user.Email,
+			Image:    user.Image,
+		})
+	}
+
+	return &pb.GetUsersByIDsResponse{Users: pbUsers}, nil
+}
