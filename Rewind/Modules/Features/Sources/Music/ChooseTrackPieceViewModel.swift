@@ -8,46 +8,68 @@ final class ChooseTrackPieceViewModel {
     enum Intent {
         case playTrack(startTime: Double = 0)
         case stopPlaying
+        case destroyPlayer
     }
     
-    var selectedTrack: Track
-    var startedPlaying = false
+    private(set) var selectedTrack: Track
+    private(set) var isTrackPlaying: Bool = false
     
+    private var currentlyLoadedURL: URL?
     private let backend: SoundCloudServiceProtocol
     private let playerManager: AudioPlayerManager
     
-    init(selectedTrack: Track) {
+    init(selectedTrack: Track,) {
+        self.selectedTrack = selectedTrack
+        
         backend = SoundCloudNetworkService()
         playerManager = AudioPlayerManager.shared
-        self.selectedTrack = selectedTrack
     }
     
-    func dispatch(_ intent: Intent) async {
+    func dispatch(_ intent: Intent) {
         switch intent {
         case let .playTrack(startTime):
-            do {
-                let streamURL: URL
+            isTrackPlaying = false
+            
+            Task { [weak self] in
+                guard let self else { return }
                 
-                if let existingURL = selectedTrack.streamURL {
-                    streamURL = existingURL
-                } else {
-                    guard let fetchedURL = try await backend.fetchStreamURL(for: selectedTrack) else {
-                        return
+                do {
+                    let streamURL: URL
+                    
+                    if let existingURL = selectedTrack.streamURL {
+                        streamURL = existingURL
+                    } else {
+                        guard let fetchedURL = try await backend.fetchStreamURL(for: selectedTrack) else {
+                            return
+                        }
+                        selectedTrack.streamURL = fetchedURL
+                        streamURL = fetchedURL
                     }
-                    selectedTrack.streamURL = fetchedURL
-                    streamURL = fetchedURL
+                    
+                    if currentlyLoadedURL != streamURL {
+                        playerManager.stop()
+                        playerManager.load(url: streamURL)
+                        currentlyLoadedURL = streamURL
+                    }
+                    
+                    playerManager.play(from: startTime) { [weak self] success in
+                        self?.isTrackPlaying = success
+                    }
+                    
+                } catch {
+                    // TODO: show error
                 }
-                
-                playerManager.load(url: streamURL)
-                playerManager.play(from: startTime)
-                startedPlaying = true
-            } catch {
-                // TODO: show error
             }
             
         case .stopPlaying:
-            startedPlaying = false
+            isTrackPlaying = false
             playerManager.stop()
+            currentlyLoadedURL = nil
+            
+        case .destroyPlayer:
+            isTrackPlaying = false
+            playerManager.cleanup()
+            currentlyLoadedURL = nil
         }
     }
 }

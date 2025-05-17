@@ -40,7 +40,7 @@ public struct ImageUploadingView: View {
                         
                         if let selectedTrack = viewModel.selectedTrack {
                             ChooseTrackPieceView(
-                                isSelectedTrackPlaying: $viewModel.isSelectedTrackPlaying,
+                                shouldPlay: $viewModel.isSelectedTrackPlaying,
                                 selectedTrack: selectedTrack
                             )
                             .id(selectedTrack.id)
