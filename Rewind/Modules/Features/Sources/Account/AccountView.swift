@@ -187,7 +187,9 @@ public struct AccountView: View {
                 }),
                 ("gift.fill", UIComponentsStrings.Account.General.widget, {}),
                 ("questionmark.circle.fill", UIComponentsStrings.Account.General.help, {}),
-                ("link.circle.fill", UIComponentsStrings.Account.General.share, {})
+                ("globe", UIComponentsStrings.Account.General.git, {
+                    UIApplication.shared.open(URL(string: "https://github.com/AleksaKhruleva/Rewind-2.0")!)
+                })
             ],
             isRisky: false
         )
