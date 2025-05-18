@@ -87,6 +87,8 @@ proto-api-gateway:
 	cd ./api-gateway-service && mkdir -p pkg
 	cp ./auth-service/proto/auth.proto ./api-gateway-service/proto
 	cd ./api-gateway-service && protoc --go_out=./pkg --go-grpc_out=./pkg --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative proto/auth.proto
+	cp ./group-service/proto/group.proto ./api-gateway-service/proto
+	cd ./api-gateway-service && protoc --go_out=./pkg --go-grpc_out=./pkg --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative proto/group.proto
 
 .PHONY: proto
 proto:

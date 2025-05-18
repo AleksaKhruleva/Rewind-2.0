@@ -146,19 +146,6 @@ message RemoveGroupMemberResponse {
   bool success = 1;
 }
 
-// Запрос на назначение/снятие администратора группы
-message SetGroupAdminRequest {
-  uint64 requesting_user_id = 1; // ID пользователя, выполняющего операцию (только текущий админ группы)
-  uint64 group_id = 2;
-  uint64 user_id_to_modify = 3; // ID пользователя, статус админа которого меняют
-  bool is_admin = 4; // true для назначения, false для снятия
-}
-
-// Ответ на назначение/снятие администратора
-message SetGroupAdminResponse {
-  bool success = 1;
-}
-
 // Запрос на создание приглашения в группу
 message CreateGroupInvitationRequest {
   uint64 requesting_user_id = 1; // ID пользователя, создающего приглашение (только админ)
