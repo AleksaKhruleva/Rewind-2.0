@@ -37,6 +37,7 @@ struct FindTrackView: View {
         Spacer()
         ProgressView("Loading top tracks")
             .modifier(RoundFontModifier(size: 15))
+            .frame(width: UIScreen.main.bounds.width)
         Spacer()
     }
     

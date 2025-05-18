@@ -1,4 +1,5 @@
 import SwiftUI
+import Base
 import Combine
 import AVFoundation
 import Networking
@@ -91,6 +92,17 @@ final class FindTrackViewModel: ObservableObject {
     }
     
     private func loadDefaultTracks() {
+        if let (cachedTracks, cachedNextHref) = DefaultTracksCache.shared.retrieve(), cachedTracks.count > 0 {
+            defaultTracks = cachedTracks
+            defaultNextHref = cachedNextHref
+            isShowingDefaultTracks = true
+            
+            tracks = defaultTracks
+            nextHref = defaultNextHref
+            hasReachedEnd = (defaultNextHref == nil)
+            return
+        }
+        
         Task {
             do {
                 let response = try await backend.fetchCharts(limit: 30)
@@ -98,16 +110,12 @@ final class FindTrackViewModel: ObservableObject {
                 defaultNextHref = response.next_href
                 isShowingDefaultTracks = true
                 
+                DefaultTracksCache.shared.store(tracks: defaultTracks, nextHref: defaultNextHref)
+                
                 tracks = defaultTracks
                 nextHref = defaultNextHref
                 hasReachedEnd = (defaultNextHref == nil)
             } catch {
-                if let urlError = error as? URLError, urlError.code == .timedOut {
-                    print("Сервер не ответил вовремя. Попробуйте ещё раз.")
-                } else {
-                    print("Произошла ошибка при загрузке треков.")
-                }
-                
                 print("Ошибка загрузки чартов: \(error)")
             }
         }
@@ -134,17 +142,19 @@ final class FindTrackViewModel: ObservableObject {
                 
                 if isShowingDefaultTracks {
                     defaultTracks.append(contentsOf: response.collection)
+                    defaultNextHref = response.next_href
                     tracks = defaultTracks
+                    
+                    DefaultTracksCache.shared.store(
+                        tracks: defaultTracks,
+                        nextHref: defaultNextHref
+                    )
                 } else {
                     tracks.append(contentsOf: response.collection)
                 }
                 
                 self.nextHref = response.next_href
                 self.hasReachedEnd = (response.next_href == nil)
-                
-                if isShowingDefaultTracks {
-                    self.defaultNextHref = response.next_href
-                }
             } catch {
                 print(error)
                 // TODO: handle error
