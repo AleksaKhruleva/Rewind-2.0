@@ -36,15 +36,6 @@ public struct ImageUploadingView: View {
                     
                     Group {
                         musicSection
-                            .padding(.horizontal, 8)
-                        
-                        if let selectedTrack = viewModel.selectedTrack {
-                            ChooseTrackPieceView(
-                                shouldPlay: $viewModel.isSelectedTrackPlaying,
-                                selectedTrack: selectedTrack
-                            )
-                            .id(selectedTrack.id)
-                        }
                         
                         TagsSectionView(tags: viewModel.loadedMediaTagsBinding)
                             .padding(.horizontal, 8)
@@ -109,37 +100,21 @@ public struct ImageUploadingView: View {
         }
     }
     
+    @ViewBuilder
     private var musicSection: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            Text(UIComponentsStrings.Music.sectionTitle)
-                .modifier(RoundFontModifier(size: 17, foregroundColor: .textSecondary))
-                .padding(.leading, 15)
-            
-            Group {
-                if let track = viewModel.selectedTrack {
-                    TrackRow(
-                        track: track,
-                        showPlayButton: false,
-                        isPlaying: false,
-                        isLoading: false,
-                        onPlayTap: {},
-                        onRowTap: { _ in
-                            viewModel.dispatch(.findTrack)
-                        }
-                    )
-                } else {
-                    MembersTableButton(
-                        systemImageName: "music.note.list",
-                        title: UIComponentsStrings.Music.addMusic,
-                        imageSize: 20
-                    ) {
-                        viewModel.dispatch(.findTrack)
-                    }
-                }
+        MusicSectionView(
+            selectedTrack: $viewModel.selectedTrack) {
+                viewModel.dispatch(.findTrack)
             }
-            .padding(.vertical, 5)
-            .background(Color.backgroundSecondary)
-            .cornerRadius(16)
+            .padding(.horizontal, 8)
+        
+        if let selectedTrack = viewModel.selectedTrack {
+            ChooseTrackPieceView(
+                shouldPlay: $viewModel.isSelectedTrackPlaying,
+                isDurationPickerAvailable: true,
+                selectedTrack: selectedTrack
+            )
+            .id(selectedTrack.id)
         }
     }
     

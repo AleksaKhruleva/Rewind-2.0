@@ -3,17 +3,17 @@ import SwiftUI
 private let selectorWidth: CGFloat = 130
 
 public struct WaveformView: View {
-    private let trackDuration: Double
-    private let selectorDuration: Double
+    @Binding var selectorDuration: CGFloat
+    private let trackDuration: CGFloat
     private let sidePaddingWidth: CGFloat
     
     public init(
-        trackDuration: Double,
-        selectorDuration: Double,
+        selectorDuration: Binding<CGFloat>,
+        trackDuration: CGFloat,
         sidePaddingWidth: CGFloat
     ) {
+        self._selectorDuration = selectorDuration
         self.trackDuration = trackDuration
-        self.selectorDuration = selectorDuration
         self.sidePaddingWidth = sidePaddingWidth
     }
     
@@ -35,7 +35,7 @@ public struct WaveformView: View {
     }
     
     private var totalWidth: CGFloat {
-        selectorWidth * CGFloat(trackDuration / selectorDuration)
+        selectorWidth * (trackDuration / selectorDuration)
     }
     
     private var barCount: Int {
@@ -46,8 +46,8 @@ public struct WaveformView: View {
 #Preview {
     ScrollView(.horizontal, showsIndicators: false) {
         WaveformView(
+            selectorDuration: .constant(15),
             trackDuration: 30,
-            selectorDuration: 15,
             sidePaddingWidth: 6
         )
     }

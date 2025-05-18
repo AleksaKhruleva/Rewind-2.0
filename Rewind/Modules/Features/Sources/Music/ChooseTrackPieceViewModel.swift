@@ -29,6 +29,7 @@ final class ChooseTrackPieceViewModel {
         switch intent {
         case let .playTrack(startTime):
             isTrackPlaying = false
+            playerManager.stop()
             
             Task { [weak self] in
                 guard let self else { return }
