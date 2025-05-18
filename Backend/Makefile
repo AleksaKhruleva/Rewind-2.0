@@ -76,8 +76,8 @@ proto-auth:
 # Генерация протофайлов для group-service из Backend
 .PHONY: proto-group
 proto-group:
-	cd ./group-service && protoc --go_out=./pkg --go-grpc_out=./pkg --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative proto/group.proto
 	cd ./group-service && mkdir -p pkg
+	cd ./group-service && protoc --go_out=./pkg --go-grpc_out=./pkg --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative proto/group.proto
 	cp ./auth-service/proto/auth.proto ./group-service/proto/clients
 	cd ./group-service && protoc --go_out=./pkg --go-grpc_out=./pkg --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative proto/clients/auth.proto
 

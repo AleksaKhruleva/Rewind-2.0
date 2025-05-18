@@ -564,3 +564,46 @@ func (s *AuthService) GetUsersByIDs(ctx context.Context, req *pb.GetUsersByIDsRe
 
 	return &pb.GetUsersByIDsResponse{Users: pbUsers}, nil
 }
+
+// GetUserByID реализует RPC метод для получения пользователя по его ID.
+func (s *AuthService) GetUserByID(ctx context.Context, req *pb.GetUserByIDRequest) (*pb.GetUserByIDResponse, error) {
+	// 1. Валидация входных данных
+	userID64 := req.GetUserId()
+	if userID64 == 0 {
+		log.Printf("GetUserByID: Invalid argument: user_id is missing or invalid: %d", userID64)
+		return nil, status.Errorf(codes.InvalidArgument, "User ID is required and must be greater than 0")
+	}
+
+	if userID64 > uint64(^uint(0)) {
+		log.Printf("GetUserByID: User ID %d exceeds maximum uint value", userID64)
+		return nil, status.Errorf(codes.InvalidArgument, "User ID %d is too large", userID64)
+	}
+	userID := uint(userID64)
+
+	// 2. Получение пользователя из репозитория
+	user, err := s.userRepo.GetUserByID(nil, userID)
+
+	// 3. Обработка ошибок репозитория
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// Если запись не найдена, возвращаем статус NotFound
+			log.Printf("GetUserByID: User with ID %d not found: %v", userID, err)
+			return nil, status.Errorf(codes.NotFound, "User with ID %d not found", userID)
+		}
+		// Для всех остальных ошибок репозитория возвращаем статус Internal
+		log.Printf("GetUserByID: Failed to get user by ID %d from DB: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to retrieve user data")
+	}
+
+	// 4. Формирование успешного ответа
+	// Маппинг модели GORM models.User на protobuf сообщение pb.User
+	pbUser := &pb.User{
+		Id:       uint64(user.ID),
+		Username: user.Username,
+		Email:    user.Email,
+		Image:    user.Image,
+	}
+
+	// Формирование и возврат ответа
+	return &pb.GetUserByIDResponse{User: pbUser}, nil
+}

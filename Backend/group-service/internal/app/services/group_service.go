@@ -1,21 +1,23 @@
 package services
 
 import (
-	"Rewind-group-service/clients/auth"
-	"Rewind-group-service/internal/app/models"
-	"Rewind-group-service/internal/app/repositories"
-	pb "Rewind-group-service/pkg/proto"
-	clients "Rewind-group-service/pkg/proto/clients"
 	"context"
 	"errors"
+	"log"
+	"time"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
-	"log"
-	"time"
+
+	"Rewind-group-service/clients/auth"
+	"Rewind-group-service/internal/app/models"
+	"Rewind-group-service/internal/app/repositories"
+	pb "Rewind-group-service/pkg/proto"
+	clients "Rewind-group-service/pkg/proto/clients"
 )
 
 // GroupService implements the group.GroupServiceServer interface
@@ -24,7 +26,7 @@ type GroupService struct {
 	groupRepo  repositories.Repository
 	validator  *validator.Validate
 	authClient *auth.AuthServiceClient
-	//MemoryClient                       memory.MemoryServiceClient // TODO: Зависимость от клиента Memory Service
+	// memoryClient       memory.MemoryServiceClient // TODO: Зависимость от клиента Memory Service
 }
 
 // NewGroupService создает новый экземпляр GroupService

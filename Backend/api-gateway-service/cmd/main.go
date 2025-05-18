@@ -14,7 +14,11 @@ import (
 // @title Rewind API Gateway
 // @version 1.0
 // @description This is the API Gateway for the Rewind application.
-// @host rewindapp.ru
+// @host localhost:8080
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+// @description Enter your access token in the format "Bearer <token>"
 func main() {
 	// Загружаем .env (если используете)
 	if err := godotenv.Load(); err != nil {

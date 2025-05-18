@@ -47,3 +47,11 @@ type LogoutResponse struct {
 type DeleteUserResponse struct {
 	Success bool `json:"success"`
 }
+
+// GetUserByIDResponse represents the HTTP response body for getting user details by ID.
+type GetUserByIDResponse struct {
+	ID       uint64 `json:"id"`       // User ID
+	Username string `json:"username"` // Username
+	Email    string `json:"email"`    // Email address
+	Image    string `json:"image"`    // User image URL
+}

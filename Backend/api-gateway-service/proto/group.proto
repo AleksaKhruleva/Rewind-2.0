@@ -1,0 +1,190 @@
+syntax = "proto3";
+
+package group;
+
+option go_package = "Rewind-2.0/Backend/group-service/proto";
+
+import "google/protobuf/timestamp.proto"; // Для работы со временем
+import "google/protobuf/duration.proto"; // Для Optional duration (если используется)
+
+// Определение сервиса GroupService
+service GroupService {
+  rpc CreateGroup (CreateGroupRequest) returns (CreateGroupResponse);
+  rpc GetGroup (GetGroupRequest) returns (GetGroupResponse);
+  rpc UpdateGroup (UpdateGroupRequest) returns (UpdateGroupResponse);
+  rpc DeleteGroup (DeleteGroupRequest) returns (DeleteGroupResponse);
+
+  rpc ListGroupMembers (ListGroupMembersRequest) returns (ListGroupMembersResponse);
+  rpc RemoveGroupMember (RemoveGroupMemberRequest) returns (RemoveGroupMemberResponse);
+
+  rpc CreateGroupInvitation (CreateGroupInvitationRequest) returns (CreateGroupInvitationResponse);
+  rpc AcceptGroupInvitation (AcceptGroupInvitationRequest) returns (AcceptGroupInvitationResponse);
+
+  rpc ListUserGroups (ListUserGroupsRequest) returns (ListUserGroupsResponse);
+}
+
+// GroupMessage представляет структуру группы
+message Group {
+  uint64 id = 1;
+  string name = 2;
+  string image = 3; // URL изображения аватара
+  uint64 admin_user_id = 4; // ID пользователя-администратора (из Auth-Service)
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+  // deleted_at не включаем в основное сообщение для клиента,
+  // т.к. удаленные группы обычно не запрашиваются клиентом.
+}
+
+// GroupMemberMessage представляет структуру участника группы
+message GroupMember {
+  uint64 id = 1;
+  uint64 group_id = 2;
+  uint64 user_id = 3; // ID пользователя (из Auth-Service)
+  bool is_admin = 4;
+  uint64 memories_added_count = 5; // Счетчики активности участника в группе
+  uint64 memories_viewed_count = 6; // Счетчики активности участника в группе
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+  // deleted_at не включаем
+}
+
+// GroupInvitationMessage представляет структуру приглашения в группу
+message GroupInvitation {
+  uint64 id = 1;
+  uint64 group_id = 2;
+  string invitation_code = 3;
+  uint64 created_by_user_id = 4; // ID пользователя, создавшего приглашение
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp expires_at = 6;
+}
+
+// --- Методы и их сообщения запросов/ответов ---
+
+// Запрос на создание группы
+message CreateGroupRequest {
+  // ID пользователя, который создает группу (будет администратором) - приходит от API Gateway
+  uint64 requesting_user_id = 1;
+  string name = 2;
+  string image = 3; // URL изображения аватара (необязательно)
+}
+
+// Ответ на создание группы
+message CreateGroupResponse {
+  Group group = 1;
+}
+
+// Запрос на получение группы по ID
+message GetGroupRequest {
+  // ID пользователя, запрашивающего информацию (для проверки прав доступа)
+  uint64 requesting_user_id = 1;
+  uint64 group_id = 2;
+}
+
+// Ответ на получение группы
+message GetGroupResponse {
+  Group group = 1;
+  bool is_admin = 2;
+}
+
+// Запрос на обновление группы
+message UpdateGroupRequest {
+  uint64 requesting_user_id = 1; // ID пользователя, обновляющего группу (для проверки прав - только админ)
+  uint64 group_id = 2;
+  // Используем обертку для необязательных полей, чтобы различать отсутствие значения и пустое значение
+  optional string name = 3;
+  optional string image = 4;
+}
+
+// Ответ на обновление группы
+message UpdateGroupResponse {
+  Group group = 1;
+}
+
+// Запрос на удаление группы
+message DeleteGroupRequest {
+  uint64 requesting_user_id = 1; // ID пользователя, удаляющего группу (только админ)
+  uint64 group_id = 2;
+}
+
+// Ответ на удаление группы
+message DeleteGroupResponse {
+  bool success = 1;
+}
+
+// Запрос на получение списка участников группы
+message ListGroupMembersRequest {
+  uint64 requesting_user_id = 1; // ID пользователя, запрашивающего список (для проверки прав - только участник)
+  uint64 group_id = 2;
+}
+
+// Ответ на получение списка участников группы
+message ListGroupMembersResponse {
+  // Тут нужно возвращать не только GroupMember, но и информацию о пользователе (username, image и т.д.)
+  // Так как информация о пользователе в Auth-Service, group-service придется запрашивать ее у Auth-Service.
+  // Для gRPC сообщения можно создать отдельную структуру, объединяющую GroupMember и User info.
+  message MemberDetails {
+    uint64 user_id = 1;
+    string username = 2; // Из Auth-Service
+    string user_image = 3; // Из Auth-Service
+    bool is_admin = 4; // Из GroupMember
+    uint64 memories_added_count = 5; // Из GroupMember
+    uint64 memories_viewed_count = 6; // Из GroupMember
+    google.protobuf.Timestamp joined_at = 7; // group_members.created_at
+  }
+  repeated MemberDetails members = 1;
+}
+
+// Запрос на удаление участника из группы (админом или сам участник)
+message RemoveGroupMemberRequest {
+  uint64 requesting_user_id = 1; // ID пользователя, выполняющего удаление (админ или сам удаляемый)
+  uint64 group_id = 2;
+  uint64 user_id_to_remove = 3; // ID пользователя, которого удаляют
+}
+
+// Ответ на удаление участника
+message RemoveGroupMemberResponse {
+  bool success = 1;
+}
+
+// Запрос на создание приглашения в группу
+message CreateGroupInvitationRequest {
+  uint64 requesting_user_id = 1; // ID пользователя, создающего приглашение (только админ)
+  uint64 group_id = 2;
+  // Можно добавить срок действия для приглашения
+  optional google.protobuf.Duration duration = 3;
+}
+
+// Ответ на создание приглашения
+message CreateGroupInvitationResponse {
+  GroupInvitation invitation = 1;
+}
+
+// Запрос на принятие приглашения
+message AcceptGroupInvitationRequest {
+  uint64 requesting_user_id = 1; // ID пользователя, принимающего приглашение
+  string invitation_code = 2;
+}
+
+// Ответ на принятие приглашения
+message AcceptGroupInvitationResponse {
+  GroupMember group_member = 1; // Информация о только что созданном участии
+  Group group = 2; // Возможно, вернуть информацию о группе, к которой присоединился
+}
+
+// Запрос на получение списка групп пользователя
+// Этот метод специально для списка "Мои группы" пользователя.
+message ListUserGroupsRequest {
+  uint64 user_id = 1; // ID пользователя, чьи группы запрашиваем
+  // TODO: Добавить фильтрацию/пагинацию при необходимости
+}
+
+// Ответ на получение списка групп пользователя
+message ListUserGroupsResponse {
+  repeated Group groups = 1;
+  // Возможно, добавить информацию о роли пользователя в каждой группе в этом списке
+  // message UserGroupDetails {
+  //    Group group = 1;
+  //    bool is_admin = 2;
+  // }
+  // repeated UserGroupDetails user_groups = 1;
+}

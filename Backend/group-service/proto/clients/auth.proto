@@ -16,6 +16,7 @@ service AuthService {
   // TODO delete in future
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {}
   rpc GetUsersByIDs(GetUsersByIDsRequest) returns (GetUsersByIDsResponse) {}
+  rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {}
 }
 
 message User {
@@ -113,4 +114,14 @@ message GetUsersByIDsRequest {
 // Ответ с информацией о пользователях
 message GetUsersByIDsResponse {
   repeated User users = 1; // Список сообщений User
+}
+
+// Запрос для получения информации о пользователе по ID
+message GetUserByIDRequest {
+  uint64 user_id = 1; // ID пользователя, информацию о котором нужно получить
+}
+
+// Ответ с информацией о пользователе
+message GetUserByIDResponse {
+  User user = 1;
 }
