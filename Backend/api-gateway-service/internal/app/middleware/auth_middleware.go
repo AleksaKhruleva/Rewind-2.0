@@ -33,8 +33,7 @@ var ExcludedPaths = []string{
 	"/api/auth/refresh",
 	"/api/auth/forgot-password",
 	"/api/auth/reset-password",
-	// Add any other public paths here
-	"/swagger/*", // Swagger UI paths usually don't require auth
+	"/swagger/",
 }
 
 // AuthMiddleware is a chi middleware that validates the JWT token from the Authorization header.

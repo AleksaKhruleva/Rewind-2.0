@@ -79,7 +79,7 @@ func NewServer(dependencies *di.Dependencies) *Server {
 		r.Post("/api/groups/{id}/invitations", dependencies.GroupHandler.CreateGroupInvitation)           // Assuming POST method
 		r.Post("/api/invitations/{code}/accept", dependencies.GroupHandler.AcceptGroupInvitation)         // Assuming POST method
 		// Note: ListUserGroups path might be better under /api/users/{user_id}/groups
-		r.Get("/api/users/{user_id}/groups", dependencies.GroupHandler.ListUserGroups) // Assuming GET method
+		r.Get("/api/users/groups", dependencies.GroupHandler.ListUserGroups) // Assuming GET method
 	})
 
 	// TODO: Add routes for other services (Memory, Media, Stats, Notification)

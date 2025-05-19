@@ -1139,15 +1139,6 @@ const docTemplate = `{
                     "groups"
                 ],
                 "summary": "List groups for a specific user",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "User ID",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "List of groups for the user",

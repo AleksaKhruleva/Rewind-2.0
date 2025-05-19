@@ -1,7 +1,5 @@
-version: "3.8"
-
 services:
-  # --- База данных ---
+  # --- База данных Auth---
   db:
     image: postgres:15-alpine
     container_name: rewind-db
@@ -20,6 +18,25 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
 
+    # --- База данных Group---
+  group-db:
+    image: postgres:15-alpine
+    container_name: rewind-group-db
+    environment:
+      POSTGRES_USER: rewind_user
+      POSTGRES_PASSWORD: rewind_password
+      POSTGRES_DB: rewind_db
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U rewind_user -d rewind_db" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - db_group_data:/var/lib/postgresql/data
+
   # --- Сервисы Go ---
 
   api-gateway-service:
@@ -28,8 +45,7 @@ services:
     environment:
       API_GATEWAY_PORT: "8080"
       AUTH_SERVICE_GRPC_ADDRESS: rewind-auth-service:50051
-      # Добавьте здесь адреса gRPC других сервисов по мере их появления
-      # GROUP_SERVICE_GRPC_ADDRESS: rewind-group-service:50052
+      GROUP_SERVICE_GRPC_ADDRESS: rewind-group-service:50052
       # MEMORY_SERVICE_GRPC_ADDRESS: rewind-memory-service:50053
       # NOTIFICATION_SERVICE_GRPC_ADDRESS: rewind-notification-service:50054
     ports:
@@ -49,9 +65,6 @@ services:
   auth-service:
     build: ./auth-service # Обновленный путь к Dockerfile
     container_name: rewind-auth-service
-    environment:
-      DATABASE_URL: postgres://rewind_user:rewind_password@db:5432/rewind_db?sslmode=disable
-      GRPC_PORT: ":50051"
     ports:
       - "50051:50051"
     depends_on:
@@ -62,18 +75,16 @@ services:
       redis:
         condition: service_started
 
-#  group-service:
-#    build: ./group-service # Обновленный путь к Dockerfile
-#    container_name: rewind-group-service
-#    environment:
-#      DATABASE_URL: postgres://rewind_user:rewind_password@db:5432/rewind_db?sslmode=disable
-#      GRPC_PORT: 50052
-#      AUTH_SERVICE_GRPC_ADDRESS: auth-service:50051
-#    ports:
-#      - "50052:50052"
-#    depends_on:
-#      - db
-#      - auth-service
+  group-service:
+    build: ./group-service # Обновленный путь к Dockerfile
+    container_name: rewind-group-service
+    ports:
+      - "50052:50052"
+    depends_on:
+      group-db:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
 #
 #  memory-service:
 #    build: ./memory-service # Обновленный путь к Dockerfile
@@ -209,6 +220,7 @@ services:
 
 volumes:
   db_data:
+  db_group_data:
   rabbitmq_data:
   redis_data:
   certbot-etc:

@@ -460,7 +460,6 @@ func (h *GroupHandler) AcceptGroupInvitation(w http.ResponseWriter, r *http.Requ
 // @Summary List groups for a specific user
 // @Tags groups
 // @Produce json
-// @Param user_id path int true "User ID"
 // @Success 200 {object} responses.ListUserGroupsResponse "List of groups for the user"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid user ID format"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"

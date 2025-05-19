@@ -11,13 +11,9 @@ import (
 
 	authClient "Rewind-api-gateway-service/clients/auth"
 	groupClient "Rewind-api-gateway-service/clients/group"
+	cm "Rewind-api-gateway-service/internal/app/middleware"
 	pb "Rewind-api-gateway-service/pkg/proto"
 )
-
-type ContextKey string
-
-// ContextKeyUserID is the key used to store the user ID in the context.
-const ContextKeyUserID ContextKey = "userID"
 
 // GroupServiceInterface определяет методы для взаимодействия с Group-Service
 // через сервисный слой API Gateway.
@@ -53,7 +49,7 @@ func NewGroupService(groupClient *groupClient.GroupServiceClient, authClient *au
 // getRequestingUserIDFromContext извлекает ID пользователя из контекста.
 // Возвращает ID пользователя и ошибку, если ID отсутствует или имеет неверный тип.
 func (s *GroupService) getRequestingUserIDFromContext(ctx context.Context) (uint64, error) {
-	userID, ok := ctx.Value(ContextKeyUserID).(uint64)
+	userID, ok := ctx.Value(cm.ContextKeyUserID).(uint64)
 	if !ok || userID == 0 {
 		return 0, status.Errorf(codes.Unauthenticated, "user ID not found in context")
 	}

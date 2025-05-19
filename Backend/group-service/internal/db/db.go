@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"Rewind-auth-service/internal/app/models"
+	"Rewind-group-service/internal/app/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -45,7 +45,7 @@ func InitDB() *gorm.DB {
 
 	log.Println("Connected to DB")
 
-	err = db.AutoMigrate(&models.User{}, &models.RefreshToken{})
+	err = db.AutoMigrate(&models.Group{}, &models.GroupMember{}, &models.GroupInvitation{})
 	if err != nil {
 		log.Fatal("Tables migration error: ", err)
 	}

@@ -1048,12 +1048,6 @@ paths:
       - users
   /api/users/groups:
     get:
-      parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        type: integer
       produces:
       - application/json
       responses:
