@@ -7,7 +7,6 @@ public struct FilterView: View {
     var onSave: (FilterSettings) -> Void
     
     @State private var date = Date()
-    @State private var invalidDatesShown = false
     
     @Environment(\.dismiss)
     private var dismiss
