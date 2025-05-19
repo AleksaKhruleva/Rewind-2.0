@@ -17,6 +17,11 @@ const docTemplate = `{
     "paths": {
         "/api/auth/delete-user": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Deletes a user account by email.",
                 "consumes": [
                     "application/json"
@@ -249,6 +254,11 @@ const docTemplate = `{
         },
         "/api/auth/logout": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Logs out a user by invalidating the refresh token.",
                 "consumes": [
                     "application/json"
@@ -539,6 +549,11 @@ const docTemplate = `{
         },
         "/api/groups": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -608,6 +623,11 @@ const docTemplate = `{
         },
         "/api/groups/{group_id}/members/{user_id}": {
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -676,6 +696,11 @@ const docTemplate = `{
         },
         "/api/groups/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -738,6 +763,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -812,6 +842,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -873,6 +908,11 @@ const docTemplate = `{
         },
         "/api/groups/{id}/invitations": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -949,6 +989,11 @@ const docTemplate = `{
         },
         "/api/groups/{id}/members": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1013,6 +1058,11 @@ const docTemplate = `{
         },
         "/api/invitations/{code}/accept": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1077,6 +1127,11 @@ const docTemplate = `{
         },
         "/api/users/groups": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1141,6 +1196,11 @@ const docTemplate = `{
         },
         "/api/users/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Retrieves details for a specific user by their ID.",
                 "produces": [
                     "application/json"

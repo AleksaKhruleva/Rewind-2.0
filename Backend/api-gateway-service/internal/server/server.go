@@ -15,9 +15,10 @@ import (
 
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 
-	_ "Rewind-api-gateway-service/docs" // Import generated swagger docs
+	_ "Rewind-api-gateway-service/docs"
 
-	"Rewind-api-gateway-service/internal/app/di" // Your Dependency Injection setup
+	"Rewind-api-gateway-service/internal/app/di"
+	cm "Rewind-api-gateway-service/internal/app/middleware"
 	// Import your authentication middleware package
 	// "Rewind-api-gateway-service/internal/pkg/middleware/auth"
 )
@@ -41,7 +42,7 @@ func NewServer(dependencies *di.Dependencies) *Server {
 
 	// TODO: Add your custom authentication middleware here.
 	// This middleware should extract the token, validate it, and add the user ID to the request context.
-	// mux.Use(auth.Authenticate) // Assuming your auth middleware is in internal/pkg/middleware/auth
+	mux.Use(cm.AuthMiddleware)
 
 	// --- Define Routes ---
 

@@ -87,6 +87,7 @@ func (h *GroupHandler) CreateGroup(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Security ApiKeyAuth
 // @Router /api/groups/{id} [get]
 func (h *GroupHandler) GetGroup(w http.ResponseWriter, r *http.Request) {
 	groupIDStr := ""
@@ -141,6 +142,7 @@ func (h *GroupHandler) GetGroup(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Security ApiKeyAuth
 // @Router /api/groups/{id} [put]
 func (h *GroupHandler) UpdateGroup(w http.ResponseWriter, r *http.Request) {
 	groupIDStr := chi.URLParam(r, "id")
@@ -205,6 +207,7 @@ func (h *GroupHandler) UpdateGroup(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Security ApiKeyAuth
 // @Router /api/groups/{id} [delete]
 func (h *GroupHandler) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 	groupIDStr := chi.URLParam(r, "id")
@@ -245,6 +248,7 @@ func (h *GroupHandler) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Security ApiKeyAuth
 // @Router /api/groups/{id}/members [get]
 func (h *GroupHandler) ListGroupMembers(w http.ResponseWriter, r *http.Request) {
 	groupIDStr := chi.URLParam(r, "id")
@@ -293,6 +297,7 @@ func (h *GroupHandler) ListGroupMembers(w http.ResponseWriter, r *http.Request) 
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group or user not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Security ApiKeyAuth
 // @Router /api/groups/{group_id}/members/{user_id} [delete]
 func (h *GroupHandler) RemoveGroupMember(w http.ResponseWriter, r *http.Request) {
 	groupIDStr := chi.URLParam(r, "group_id")
@@ -342,6 +347,7 @@ func (h *GroupHandler) RemoveGroupMember(w http.ResponseWriter, r *http.Request)
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Security ApiKeyAuth
 // @Router /api/groups/{id}/invitations [post]
 func (h *GroupHandler) CreateGroupInvitation(w http.ResponseWriter, r *http.Request) {
 	groupIDStr := chi.URLParam(r, "id")
@@ -399,6 +405,7 @@ func (h *GroupHandler) CreateGroupInvitation(w http.ResponseWriter, r *http.Requ
 // @Failure 409 {object} responses.ErrorResponse "Conflict - User is already a member of the group"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Security ApiKeyAuth
 // @Router /api/invitations/{code}/accept [post]
 func (h *GroupHandler) AcceptGroupInvitation(w http.ResponseWriter, r *http.Request) {
 	invitationCode := chi.URLParam(r, "code")
@@ -461,6 +468,7 @@ func (h *GroupHandler) AcceptGroupInvitation(w http.ResponseWriter, r *http.Requ
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Security ApiKeyAuth
 // @Router /api/users/groups [get]
 func (h *GroupHandler) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 	// Service layer handles requesting user ID extraction and permission/existence checks

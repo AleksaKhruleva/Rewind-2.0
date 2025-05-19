@@ -276,6 +276,7 @@ func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid refresh token format or request body".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Security ApiKeyAuth
 // @Router /api/auth/logout [post].
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	var req requests.LogoutRequest
@@ -310,6 +311,7 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Security ApiKeyAuth
 // @Router /api/auth/delete-user [post].
 func (h *AuthHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	var req requests.DeleteUserRequest
@@ -343,6 +345,7 @@ func (h *AuthHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Security ApiKeyAuth
 // @Router /api/users/{id} [get].
 func (h *AuthHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 	userIDStr := chi.URLParam(r, "id")

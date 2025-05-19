@@ -323,6 +323,8 @@ paths:
           description: Service Unavailable".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Delete user account.
       tags:
       - auth
@@ -473,6 +475,8 @@ paths:
           description: Service Unavailable".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: User logout.
       tags:
       - auth
@@ -676,6 +680,8 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Create a new group
       tags:
       - groups
@@ -722,6 +728,8 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Remove a member from a group
       tags:
       - groups
@@ -762,6 +770,8 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Delete a group by ID
       tags:
       - groups
@@ -803,6 +813,8 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Get group details by ID
       tags:
       - groups
@@ -852,6 +864,8 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Update group details by ID
       tags:
       - groups
@@ -902,6 +916,8 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Create a group invitation
       tags:
       - groups
@@ -944,6 +960,8 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: List members of a group
       tags:
       - groups
@@ -986,6 +1004,8 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Accept a group invitation
       tags:
       - groups
@@ -1021,6 +1041,8 @@ paths:
           description: Service Unavailable".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: Get user details by ID.
       tags:
       - users
@@ -1064,6 +1086,8 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       summary: List groups for a specific user
       tags:
       - groups
