@@ -2,8 +2,21 @@ import SwiftUI
 
 struct TagsView: View {
     @Binding var tags: [String]
-    @State private var totalHeight = CGFloat.zero
-    @State private var tagInputPresented = false
+    @State private var totalHeight: CGFloat
+    @State private var tagInputPresented: Bool
+    var useInvertedColors: Bool
+    
+    init(
+        tags: Binding<[String]>,
+        totalHeight: Double = CGFloat.zero,
+        tagInputPresented: Bool = false,
+        useInvertedColors: Bool
+    ) {
+        self._tags = tags
+        self.totalHeight = totalHeight
+        self.tagInputPresented = tagInputPresented
+        self.useInvertedColors = useInvertedColors
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -63,7 +76,8 @@ struct TagsView: View {
             Image(systemName: "plus")
                 .font(.system(size: 18, weight: .black))
                 .frame(width: 38, height: 38)
-                .background(Color.backgroundSecondary)
+                .background(useInvertedColors ? Color.background : Color.backgroundSecondary)
+                .foregroundColor(Color.textPrimary)
                 .clipShape(Circle())
                 .padding([.vertical, .trailing], 4)
                 .alignmentGuide(.leading) { d in
@@ -98,7 +112,8 @@ struct TagsView: View {
             Image(systemName: "minus")
                 .font(.system(size: 16, weight: .black))
                 .frame(width: 30, height: 30)
-                .background(Color.background)
+                .background(useInvertedColors ? Color.backgroundSecondary : Color.background)
+                .foregroundColor(Color.textPrimary)
                 .clipShape(Circle())
                 .onTapGesture {
                     withAnimation {
@@ -107,7 +122,7 @@ struct TagsView: View {
                 }
         }
         .padding(4)
-        .background(Color.backgroundSecondary)
+        .background(useInvertedColors ? Color.background : Color.backgroundSecondary)
         .cornerRadius(20)
     }
 }
@@ -119,5 +134,5 @@ struct TagsView: View {
         "PlayStatio",
         "PlayStation 2",
         "PlayStation 4ddd"
-      ]))
+    ]), useInvertedColors: false)
 }

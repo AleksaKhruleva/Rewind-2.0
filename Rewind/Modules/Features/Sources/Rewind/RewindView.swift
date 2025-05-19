@@ -5,6 +5,7 @@ import Base
 public struct RewindView: View {
     @State private var rolls = 0
     @State private var currentIndex = 0
+    @State private var filterSettingsShown = false
     @State private var isSelectGroupPresented = false
     
     private let router: RewindRouter
@@ -37,7 +38,7 @@ public struct RewindView: View {
                 MediaTopButtons {
                     router.navigateToMediaDetails(mediaImages[currentIndex])
                 } onSettingsTap: {
-                    // TODO: open settings
+                    filterSettingsShown = true
                 }
                 
                 mediaView
@@ -80,6 +81,11 @@ public struct RewindView: View {
                 .presentationCornerRadius(30)
                 .presentationDragIndicator(.visible)
                 .presentationDetents([.height(450)])
+        }
+        .sheet(isPresented: $filterSettingsShown) {
+            FilterView(title: UIComponentsStrings.Rewind.Filters.title) { settings in
+                print(settings)
+            }
         }
     }
     

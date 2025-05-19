@@ -4,9 +4,11 @@ let maxTags = 5
 
 public struct TagsSectionView: View {
     @Binding var tags: [String]
+    var useInvertedColors: Bool
     
-    public init(tags: Binding<[String]>) {
+    public init(tags: Binding<[String]>, useInvertedColors: Bool = false) {
         self._tags = tags
+        self.useInvertedColors = useInvertedColors
     }
     
     public var body: some View {
@@ -34,7 +36,7 @@ public struct TagsSectionView: View {
                 .disabledWithOpacity(tags.isEmpty)
             }
             
-            TagsView(tags: $tags)
+            TagsView(tags: $tags, useInvertedColors: useInvertedColors)
         }
     }
 }

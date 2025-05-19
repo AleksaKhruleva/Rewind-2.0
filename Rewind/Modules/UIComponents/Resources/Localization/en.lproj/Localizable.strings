@@ -244,6 +244,8 @@
 
 "gallery.new_quote" = "New quote";
 
+"gallery.filters.title" = "Gallery media settings";
+
 // MARK: - End note string
 "note.end" = "🙀 The end!";
 
@@ -254,6 +256,8 @@
 "rewind.details" = "View details";
 
 "rewind.rolls" = "Rewind\nrolls today!";
+
+"rewind.filters.title" = "Random media settings";
 
 // MARK: - Stands strings
 
@@ -312,3 +316,25 @@
 "generic_input.new_tag.placeholder" = "new tag";
 
 "generic_input.verification_code.title" = "Enter verification code";
+
+// MARK: - Filtering strings
+
+"filter_settings.from_date" = "From";
+
+"filter_settings.to_date" = "To";
+
+"filter_settings.invalid_dates.title" = "Your dates are invalid";
+
+"filter_settings.invalid_dates.message" = "From date must preceed To date!";
+
+"filter_settings.toggle.photos" = "Photos";
+
+"filter_settings.toggle.videos" = "Videos";
+
+"filter_settings.toggle.quotes" = "Quotes";
+
+"filter_settings.toggle.favourites" = "Favourites";
+
+"filter_settings.toggle.medias_count" = "%@ medias";
+
+"filter_settings.save" = "Save filters";

@@ -5,7 +5,7 @@ import Domain
 
 public struct GalleryView: View {
     @State private var viewModel: GalleryViewModel
-    
+
     private let router: GalleryRouter
 
     @Environment(\.showToast)
@@ -68,6 +68,11 @@ public struct GalleryView: View {
                 Spacer(minLength: 0)
             }
             .background(Color.background)
+            .sheet(isPresented: $viewModel.filterSettingsShown) {
+                FilterView(title: UIComponentsStrings.Gallery.Filters.title) { settings in
+                    print(settings)
+                }
+            }
             .overlay {
                 if let selectedMedia = viewModel.viewingBlurredMedia {
                     BlurredMediaView(
@@ -136,7 +141,7 @@ public struct GalleryView: View {
                 Spacer()
                 
                 RewindMediaButton(size: 50, fontSize: 28, type: .settings) {
-                    print("plus")
+                    Task { await viewModel.dispatch(.openFilters) }
                 }
             }
             .padding(.horizontal, 50)

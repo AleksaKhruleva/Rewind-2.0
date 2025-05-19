@@ -244,6 +244,8 @@
 
 "gallery.new_quote" = "Новая цитата";
 
+"gallery.filters.title" = "Настройки медиа в галерее";
+
 // MARK: - End note string
 "note.end" = "🙀 Это конец!";
 
@@ -254,6 +256,8 @@
 "rewind.details" = "Детали";
 
 "rewind.rolls" = "Прокруок\nсегодня!";
+
+"rewind.filters.title" = "Настройки рандомного медиа";
 
 // MARK: - Stands strings
 
@@ -312,3 +316,25 @@
 "generic_input.new_tag.placeholder" = "новый тэг";
 
 "generic_input.verification_code.title" = "Введи код потдверждения";
+
+// MARK: - Filtering strings
+
+"filter_settings.from_date" = "С";
+
+"filter_settings.to_date" = "По";
+
+"filter_settings.invalid_dates.title" = "Твои даты ошибочны";
+
+"filter_settings.invalid_dates.message" = "Начальная дата должна идти до Конечной даты!";
+
+"filter_settings.toggle.photos" = "Фото";
+
+"filter_settings.toggle.videos" = "Видео";
+
+"filter_settings.toggle.quotes" = "Цитаты";
+
+"filter_settings.toggle.favourites" = "Избранные";
+
+"filter_settings.toggle.medias_count" = "%@ медиа";
+
+"filter_settings.save" = "Сохранить фильтры";
