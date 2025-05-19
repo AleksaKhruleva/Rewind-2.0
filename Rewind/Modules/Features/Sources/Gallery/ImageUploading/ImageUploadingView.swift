@@ -61,9 +61,9 @@ public struct ImageUploadingView: View {
                 }
             }
         }
-        .sheet(isPresented: $viewModel.findTrackViewPresented) {
+        .sheet(isPresented: $viewModel.findTrackViewPresented, onDismiss: {
             viewModel.dispatch(.resumePlayback)
-        } content: {
+        }) {
             FindTrackView { selectedTrack in
                 viewModel.dispatch(.trackSelected(selectedTrack))
             }

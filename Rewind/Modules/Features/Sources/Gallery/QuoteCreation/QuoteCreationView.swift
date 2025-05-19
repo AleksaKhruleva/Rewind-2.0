@@ -49,9 +49,9 @@ public struct QuoteCreationView: View {
         }) {
             quoteInputContent
         }
-        .sheet(isPresented: $viewModel.findTrackViewPresented) {
+        .sheet(isPresented: $viewModel.findTrackViewPresented, onDismiss: {
             viewModel.dispatch(.resumePlayback)
-        } content: {
+        }) {
             FindTrackView { selectedTrack in
                 viewModel.dispatch(.trackSelected(selectedTrack))
             }
