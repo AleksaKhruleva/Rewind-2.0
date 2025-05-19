@@ -27,14 +27,18 @@ public struct QuoteCreationView: View {
                         .onTapGesture {
                             viewModel.dispatch(.presentQuoteInput)
                         }
+                        .padding(.horizontal, 8)
                     
                     generalTable
+                        .padding(.horizontal, 8)
+                    
+                    musicSection
                     
                     TagsSectionView(tags: $viewModel.tags)
+                        .padding(.horizontal, 8)
                 }
             }
             .scrollIndicators(.hidden)
-            .padding(.horizontal, 8)
         }
         .background(Color.background)
         .safeAreaInset(edge: .bottom) {
@@ -42,6 +46,13 @@ public struct QuoteCreationView: View {
         }
         .sheet(isPresented: $viewModel.quoteInputPresented) {
             quoteInputContent
+        }
+        .sheet(isPresented: $viewModel.findTrackViewPresented) {
+            viewModel.dispatch(.resumePlayback)
+        } content: {
+            FindTrackView { selectedTrack in
+                viewModel.dispatch(.trackSelected(selectedTrack))
+            }
         }
     }
     
@@ -142,6 +153,28 @@ public struct QuoteCreationView: View {
             .cornerRadius(24)
         }
         .disabledWithOpacity(viewModel.quoteState == .empty)
+    }
+    
+    @ViewBuilder
+    private var musicSection: some View {
+        MusicSectionView(
+            selectedTrack: $viewModel.selectedTrack) {
+                viewModel.dispatch(.findTrack)
+            }
+            .padding(.horizontal, 8)
+        
+        if let selectedTrack = viewModel.selectedTrack {
+            ChooseTrackPieceView(
+                shouldPlay: $viewModel.isSelectedTrackPlaying,
+                selectedTrack: selectedTrack,
+                onTrashTap: {
+                    withAnimation {
+                        viewModel.selectedTrack = nil
+                    }
+                }
+            )
+            .id(selectedTrack.id)
+        }
     }
     
     private var continueButton: some View {

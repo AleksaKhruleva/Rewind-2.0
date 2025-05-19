@@ -111,8 +111,12 @@ public struct ImageUploadingView: View {
         if let selectedTrack = viewModel.selectedTrack {
             ChooseTrackPieceView(
                 shouldPlay: $viewModel.isSelectedTrackPlaying,
-                isDurationPickerAvailable: true,
-                selectedTrack: selectedTrack
+                selectedTrack: selectedTrack,
+                onTrashTap: {
+                    withAnimation {
+                        viewModel.selectedTrack = nil
+                    }
+                }
             )
             .id(selectedTrack.id)
         }

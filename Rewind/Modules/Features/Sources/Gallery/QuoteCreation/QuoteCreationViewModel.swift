@@ -1,5 +1,6 @@
 import SwiftUI
 import UIComponents
+import Domain
 
 @MainActor @Observable
 final class QuoteCreationViewModel {
@@ -14,13 +15,19 @@ final class QuoteCreationViewModel {
         case dismissAll
         case saveQuote(AnyView)
         case resetQuote
+        case findTrack
+        case trackSelected(Track)
+        case resumePlayback
     }
     
     var quoteInputPresented = false
     var authorInputPresented = false
+    var findTrackViewPresented = false
+    var isSelectedTrackPlaying = true
     
     var quote: String = ""
     var author: String = ""
+    var selectedTrack: Track?
     var tags: [String] = []
     
     var quoteState: QuoteState {
@@ -46,6 +53,13 @@ final class QuoteCreationViewModel {
         case .resetQuote:
             quote = ""
             author = ""
+        case .findTrack:
+            isSelectedTrackPlaying = false
+            findTrackViewPresented = true
+        case let .trackSelected(track):
+            selectedTrack = track
+        case .resumePlayback:
+            isSelectedTrackPlaying = true
         }
     }
 }

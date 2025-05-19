@@ -19,11 +19,15 @@ struct ChooseTrackPieceView: View {
     @State private var durationInPicker: CGFloat = 15
     @State private var showDurationPicker = false
     
-    private let isDurationPickerAvailable: Bool
+    private let onTrashTap: () -> Void
     
-    init(shouldPlay: Binding<Bool>, isDurationPickerAvailable: Bool, selectedTrack: Track) {
+    init(
+        shouldPlay: Binding<Bool>,
+        selectedTrack: Track,
+        onTrashTap: @escaping () -> Void
+    ) {
         self._shouldPlay = shouldPlay
-        self.isDurationPickerAvailable = isDurationPickerAvailable
+        self.onTrashTap = onTrashTap
         viewModel = ChooseTrackPieceViewModel(selectedTrack: selectedTrack)
     }
     
@@ -39,7 +43,6 @@ struct ChooseTrackPieceView: View {
                         .frame(width: buttonSize, height: buttonSize)
                         .background(Circle().fill(Color.backgroundSecondary))
                 }
-                .disabledWithOpacity(!isDurationPickerAvailable)
                 
                 Capsule()
                     .fill(Color.backgroundSecondary)
@@ -53,6 +56,15 @@ struct ChooseTrackPieceView: View {
                                 .animation(.linear(duration: 0.1), value: realTimeOffset)
                         }
                     )
+                
+                Button {
+                    onTrashTap()
+                } label: {
+                    Image(systemName: "trash.fill")
+                        .modifier(RoundFontModifier(size: 13))
+                        .frame(width: buttonSize, height: buttonSize)
+                        .background(Circle().fill(Color.backgroundSecondary))
+                }
                 
                 Button {
                     if viewModel.isTrackPlaying {
@@ -114,36 +126,12 @@ struct ChooseTrackPieceView: View {
         .sheet(isPresented: $showDurationPicker, onDismiss: {
             durationInPicker = selectorDuration
         }) {
-            VStack {
-                Text("Choose song duration")
-                    .modifier(RoundFontModifier(size: 15))
-                    .padding(.top)
-                
-                Picker("Duration", selection: $durationInPicker) {
-                    ForEach(5...15, id: \.self) { val in
-                        Text("\(val) сек").tag(CGFloat(val))
-                    }
+            durationPicker
+                .onAppear {
+                    durationInPicker = selectorDuration
                 }
-                .labelsHidden()
-                .pickerStyle(.wheel)
-                .frame(height: 160)
-                
-                Button("Done") {
-                    selectorDuration = durationInPicker
-                    showDurationPicker = false
-                    viewModel.dispatch(.playTrack(startTime: startTime))
-                }
-                .modifier(
-                    RoundFontModifier(size: 15, foregroundColor: .pinkPrimary)
-                )
-                .padding()
-            }
-            .onAppear {
-                durationInPicker = selectorDuration
-            }
-            .presentationDetents([.height(280)])
-            .presentationDragIndicator(.visible)
-            .background(Color.background)
+                .presentationDetents([.height(280)])
+                .presentationDragIndicator(.visible)
         }
         .onChange(of: selectorDuration) { oldValue, newValue in
             let oldWaveformWidth = selectorWidth * (viewModel.selectedTrack.duration / oldValue)
@@ -224,5 +212,33 @@ struct ChooseTrackPieceView: View {
         progress = 0
         timer?.invalidate()
         timer = nil
+    }
+    
+    private var durationPicker: some View {
+        VStack {
+            Text("Choose track duration")
+                .modifier(RoundFontModifier(size: 15))
+                .padding(.top)
+            
+            Picker("Duration", selection: $durationInPicker) {
+                ForEach(5...15, id: \.self) { val in
+                    Text("\(val) сек").tag(CGFloat(val))
+                }
+            }
+            .labelsHidden()
+            .pickerStyle(.wheel)
+            .frame(height: 160)
+            
+            Button("Done") {
+                selectorDuration = durationInPicker
+                showDurationPicker = false
+                viewModel.dispatch(.playTrack(startTime: startTime))
+            }
+            .modifier(
+                RoundFontModifier(size: 15, foregroundColor: .pinkPrimary)
+            )
+            .padding()
+        }
+        .background(Color.background)
     }
 }
