@@ -17,91 +17,93 @@ public struct GalleryView: View {
     }
     
     public var body: some View {
-        VStack(spacing: 0) {
-            GalleryHeader(
-                image: UIComponentsAsset.media5.image,
-                groupName: "Group name",
-                onDismiss: {
-                    DispatchQueue.main.async {
-                        router.dismiss()
-                    }
-                },
-                onAddingQuote: router.navigateToQuoteCreation,
-                onAddingMedias:  { Task { await viewModel.dispatch(.showMediasDialog) } }
-            )
-            
-            ScrollView {
-                VStack {
-                    LazyVGrid(columns: [
-                        GridItem(.flexible()),
-                        GridItem(.flexible()),
-                        GridItem(.flexible())
-                    ], spacing: 3) {
-                        let medias = GalleryConstants.galleryMedias
-                        ForEach(medias, id: \.self) { media in
-                            Rectangle()
-                                .toSquare(media, cornerRadius: 14)
-                                .frame(
-                                    width: UIScreen.main.bounds.width / 3,
-                                    height: UIScreen.main.bounds.width / 3
-                                )
-                                .onTapGesture {
-                                    Task {
-                                        await viewModel.dispatch(.viewBlurredMedia(media))
-                                    }
-                                }
+        NavigationStack {
+            VStack(spacing: 0) {
+                GalleryHeader(
+                    image: UIComponentsAsset.media5.image,
+                    groupName: "Group name",
+                    onDismiss: {
+                        DispatchQueue.main.async {
+                            router.dismiss()
                         }
-                    }
-                    
-                    RewindNoteTextView(text: UIComponentsStrings.Note.end)
-                        .padding(.vertical, 4)
-                }
-            }
-            .scrollIndicators(.hidden)
-            .safeAreaInset(edge: .bottom) {
-                ZStack(alignment: .bottom) {
-                    footer
-                }
-            }
-            
-            Spacer(minLength: 0)
-        }
-        .background(Color.background)
-        .overlay {
-            if let selectedMedia = viewModel.viewingBlurredMedia {
-                BlurredMediaView(
-                    image: selectedMedia,
-                    isPresented: $viewModel.blurredMediaShown,
-                    showMediaDetails: router.navigateToMediaDetails
+                    },
+                    onAddingQuote: router.navigateToQuoteCreation,
+                    onAddingMedias:  { Task { await viewModel.dispatch(.showMediasDialog) } }
                 )
+                
+                ScrollView {
+                    VStack {
+                        LazyVGrid(columns: [
+                            GridItem(.flexible()),
+                            GridItem(.flexible()),
+                            GridItem(.flexible())
+                        ], spacing: 3) {
+                            let medias = GalleryConstants.galleryMedias
+                            ForEach(medias, id: \.self) { media in
+                                Rectangle()
+                                    .toSquare(media, cornerRadius: 14)
+                                    .frame(
+                                        width: UIScreen.main.bounds.width / 3,
+                                        height: UIScreen.main.bounds.width / 3
+                                    )
+                                    .onTapGesture {
+                                        Task {
+                                            await viewModel.dispatch(.viewBlurredMedia(media))
+                                        }
+                                    }
+                            }
+                        }
+                        
+                        RewindNoteTextView(text: UIComponentsStrings.Note.end)
+                            .padding(.vertical, 4)
+                    }
+                }
+                .scrollIndicators(.hidden)
+                .safeAreaInset(edge: .bottom) {
+                    ZStack(alignment: .bottom) {
+                        footer
+                    }
+                }
+                
+                Spacer(minLength: 0)
             }
-        }
-        .onAppear {
-            viewModel.set(showToast: showToast)
-        }
-        .onChange(of: viewModel.mediaSelection) { _, newValue in
-            if let newValue {
-                Task { await viewModel.dispatch(.selectOneMedia(newValue)) }
+            .background(Color.background)
+            .overlay {
+                if let selectedMedia = viewModel.viewingBlurredMedia {
+                    BlurredMediaView(
+                        image: selectedMedia,
+                        isPresented: $viewModel.blurredMediaShown,
+                        showMediaDetails: router.navigateToMediaDetails
+                    )
+                }
             }
-        }
-        .confirmationDialog(
-            UIComponentsStrings.Gallery.NewMedia.Dialog.title,
-            isPresented: $viewModel.mediaUploadingDialogShown,
-            titleVisibility: .visible
-        ) {
-            Button(UIComponentsStrings.Gallery.NewMedia.Dialog.one) {
-                Task { await viewModel.dispatch(.viewGallery) }
+            .onAppear {
+                viewModel.set(showToast: showToast)
             }
-            Button(UIComponentsStrings.Gallery.NewMedia.Dialog.multiple) {
-                router.navigateToMediasUploading()
+            .onChange(of: viewModel.mediaSelection) { _, newValue in
+                if let newValue {
+                    Task { await viewModel.dispatch(.selectOneMedia(newValue)) }
+                }
             }
-        }
-        .photosPicker(isPresented: $viewModel.mediaPickerPresented, selection: $viewModel.mediaSelection)
-        .navigationDestination(item: $viewModel.uploadingMedia) { media in
-            uploadingMediaDestination(for: media) { readyMedia in
-                // TODO: Saving here
-                print("Saving")
-            }.toolbar(.hidden)
+            .confirmationDialog(
+                UIComponentsStrings.Gallery.NewMedia.Dialog.title,
+                isPresented: $viewModel.mediaUploadingDialogShown,
+                titleVisibility: .visible
+            ) {
+                Button(UIComponentsStrings.Gallery.NewMedia.Dialog.one) {
+                    Task { await viewModel.dispatch(.viewGallery) }
+                }
+                Button(UIComponentsStrings.Gallery.NewMedia.Dialog.multiple) {
+                    router.navigateToMediasUploading()
+                }
+            }
+            .photosPicker(isPresented: $viewModel.mediaPickerPresented, selection: $viewModel.mediaSelection)
+            .navigationDestination(item: $viewModel.uploadingMedia) { media in
+                uploadingMediaDestination(for: media) { readyMedia in
+                    // TODO: Saving here
+                    print("Saving")
+                }.toolbar(.hidden)
+            }
         }
     }
     

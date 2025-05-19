@@ -23,7 +23,7 @@ public struct GalleryHeader: View {
     
     public var body: some View {
         RewindHeader {
-            RewindButton(type: .leftChevron) { onDismiss() }
+            RewindButton(type: .xmark) { onDismiss() }
         } centerView: {
             HeaderBadgeView(
                 image: image,
