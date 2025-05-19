@@ -15,6 +15,15 @@ service AuthService {
   rpc Logout(LogoutRequest) returns (LogoutResponse) {}
   // TODO delete in future
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {}
+  rpc GetUsersByIDs(GetUsersByIDsRequest) returns (GetUsersByIDsResponse) {}
+  rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {}
+}
+
+message User {
+  uint64 id = 1;
+  string username = 2;
+  string email = 3;
+  string image = 4;
 }
 
 message StartRegistrationRequest {
@@ -95,4 +104,24 @@ message DeleteUserRequest {
 
 message DeleteUserResponse {
   bool success = 1;
+}
+
+// Запрос для получения информации о пользователях по списку их ID
+message GetUsersByIDsRequest {
+  repeated uint64 user_ids = 1; // Список ID пользователей, информацию о которых нужно получить
+}
+
+// Ответ с информацией о пользователях
+message GetUsersByIDsResponse {
+  repeated User users = 1; // Список сообщений User
+}
+
+// Запрос для получения информации о пользователе по ID
+message GetUserByIDRequest {
+  uint64 user_id = 1; // ID пользователя, информацию о котором нужно получить
+}
+
+// Ответ с информацией о пользователе
+message GetUserByIDResponse {
+  User user = 1;
 }

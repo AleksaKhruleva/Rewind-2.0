@@ -88,3 +88,13 @@ func (c *AuthServiceClient) Logout(ctx context.Context, req *pb.LogoutRequest) (
 func (c *AuthServiceClient) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*pb.DeleteUserResponse, error) {
 	return c.client.DeleteUser(ctx, req)
 }
+
+// GetUsersByIDs вызывает метода GetUsersByIDs сервиса аутентификации
+func (c *AuthServiceClient) GetUsersByIDs(ctx context.Context, req *pb.GetUsersByIDsRequest) (*pb.GetUsersByIDsResponse, error) {
+	return c.client.GetUsersByIDs(ctx, req)
+}
+
+// GetUserByID вызывает метода GetUserByID сервиса аутентификации
+func (c *AuthServiceClient) GetUserByID(ctx context.Context, req *pb.GetUserByIDRequest) (*pb.GetUserByIDResponse, error) {
+	return c.client.GetUserByID(ctx, req)
+}

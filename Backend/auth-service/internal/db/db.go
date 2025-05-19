@@ -2,11 +2,12 @@
 package db
 
 import (
-	"Rewind-auth-service/internal/app/models"
 	"fmt"
 	"log"
 	"os"
 	"time"
+
+	"Rewind-auth-service/internal/app/models"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

@@ -2,15 +2,18 @@ package di
 
 import (
 	"Rewind-api-gateway-service/clients/auth"
+	"Rewind-api-gateway-service/clients/group"
 	"Rewind-api-gateway-service/internal/app/handlers"
 	"Rewind-api-gateway-service/internal/app/services"
 )
 
 type Dependencies struct {
-	AuthClient  *auth.AuthServiceClient
-	AuthService services.AuthServiceInterface
-	AuthHandler *handlers.AuthHandler
-	// Add other service clients and handlers here as needed (e.g., GroupClient, GroupService, GroupHandler)
+	AuthClient   *auth.AuthServiceClient
+	AuthService  services.AuthServiceInterface
+	AuthHandler  *handlers.AuthHandler
+	GroupClient  *group.GroupServiceClient
+	GroupService services.GroupServiceInterface
+	GroupHandler *handlers.GroupHandler
 }
 
 func BuildDependencies() *Dependencies {
@@ -27,11 +30,21 @@ func BuildDependencies() *Dependencies {
 	// Initialize handlers with injected dependencies
 	authHandler := handlers.NewAuthHandler(authService)
 
+	groupClient, err := group.NewGroupServiceClient()
+	if err != nil {
+		panic("Failed to create group client: " + err.Error())
+	}
+
+	groupService := services.NewGroupService(groupClient, authClient)
+	groupHandler := handlers.NewGroupHandler(groupService)
+
 	return &Dependencies{
-		AuthClient:  authClient,
-		AuthService: authService,
-		AuthHandler: authHandler,
-		// Initialize other clients and handlers here
+		AuthClient:   authClient,
+		AuthService:  authService,
+		AuthHandler:  authHandler,
+		GroupClient:  groupClient,
+		GroupService: groupService,
+		GroupHandler: groupHandler,
 	}
 }
 
@@ -42,5 +55,10 @@ func (d *Dependencies) Close() {
 			println("Error closing auth client:", err.Error())
 		}
 	}
-	// Close other clients here if needed
+	if d.GroupClient != nil {
+		if err := d.GroupClient.Close(); err != nil {
+			// Log the error, but don't necessarily panic in a defer
+			println("Error closing group client:", err.Error())
+		}
+	}
 }

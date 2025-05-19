@@ -1,4 +1,21 @@
 definitions:
+  requests.CreateGroupInvitationRequest:
+    properties:
+      duration_seconds:
+        description: Optional duration in seconds
+        type: integer
+    type: object
+  requests.CreateGroupRequest:
+    properties:
+      image:
+        description: Image URL is optional
+        type: string
+      name:
+        description: Group name is required
+        type: string
+    required:
+    - name
+    type: object
   requests.DeleteUserRequest:
     properties:
       email:
@@ -47,11 +64,37 @@ definitions:
       email:
         type: string
     type: object
+  requests.UpdateGroupRequest:
+    properties:
+      image:
+        description: Optional image URL
+        type: string
+      name:
+        description: Optional group name
+        type: string
+    type: object
   requests.VerifyEmailCodeRequest:
     properties:
       registration_id:
         type: string
       verification_code:
+        type: string
+    type: object
+  responses.AcceptGroupInvitationResponse:
+    properties:
+      group:
+        allOf:
+        - $ref: '#/definitions/responses.GroupResponse'
+        description: Details of the group joined
+      group_member:
+        allOf:
+        - $ref: '#/definitions/responses.GroupMemberResponse'
+        description: Details of the user's membership
+    type: object
+  responses.CreateGroupInvitationResponse:
+    properties:
+      invitation_code:
+        description: The generated invitation code
         type: string
     type: object
   responses.DeleteUserResponse:
@@ -69,6 +112,109 @@ definitions:
       success:
         type: boolean
     type: object
+  responses.GetGroupResponse:
+    properties:
+      admin_user_id:
+        description: ID of the group administrator
+        type: integer
+      created_at:
+        description: Creation timestamp
+        type: string
+      id:
+        description: Group ID
+        type: integer
+      image:
+        description: Group image URL
+        type: string
+      is_admin:
+        description: Is the requesting user an admin of this group?
+        type: boolean
+      name:
+        description: Group name
+        type: string
+      updated_at:
+        description: Last update timestamp
+        type: string
+    type: object
+  responses.GetUserByIDResponse:
+    properties:
+      email:
+        description: Email address
+        type: string
+      id:
+        description: User ID
+        type: integer
+      image:
+        description: User image URL
+        type: string
+      username:
+        description: Username
+        type: string
+    type: object
+  responses.GroupMemberResponse:
+    properties:
+      created_at:
+        description: Creation timestamp
+        type: string
+      group_id:
+        description: Associated Group ID
+        type: integer
+      id:
+        description: Group Member entry ID
+        type: integer
+      is_admin:
+        description: Is this member an admin?
+        type: boolean
+      memories_added_count:
+        description: Memories added count
+        type: integer
+      memories_viewed_count:
+        description: Memories viewed count
+        type: integer
+      updated_at:
+        description: Last update timestamp
+        type: string
+      user_id:
+        description: Associated User ID
+        type: integer
+    type: object
+  responses.GroupResponse:
+    properties:
+      admin_user_id:
+        description: ID of the group administrator
+        type: integer
+      created_at:
+        description: Creation timestamp
+        type: string
+      id:
+        description: Group ID
+        type: integer
+      image:
+        description: Group image URL
+        type: string
+      name:
+        description: Group name
+        type: string
+      updated_at:
+        description: Last update timestamp
+        type: string
+    type: object
+  responses.ListGroupMembersResponse:
+    properties:
+      members:
+        description: List of group members with details
+        items:
+          $ref: '#/definitions/responses.MemberDetails'
+        type: array
+    type: object
+  responses.ListUserGroupsResponse:
+    properties:
+      groups:
+        description: List of groups
+        items:
+          $ref: '#/definitions/responses.GroupResponse'
+        type: array
+    type: object
   responses.LoginResponse:
     properties:
       access_token:
@@ -80,6 +226,30 @@ definitions:
     properties:
       success:
         type: boolean
+    type: object
+  responses.MemberDetails:
+    properties:
+      is_admin:
+        description: Is this member an admin of the group?
+        type: boolean
+      joined_at:
+        description: Timestamp when the user joined the group
+        type: string
+      memories_added_count:
+        description: Count of memories added by this member
+        type: integer
+      memories_viewed_count:
+        description: Count of memories viewed by this member
+        type: integer
+      user_id:
+        description: User ID
+        type: integer
+      user_image:
+        description: User image URL from Auth-Service
+        type: string
+      username:
+        description: Username from Auth-Service
+        type: string
     type: object
   responses.RefreshTokenResponse:
     properties:
@@ -134,26 +304,28 @@ paths:
       - application/json
       responses:
         "200":
-          description: User account successfully deleted
+          description: User account successfully deleted".
           schema:
             $ref: '#/definitions/responses.DeleteUserResponse'
         "400":
-          description: Bad Request - Invalid email format or request body
+          description: Bad Request - Invalid email format or request body".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
-          description: Not Found - User not found
+          description: Not Found - User not found".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: Internal Server Error".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
-          description: Service Unavailable
+          description: Service Unavailable".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
-      summary: Delete user account
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user account.
       tags:
       - auth
   /api/auth/finish-register:
@@ -172,30 +344,30 @@ paths:
       - application/json
       responses:
         "200":
-          description: Password and username successfully set
+          description: Password and username successfully set".
           schema:
             $ref: '#/definitions/responses.SetPasswordAndUsernameResponse'
         "400":
-          description: Bad Request - Invalid format or request body
+          description: Bad Request - Invalid format or request body".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
-          description: Not Found - Registration ID not found or expired
+          description: Not Found - Registration ID not found or expired".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "409":
-          description: Conflict - User with this email or username already exists
+          description: Conflict - User with this email or username already exists".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: Internal Server Error".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
-          description: Service Unavailable
+          description: Service Unavailable".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
-      summary: Set password and username (Third stage of registration)
+      summary: Set password and username (Third stage of registration).
       tags:
       - auth
   /api/auth/forgot-password:
@@ -215,22 +387,22 @@ paths:
       responses:
         "200":
           description: Password reset link sent (success is true even if user not
-            found to prevent enumeration)
+            found to prevent enumeration)".
           schema:
             $ref: '#/definitions/responses.ForgotPasswordResponse'
         "400":
-          description: Bad Request - Invalid email format or request body
+          description: Bad Request - Invalid email format or request body".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: Internal Server Error".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
-          description: Service Unavailable
+          description: Service Unavailable".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
-      summary: Request password reset
+      summary: Request password reset.
       tags:
       - auth
   /api/auth/login:
@@ -249,26 +421,26 @@ paths:
       - application/json
       responses:
         "200":
-          description: User successfully logged in
+          description: User successfully logged in".
           schema:
             $ref: '#/definitions/responses.LoginResponse'
         "400":
-          description: Bad Request - Invalid email or password format
+          description: Bad Request - Invalid email or password format".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "401":
-          description: Unauthorized - Invalid credentials
+          description: Unauthorized - Invalid credentials".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: Internal Server Error".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
-          description: Service Unavailable
+          description: Service Unavailable".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
-      summary: User login
+      summary: User login.
       tags:
       - auth
   /api/auth/logout:
@@ -288,22 +460,24 @@ paths:
       responses:
         "200":
           description: User successfully logged out (success is true even if token
-            not found)
+            not found)".
           schema:
             $ref: '#/definitions/responses.LogoutResponse'
         "400":
-          description: Bad Request - Invalid refresh token format or request body
+          description: Bad Request - Invalid refresh token format or request body".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: Internal Server Error".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
-          description: Service Unavailable
+          description: Service Unavailable".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
-      summary: User logout
+      security:
+      - ApiKeyAuth: []
+      summary: User logout.
       tags:
       - auth
   /api/auth/refresh:
@@ -322,26 +496,26 @@ paths:
       - application/json
       responses:
         "200":
-          description: Access token successfully refreshed
+          description: Access token successfully refreshed".
           schema:
             $ref: '#/definitions/responses.RefreshTokenResponse'
         "400":
-          description: Bad Request - Invalid refresh token format
+          description: Bad Request - Invalid refresh token format".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "401":
-          description: Unauthorized - Invalid or expired refresh token
+          description: Unauthorized - Invalid or expired refresh token".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: Internal Server Error".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
-          description: Service Unavailable
+          description: Service Unavailable".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
-      summary: Refresh access token
+      summary: Refresh access token.
       tags:
       - auth
   /api/auth/register:
@@ -361,26 +535,26 @@ paths:
       - application/json
       responses:
         "200":
-          description: Successfully initiated registration
+          description: Successfully initiated registration".
           schema:
             $ref: '#/definitions/responses.StartRegistrationResponse'
         "400":
-          description: Bad Request - Invalid email format or request body
+          description: Bad Request - Invalid email format or request body".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "409":
-          description: Conflict - User with this email already exists
+          description: Conflict - User with this email already exists".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: Internal Server Error".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
-          description: Service Unavailable
+          description: Service Unavailable".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
-      summary: Start user registration (First stage of registration)
+      summary: Start user registration (First stage of registration).
       tags:
       - auth
   /api/auth/reset-password:
@@ -399,26 +573,26 @@ paths:
       - application/json
       responses:
         "200":
-          description: Password successfully reset
+          description: Password successfully reset".
           schema:
             $ref: '#/definitions/responses.ResetPasswordResponse'
         "400":
-          description: Bad Request - Invalid password format or request body
+          description: Bad Request - Invalid password format or request body".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
-          description: Not Found - Invalid or expired reset token
+          description: Not Found - Invalid or expired reset token".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
-          description: Internal Server Error
+          description: Internal Server Error".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
-          description: Service Unavailable
+          description: Service Unavailable".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
-      summary: Reset password
+      summary: Reset password.
       tags:
       - auth
   /api/auth/verify-email:
@@ -437,20 +611,65 @@ paths:
       - application/json
       responses:
         "200":
-          description: Email code successfully verified
+          description: Email code successfully verified".
           schema:
             $ref: '#/definitions/responses.VerifyEmailCodeResponse'
         "400":
           description: Bad Request - Invalid registration ID or verification code
-            format
+            format".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
-          description: Not Found - Registration ID not found or expired
+          description: Not Found - Registration ID not found or expired".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "409":
-          description: Conflict - Registration ID or code already used
+          description: Conflict - Registration ID or code already used".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      summary: Verify email code (Second stage of registration).
+      tags:
+      - auth
+  /api/groups:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Group details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateGroupRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully created group
+          schema:
+            $ref: '#/definitions/responses.GroupResponse'
+        "400":
+          description: Bad Request - Invalid request body or data
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - Permission denied by service
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "409":
+          description: Conflict - Group with this name already exists
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
@@ -461,7 +680,415 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
-      summary: Verify email code (Second stage of registration)
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new group
       tags:
-      - auth
+      - groups
+  /api/groups/{group_id}/members/{user_id}:
+    delete:
+      parameters:
+      - description: Group ID
+        in: path
+        name: group_id
+        required: true
+        type: integer
+      - description: User ID to remove
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Successfully removed member (No Content)
+        "400":
+          description: Bad Request - Invalid group ID or user ID format
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - User does not have permission (not admin or not
+            removing self)
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - Group or user not found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Remove a member from a group
+      tags:
+      - groups
+  /api/groups/{id}:
+    delete:
+      parameters:
+      - description: Group ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Successfully deleted group (No Content)
+        "400":
+          description: Bad Request - Invalid group ID format
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - User is not an administrator of the group
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - Group not found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a group by ID
+      tags:
+      - groups
+    get:
+      parameters:
+      - description: Group ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Group details
+          schema:
+            $ref: '#/definitions/responses.GetGroupResponse'
+        "400":
+          description: Bad Request - Invalid group ID format
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - User is not a member of the group
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - Group not found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get group details by ID
+      tags:
+      - groups
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Group ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated group details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateGroupRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated group
+          schema:
+            $ref: '#/definitions/responses.GroupResponse'
+        "400":
+          description: Bad Request - Invalid request body, data, or group ID format
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - User is not an administrator of the group
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - Group not found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update group details by ID
+      tags:
+      - groups
+  /api/groups/{id}/invitations:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Group ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Invitation details (optional duration)
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateGroupInvitationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully created invitation
+          schema:
+            $ref: '#/definitions/responses.CreateGroupInvitationResponse'
+        "400":
+          description: Bad Request - Invalid group ID format or request body
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - User is not an administrator of the group
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - Group not found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a group invitation
+      tags:
+      - groups
+  /api/groups/{id}/members:
+    get:
+      parameters:
+      - description: Group ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of group members
+          schema:
+            $ref: '#/definitions/responses.ListGroupMembersResponse'
+        "400":
+          description: Bad Request - Invalid group ID format
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - User is not a member of the group
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - Group not found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: List members of a group
+      tags:
+      - groups
+  /api/invitations/{code}/accept:
+    post:
+      parameters:
+      - description: Invitation Code
+        in: path
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully accepted invitation
+          schema:
+            $ref: '#/definitions/responses.AcceptGroupInvitationResponse'
+        "400":
+          description: Bad Request - Invalid invitation code format
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - Invitation not found or expired
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "409":
+          description: Conflict - User is already a member of the group
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Accept a group invitation
+      tags:
+      - groups
+  /api/users/{id}:
+    get:
+      description: Retrieves details for a specific user by their ID.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details".
+          schema:
+            $ref: '#/definitions/responses.GetUserByIDResponse'
+        "400":
+          description: Bad Request - Invalid user ID format".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - User not found".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user details by ID.
+      tags:
+      - users
+  /api/users/groups:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of groups for the user
+          schema:
+            $ref: '#/definitions/responses.ListUserGroupsResponse'
+        "400":
+          description: Bad Request - Invalid user ID format
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - User does not have permission to list groups for
+            this user
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - User not found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: List groups for a specific user
+      tags:
+      - groups
+securityDefinitions:
+  ApiKeyAuth:
+    description: Enter your access token in the format "Bearer <token>"
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
