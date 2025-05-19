@@ -27,7 +27,7 @@ public final class AppRouter {
         case account
         case gallery
         case quoteCreation
-        case mediaLoading
+        case mediasUploading
         case mediaDetails(UIImage)
     }
     

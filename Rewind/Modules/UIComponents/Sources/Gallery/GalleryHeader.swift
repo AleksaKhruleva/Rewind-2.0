@@ -5,25 +5,25 @@ public struct GalleryHeader: View {
     private let groupName: String
     private let onDismiss: () -> Void
     private let onAddingQuote: () -> Void
-    private let onAddingMedia: () -> Void
+    private let onAddingMedias: () -> Void
     
     public init(
         image: UIImage,
         groupName: String,
         onDismiss: @escaping () -> Void,
         onAddingQuote: @escaping () -> Void,
-        onAddingMedia: @escaping () -> Void
+        onAddingMedias: @escaping () -> Void
     ) {
         self.image = image
         self.groupName = groupName
         self.onDismiss = onDismiss
         self.onAddingQuote = onAddingQuote
-        self.onAddingMedia = onAddingMedia
+        self.onAddingMedias = onAddingMedias
     }
     
     public var body: some View {
         RewindHeader {
-            RewindButton(type: .leftChevron) { onDismiss() }
+            RewindButton(type: .xmark) { onDismiss() }
         } centerView: {
             HeaderBadgeView(
                 image: image,
@@ -33,7 +33,7 @@ public struct GalleryHeader: View {
             GalleryMenu(
                 label: { RewindButton(type: .plus) {} },
                 onAddingQuote: onAddingQuote,
-                onAddingMedia: onAddingMedia
+                onAddingMedias: onAddingMedias
             )
         }
     }
