@@ -140,7 +140,7 @@ services:
       - www-data:/var/www/certbot
       - ./nginx/certs:/etc/nginx/certs:ro
       # Монтируем файл для использования Universal Links
-      - ./nginx/www/rewindapp.ru:/var/www/rewindapp.ru:ro
+      - ./var/www/rewindapp.ru:/var/www/rewindapp.ru:ro
 
 
     depends_on:
