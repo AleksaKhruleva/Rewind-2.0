@@ -50,22 +50,21 @@ public struct ImageUploadingView: View {
             return viewModel.image
         } set: { newImage in
             viewModel.dispatch(.changeImage(newImage, .hard))
-        }) {}
-            .fullScreenCover(isPresented: $viewModel.imageEditorPresented) {
-                RewindImageEditor(image: viewModel.initialImage, cropType: .rectangle) { croppedImage, status in
-                    if status {
-                        viewModel.dispatch(.changeImage(croppedImage))
-                    }
+        })
+        .fullScreenCover(isPresented: $viewModel.imageEditorPresented) {
+            RewindImageEditor(image: viewModel.initialImage, cropType: .rectangle) { croppedImage, status in
+                if status {
+                    viewModel.dispatch(.changeImage(croppedImage))
                 }
             }
-            .sheet(
-                isPresented: $viewModel.findTrackViewPresented) {
-                    viewModel.dispatch(.resumePlayback)
-                } content: {
-                    FindTrackView { selectedTrack in
-                        viewModel.dispatch(.trackSelected(selectedTrack))
-                    }
-                }
+        }
+        .sheet(isPresented: $viewModel.findTrackViewPresented) {
+            viewModel.dispatch(.resumePlayback)
+        } content: {
+            FindTrackView { selectedTrack in
+                viewModel.dispatch(.trackSelected(selectedTrack))
+            }
+        }
     }
     
     private var header: some View {
