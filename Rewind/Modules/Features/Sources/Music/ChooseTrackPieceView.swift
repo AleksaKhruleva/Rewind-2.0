@@ -9,13 +9,14 @@ private let timerStep: CGFloat = 1 / 60
 
 struct ChooseTrackPieceView: View {
     @Binding var shouldPlay: Bool
+    @Binding var startTime: Double
+    @Binding var selectorDuration: CGFloat
     
     @State private var viewModel: ChooseTrackPieceViewModel
     @State private var progress: CGFloat = 0
     @State private var timer: Timer?
     @State private var offset: CGFloat = 0
     @State private var realTimeOffset: CGFloat = 0
-    @State private var selectorDuration: CGFloat = 15
     @State private var durationInPicker: CGFloat = 15
     @State private var showDurationPicker = false
     
@@ -23,10 +24,14 @@ struct ChooseTrackPieceView: View {
     
     init(
         shouldPlay: Binding<Bool>,
+        startTime: Binding<Double>,
+        selectorDuration: Binding<CGFloat>,
         selectedTrack: Track,
         onTrashTap: @escaping () -> Void
     ) {
         self._shouldPlay = shouldPlay
+        self._startTime = startTime
+        self._selectorDuration = selectorDuration
         self.onTrashTap = onTrashTap
         viewModel = ChooseTrackPieceViewModel(selectedTrack: selectedTrack)
     }
@@ -70,6 +75,7 @@ struct ChooseTrackPieceView: View {
                     if viewModel.isTrackPlaying {
                         viewModel.dispatch(.stopPlaying)
                     } else {
+                        startTime = computedStartTime
                         viewModel.dispatch(.playTrack(startTime: startTime))
                     }
                 } label: {
@@ -108,6 +114,7 @@ struct ChooseTrackPieceView: View {
                     },
                     onEndDragging: { newOffset in
                         offset = newOffset
+                        startTime = computedStartTime
                         viewModel.dispatch(.playTrack(startTime: startTime))
                     },
                     onScroll: { currentOffset in
@@ -142,6 +149,7 @@ struct ChooseTrackPieceView: View {
         }
         .onChange(of: shouldPlay) { _, newValue in
             if shouldPlay {
+                startTime = computedStartTime
                 viewModel.dispatch(.playTrack(startTime: startTime))
             } else {
                 viewModel.dispatch(.stopPlaying)
@@ -164,7 +172,7 @@ struct ChooseTrackPieceView: View {
         return max((screenWidth - selectorWidth) / 2, 0)
     }
     
-    private var startTime: Double {
+    private var computedStartTime: Double {
         let waveformWidth = selectorWidth * (viewModel.selectedTrack.duration / selectorDuration)
         let secondsPerPoint = viewModel.selectedTrack.duration / waveformWidth
         let clampedOffset = max(0, min(offset, waveformWidth - selectorWidth))
@@ -201,6 +209,7 @@ struct ChooseTrackPieceView: View {
             if progress >= 1 {
                 progress = 1
                 stopFill()
+                startTime = computedStartTime
                 Task {
                     await viewModel.dispatch(.playTrack(startTime: startTime))
                 }
@@ -232,6 +241,7 @@ struct ChooseTrackPieceView: View {
             Button("Done") {
                 selectorDuration = durationInPicker
                 showDurationPicker = false
+                startTime = computedStartTime
                 viewModel.dispatch(.playTrack(startTime: startTime))
             }
             .modifier(

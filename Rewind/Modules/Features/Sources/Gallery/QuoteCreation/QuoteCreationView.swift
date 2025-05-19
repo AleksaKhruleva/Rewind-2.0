@@ -44,7 +44,9 @@ public struct QuoteCreationView: View {
         .safeAreaInset(edge: .bottom) {
             continueButton
         }
-        .sheet(isPresented: $viewModel.quoteInputPresented) {
+        .sheet(isPresented: $viewModel.quoteInputPresented, onDismiss: {
+            viewModel.dispatch(.resumePlayback)
+        }) {
             quoteInputContent
         }
         .sheet(isPresented: $viewModel.findTrackViewPresented) {
@@ -155,25 +157,28 @@ public struct QuoteCreationView: View {
         .disabledWithOpacity(viewModel.quoteState == .empty)
     }
     
-    @ViewBuilder
     private var musicSection: some View {
-        MusicSectionView(
-            selectedTrack: $viewModel.selectedTrack) {
-                viewModel.dispatch(.findTrack)
-            }
-            .padding(.horizontal, 8)
-        
-        if let selectedTrack = viewModel.selectedTrack {
-            ChooseTrackPieceView(
-                shouldPlay: $viewModel.isSelectedTrackPlaying,
-                selectedTrack: selectedTrack,
-                onTrashTap: {
-                    withAnimation {
-                        viewModel.selectedTrack = nil
-                    }
+        VStack {
+            MusicSectionView(
+                selectedTrack: $viewModel.selectedTrack) {
+                    viewModel.dispatch(.findTrack)
                 }
-            )
-            .id(selectedTrack.id)
+                .padding(.horizontal, 8)
+            
+            if let selectedTrack = viewModel.selectedTrack {
+                ChooseTrackPieceView(
+                    shouldPlay: $viewModel.isSelectedTrackPlaying,
+                    startTime: $viewModel.selectedStartTime,
+                    selectorDuration: $viewModel.selectedDuration,
+                    selectedTrack: selectedTrack,
+                    onTrashTap: {
+                        withAnimation {
+                            viewModel.selectedTrack = nil
+                        }
+                    }
+                )
+                .id(selectedTrack.id)
+            }
         }
     }
     
@@ -183,6 +188,15 @@ public struct QuoteCreationView: View {
                 showToast(UIComponentsStrings.Quote.Toast.empty)
                 return
             }
+            
+            // TODO: delete later
+            let trackInfo = (
+                viewModel.selectedTrack?.id,
+                viewModel.selectedStartTime,
+                viewModel.selectedDuration
+            )
+            
+            print(trackInfo)
             
             viewModel.dispatch(.saveQuote(AnyView(quoteContent)))
             

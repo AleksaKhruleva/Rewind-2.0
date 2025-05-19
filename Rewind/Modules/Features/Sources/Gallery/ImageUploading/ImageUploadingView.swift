@@ -43,6 +43,7 @@ public struct ImageUploadingView: View {
                 }
             }
         }
+        .background(Color.background)
         .safeAreaInset(edge: .bottom) {
             continueButton
         }
@@ -51,7 +52,9 @@ public struct ImageUploadingView: View {
         } set: { newImage in
             viewModel.dispatch(.changeImage(newImage, .hard))
         })
-        .fullScreenCover(isPresented: $viewModel.imageEditorPresented) {
+        .fullScreenCover(isPresented: $viewModel.imageEditorPresented, onDismiss: {
+            viewModel.dispatch(.resumePlayback)
+        }) {
             RewindImageEditor(image: viewModel.initialImage, cropType: .rectangle) { croppedImage, status in
                 if status {
                     viewModel.dispatch(.changeImage(croppedImage))
@@ -99,31 +102,43 @@ public struct ImageUploadingView: View {
         }
     }
     
-    @ViewBuilder
     private var musicSection: some View {
-        MusicSectionView(
-            selectedTrack: $viewModel.selectedTrack) {
-                viewModel.dispatch(.findTrack)
-            }
-            .padding(.horizontal, 8)
-        
-        if let selectedTrack = viewModel.selectedTrack {
-            ChooseTrackPieceView(
-                shouldPlay: $viewModel.isSelectedTrackPlaying,
-                selectedTrack: selectedTrack,
-                onTrashTap: {
-                    withAnimation {
-                        viewModel.selectedTrack = nil
-                    }
+        VStack {
+            MusicSectionView(
+                selectedTrack: $viewModel.selectedTrack) {
+                    viewModel.dispatch(.findTrack)
                 }
-            )
-            .id(selectedTrack.id)
+                .padding(.horizontal, 8)
+            
+            if let selectedTrack = viewModel.selectedTrack {
+                ChooseTrackPieceView(
+                    shouldPlay: $viewModel.isSelectedTrackPlaying,
+                    startTime: $viewModel.selectedStartTime,
+                    selectorDuration: $viewModel.selectedDuration,
+                    selectedTrack: selectedTrack,
+                    onTrashTap: {
+                        withAnimation {
+                            viewModel.selectedTrack = nil
+                        }
+                    }
+                )
+                .id(selectedTrack.id)
+            }
         }
     }
     
     private var continueButton: some View {
         GradientButton(title: "Save image", width: .given(200)) {
             if let loadedMedia = viewModel.loadedMedia {
+                // TODO: delete later
+                let trackInfo = (
+                    viewModel.selectedTrack?.id,
+                    viewModel.selectedStartTime,
+                    viewModel.selectedDuration
+                )
+                
+                print(trackInfo)
+                
                 onSave(loadedMedia)
                 dismiss()
             }

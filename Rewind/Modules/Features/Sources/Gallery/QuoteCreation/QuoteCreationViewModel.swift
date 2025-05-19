@@ -27,8 +27,11 @@ final class QuoteCreationViewModel {
     
     var quote: String = ""
     var author: String = ""
-    var selectedTrack: Track?
     var tags: [String] = []
+    
+    var selectedTrack: Track?
+    var selectedStartTime: Double = 0
+    var selectedDuration: CGFloat = 15
     
     var quoteState: QuoteState {
         !quote.isEmpty && !author.isEmpty ? .ready : .empty
@@ -37,6 +40,7 @@ final class QuoteCreationViewModel {
     func dispatch(_ intent: Intent) {
         switch intent {
         case .presentQuoteInput:
+            isSelectedTrackPlaying = false
             quoteInputPresented = true
         case .presentAuthorInput:
             guard !quote.isEmpty else { return }
@@ -44,6 +48,7 @@ final class QuoteCreationViewModel {
         case .dismissAll:
             guard !quote.isEmpty, !author.isEmpty else { return }
             quoteInputPresented = false
+            isSelectedTrackPlaying = true
         case let .saveQuote(content):
             let renderer = ImageRenderer(content: content)
             

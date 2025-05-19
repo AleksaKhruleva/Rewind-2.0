@@ -24,7 +24,7 @@ public struct GalleryPreview: View {
                             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                    .stroke(Color.white, lineWidth: 2)
+                                    .stroke(Color.background, lineWidth: 2)
                             )
                             .rotationEffect(rotation(for: images.count, at: index))
                             .offset(y: verticalOffset(for: images.count, at: index))

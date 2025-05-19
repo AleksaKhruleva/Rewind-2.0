@@ -52,12 +52,8 @@ public struct MediasUploadingView: View {
                 settingsToggle
                     .padding(.bottom, 16)
                 
-                Group {
-                    musicSection
-                        .padding(.bottom, 16)
-                    
-                    TagsSectionView(tags: $viewModel.tags)
-                }.disabledWithOpacity(!viewModel.similarSettigns)
+                TagsSectionView(tags: $viewModel.tags)
+                    .disabledWithOpacity(!viewModel.similarSettigns)
                 
                 Spacer()
             }
@@ -93,23 +89,6 @@ public struct MediasUploadingView: View {
         .padding()
         .background(Color.backgroundSecondary)
         .cornerRadius(25)
-    }
-    
-    private var musicSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Music")
-                .foregroundColor(.textSecondary)
-                .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .black))
-                .padding(.leading, 16)
-            
-            MusicCell(
-                cover: UIComponentsAsset.media3.image,
-                trackName: "OVER",
-                artist: "Playboi Carti"
-            ) {}
-                .background(Color.backgroundSecondary)
-                .cornerRadius(25)
-        }
     }
     
     private var photosPicker: some View {
