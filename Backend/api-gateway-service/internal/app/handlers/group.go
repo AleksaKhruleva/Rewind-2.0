@@ -90,12 +90,10 @@ func (h *GroupHandler) CreateGroup(w http.ResponseWriter, r *http.Request) {
 // @Security ApiKeyAuth
 // @Router /api/groups/{id} [get]
 func (h *GroupHandler) GetGroup(w http.ResponseWriter, r *http.Request) {
-	groupIDStr := ""
+	groupIDStr := chi.URLParam(r, "id")
 	groupID, err := strconv.ParseUint(groupIDStr, 10, 64)
-	if err != nil || groupID == 0 { // groupID cannot be 0
+	if err != nil || groupID == 0 {
 		log.Printf("GroupHandler.GetGroup: Invalid group ID in URL: %s", groupIDStr)
-		respondError(w, http.StatusBadRequest, "Invalid group ID format")
-		return
 	}
 
 	// User ID is extracted by the service layer from the context
