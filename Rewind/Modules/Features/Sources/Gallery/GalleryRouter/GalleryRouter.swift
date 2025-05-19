@@ -19,4 +19,8 @@ public final class GalleryRouter {
     func navigateToMediaDetails(_ image: UIImage) {
         appRouter?.navigate(to: .mediaDetails(image))
     }
+    
+    func dismiss() {
+        appRouter?.pop()
+    }
 }

@@ -7,7 +7,7 @@ public struct RewindView: View {
     @State private var currentIndex = 0
     @State private var isSelectGroupPresented = false
     
-    let router: RewindRouter
+    private let router: RewindRouter
     
     @Environment(\.showToast)
     private var showToast

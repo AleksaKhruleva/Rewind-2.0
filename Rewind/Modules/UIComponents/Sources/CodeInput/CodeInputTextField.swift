@@ -10,7 +10,7 @@ public struct CodeInputTextField: View {
     var onCodeFilled: () -> Void
     
     @State
-    private var focusedField: Int = 0
+    private var focusedField: Int = -1
     
     public init(
         code: Binding<[String]>,
@@ -45,6 +45,11 @@ public struct CodeInputTextField: View {
         .onChange(of: joinedCode.count == 4) { _, newValue in
             if newValue {
                 onCodeFilled()
+            }
+        }
+        .onAppear {
+            DispatchQueue.main.asyncAfter(deadline: .now() + AuthConstants.keyboardFocusDelay) {
+                focusedField = 0
             }
         }
     }

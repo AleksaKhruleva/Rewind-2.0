@@ -7,12 +7,14 @@ public struct QuoteCreationView: View {
     @State var backgroundColor: Color = .random
     @State var textColor: Color = .random
     
-    @Environment(\.dismiss)
-    private var dismiss
     @Environment(\.showToast)
     private var showToast
     
-    public init() {}
+    private let router: AppRouter
+    
+    public init(router: AppRouter) {
+        self.router = router
+    }
     
     public var body: some View {
         VStack(spacing: 0) {
@@ -45,7 +47,7 @@ public struct QuoteCreationView: View {
     
     private var header: some View {
         RewindHeader {
-            RewindButton(type: .leftChevron) { dismiss() }
+            RewindButton(type: .leftChevron) { router.pop() }
         } rightView: {
             RewindButton(type: .trash) {
                 guard viewModel.quoteState != .empty else { return }
@@ -64,7 +66,7 @@ public struct QuoteCreationView: View {
             .aspectRatio(1, contentMode: .fit)
             .foregroundColor(
                 viewModel.quoteState == .empty ?
-                .backgroundSecondary : backgroundColor
+                    .backgroundSecondary : backgroundColor
             )
             .overlay {
                 switch viewModel.quoteState {
@@ -152,12 +154,8 @@ public struct QuoteCreationView: View {
             viewModel.dispatch(.saveQuote(AnyView(quoteContent)))
             
             showToast(UIComponentsStrings.Quote.Toast.success)
-            dismiss()
+            router.pop()
         }
         .disabledWithOpacity(viewModel.quoteState == .empty)
     }
-}
-
-#Preview {
-    QuoteCreationView()
 }

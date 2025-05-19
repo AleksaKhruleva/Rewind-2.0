@@ -16,9 +16,6 @@ public struct StandView: View {
     private let title: String
     private let counterType: CounterType
     
-    @Environment(\.dismiss)
-    private var dismiss
-    
     public init(title: String, counterType: CounterType) {
         self.title = title
         self.counterType = counterType
@@ -88,7 +85,7 @@ public struct StandView: View {
     private var header: some View {
         RewindHeader(backgroundColor: .clear, rightView: {
             RewindButton(type: .rightChevron, tint: .white) {
-                dismiss()
+                // TODO: dismiss
             }
         })
     }

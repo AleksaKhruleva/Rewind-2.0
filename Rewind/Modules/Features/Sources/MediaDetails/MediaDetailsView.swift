@@ -3,11 +3,11 @@ import UIComponents
 
 public struct MediaDetailsView: View {
     @State var tags: [String] = []
+    private let router: AppRouter
     var image: UIImage
     
-    @Environment(\.dismiss) private var dismiss
-
-    public init(image: UIImage) {
+    public init(router: AppRouter, image: UIImage) {
+        self.router = router
         self.image = image
     }
     
@@ -37,7 +37,7 @@ public struct MediaDetailsView: View {
     
     private var header: some View {
         RewindHeader {
-            RewindButton(type: .leftChevron) { dismiss() }
+            RewindButton(type: .leftChevron) { router.pop() }
         } centerView: {
             Text(UIComponentsStrings.MediaDetails.title)
                 .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .bold))
@@ -62,8 +62,4 @@ public struct MediaDetailsView: View {
     private var riskyTable: some View {
         InformationTable(title: UIComponentsStrings.MediaDetails.risky, data: AccountConstants.risky, isRisky: true)
     }
-}
-
-#Preview {
-    MediaDetailsView(image: UIComponentsAsset.avatar.image)
 }

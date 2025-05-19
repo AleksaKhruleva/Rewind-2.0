@@ -9,4 +9,8 @@ public final class AccountRouter {
     func navigateToWelcome() {
         appRouter?.navigate(to: .welcome)
     }
+    
+    func dismiss() {
+        appRouter?.pop()
+    }
 }

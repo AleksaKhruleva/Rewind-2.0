@@ -6,77 +6,80 @@ import Domain
 public struct MediasUploadingView: View {
     @State var viewModel: MediasUploadingViewModel
     
-    @Environment(\.dismiss)
-    private var dismiss
+    private let router: AppRouter
+    
     @Environment(\.showToast)
     private var showToast
     
-    public init() {
+    public init(router: AppRouter) {
         viewModel = .init()
+        self.router = router
     }
     
     public var body: some View {
-        VStack(spacing: 0) {
-            header
-            
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
-                    ForEach(viewModel.loadedMedias) { loadedMedia in
-                        loadedMedia.makeView()
-                            .overlay {
-                                badges(for: loadedMedia) {
-                                    Task {
-                                        await viewModel.dispatch(.removeMedia(loadedMedia))
+        NavigationStack {
+            VStack(spacing: 0) {
+                header
+                
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 10) {
+                        ForEach(viewModel.loadedMedias) { loadedMedia in
+                            loadedMedia.makeView()
+                                .overlay {
+                                    badges(for: loadedMedia) {
+                                        Task {
+                                            await viewModel.dispatch(.removeMedia(loadedMedia))
+                                        }
                                     }
                                 }
-                            }
-                            .onTapGesture {
-                                Task {
-                                    await viewModel.dispatch(.showMediaSettings(loadedMedia))
+                                .onTapGesture {
+                                    Task {
+                                        await viewModel.dispatch(.showMediaSettings(loadedMedia))
+                                    }
                                 }
-                            }
+                        }
+                        
+                        photosPicker
                     }
-                    
-                    photosPicker
+                    .padding(.horizontal, 10)
                 }
-                .padding(.horizontal, 10)
-            }
-            .padding(.vertical, 10)
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .background(Color.backgroundSecondary)
-            .cornerRadius(32)
-            .padding(.bottom, 8)
-            
-            settingsToggle
-                .padding(.bottom, 16)
-            
-            Group {
-                musicSection
+                .padding(.vertical, 10)
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .background(Color.backgroundSecondary)
+                .cornerRadius(32)
+                .padding(.bottom, 8)
+                
+                settingsToggle
                     .padding(.bottom, 16)
                 
-                TagsSectionView(tags: $viewModel.tags)
-            }.disabledWithOpacity(!viewModel.similarSettigns)
-            
-            Spacer()
-        }
-        .navigationDestination(item: $viewModel.viewingMedia) { media in
-            mediaSettings(for: media)
-        }
-        .onAppear {
-            viewModel.set(showToast: showToast)
-        }
-        .padding(.horizontal, 8)
-        .background(Color.background)
-        .onChange(of: viewModel.selection) { _, newItems in
-            Task {
-                await viewModel.dispatch(.importMedias(newItems))
+                Group {
+                    musicSection
+                        .padding(.bottom, 16)
+                    
+                    TagsSectionView(tags: $viewModel.tags)
+                }.disabledWithOpacity(!viewModel.similarSettigns)
+                
+                Spacer()
+            }
+            .navigationDestination(item: $viewModel.viewingMedia) { media in
+                mediaSettings(for: media)
+            }
+            .onAppear {
+                viewModel.set(showToast: showToast)
+            }
+            .padding(.horizontal, 8)
+            .background(Color.background)
+            .onChange(of: viewModel.selection) { _, newItems in
+                Task {
+                    await viewModel.dispatch(.importMedias(newItems))
+                }
             }
         }
     }
     
     private var header: some View {
         RewindHeader(leftView: {
-            RewindButton(type: .leftChevron) { dismiss() }
+            RewindButton(type: .leftChevron) { router.pop() }
         })
     }
     
@@ -104,8 +107,8 @@ public struct MediasUploadingView: View {
                 trackName: "OVER",
                 artist: "Playboi Carti"
             ) {}
-            .background(Color.backgroundSecondary)
-            .cornerRadius(25)
+                .background(Color.backgroundSecondary)
+                .cornerRadius(25)
         }
     }
     

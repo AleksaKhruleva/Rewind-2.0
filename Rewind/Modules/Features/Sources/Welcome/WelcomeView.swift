@@ -5,7 +5,7 @@ import Base
 public struct WelcomeView: View {
     @State private var textWidth: CGFloat = 0
     
-    let router: AuthenticationRouter
+    private let router: AuthenticationRouter
     
     public init(router: AuthenticationRouter) {
         self.router = router
