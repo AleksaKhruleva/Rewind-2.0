@@ -31,6 +31,9 @@ struct RewindApp: App {
                 .environment(\.showToast, {
                     toastController.present(with: $0)
                 })
+                .onOpenURL { url in
+                    print("Universal Link received: \(url)")
+                }
         }
     }
     
