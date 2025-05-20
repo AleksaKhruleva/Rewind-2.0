@@ -29,6 +29,14 @@ public final class AppRouter {
         case quoteCreation
         case mediasUploading
         case mediaDetails(UIImage)
+        
+        case group
+        case addMember
+        case memberDetails
+        
+        case rewindsStand
+        case rollsStand
+        case groupSettings
     }
     
     public var stack: [RouteWrapper] = []

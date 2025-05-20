@@ -14,13 +14,17 @@ let activitiesData = [
 ]
 
 public struct MemberDetailsView: View {
-    public init() {}
+    private weak var router: AppRouter?
+    
+    public init(router: AppRouter) {
+        self.router = router
+    }
     
     public var body: some View {
         VStack {
             header
             
-            ScrollView {
+            ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 15) {
                     avatar
                     
@@ -32,24 +36,18 @@ public struct MemberDetailsView: View {
                 }
                 .padding(.horizontal, 16)
             }
-            .scrollIndicators(.hidden)
         }
         .background(Color.background)
     }
     
     private var header: some View {
-        RewindHeader {
-            RewindButton(type: .rightChevron).hidden()
-        } centerView: {
-            HeaderBadgeView(
-                image: memberAvatar,
-                text: memberName
-            )
-        } rightView: {
+        RewindHeader(centerView: {
+            HeaderBadgeView(image: memberAvatar, text: memberName)
+        }, rightView: {
             RewindButton(type: .rightChevron) {
-                print(1)
+                router?.pop()
             }
-        }
+        })
     }
     
     private var avatar: some View {
@@ -71,5 +69,5 @@ public struct MemberDetailsView: View {
 }
 
 #Preview {
-    MemberDetailsView()
+    MemberDetailsView(router: AppRouter())
 }

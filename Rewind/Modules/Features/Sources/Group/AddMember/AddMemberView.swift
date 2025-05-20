@@ -5,24 +5,23 @@ private let width = UIScreen.main.bounds.width / 1.5
 private let color = Color.background
 
 public struct AddMemberView: View {
-    
     @State private var viewModel: AddMemberViewModel
     
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.showToast) private var showToast
     
-    public init() {
-        self.viewModel = AddMemberViewModel()
+    private weak var router: AppRouter?
+    
+    public init(router: AppRouter) {
+        self.router = router
+        viewModel = AddMemberViewModel()
     }
     
     public var body: some View {
-        ZStack {
-            color
-                .ignoresSafeArea()
+        VStack {
+            header
             
             VStack(spacing: 12) {
-                Spacer()
-                
                 title
                 
                 qrCode
@@ -39,7 +38,9 @@ public struct AddMemberView: View {
                 
                 Spacer()
             }
+            .modifier(VStackTopOffsetModifier(topOffsetRatio: 0.15))
         }
+        .background(Color.background)
         .sheet(isPresented: $viewModel.showShareSheet) {
             ActivityView(
                 activityItems: [viewModel.link],
@@ -54,14 +55,15 @@ public struct AddMemberView: View {
             showToast(newValue)
             viewModel.toastMessage = nil
         }
-        .onAppear {
-            viewModel
-                .dispatch(
+        .task {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                viewModel.dispatch(
                     .generateQR(
                         color: color,
                         colorScheme: colorScheme
                     )
                 )
+            }
         }
         .onChange(of: colorScheme) { _, newValue in
             viewModel
@@ -72,6 +74,14 @@ public struct AddMemberView: View {
                     )
                 )
         }
+    }
+    
+    private var header: some View {
+        RewindHeader(backgroundColor: .clear, rightView: {
+            RewindButton(type: .rightChevron) {
+                router?.pop()
+            }
+        })
     }
     
     private var title: some View {
@@ -86,29 +96,35 @@ public struct AddMemberView: View {
     
     @ViewBuilder
     private var qrCode: some View {
-        if let image = viewModel.qrCodeImage {
-            ZStack {
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color(hex: "FF3299"),
-                                Color(hex: "FF65B5"),
-                                Color(hex: "FF8FC7"),
-                            ],
-                            startPoint: .leading,
-                            endPoint: .trailing
+        switch viewModel.qrCodeImageState {
+        case .requested:
+            ProgressView()
+                .frame(width: width, height: width)
+        case let .ready(qrCodeImage):
+            withAnimation {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 24)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color(hex: "FF3299"),
+                                    Color(hex: "FF65B5"),
+                                    Color(hex: "FF8FC7"),
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
                         )
-                    )
-                    .frame(width: width, height: width)
-                
-                Image(uiImage: image)
-                    .resizable()
-                    .interpolation(.none)
-                    .scaledToFit()
-                    .frame(width: width * 0.88, height: width * 0.88)
+                        .frame(width: width, height: width)
+                    
+                    Image(uiImage: qrCodeImage)
+                        .resizable()
+                        .interpolation(.none)
+                        .scaledToFit()
+                        .frame(width: width * 0.88, height: width * 0.88)
+                }
             }
-        } else {
+        case .failed:
             EmptyView()
         }
     }
@@ -130,5 +146,5 @@ public struct AddMemberView: View {
 }
 
 #Preview {
-    AddMemberView()
+    AddMemberView(router: AppRouter())
 }

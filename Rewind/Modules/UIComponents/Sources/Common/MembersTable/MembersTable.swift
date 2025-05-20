@@ -4,11 +4,18 @@ public struct MembersTable: View {
     private let title: String
     private let members: [Member]
     private let isShortened: Bool
+    private let onAddMemberTap: () -> Void
     
-    public init(title: String = "Members", members: [Member], isShortened: Bool) {
+    public init(
+        title: String = "Members",
+        members: [Member],
+        isShortened: Bool,
+        onAddMemberTap: @escaping () -> Void
+    ) {
         self.title = title
         self.members = members
         self.isShortened = isShortened
+        self.onAddMemberTap = onAddMemberTap
     }
     
     public var body: some View {
@@ -24,7 +31,7 @@ public struct MembersTable: View {
                     title: UIComponentsStrings.Group.Members.add,
                     imageSize: 25
                 ) {
-                    print("Add members plz")
+                    onAddMemberTap()
                 }
                 
                 ForEach(members) { member in
@@ -52,13 +59,4 @@ public struct MembersTable: View {
             .cornerRadius(24)
         }
     }
-}
-
-#Preview {
-    VStack {
-        MembersTable(title: "Members", members: Array(membersForTest.prefix(4)), isShortened: true)
-        
-        MembersTable(title: "Members", members: membersForTest, isShortened: false)
-    }
-    .padding()
 }

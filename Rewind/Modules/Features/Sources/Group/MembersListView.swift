@@ -55,7 +55,10 @@ public struct MembersListView: View {
         MembersTable(
             title: UIComponentsStrings.Group.Members.count(filteredMembers.count),
             members: filteredMembers,
-            isShortened: false
+            isShortened: false,
+            onAddMemberTap: {
+                // TODO: go to AddMemberView
+            }
         )
     }
 }

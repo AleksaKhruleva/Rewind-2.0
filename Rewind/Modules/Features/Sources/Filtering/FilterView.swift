@@ -53,7 +53,7 @@ public struct FilterView: View {
         }
         .alert(
             UIComponentsStrings.FilterSettings.InvalidDates.title,
-            isPresented: $invalidDatesShown,
+            isPresented: .constant(false),
             actions: {},
             message: { Text(UIComponentsStrings.FilterSettings.InvalidDates.message) }
         )
@@ -107,7 +107,7 @@ public struct FilterView: View {
             width: .generic
         ) {
             guard !viewModel.invalidDates else {
-                invalidDatesShown = true
+//                invalidDatesShown = true
                 return
             }
             onSave(viewModel.generateFilters())

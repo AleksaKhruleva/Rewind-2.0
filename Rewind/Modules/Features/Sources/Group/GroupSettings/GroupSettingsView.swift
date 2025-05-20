@@ -13,15 +13,17 @@ let riskyData = [
 ]
 
 public struct GroupSettingsView: View {
-    @State private var isBlurredAvatarPresented = false
+    private let router: GroupSettingsRouter
     
-    public init() {}
+    public init(router: GroupSettingsRouter) {
+        self.router = router
+    }
     
     public var body: some View {
         VStack {
             header
             
-            ScrollView {
+            ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 15) {
                     avatar
                     
@@ -31,17 +33,8 @@ public struct GroupSettingsView: View {
                 }
                 .padding(.horizontal, 16)
             }
-            .scrollIndicators(.hidden)
         }
         .background(Color.background)
-        .overlay {
-            if isBlurredAvatarPresented {
-                BlurredAvatarView(
-                    image: UIComponentsAsset.groupAvatar.image,
-                    isPresented: $isBlurredAvatarPresented
-                )
-            }
-        }
     }
     
     private var header: some View {
@@ -54,7 +47,7 @@ public struct GroupSettingsView: View {
             )
         } rightView: {
             RewindButton(type: .rightChevron) {
-                // TODO: go back
+                router.dismiss()
             }
         }
     }
@@ -70,8 +63,4 @@ public struct GroupSettingsView: View {
     private var riskyTable: some View {
         InformationTable(title: UIComponentsStrings.Group.Settings.risky, data: riskyData, isRisky: true)
     }
-}
-
-#Preview {
-    GroupSettingsView()
 }

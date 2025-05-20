@@ -1,13 +1,15 @@
 import SwiftUI
 
+private let imageSize: CGFloat = 100
+private let imageCornerRadius: CGFloat = 14
+
 public struct GalleryScrollPreview: View {
     private let images: [UIImage]
+    private let onChevronTap: () -> Void
     
-    private static let imageSize: CGFloat = 100
-    private static let cornerRadius: CGFloat = 14
-    
-    public init(images: [UIImage]) {
+    public init(images: [UIImage], onChevronTap: @escaping () -> Void) {
         self.images = images
+        self.onChevronTap = onChevronTap
     }
     
     public var body: some View {
@@ -27,20 +29,23 @@ public struct GalleryScrollPreview: View {
                                 Image(uiImage: image)
                                     .resizable()
                                     .scaledToFill()
-                                    .frame(width: Self.imageSize, height: Self.imageSize)
-                                    .clipShape(RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous))
+                                    .frame(width: imageSize, height: imageSize)
+                                    .clipShape(RoundedRectangle(cornerRadius: imageCornerRadius, style: .continuous))
                             }
                         }
                     }
-                    .frame(height: Self.imageSize)
-                    .clipShape(RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous))
+                    .frame(height: imageSize)
+                    .clipShape(RoundedRectangle(cornerRadius: imageCornerRadius, style: .continuous))
                     .padding(.leading, 10)
                     .padding(.trailing, 5)
                     
                     Image(systemName: "chevron.right")
-                        .frame(width: 34, height: Self.imageSize)
+                        .frame(width: 34, height: imageSize)
                         .modifier(RoundFontModifier(size: 14))
                         .padding(.trailing, 6)
+                        .onTapGesture {
+                            onChevronTap()
+                        }
                 }
             }
             .frame(height: 120)
