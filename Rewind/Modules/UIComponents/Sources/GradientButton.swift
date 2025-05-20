@@ -45,7 +45,7 @@ extension View {
         switch width {
         case .generic:
             self
-                .padding(.horizontal, 12)
+                .padding(.horizontal, 24)
                 .frame(height: height)
         case let .given(value):
             self.frame(width: value, height: height)

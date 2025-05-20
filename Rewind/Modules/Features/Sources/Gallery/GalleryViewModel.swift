@@ -11,6 +11,7 @@ final class GalleryViewModel {
         case showMediasDialog
         case selectOneMedia(PhotosPickerItem)
         case viewBlurredMedia(UIImage)
+        case openFilters
     }
     
     var mediaPickerPresented: Bool = false
@@ -19,6 +20,7 @@ final class GalleryViewModel {
     var mediaUploadingDialogShown: Bool = false
     var uploadingMedia: LoadedMedia?
     
+    var filterSettingsShown = false
     var blurredMediaShown = false
     var blurredMediaSelection: UIImage?
     
@@ -57,6 +59,8 @@ final class GalleryViewModel {
                 blurredMediaSelection = media
                 blurredMediaShown = true
             }
+        case let .openFilters:
+            filterSettingsShown = true
         }
     }
     

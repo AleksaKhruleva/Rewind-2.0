@@ -27,7 +27,7 @@ public struct RewindHeader<LeftContent: View, CenterContent: View, RightContent:
             rightView
         }
         .padding([.bottom, .horizontal])
-        .background(backgroundColor)
+        .background(.clear)
     }
 }
 
