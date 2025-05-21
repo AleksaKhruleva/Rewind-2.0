@@ -47,6 +47,15 @@ public struct RootView: View {
         case .quoteCreation: QuoteCreationView(router: router)
         case .mediasUploading: MediasUploadingView(router: router)
         case let .mediaDetails(image): MediaDetailsView(router: router, image: image)
+            
+        case .group: GroupView(router: GroupRouter(appRouter: router))
+        case .groupSettings: GroupSettingsView(router: GroupSettingsRouter(appRouter: router))
+        case let .addMember(groupName): AddMemberView(groupName: groupName, router: router)
+        case let .memberDetails(member): MemberDetailsView(member: member, router: router)
+        case .membersList: MembersListView(router: MembersListRouter(appRouter: router))
+            
+        case .rewindsStand: StandView(title: "You added 207 Rewinds", counterType: .rewinds, router: router)
+        case .rollsStand: StandView(title: "You rolled 207 Rewinds", counterType: .rolls, router: router)
         }
     }
     

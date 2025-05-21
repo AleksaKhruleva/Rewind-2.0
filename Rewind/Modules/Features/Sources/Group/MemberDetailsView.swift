@@ -1,9 +1,6 @@
 import SwiftUI
 import UIComponents
-
-// vremenno
-let memberName = "Matthew"
-let memberAvatar = UIComponentsAsset.matthewMcConaughey.image
+import Domain
 
 let nilAction: (() -> Void)? = nil // temporary
 let groupsData = [("person.2.fill", UIComponentsStrings.Account.Groups.count(8), nilAction)]
@@ -14,13 +11,20 @@ let activitiesData = [
 ]
 
 public struct MemberDetailsView: View {
-    public init() {}
+    private let member: Member
+    
+    private weak var router: AppRouter?
+    
+    public init(member: Member, router: AppRouter) {
+        self.member = member
+        self.router = router
+    }
     
     public var body: some View {
         VStack {
             header
             
-            ScrollView {
+            ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 15) {
                     avatar
                     
@@ -32,28 +36,22 @@ public struct MemberDetailsView: View {
                 }
                 .padding(.horizontal, 16)
             }
-            .scrollIndicators(.hidden)
         }
         .background(Color.background)
     }
     
     private var header: some View {
-        RewindHeader {
-            RewindButton(type: .rightChevron).hidden()
-        } centerView: {
-            HeaderBadgeView(
-                image: memberAvatar,
-                text: memberName
-            )
-        } rightView: {
+        RewindHeader(centerView: {
+            HeaderBadgeView(image: member.avatar, text: member.name)
+        }, rightView: {
             RewindButton(type: .rightChevron) {
-                print(1)
+                router?.pop()
             }
-        }
+        })
     }
     
     private var avatar: some View {
-        AvatarView(image: memberAvatar, text: memberName)
+        AvatarView(image: member.avatar, text: member.name)
     }
     
     private var groupsTable: some View {
@@ -65,11 +63,11 @@ public struct MemberDetailsView: View {
     }
     
     private var userExistenceNote: some View {
-        RewindNoteTextView(text: UIComponentsStrings.Account.Note.stranger(memberName, 100))
+        RewindNoteTextView(text: UIComponentsStrings.Account.Note.stranger(member.name, 100))
             .padding(.vertical, 4)
     }
 }
 
 #Preview {
-    MemberDetailsView()
+    MemberDetailsView(member: membersForTest.first!, router: AppRouter())
 }

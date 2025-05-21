@@ -1,15 +1,39 @@
 import SwiftUI
+import Domain
 
-struct PodiumBadgeView: View {
-    let rank: Int
-    let member: Member
-    let imageSize: CGFloat
-    let count: Int
-    let counterType: CounterType
-    let badgeSize: CGFloat
-    let badgeColor: Color
+public enum CounterType {
+    case rolls
+    case rewinds
+}
+
+public struct PodiumBadgeView: View {
+    private let rank: Int
+    private let member: Member
+    private let imageSize: CGFloat
+    private let count: Int
+    private let counterType: CounterType
+    private let badgeSize: CGFloat
+    private let badgeColor: Color
     
-    var body: some View {
+    public init(
+        rank: Int,
+        member: Member,
+        imageSize: CGFloat,
+        count: Int,
+        counterType: CounterType,
+        badgeSize: CGFloat,
+        badgeColor: Color
+    ) {
+        self.rank = rank
+        self.member = member
+        self.imageSize = imageSize
+        self.count = count
+        self.counterType = counterType
+        self.badgeSize = badgeSize
+        self.badgeColor = badgeColor
+    }
+    
+    public var body: some View {
         VStack(spacing: 5) {
             ZStack(alignment: .topTrailing) {
                 Image(uiImage: member.avatar)

@@ -1,13 +1,14 @@
 import SwiftUI
+import Domain
 
-struct MembersTableCell: View {
+struct MemberRow: View {
     private let member: Member
-    private let onTap: () -> Void
+    private let onTap: (Member) -> Void
     private let onRemove: () -> Void
     
     init(
         member: Member,
-        onTap: @escaping () -> Void,
+        onTap: @escaping (Member) -> Void,
         onRemove: @escaping () -> Void
     ) {
         self.member = member
@@ -37,35 +38,28 @@ struct MembersTableCell: View {
                 
                 Spacer()
             }
+            .frame(height: 42)
+            .padding(.leading, 14)
             .contentShape(Rectangle())
             .onTapGesture {
-                onTap()
+                onTap(member)
             }
             
-            if member.isOwner {
-                Image(systemName: "star.fill")
-                    .modifier(RoundFontModifier(size: 14, foregroundColor: .pinkPrimary))
-            } else {
-                Button(action: onRemove) {
-                    Image(systemName: "xmark")
-                        .modifier(RoundFontModifier(size: 14))
-                        .padding(.trailing, 1)
+            Group {
+                if member.isOwner {
+                    Image(systemName: "star.fill")
+                        .modifier(RoundFontModifier(size: 14, foregroundColor: .pinkPrimary))
+                        .padding(.trailing, -2)
+                } else {
+                    Button(action: onRemove) {
+                        Image(systemName: "xmark")
+                            .modifier(RoundFontModifier(size: 14))
+                    }
                 }
-                .contentShape(Circle())
             }
+            .frame(height: 42)
+            .padding(.horizontal, 14)
         }
-        .frame(height: 42)
-        .padding(.horizontal, 14)
         .padding(.vertical, 5)
-    }
-}
-
-#Preview {
-    ForEach(membersForTest) { member in
-        MembersTableCell(member: member) {
-            print("Open member details screen")
-        } onRemove: {
-            print("Remove \(member.name)?")
-        }
     }
 }

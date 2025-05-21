@@ -16,13 +16,17 @@ let images = [
 public struct GroupView: View {
     @State private var isBlurredAvatarPresented = false
     
-    public init() {}
+    private let router: GroupRouter
+    
+    public init(router: GroupRouter) {
+        self.router = router
+    }
     
     public var body: some View {
         VStack {
             header
             
-            ScrollView {
+            ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 15) {
                     avatar
                         .onTapGesture {
@@ -41,7 +45,6 @@ public struct GroupView: View {
                 }
                 .padding(.horizontal, 16)
             }
-            .scrollIndicators(.hidden)
         }
         .background(Color.background)
         .overlay {
@@ -57,7 +60,7 @@ public struct GroupView: View {
     private var header: some View {
         RewindHeader {
             RewindButton(type: .gearshape) {
-                // TODO: go to settings
+                router.navigateToGroupSettings()
             }
         } centerView: {
             HeaderBadgeView(
@@ -66,7 +69,7 @@ public struct GroupView: View {
             )
         } rightView: {
             RewindButton(type: .rightChevron) {
-                // TODO: go back
+                router.dismiss()
             }
         }
     }
@@ -76,7 +79,19 @@ public struct GroupView: View {
     }
     
     private var membersTable: some View {
-        MembersTable(members: Array(membersForTest.prefix(4)), isShortened: true)
+        MembersTable(
+            members: Array(membersForTest.prefix(4)),
+            isShortened: true,
+            onAddMemberTap: {
+                router.navigateToAddMember(groupName: "Friends")
+            },
+            onMemberTap: { member in
+                router.navigateToMemberDetails(member)
+            },
+            onShowAllMembersTap: {
+                router.navigateToMembersList()
+            }
+        )
     }
     
     // думаю, стоит либо сделать отдельно SectionTable, либо чуть "обобщить" InformationTable,
@@ -91,14 +106,14 @@ public struct GroupView: View {
                     systemImageName: "photo.on.rectangle",
                     title: UIComponentsStrings.Group.Stand.rewinds,
                     imageSize: 20) {
-                        // TODO: show stand
+                        router.navigateToRewindsStand()
                     }
                 
                 MembersTableButton(
                     systemImageName: "forward.fill",
                     title: UIComponentsStrings.Group.Stand.rolls,
                     imageSize: 15) {
-                        // TODO: show stand
+                        router.navigateToRollsStand()
                     }
             }
             .padding(.vertical, 5)
@@ -108,15 +123,13 @@ public struct GroupView: View {
     }
     
     private var galleryPreview: some View {
-        GalleryScrollPreview(images: images)
+        GalleryScrollPreview(images: images, onChevronTap: {
+            router.navigateToGallery()
+        })
     }
     
     private var groupExistenceNote: some View {
         RewindNoteTextView(text: UIComponentsStrings.Group.note(100))
             .padding(.vertical, 4)
     }
-}
-
-#Preview {
-    GroupView()
 }

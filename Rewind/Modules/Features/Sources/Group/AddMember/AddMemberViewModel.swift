@@ -2,22 +2,25 @@ import Base
 import SwiftUI
 import UIComponents
 
-@MainActor
-@Observable
+@MainActor @Observable
 final class AddMemberViewModel {
-    
     enum Intent {
         case copyLink
         case shareLink
         case generateQR(color: Color, colorScheme: ColorScheme)
     }
     
-    var showShareSheet = false
-    var toastMessage: String?
-    var qrCodeImage: UIImage?
+    enum QRCodeImageState {
+        case requested
+        case ready(UIImage)
+        case failed
+    }
     
+    var toastMessage: String?
+    var showShareSheet = false
     let link = "https://rewindapp.ru/swagger/index.html"
-    let groupName = "Friends"
+    
+    private(set) var qrCodeImageState: QRCodeImageState = .requested
     
     func dispatch(_ intent: Intent) {
         switch intent {
@@ -36,11 +39,16 @@ final class AddMemberViewModel {
     }
     
     private func generateQR(color: Color, colorScheme: ColorScheme) {
+        qrCodeImageState = .requested
+        
         guard let generatedQR = QRCodeGenerator.generate(from: link, pixelColor: color, colorScheme: colorScheme) else {
             toastMessage = UIComponentsStrings.Group.AddMember.QrCodeGeneration.failure
+            qrCodeImageState = .failed
             return
         }
         
-        qrCodeImage = generatedQR
+        withAnimation {
+            qrCodeImageState = .ready(generatedQR)
+        }
     }
 }

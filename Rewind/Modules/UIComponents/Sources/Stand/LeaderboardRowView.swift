@@ -1,12 +1,25 @@
 import SwiftUI
+import Domain
 
-struct LeaderboardRowView: View {
-    let rank: Int
-    let member: Member
-    let count: Int
-    let counterType: CounterType
+public struct LeaderboardRowView: View {
+    private let rank: Int
+    private let member: Member
+    private let count: Int
+    private let counterType: CounterType
     
-    var body: some View {
+    public init(
+        rank: Int,
+        member: Member,
+        count: Int,
+        counterType: CounterType
+    ) {
+        self.rank = rank
+        self.member = member
+        self.count = count
+        self.counterType = counterType
+    }
+    
+    public var body: some View {
         HStack {
             Text("\(rank)")
                 .modifier(RoundFontModifier(size: 16, foregroundColor: .white))

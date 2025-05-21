@@ -1,4 +1,5 @@
 import SwiftUI
+import UIComponents
 
 // временно
 let podiumMembers = [
@@ -11,9 +12,12 @@ public struct StandView: View {
     private let title: String
     private let counterType: CounterType
     
-    public init(title: String, counterType: CounterType) {
+    private weak var router: AppRouter?
+    
+    public init(title: String, counterType: CounterType, router: AppRouter) {
         self.title = title
         self.counterType = counterType
+        self.router = router
     }
     
     public var body: some View {
@@ -80,13 +84,8 @@ public struct StandView: View {
     private var header: some View {
         RewindHeader(backgroundColor: .clear, rightView: {
             RewindButton(type: .rightChevron, tint: .white) {
-                // TODO: dismiss
+                router?.pop()
             }
         })
     }
-}
-
-#Preview {
-    StandView(title: "You rolled 70 Rewinds", counterType: .rolls)
-    //    StandView(title: "You added 70 Rewinds", counterType: .rewinds)
 }

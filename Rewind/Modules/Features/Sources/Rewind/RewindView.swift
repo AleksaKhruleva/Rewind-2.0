@@ -92,6 +92,10 @@ public struct RewindView: View {
     private var header: some View {
         RewindHeader {
             RoundImageView(image: UIComponentsAsset.media5.image, size: 44)
+                .contentShape(Circle())
+                .onTapGesture {
+                    router.navigateToGroup()
+                }
         } centerView: {
             GroupsAndLocationHeader(groupCount: 8) {
                 isSelectGroupPresented = true
