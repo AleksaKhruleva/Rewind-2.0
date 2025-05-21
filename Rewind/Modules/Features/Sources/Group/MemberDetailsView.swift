@@ -1,9 +1,6 @@
 import SwiftUI
 import UIComponents
-
-// vremenno
-let memberName = "Matthew"
-let memberAvatar = UIComponentsAsset.matthewMcConaughey.image
+import Domain
 
 let nilAction: (() -> Void)? = nil // temporary
 let groupsData = [("person.2.fill", UIComponentsStrings.Account.Groups.count(8), nilAction)]
@@ -14,9 +11,12 @@ let activitiesData = [
 ]
 
 public struct MemberDetailsView: View {
+    private let member: Member
+    
     private weak var router: AppRouter?
     
-    public init(router: AppRouter) {
+    public init(member: Member, router: AppRouter) {
+        self.member = member
         self.router = router
     }
     
@@ -42,7 +42,7 @@ public struct MemberDetailsView: View {
     
     private var header: some View {
         RewindHeader(centerView: {
-            HeaderBadgeView(image: memberAvatar, text: memberName)
+            HeaderBadgeView(image: member.avatar, text: member.name)
         }, rightView: {
             RewindButton(type: .rightChevron) {
                 router?.pop()
@@ -51,7 +51,7 @@ public struct MemberDetailsView: View {
     }
     
     private var avatar: some View {
-        AvatarView(image: memberAvatar, text: memberName)
+        AvatarView(image: member.avatar, text: member.name)
     }
     
     private var groupsTable: some View {
@@ -63,11 +63,11 @@ public struct MemberDetailsView: View {
     }
     
     private var userExistenceNote: some View {
-        RewindNoteTextView(text: UIComponentsStrings.Account.Note.stranger(memberName, 100))
+        RewindNoteTextView(text: UIComponentsStrings.Account.Note.stranger(member.name, 100))
             .padding(.vertical, 4)
     }
 }
 
 #Preview {
-    MemberDetailsView(router: AppRouter())
+    MemberDetailsView(member: membersForTest.first!, router: AppRouter())
 }

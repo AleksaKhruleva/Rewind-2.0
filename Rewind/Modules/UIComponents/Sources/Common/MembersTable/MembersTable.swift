@@ -1,21 +1,28 @@
 import SwiftUI
+import Domain
 
 public struct MembersTable: View {
     private let title: String
     private let members: [Member]
     private let isShortened: Bool
     private let onAddMemberTap: () -> Void
+    private let onMemberTap: (Member) -> Void
+    private let onShowAllMembersTap: (() -> Void)?
     
     public init(
         title: String = "Members",
         members: [Member],
         isShortened: Bool,
-        onAddMemberTap: @escaping () -> Void
+        onAddMemberTap: @escaping () -> Void,
+        onMemberTap: @escaping (Member) -> Void,
+        onShowAllMembersTap: (() -> Void)? = nil
     ) {
         self.title = title
         self.members = members
         self.isShortened = isShortened
         self.onAddMemberTap = onAddMemberTap
+        self.onMemberTap = onMemberTap
+        self.onShowAllMembersTap = onShowAllMembersTap
     }
     
     public var body: some View {
@@ -35,9 +42,8 @@ public struct MembersTable: View {
                 }
                 
                 ForEach(members) { member in
-                    MembersTableCell(member: member) {
-                        // TODO: go to MemberDetails
-                        print("go")
+                    MemberRow(member: member) { member in
+                        onMemberTap(member)
                     } onRemove: {
                         // TODO: show remove confirmation
                         print("remove")
@@ -50,7 +56,7 @@ public struct MembersTable: View {
                         title: UIComponentsStrings.Group.Members.count(membersForTest.count),
                         imageSize: 20
                     ) {
-                        print("Show all members")
+                        onShowAllMembersTap?()
                     }
                 }
             }

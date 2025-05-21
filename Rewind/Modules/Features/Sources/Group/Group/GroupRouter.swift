@@ -1,4 +1,5 @@
 import SwiftUI
+import Domain
 
 @MainActor
 public final class GroupRouter {
@@ -16,8 +17,12 @@ public final class GroupRouter {
         appRouter?.navigate(to: .addMember, with: .pushFromLeft)
     }
     
-    func navigateToMemberDetails() {
-        appRouter?.navigate(to: .memberDetails, with: .pushFromLeft)
+    func navigateToMemberDetails(_ member: Member) {
+        appRouter?.navigate(to: .memberDetails(member), with: .pushFromLeft)
+    }
+    
+    func navigateToMembersList() {
+        appRouter?.navigate(to: .membersList, with: .pushFromLeft)
     }
     
     func navigateToRewindsStand() {

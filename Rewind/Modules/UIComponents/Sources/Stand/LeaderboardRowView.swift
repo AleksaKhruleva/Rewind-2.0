@@ -1,4 +1,5 @@
 import SwiftUI
+import Domain
 
 public struct LeaderboardRowView: View {
     private let rank: Int

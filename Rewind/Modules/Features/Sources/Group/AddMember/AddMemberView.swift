@@ -55,6 +55,15 @@ public struct AddMemberView: View {
             showToast(newValue)
             viewModel.toastMessage = nil
         }
+        .onChange(of: colorScheme) { _, newValue in
+            viewModel
+                .dispatch(
+                    .generateQR(
+                        color: color,
+                        colorScheme: newValue
+                    )
+                )
+        }
         .task {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                 viewModel.dispatch(
@@ -64,15 +73,6 @@ public struct AddMemberView: View {
                     )
                 )
             }
-        }
-        .onChange(of: colorScheme) { _, newValue in
-            viewModel
-                .dispatch(
-                    .generateQR(
-                        color: color,
-                        colorScheme: newValue
-                    )
-                )
         }
     }
     
@@ -101,28 +101,26 @@ public struct AddMemberView: View {
             ProgressView()
                 .frame(width: width, height: width)
         case let .ready(qrCodeImage):
-            withAnimation {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 24)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color(hex: "FF3299"),
-                                    Color(hex: "FF65B5"),
-                                    Color(hex: "FF8FC7"),
-                                ],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
+            ZStack {
+                RoundedRectangle(cornerRadius: 24)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color(hex: "FF3299"),
+                                Color(hex: "FF65B5"),
+                                Color(hex: "FF8FC7"),
+                            ],
+                            startPoint: .leading,
+                            endPoint: .trailing
                         )
-                        .frame(width: width, height: width)
-                    
-                    Image(uiImage: qrCodeImage)
-                        .resizable()
-                        .interpolation(.none)
-                        .scaledToFit()
-                        .frame(width: width * 0.88, height: width * 0.88)
-                }
+                    )
+                    .frame(width: width, height: width)
+                
+                Image(uiImage: qrCodeImage)
+                    .resizable()
+                    .interpolation(.none)
+                    .scaledToFit()
+                    .frame(width: width * 0.88, height: width * 0.88)
             }
         case .failed:
             EmptyView()

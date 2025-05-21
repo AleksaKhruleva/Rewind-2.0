@@ -48,6 +48,8 @@ final class AddMemberViewModel {
             return
         }
         
-        qrCodeImageState = .ready(generatedQR)
+        withAnimation {
+            qrCodeImageState = .ready(generatedQR)
+        }
     }
 }

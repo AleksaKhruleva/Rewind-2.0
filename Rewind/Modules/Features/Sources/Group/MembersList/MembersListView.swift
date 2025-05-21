@@ -1,9 +1,11 @@
 import SwiftUI
 import UIComponents
+import Domain
 
-// докручу этот экран позже, сейчас он меня бесит уже 😔
 public struct MembersListView: View {
     @State private var searchText = ""
+    
+    private let router: MembersListRouter
     
     // ochevidno vremenno
     private var filteredMembers: [Member] {
@@ -16,7 +18,9 @@ public struct MembersListView: View {
         }
     }
     
-    public init() {}
+    public init(router: MembersListRouter) {
+        self.router = router
+    }
     
     public var body: some View {
         VStack {
@@ -36,15 +40,16 @@ public struct MembersListView: View {
     }
     
     private var header: some View {
-        RewindHeader {
-            RewindButton(type: .rightChevron).hidden()
-        } centerView: {
-            HeaderBadgeView(image: UIComponentsAsset.groupAvatar.image, text: UIComponentsStrings.Members.title("Friends'"))
-        } rightView: {
+        RewindHeader(centerView: {
+            HeaderBadgeView(
+                image: UIComponentsAsset.groupAvatar.image,
+                text: "Friends"
+            )
+        }, rightView: {
             RewindButton(type: .rightChevron) {
-                // TODO: go back
+                router.dismiss()
             }
-        }
+        })
     }
     
     private var searchField: some View {
@@ -57,12 +62,12 @@ public struct MembersListView: View {
             members: filteredMembers,
             isShortened: false,
             onAddMemberTap: {
-                // TODO: go to AddMemberView
+                router.navigateToAddMember()
+            },
+            onMemberTap: { member in
+                router.navigateToMemberDetails(member)
             }
         )
+        .animation(.easeInOut(duration: 0.3), value: filteredMembers)
     }
-}
-
-#Preview {
-    MembersListView()
 }

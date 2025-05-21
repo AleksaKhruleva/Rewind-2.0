@@ -84,6 +84,12 @@ public struct GroupView: View {
             isShortened: true,
             onAddMemberTap: {
                 router.navigateToAddMember()
+            },
+            onMemberTap: { member in
+                router.navigateToMemberDetails(member)
+            },
+            onShowAllMembersTap: {
+                router.navigateToMembersList()
             }
         )
     }
