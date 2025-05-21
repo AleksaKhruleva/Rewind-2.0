@@ -13,8 +13,8 @@ public final class GroupRouter {
         appRouter?.navigate(to: .groupSettings, with: .pushFromLeft)
     }
     
-    func navigateToAddMember() {
-        appRouter?.navigate(to: .addMember, with: .pushFromLeft)
+    func navigateToAddMember(groupName: String) {
+        appRouter?.navigate(to: .addMember(groupName), with: .pushFromLeft)
     }
     
     func navigateToMemberDetails(_ member: Member) {

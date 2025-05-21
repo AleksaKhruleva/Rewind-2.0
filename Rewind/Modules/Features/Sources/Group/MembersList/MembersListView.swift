@@ -62,7 +62,7 @@ public struct MembersListView: View {
             members: filteredMembers,
             isShortened: false,
             onAddMemberTap: {
-                router.navigateToAddMember()
+                router.navigateToAddMember(groupName: "Friends")
             },
             onMemberTap: { member in
                 router.navigateToMemberDetails(member)

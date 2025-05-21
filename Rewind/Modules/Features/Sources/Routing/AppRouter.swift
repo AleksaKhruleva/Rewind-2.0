@@ -32,9 +32,10 @@ public final class AppRouter {
         
         case group
         case groupSettings
-        case addMember
+        case addMember(String)
         case memberDetails(Member)
         case membersList
+        
         case rewindsStand
         case rollsStand
     }

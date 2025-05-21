@@ -10,9 +10,12 @@ public struct AddMemberView: View {
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.showToast) private var showToast
     
+    private let groupName: String
+    
     private weak var router: AppRouter?
     
-    public init(router: AppRouter) {
+    public init(groupName: String, router: AppRouter) {
+        self.groupName = groupName
         self.router = router
         viewModel = AddMemberViewModel()
     }
@@ -85,7 +88,7 @@ public struct AddMemberView: View {
     }
     
     private var title: some View {
-        Text(UIComponentsStrings.Group.AddMember.join(viewModel.groupName))
+        Text(UIComponentsStrings.Group.AddMember.join(groupName))
             .modifier(
                 RoundFontModifier(
                     size: 20,
@@ -141,8 +144,4 @@ public struct AddMemberView: View {
         }
         .frame(width: width / 2 - 6, height: 56)
     }
-}
-
-#Preview {
-    AddMemberView(router: AppRouter())
 }

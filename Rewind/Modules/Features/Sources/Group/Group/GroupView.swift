@@ -83,7 +83,7 @@ public struct GroupView: View {
             members: Array(membersForTest.prefix(4)),
             isShortened: true,
             onAddMemberTap: {
-                router.navigateToAddMember()
+                router.navigateToAddMember(groupName: "Friends")
             },
             onMemberTap: { member in
                 router.navigateToMemberDetails(member)

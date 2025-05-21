@@ -19,7 +19,6 @@ final class AddMemberViewModel {
     var toastMessage: String?
     var showShareSheet = false
     let link = "https://rewindapp.ru/swagger/index.html"
-    let groupName = "Friends"
     
     private(set) var qrCodeImageState: QRCodeImageState = .requested
     

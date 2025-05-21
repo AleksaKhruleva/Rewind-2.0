@@ -50,7 +50,7 @@ public struct RootView: View {
             
         case .group: GroupView(router: GroupRouter(appRouter: router))
         case .groupSettings: GroupSettingsView(router: GroupSettingsRouter(appRouter: router))
-        case .addMember: AddMemberView(router: router)
+        case let .addMember(groupName): AddMemberView(groupName: groupName, router: router)
         case let .memberDetails(member): MemberDetailsView(member: member, router: router)
         case .membersList: MembersListView(router: MembersListRouter(appRouter: router))
             
