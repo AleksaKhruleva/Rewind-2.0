@@ -121,7 +121,7 @@ public struct GalleryView: View {
         case .image:
             ImageUploadingView(media: media, onSave: onSave)
         case .video:
-            VideoUploadingView(media: media) // TODO: onSave here
+            VideoUploadingView(media: media, onSave: onSave)
         }
     }
     

@@ -5,21 +5,18 @@ import SwiftUI
 import UIComponents
 
 public struct VideoUploadingView: View {
-    @State private var viewModel = VideoUploadingViewModel()
-    @State private var timerCancellable: Cancellable?
+    @State private var viewModel: VideoUploadingViewModel
     
     @Environment(\.showToast)
     private var showToast
     @Environment(\.dismiss)
     private var dismiss
     
+    private var onSave: (LoadedMedia) -> Void
     
-    private let timer = Timer.publish(every: 0.05, on: .main, in: .common)
-    
-    public init(media: LoadedMedia) {
-        if case let .video(url, _) = media.content {
-            self.viewModel.dispatch(.initializePlayer(AVURLAsset(url: url)))
-        }
+    public init(media: LoadedMedia, onSave: @escaping (LoadedMedia) -> Void) {
+        self.onSave = onSave
+        viewModel = VideoUploadingViewModel(loadedMedia: media)
     }
     
     public var body: some View {
@@ -34,8 +31,6 @@ public struct VideoUploadingView: View {
                         if let asset = viewModel.videoAsset {
                             videoTimeline(asset: asset)
                         }
-                        
-                        musicSection
                         
                         tagsSection
                     } else {
@@ -68,19 +63,11 @@ public struct VideoUploadingView: View {
                 }
             )
         }
-//        .onChange(of: viewModel.toastMessage) { message in
-//            guard let message else { return }
-//            showToast(message)
-//            viewModel.toastMessage = nil
-//        }
-        .onAppear {
-            timerCancellable = timer.connect()
-        }
-        .onDisappear {
-            timerCancellable?.cancel()
-        }
-        .onReceive(timer) { _ in
-            viewModel.dispatch(.updateTime)
+        .onChange(of: viewModel.isSettingsSaved) {
+            guard let loadedMedia = viewModel.loadedMedia else { return }
+            
+            onSave(loadedMedia)
+            dismiss()
         }
         .background(Color.background)
     }
@@ -133,25 +120,6 @@ public struct VideoUploadingView: View {
         }
     }
     
-    private var musicSection: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            Text(UIComponentsStrings.Music.sectionTitle)
-                .modifier(RoundFontModifier(size: 17, foregroundColor: .textSecondary))
-                .padding(.leading, 15)
-            VStack(alignment: .leading, spacing: 5) {
-                MembersTableButton(
-                    systemImageName: "music.note.list",
-                    title: UIComponentsStrings.Music.addMusic,
-                    imageSize: 20) {
-                        // TODO: show add music view
-                    }
-            }
-            .padding(.vertical, 5)
-            .background(Color.backgroundSecondary)
-            .cornerRadius(24)
-        }
-    }
-    
     private var tagsSection: some View {
         TagsSectionView(tags: $viewModel.tags)
     }
@@ -161,13 +129,14 @@ public struct VideoUploadingView: View {
             title: UIComponentsStrings.Video.save,
             width: .given(200)
         ) {
-            // TODO: save video
+            viewModel.dispatch(.saveSettings)
         }
     }
     
     private func videoPlayer(player: AVPlayer) -> some View {
         CustomPlayerView(
             isPlaying: $viewModel.isPlaying,
+            isMuted: $viewModel.isMuted,
             player: player,
             startTime: viewModel.startTime,
             shouldSeekToStartTime: viewModel.shouldSeekToStartTime,

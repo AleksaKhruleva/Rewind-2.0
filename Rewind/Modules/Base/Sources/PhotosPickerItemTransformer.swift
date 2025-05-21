@@ -22,12 +22,15 @@ public final class PhotosPickerItemTransformer {
         return LoadedMedia(content: .image(image), photosPickerItem: source)
     }
     
-    public func makeImageFromVideo(url: URL, at time: TimeInterval) async throws -> UIImage {
+    public func makeImageFromVideo(url: URL, at time: TimeInterval, composition: AVVideoComposition? = nil) async throws -> UIImage {
         let asset = AVURLAsset(url: url)
         
         let assetImageGenerator = AVAssetImageGenerator(asset: asset)
-        assetImageGenerator.appliesPreferredTrackTransform = true
-        assetImageGenerator.apertureMode = AVAssetImageGenerator.ApertureMode.encodedPixels
+        assetImageGenerator.appliesPreferredTrackTransform = composition == nil
+        assetImageGenerator.apertureMode = .encodedPixels
+        assetImageGenerator.videoComposition = composition
+        assetImageGenerator.requestedTimeToleranceBefore = .zero
+        assetImageGenerator.requestedTimeToleranceAfter = .zero
         
         let cmTime = CMTime(seconds: time, preferredTimescale: 60)
         let thumbnailImage = try await assetImageGenerator.image(at: cmTime).image
