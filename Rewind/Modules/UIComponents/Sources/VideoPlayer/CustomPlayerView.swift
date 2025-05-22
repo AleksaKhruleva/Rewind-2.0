@@ -4,25 +4,25 @@ import AVFoundation
 public struct CustomPlayerView: UIViewRepresentable {
     @Binding var isPlaying: Bool
     @Binding var isMuted: Bool
+    @Binding var shouldSeekToStartTime: Bool
     
     private let player: AVPlayer
     private let startTime: CMTime
-    private let shouldSeekToStartTime: Bool
     private let onSeekComplete: () -> Void
     
     public init(
         isPlaying: Binding<Bool>,
         isMuted: Binding<Bool>,
+        shouldSeekToStartTime: Binding<Bool>,
         player: AVPlayer,
         startTime: CMTime,
-        shouldSeekToStartTime: Bool,
         onSeekComplete: @escaping () -> Void
     ) {
         self._isPlaying = isPlaying
         self._isMuted = isMuted
+        self._shouldSeekToStartTime = shouldSeekToStartTime
         self.player = player
         self.startTime = startTime
-        self.shouldSeekToStartTime = shouldSeekToStartTime
         self.onSeekComplete = onSeekComplete
     }
     
@@ -43,8 +43,9 @@ public struct CustomPlayerView: UIViewRepresentable {
         
         if isPlaying {
             if shouldSeekToStartTime {
-                player.seek(to: startTime) { _ in
+                player.seek(to: startTime, toleranceBefore: .zero, toleranceAfter: .zero) { _ in
                     DispatchQueue.main.async {
+                        shouldSeekToStartTime = false
                         onSeekComplete()
                     }
                     player.play()

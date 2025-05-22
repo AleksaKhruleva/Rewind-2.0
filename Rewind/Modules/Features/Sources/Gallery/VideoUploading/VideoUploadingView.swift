@@ -65,7 +65,6 @@ public struct VideoUploadingView: View {
         }
         .onChange(of: viewModel.isSettingsSaved) {
             guard let loadedMedia = viewModel.loadedMedia else { return }
-            
             onSave(loadedMedia)
             dismiss()
         }
@@ -137,9 +136,9 @@ public struct VideoUploadingView: View {
         CustomPlayerView(
             isPlaying: $viewModel.isPlaying,
             isMuted: $viewModel.isMuted,
+            shouldSeekToStartTime: $viewModel.shouldSeekToStartTime,
             player: player,
             startTime: viewModel.startTime,
-            shouldSeekToStartTime: viewModel.shouldSeekToStartTime,
             onSeekComplete: {
                 viewModel.dispatch(.completeSeek)
             }
@@ -147,6 +146,7 @@ public struct VideoUploadingView: View {
         .aspectRatio(1, contentMode: .fit)
         .clipShape(RoundedRectangle(cornerRadius: 40))
         .contentShape(RoundedRectangle(cornerRadius: 40))
+        .id(viewModel.timelineID)
     }
     
     private func videoTimeline(asset: AVURLAsset) -> some View {

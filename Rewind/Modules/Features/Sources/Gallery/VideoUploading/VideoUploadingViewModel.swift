@@ -24,12 +24,15 @@ final class VideoUploadingViewModel {
     private static let maxVideoDuration: CMTime = CMTime(seconds: 15, preferredTimescale: 600)
     
     // MARK: - Published Properties
-    private(set) var isSettingsSaved = false
+    var isSettingsSaved = false
     
     var loadedMedia: LoadedMedia?
     var toastMessage: String? = nil // TODO: implement later
     
-    var tags = [String]()
+    var tags: [String] {
+        get { loadedMedia?.tags ?? [] }
+        set { loadedMedia?.tags = newValue }
+    }
     
     var videoPickerPresented = false
     
@@ -57,14 +60,16 @@ final class VideoUploadingViewModel {
     
     var cropPreviewImage: IdentifiableImage?
     
-    private let transformer: PhotosPickerItemTransformer
+    private let photoTransformer: PhotosPickerItemTransformer
+    private let videoTransformer: VideoTransformer
     private var playerItem: AVPlayerItem?
     private var timeObserver: Any?
     
     // MARK: - Init
     
     init(loadedMedia: LoadedMedia?) {
-        transformer = PhotosPickerItemTransformer()
+        photoTransformer = PhotosPickerItemTransformer()
+        videoTransformer = VideoTransformer()
         self.loadedMedia = loadedMedia
         if case let .video(url, _) = loadedMedia?.content {
             Task {
@@ -89,17 +94,22 @@ final class VideoUploadingViewModel {
             videoPickerPresented = true
         case let .applyCrop(scale, offset):
             Task {
-                await applyCrop(scale: scale, offset: offset)
+                guard let videoAsset else { return }
+                let composition = try await videoTransformer.makeVideoComposition(
+                    from: videoAsset,
+                    cropScale: scale,
+                    cropOffset: offset
+                )
+                playerItem?.videoComposition = composition
             }
         case .cropVideo:
             isPlaying = false
             Task {
                 guard let url = videoAsset?.url else { return }
                 do {
-                    let currentFrame = try await transformer.makeImageFromVideo(
+                    let currentFrame = try await photoTransformer.makeImageFromVideo(
                         url: url,
-                        at: currentTime,
-                        composition: playerItem?.videoComposition
+                        at: currentTime
                     )
                     cropPreviewImage = IdentifiableImage(image: cropSafeImage(currentFrame))
                 } catch {
@@ -112,6 +122,15 @@ final class VideoUploadingViewModel {
         case .changeTrim:
             isPlaying = false
             shouldSeekToStartTime = true
+            Task {
+                guard let player else { return }
+                await player.seek(
+                    to: startTime,
+                    toleranceBefore: .zero,
+                    toleranceAfter: .zero
+                )
+                currentTime = startTime.seconds
+            }
         case .saveSettings:
             loadedMedia?.videoEditingSettings = VideoEditingSettings(
                 startTime: startTime,
@@ -122,7 +141,7 @@ final class VideoUploadingViewModel {
             Task {
                 guard let url = videoAsset?.url else { return }
                 do {
-                    let firstFrame = try await transformer.makeImageFromVideo(
+                    let firstFrame = try await photoTransformer.makeImageFromVideo(
                         url: url,
                         at: startTime.seconds,
                         composition: playerItem?.videoComposition
@@ -139,30 +158,25 @@ final class VideoUploadingViewModel {
     // MARK: - Private Methods
     
     private func resetPlayer() {
-        if let player = player {
-            NotificationCenter.default.removeObserver(
-                self,
-                name: .AVPlayerItemDidPlayToEndTime,
-                object: player.currentItem
-            )
-            player.pause()
-            player.replaceCurrentItem(with: nil)
-        }
-        
         if let observer = timeObserver, let player = player {
             player.removeTimeObserver(observer)
             timeObserver = nil
         }
         
+        playerItem = nil
         videoAsset = nil
         player = nil
         isPlaying = false
+        cropPreviewImage = nil
+        startTime = .zero
+        endTime = .zero
+        timelineID = UUID()
     }
     
     private func handleVideoEnd() {
         guard let player = player else { return }
         player.pause()
-        player.seek(to: startTime)
+        player.seek(to: startTime, toleranceBefore: .zero, toleranceAfter: .zero)
         isPlaying = false
     }
     
@@ -188,28 +202,19 @@ final class VideoUploadingViewModel {
             self.timelineID = UUID()
             self.currentTime = 0
             
-            if let settings = loadedMedia?.videoEditingSettings {
-                self.startTime = settings.startTime
-                self.endTime = settings.endTime
-                self.isMuted = settings.isMuted
-                self.playerItem?.videoComposition = settings.composition
-            } else {
-                self.startTime = .zero
-                self.endTime = clampedDuration
-                self.isMuted = false
-            }
+            self.startTime = loadedMedia?.videoEditingSettings?.startTime ?? .zero
+            self.endTime = loadedMedia?.videoEditingSettings?.endTime ?? clampedDuration
+            self.isMuted = loadedMedia?.videoEditingSettings?.isMuted ?? false
             
             self.duration = CMTimeGetSeconds(videoDuration)
             
             let item = AVPlayerItem(asset: asset)
-            if let settings = loadedMedia?.videoEditingSettings {
-                item.videoComposition = settings.composition
-            }
+            item.videoComposition = loadedMedia?.videoEditingSettings?.composition
             self.playerItem = item
             
             let newPlayer = AVPlayer(playerItem: item)
-            await newPlayer.seek(to: self.startTime, toleranceBefore: .zero, toleranceAfter: .zero)
             self.player = newPlayer
+            await newPlayer.seek(to: self.startTime, toleranceBefore: .zero, toleranceAfter: .zero)
             self.isPlaying = false
             
             let interval = CMTime(seconds: 0.05, preferredTimescale: 600)
@@ -223,18 +228,6 @@ final class VideoUploadingViewModel {
                     if currentTime >= self.endTime - interval {
                         self.handleVideoEnd()
                     }
-                }
-            }
-            
-            NotificationCenter.default.addObserver(
-                forName: .AVPlayerItemDidPlayToEndTime,
-                object: item,
-                queue: .main
-            ) { [weak self] _ in
-                Task { @MainActor in
-                    guard let self else { return }
-                    self.player?.seek(to: self.startTime)
-                    self.isPlaying = false
                 }
             }
         } catch {
@@ -256,81 +249,5 @@ final class VideoUploadingViewModel {
         }
         
         return UIImage(cgImage: croppedCGImage, scale: image.scale, orientation: image.imageOrientation)
-    }
-    
-    private func applyCrop(scale cropScale: CGFloat, offset cropOffset: CGSize) async {
-        guard let playerItem = playerItem, let asset = videoAsset else { return }
-        
-        do {
-            let tracks = try await asset.loadTracks(withMediaType: .video)
-            guard let videoTrack = tracks.first else { return }
-            
-            let naturalSize = try await videoTrack.load(.naturalSize)
-            let duration = try await asset.load(.duration)
-            let preferredTransform = try await videoTrack.load(.preferredTransform)
-            
-            let isPortrait = abs(preferredTransform.b) == 1 && abs(preferredTransform.c) == 1
-            let renderSize = isPortrait
-            ? CGSize(width: naturalSize.height, height: naturalSize.width)
-            : naturalSize
-            
-            let cropFrameSize = CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width)
-            
-            let fittingScale = max(
-                cropFrameSize.width / renderSize.width,
-                cropFrameSize.height / renderSize.height
-            )
-            
-            let renderedVideoSize = CGSize(
-                width: renderSize.width * fittingScale,
-                height: renderSize.height * fittingScale
-            )
-            
-            let scaleRatio = renderSize.width / renderedVideoSize.width
-            
-            let minimalOffset: CGFloat = 0.5
-            let adjustedCropOffset = CGSize(
-                width: abs(cropOffset.width) < minimalOffset ? 0 : cropOffset.width,
-                height: abs(cropOffset.height) < minimalOffset ? 0 : cropOffset.height
-            )
-            
-            let transformedOffset = CGSize(
-                width: round(adjustedCropOffset.width * scaleRatio),
-                height: round(adjustedCropOffset.height * scaleRatio)
-            )
-            
-            let epsilon: CGFloat = 0.002
-            let adjustedScale = cropScale + epsilon
-            
-            let anchor = CGPoint(x: renderSize.width / 2, y: renderSize.height / 2)
-            
-            let scaleTransform = CGAffineTransform.identity
-                .translatedBy(x: anchor.x, y: anchor.y)
-                .scaledBy(x: adjustedScale, y: adjustedScale)
-                .translatedBy(x: -anchor.x, y: -anchor.y)
-            
-            let offsetTransform = CGAffineTransform(translationX: transformedOffset.width, y: transformedOffset.height)
-            
-            let cropTransform = scaleTransform.concatenating(offsetTransform)
-            
-            let finalTransform = preferredTransform.concatenating(cropTransform)
-            
-            let composition = AVMutableVideoComposition()
-            composition.renderSize = renderSize
-            composition.frameDuration = CMTime(value: 1, timescale: 30)
-            
-            let instruction = AVMutableVideoCompositionInstruction()
-            instruction.timeRange = CMTimeRange(start: .zero, duration: duration)
-            
-            let layerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoTrack)
-            layerInstruction.setTransform(finalTransform, at: .zero)
-            
-            instruction.layerInstructions = [layerInstruction]
-            composition.instructions = [instruction]
-            
-            playerItem.videoComposition = composition
-        } catch {
-            print("Ошибка при применении кропа: \(error)")
-        }
     }
 }
