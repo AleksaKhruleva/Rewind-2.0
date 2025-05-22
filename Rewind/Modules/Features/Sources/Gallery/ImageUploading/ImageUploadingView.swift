@@ -25,22 +25,25 @@ public struct ImageUploadingView: View {
                     if let image = viewModel.image {
                         Rectangle().toSquare(image)
                             .clipShape(RoundedRectangle(cornerRadius: 40))
+                            .padding(.horizontal, 8)
                     } else {
                         emptyImageContent
                             .onTapGesture {
                                 viewModel.dispatch(.viewGallery)
                             }
+                            .padding(.horizontal, 8)
                     }
                     
                     Group {
                         musicSection
                         
                         TagsSectionView(tags: viewModel.loadedMediaTagsBinding)
+                            .padding(.horizontal, 8)
                     }.disabledWithOpacity(!viewModel.ready)
                 }
             }
         }
-        .padding(.horizontal, 8)
+        .background(Color.background)
         .safeAreaInset(edge: .bottom) {
             continueButton
         }
@@ -48,12 +51,21 @@ public struct ImageUploadingView: View {
             return viewModel.image
         } set: { newImage in
             viewModel.dispatch(.changeImage(newImage, .hard))
-        }) {}
-        .fullScreenCover(isPresented: $viewModel.imageEditorPresented) {
+        })
+        .fullScreenCover(isPresented: $viewModel.imageEditorPresented, onDismiss: {
+            viewModel.dispatch(.resumePlayback)
+        }) {
             RewindImageEditor(image: viewModel.initialImage, cropType: .rectangle) { croppedImage, status in
                 if status {
                     viewModel.dispatch(.changeImage(croppedImage))
                 }
+            }
+        }
+        .sheet(isPresented: $viewModel.findTrackViewPresented, onDismiss: {
+            viewModel.dispatch(.resumePlayback)
+        }) {
+            FindTrackView { selectedTrack in
+                viewModel.dispatch(.trackSelected(selectedTrack))
             }
         }
     }
@@ -91,27 +103,42 @@ public struct ImageUploadingView: View {
     }
     
     private var musicSection: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            Text(UIComponentsStrings.Music.sectionTitle)
-                .modifier(RoundFontModifier(size: 17, foregroundColor: .textSecondary))
-                .padding(.leading, 15)
-            VStack(alignment: .leading, spacing: 5) {
-                MembersTableButton(
-                    systemImageName: "music.note.list",
-                    title: UIComponentsStrings.Music.addMusic,
-                    imageSize: 20) {
-                        // TODO: show add music view
+        VStack {
+            MusicSectionView(
+                selectedTrack: $viewModel.selectedTrack) {
+                    viewModel.dispatch(.findTrack)
+                }
+                .padding(.horizontal, 8)
+            
+            if let selectedTrack = viewModel.selectedTrack {
+                ChooseTrackPieceView(
+                    shouldPlay: $viewModel.isSelectedTrackPlaying,
+                    startTime: $viewModel.selectedStartTime,
+                    selectorDuration: $viewModel.selectedDuration,
+                    selectedTrack: selectedTrack,
+                    onTrashTap: {
+                        withAnimation {
+                            viewModel.selectedTrack = nil
+                        }
                     }
+                )
+                .id(selectedTrack.id)
             }
-            .padding(.vertical, 5)
-            .background(Color.backgroundSecondary)
-            .cornerRadius(24)
         }
     }
     
     private var continueButton: some View {
         GradientButton(title: "Save image", width: .given(200)) {
             if let loadedMedia = viewModel.loadedMedia {
+                // TODO: delete later
+                let trackInfo = (
+                    viewModel.selectedTrack?.id,
+                    viewModel.selectedStartTime,
+                    viewModel.selectedDuration
+                )
+                
+                print(trackInfo)
+                
                 onSave(loadedMedia)
                 dismiss()
             }

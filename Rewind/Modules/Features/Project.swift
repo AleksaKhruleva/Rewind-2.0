@@ -7,5 +7,6 @@ let featuresProject = Project.featureFramework(
         .project(target: "UIComponents", path: "../UIComponents"),
         .project(target: "Networking", path: "../Networking"),
         .project(target: "AccessibilitySupport", path: "../AccessibilitySupport"),
+        .project(target: "Domain", path: "../Domain"),
     ]
 )

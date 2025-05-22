@@ -27,21 +27,34 @@ public struct QuoteCreationView: View {
                         .onTapGesture {
                             viewModel.dispatch(.presentQuoteInput)
                         }
+                        .padding(.horizontal, 8)
                     
                     generalTable
+                        .padding(.horizontal, 8)
+                    
+                    musicSection
                     
                     TagsSectionView(tags: $viewModel.tags)
+                        .padding(.horizontal, 8)
                 }
             }
             .scrollIndicators(.hidden)
-            .padding(.horizontal, 8)
         }
         .background(Color.background)
         .safeAreaInset(edge: .bottom) {
             continueButton
         }
-        .sheet(isPresented: $viewModel.quoteInputPresented) {
+        .sheet(isPresented: $viewModel.quoteInputPresented, onDismiss: {
+            viewModel.dispatch(.resumePlayback)
+        }) {
             quoteInputContent
+        }
+        .sheet(isPresented: $viewModel.findTrackViewPresented, onDismiss: {
+            viewModel.dispatch(.resumePlayback)
+        }) {
+            FindTrackView { selectedTrack in
+                viewModel.dispatch(.trackSelected(selectedTrack))
+            }
         }
     }
     
@@ -144,12 +157,46 @@ public struct QuoteCreationView: View {
         .disabledWithOpacity(viewModel.quoteState == .empty)
     }
     
+    private var musicSection: some View {
+        VStack {
+            MusicSectionView(
+                selectedTrack: $viewModel.selectedTrack) {
+                    viewModel.dispatch(.findTrack)
+                }
+                .padding(.horizontal, 8)
+            
+            if let selectedTrack = viewModel.selectedTrack {
+                ChooseTrackPieceView(
+                    shouldPlay: $viewModel.isSelectedTrackPlaying,
+                    startTime: $viewModel.selectedStartTime,
+                    selectorDuration: $viewModel.selectedDuration,
+                    selectedTrack: selectedTrack,
+                    onTrashTap: {
+                        withAnimation {
+                            viewModel.selectedTrack = nil
+                        }
+                    }
+                )
+                .id(selectedTrack.id)
+            }
+        }
+    }
+    
     private var continueButton: some View {
         GradientButton(title: UIComponentsStrings.Quote.save, width: .given(200)) {
             guard viewModel.quoteState == .ready else {
                 showToast(UIComponentsStrings.Quote.Toast.empty)
                 return
             }
+            
+            // TODO: delete later
+            let trackInfo = (
+                viewModel.selectedTrack?.id,
+                viewModel.selectedStartTime,
+                viewModel.selectedDuration
+            )
+            
+            print(trackInfo)
             
             viewModel.dispatch(.saveQuote(AnyView(quoteContent)))
             
