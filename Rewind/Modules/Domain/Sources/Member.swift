@@ -2,14 +2,14 @@ import Foundation
 import SwiftUI
 
 public struct Member: Identifiable, Hashable {
-    public let id: UUID
+    public let id: Int
     public let name: String
     public let avatar: UIImage
     public let isOwner: Bool
     public let isUser: Bool
 
     public init(
-        id: UUID,
+        id: Int,
         name: String,
         avatar: UIImage,
         isOwner: Bool = false,

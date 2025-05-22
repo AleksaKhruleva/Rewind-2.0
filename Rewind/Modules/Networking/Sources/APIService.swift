@@ -7,26 +7,28 @@ enum APIService {
     case register(email: String)
     case verifyEmail(registrationID: String, verificationCode: String)
     case finishRegister(password: String, registrationID: String, username: String)
-
+    
     case login(email: String, password: String)
-
+    
     case logout(accessToken: String, refreshToken: String)
     case deleteUser(accessToken: String, email: String)
 
     case refresh(refreshToken: String)
     case user(accessToken: String)
-
+    
     case updateUserName(accessToken: String, name: String)
-
     case updateUserAvatar(accessToken: String, avatar: UIImage)
-
+    
     case passwordResetSet(accessToken: String, password: String)
     case passwordResetStart(accessToken: String)
     case passwordResetVerify(accessToken: String, verificationCode: String)
-
+    
     case checkPassword(accessToken: String, password: String)
     case emailStartChange(accessToken: String, email: String)
     case emailVerifyChange(accessToken: String, verificationCode: String)
+    
+    case createGroup(accessToken: String, name: String)
+    case fetchGroups(accessToken: String)
 }
 
 extension APIService: TargetType {
@@ -36,7 +38,7 @@ extension APIService: TargetType {
         }
         return URL(string: "https://rewindapp.ru/api")!
     }
-
+    
     var path: String {
         switch self {
         case .register:
@@ -54,7 +56,7 @@ extension APIService: TargetType {
         case .refresh:
             return "/auth/refresh"
         case let .user(accessToken):
-            let id = JWTDecoderService().getUserId(from: accessToken) ?? "undefined"
+            let id = JWTDecoder().getUserId(from: accessToken) ?? "undefined"
             return "users/\(id)"
         case .updateUserName:
             return "users/username"
@@ -72,12 +74,17 @@ extension APIService: TargetType {
             return "users/email/start-change"
         case .emailVerifyChange:
             return "users/email/verify-change"
+        case .createGroup:
+            return "/groups"
+        case .fetchGroups:
+            return "/users/groups"
         }
     }
-
+    
     var method: Moya.Method {
         switch self {
-        case .user:
+        case .user,
+                .fetchGroups:
             return .get
         case .register,
                 .verifyEmail,
@@ -88,7 +95,8 @@ extension APIService: TargetType {
                 .passwordResetStart,
                 .passwordResetVerify,
                 .checkPassword,
-                .emailStartChange:
+                .emailStartChange,
+                .createGroup:
             return .post
         case .updateUserName,
                 .updateUserAvatar,
@@ -99,22 +107,20 @@ extension APIService: TargetType {
             return .delete
         }
     }
-
+    
     var task: Moya.Task {
         switch self {
         case let .register(email):
-            let parameters = ["email": email]
-            return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+            return jsonRequest(["email": email])
         case let .verifyEmail(registrationID, verificationCode):
-            let parameters = ["registration_id": registrationID, "verification_code": verificationCode]
-            return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+            return jsonRequest(["registration_id": registrationID, "verification_code": verificationCode])
         case let .finishRegister(password, registrationID, username):
             let parameters = [
                 "password": password,
                 "registration_id": registrationID,
                 "username": username
             ]
-            return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+            return jsonRequest(parameters)
         case let .login(email, password):
             let parameters = ["email": email, "password": password]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
@@ -136,7 +142,7 @@ extension APIService: TargetType {
             guard let imageData = avatar.jpegData(compressionQuality: 1) else {
                 return .requestPlain
             }
-
+            
             let formData = MultipartFormData(
                 provider: .data(imageData),
                 name: "image",
@@ -161,9 +167,13 @@ extension APIService: TargetType {
         case let .emailVerifyChange(_, verificationCode):
             let parameters = ["verification_code": verificationCode]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+        case let .createGroup(_, name):
+            return jsonRequest(["image": "aboba", "name": name])
+        case .fetchGroups:
+            return .requestPlain
         }
     }
-
+    
     var headers: [String: String]? {
         switch self {
         case let .logout(accessToken, _),
@@ -176,7 +186,9 @@ extension APIService: TargetType {
             let .passwordResetVerify(accessToken, _),
             let .checkPassword(accessToken, _),
             let .emailStartChange(accessToken, _),
-            let .emailVerifyChange(accessToken, _):
+            let .emailVerifyChange(accessToken, _),
+            let .createGroup(accessToken, _),
+            let .fetchGroups(accessToken):
             return [
                 "Authorization": "Bearer \(accessToken)",
                 "Content-Type": "application/json"
@@ -184,5 +196,9 @@ extension APIService: TargetType {
         default:
             return ["Content-Type": "application/json"]
         }
+    }
+    
+    private func jsonRequest(_ parameters: [String: Any]) -> Moya.Task {
+        .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
     }
 }

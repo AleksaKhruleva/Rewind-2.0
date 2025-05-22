@@ -30,8 +30,8 @@ public final class AppRouter {
         case mediasUploading
         case mediaDetails(MediaItem)
 
-        case group
         case groupsList
+        case group(Domain.Group)
         case groupSettings
         case addMember(String)
         case memberDetails(Member)

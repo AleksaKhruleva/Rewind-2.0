@@ -4,34 +4,34 @@ import Domain
 // ВРЕМЕННО
 public let membersForTest: [Member] = [
     Member(
-        id: UUID(),
+        id: 1,
         name: "Claire",
         avatar: UIComponentsAsset.claireForlani.image,
         isOwner: true,
         isUser: true
     ),
     Member(
-        id: UUID(),
+        id: 2,
         name: "Diana",
         avatar: UIComponentsAsset.diana.image
     ),
     Member(
-        id: UUID(),
+        id: 3,
         name: "Jonny",
         avatar: UIComponentsAsset.johnnyDepp.image
     ),
     Member(
-        id: UUID(),
+        id: 4,
         name: "Leo",
         avatar: UIComponentsAsset.leonardoDiCaprio.image
     ),
     Member(
-        id: UUID(),
+        id: 5,
         name: "Marlo",
         avatar: UIComponentsAsset.marlonBrando.image
     ),
     Member(
-        id: UUID(),
+        id: 6,
         name: "Matthew",
         avatar: UIComponentsAsset.matthewMcConaughey.image
     )

@@ -6,4 +6,5 @@ public enum GenericInputSheetItem: String, Identifiable {
     case email
     case tag
     case code
+    case groupName
 }

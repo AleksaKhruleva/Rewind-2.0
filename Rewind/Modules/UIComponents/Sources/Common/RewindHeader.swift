@@ -26,7 +26,8 @@ public struct RewindHeader<LeftContent: View, CenterContent: View, RightContent:
             Spacer()
             rightView
         }
-        .padding([.bottom, .horizontal])
+        .padding(.bottom)
+        .padding(.horizontal, 8)
         .background(.clear)
     }
 }

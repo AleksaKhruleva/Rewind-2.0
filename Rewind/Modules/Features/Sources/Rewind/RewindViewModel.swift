@@ -13,13 +13,16 @@ final class RewindViewModel {
         case fetchUser
         case toggleTrackPlaying
         case showNextMediaItem
+        case fetchGroups
     }
-
+    
     var showToast: (String) -> Void
     var isTrackPlaying = false
     var rolls = 0
     private(set) var currentMediaItem: MediaItem
-
+    private(set) var isLoadingGroups = false
+    private(set) var groups: [Domain.Group] = []
+    
     var fetchedUser: User?
     var user: User {
         get {
@@ -33,12 +36,12 @@ final class RewindViewModel {
             fetchedUser = newValue
         }
     }
-
+    
     private let backend: NetworkServiceProtocol
     private let audioManager: AudioPlayerManager
     private var mediaItems = [MediaItem]()
     private var currentIndex = 0
-
+    
     init() {
         showToast = { _ in }
         backend = NetworkService()
@@ -95,9 +98,26 @@ final class RewindViewModel {
                 currentIndex = (currentIndex + 1) % mediaItems.count
                 currentMediaItem = mediaItems[currentIndex]
             }
+        case .fetchGroups:
+            isLoadingGroups = true
+            defer { isLoadingGroups = false }
+            do {
+                let responses = try await backend.fetchGroups()
+                groups = responses.map { response in
+                    Group(
+                        id: response.groupID,
+                        name: response.name,
+                        //                        imageData: Data(from: response.imageData)
+                    )
+                }
+            } catch {
+                groups = []
+                print(error)
+                // TODO: handle error (например, показать toast)
+            }
         }
     }
-
+    
     func set(showToast: @escaping (String) -> Void) {
         self.showToast = showToast
     }

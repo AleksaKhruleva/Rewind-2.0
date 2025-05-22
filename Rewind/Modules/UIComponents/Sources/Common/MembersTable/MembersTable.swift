@@ -53,7 +53,7 @@ public struct MembersTable: View {
                 if isShortened {
                     MembersTableButton(
                         systemImageName: "eye.fill",
-                        title: UIComponentsStrings.Group.Members.count(membersForTest.count),
+                        title: "View all members",
                         imageSize: 20
                     ) {
                         onShowAllMembersTap?()

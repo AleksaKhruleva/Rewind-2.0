@@ -1,30 +1,13 @@
 import SwiftUI
 import UIComponents
 
-// временно
 let imageSize: CGFloat = 90
 
-// временно
-let groupNames = [
-    "Friends",
-    "Family",
-    "Work",
-    "Travel",
-    "Fitness",
-    "Photography",
-    "Study",
-    "Music",
-    "Foodies"
-]
-
-// временно
-let groupsForTest: [RewindGroup] = zip(images, groupNames).map { image, name in
-    RewindGroup(image: image, name: name)
-}
-
-struct SelectGroupView: View {
+struct GroupSelectionView: View {
+    @State private var viewModel: GroupSelectionViewModel
     @State private var searchText = ""
-
+    @Environment(\.dismiss) private var dismiss
+    
     private var filteredGroups: [RewindGroup] {
         if searchText.isEmpty {
             return groupsForTest
@@ -34,7 +17,14 @@ struct SelectGroupView: View {
             }
         }
     }
-
+    
+    private let router: RewindRouter
+    
+    init(router: RewindRouter) {
+        self.router = router
+        viewModel = GroupSelectionViewModel(router: router)
+    }
+    
     var body: some View {
         ZStack {
             Color.backgroundSecondary.ignoresSafeArea()
@@ -50,6 +40,21 @@ struct SelectGroupView: View {
                 suggestionsTable
             }
             .padding(.horizontal)
+        }
+        .sheet(isPresented: $viewModel.isGroupCreationViewPresented) {
+            GroupNameInputView(
+                isPresented: $viewModel.isGroupCreationViewPresented,
+                isLoading: $viewModel.isLoading
+            ) { name in
+                Task {
+                    await viewModel.dispatch(.createGroup(name))
+                }
+            }
+        }
+        .onChange(of: viewModel.shouldDismissSelf) { _, shouldDismiss in
+            if shouldDismiss {
+                dismiss()
+            }
         }
     }
 
@@ -93,8 +98,20 @@ struct SelectGroupView: View {
                 .padding(.leading, 15)
 
             VStack(alignment: .leading, spacing: 0) {
-                suggestionRow(icon: "plus", title: UIComponentsStrings.Group.Select.add)
-                suggestionRow(icon: "person.2.fill", title: UIComponentsStrings.Group.Select.count(images.count))
+                suggestionRow(
+                    icon: "plus",
+                    title: UIComponentsStrings.Group.Select.add,
+                    action: {
+                        viewModel.isGroupCreationViewPresented = true
+                    }
+                )
+                suggestionRow(
+                    icon: "person.2.fill",
+                    title: UIComponentsStrings.Group.Select.count(images.count),
+                    action: {
+                        // aboba
+                    }
+                )
             }
             .background(Color.background)
             .cornerRadius(20)
@@ -102,7 +119,7 @@ struct SelectGroupView: View {
     }
 
     // временно
-    private func suggestionRow(icon: String, title: String) -> some View {
+    private func suggestionRow(icon: String, title: String, action: @escaping () -> Void) -> some View {
         HStack(spacing: 10) {
             Image(systemName: icon)
                 .modifier(RoundFontModifier(size: 20))
@@ -121,9 +138,8 @@ struct SelectGroupView: View {
         .contentShape(Rectangle())
         .frame(height: 50)
         .padding(.horizontal)
+        .onTapGesture {
+            action()
+        }
     }
-}
-
-#Preview {
-    SelectGroupView()
 }

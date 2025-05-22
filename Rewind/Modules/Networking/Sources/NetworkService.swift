@@ -28,6 +28,9 @@ public protocol NetworkServiceProtocol {
     func checkPassword(tokens: Tokens, password: String) async throws -> SuccessResponse
     func emailStartChange(tokens: Tokens, email: String) async throws -> SuccessResponse
     func emailVerifyChange(tokens: Tokens, verificationCode: String) async throws -> SuccessResponse
+    
+    func createGroup(name: String) async throws -> GroupResponse
+    func fetchGroups() async throws -> [GroupResponse]
 }
 
 public final class NetworkService: NetworkServiceProtocol {
@@ -227,6 +230,24 @@ public final class NetworkService: NetworkServiceProtocol {
             KeychainService.shared.save(newToken, for: .accessToken)
 
             return try await perform(newToken)
+        }
+    
+    public func createGroup(name: String) async throws -> GroupResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+            try await provider.request(
+                .createGroup(name: name),
+                type: GroupResponse.self
+            )
+        }
+    }
+    
+    public func fetchGroups() async throws -> [GroupResponse] {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+            let response = try await provider.request(
+                .fetchGroups,
+                type: GroupsListResponse.self
+            )
+            return response.groups
         }
     }
 }

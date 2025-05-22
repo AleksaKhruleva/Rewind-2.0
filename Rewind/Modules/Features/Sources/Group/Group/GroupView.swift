@@ -1,24 +1,15 @@
 import SwiftUI
 import UIComponents
-
-let images = [
-    UIComponentsAsset.media1.image,
-    UIComponentsAsset.media2.image,
-    UIComponentsAsset.media3.image,
-    UIComponentsAsset.media4.image,
-    UIComponentsAsset.media6.image,
-    UIComponentsAsset.media7.image,
-    UIComponentsAsset.media8.image,
-    UIComponentsAsset.media9.image,
-    UIComponentsAsset.media10.image
-]
+import Domain
 
 public struct GroupView: View {
     @State private var isBlurredAvatarPresented = false
 
+    private let group: Domain.Group
     private let router: GroupRouter
-
-    public init(router: GroupRouter) {
+    
+    public init(group: Domain.Group, router: GroupRouter) {
+        self.group = group
         self.router = router
     }
 
@@ -64,8 +55,8 @@ public struct GroupView: View {
             }
         } centerView: {
             HeaderBadgeView(
-                image: UIComponentsAsset.groupAvatar.image,
-                text: "Friends"
+                image: group.image,
+                text: group.name
             )
         } rightView: {
             RewindButton(type: .rightChevron) {
@@ -75,15 +66,15 @@ public struct GroupView: View {
     }
 
     private var avatar: some View {
-        AvatarView(image: UIComponentsAsset.groupAvatar.image, text: "Friends")
+        AvatarView(image: group.image, text: group.name)
     }
 
     private var membersTable: some View {
         MembersTable(
-            members: Array(membersForTest.prefix(4)),
+            members: group.members ?? [],
             isShortened: true,
             onAddMemberTap: {
-                router.navigateToAddMember(groupName: "Friends")
+                router.navigateToAddMember(groupName: group.name)
             },
             onMemberTap: { member in
                 router.navigateToMemberDetails(member)
@@ -122,14 +113,20 @@ public struct GroupView: View {
         }
     }
 
+    @ViewBuilder
     private var galleryPreview: some View {
-        GalleryScrollPreview(images: images, onChevronTap: {
-            router.navigateToGallery()
-        })
+        if let gallery = group.gallery {
+            GalleryScrollPreview(images: gallery, onChevronTap: {
+                router.navigateToGallery()
+            })
+        }
     }
 
+    @ViewBuilder
     private var groupExistenceNote: some View {
-        RewindNoteTextView(text: UIComponentsStrings.Group.note(100))
-            .padding(.vertical, 4)
+        if let days = group.daysSinceCreation {
+            RewindNoteTextView(text: UIComponentsStrings.Group.note(days))
+                .padding(.vertical, 4)
+        }
     }
 }

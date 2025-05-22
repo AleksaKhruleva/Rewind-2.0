@@ -1,6 +1,6 @@
 import Foundation
 
-public struct JWTDecoderService {
+public struct JWTDecoder {
     public init() {}
 
     public func decode(jwtToken: String) -> [String: Any]? {

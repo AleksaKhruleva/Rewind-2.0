@@ -49,8 +49,8 @@ public struct RootView: View {
         case .mediasUploading: MediasUploadingView(router: router)
         case let .mediaDetails(mediaItem): MediaDetailsView(mediaItem: mediaItem, router: router)
 
-        case .group: GroupView(router: GroupRouter(appRouter: router))
         case .groupsList: GroupsListView(router: GroupsListRouter(appRouter: router))
+        case let .group(group): GroupView(group: group, router: GroupRouter(appRouter: router))
         case .groupSettings: GroupSettingsView(router: GroupSettingsRouter(appRouter: router))
         case let .addMember(groupName): AddMemberView(groupName: groupName, router: router)
         case let .memberDetails(member): MemberDetailsView(member: member, router: router)
