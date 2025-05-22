@@ -40,3 +40,29 @@ type LogoutRequest struct {
 type DeleteUserRequest struct {
 	Email string `json:"email"`
 }
+
+type UpdateUsernameRequest struct {
+	NewUsername string `json:"new_username"`
+}
+
+type CheckPasswordRequest struct {
+	Password string `json:"password"`
+}
+
+type UpdateEmailRequest struct {
+	NewEmail string `json:"new_email"`
+	Password string `json:"password"`
+}
+
+type VerifyNewEmailCodeRequest struct {
+	NewEmail         string `json:"new_email"`
+	VerificationCode string `json:"verification_code"`
+}
+
+type VerifyPasswordResetCodeRequest struct {
+	VerificationCode string `json:"verification_code"`
+}
+
+type SetNewPasswordRequest struct {
+	NewPassword string `json:"new_password"`
+}

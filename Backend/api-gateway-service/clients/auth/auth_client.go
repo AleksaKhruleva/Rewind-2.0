@@ -1,4 +1,4 @@
-package auth
+package clients
 
 import (
 	"context"
@@ -97,4 +97,44 @@ func (c *AuthServiceClient) GetUsersByIDs(ctx context.Context, req *pb.GetUsersB
 // GetUserByID вызывает метода GetUserByID сервиса аутентификации
 func (c *AuthServiceClient) GetUserByID(ctx context.Context, req *pb.GetUserByIDRequest) (*pb.GetUserByIDResponse, error) {
 	return c.client.GetUserByID(ctx, req)
+}
+
+// UpdateUsername вызывает метод UpdateUsername сервиса аутентификации
+func (c *AuthServiceClient) UpdateUsername(ctx context.Context, req *pb.UpdateUsernameRequest) (*pb.UpdateUsernameResponse, error) {
+	return c.client.UpdateUsername(ctx, req)
+}
+
+// CheckPassword вызывает метод CheckPassword сервиса аутентификации
+func (c *AuthServiceClient) CheckPassword(ctx context.Context, req *pb.CheckPasswordRequest) (*pb.CheckPasswordResponse, error) {
+	return c.client.CheckPassword(ctx, req)
+}
+
+// UpdateEmail вызывает метод UpdateEmail сервиса аутентификации
+func (c *AuthServiceClient) UpdateEmail(ctx context.Context, req *pb.UpdateEmailRequest) (*pb.UpdateEmailResponse, error) {
+	return c.client.UpdateEmail(ctx, req)
+}
+
+// VerifyNewEmailCode вызывает метод VerifyNewEmailCode сервиса аутентификации
+func (c *AuthServiceClient) VerifyNewEmailCode(ctx context.Context, req *pb.VerifyNewEmailCodeRequest) (*pb.VerifyNewEmailCodeResponse, error) {
+	return c.client.VerifyNewEmailCode(ctx, req)
+}
+
+// UpdateAvatar вызывает метод UpdateAvatar сервиса аутентификации
+func (c *AuthServiceClient) UpdateAvatar(ctx context.Context, req *pb.UpdateAvatarRequest) (*pb.UpdateAvatarResponse, error) {
+	return c.client.UpdateAvatar(ctx, req)
+}
+
+// StartPasswordReset вызывает метод StartPasswordReset сервиса аутентификации
+func (c *AuthServiceClient) StartPasswordReset(ctx context.Context, req *pb.StartPasswordResetRequest) (*pb.StartPasswordResetResponse, error) {
+	return c.client.StartPasswordReset(ctx, req)
+}
+
+// VerifyPasswordResetCode вызывает метод VerifyPasswordResetCode сервиса аутентификации
+func (c *AuthServiceClient) VerifyPasswordResetCode(ctx context.Context, req *pb.VerifyPasswordResetCodeRequest) (*pb.VerifyPasswordResetCodeResponse, error) {
+	return c.client.VerifyPasswordResetCode(ctx, req)
+}
+
+// SetNewPassword вызывает метод SetNewPassword сервиса аутентификации
+func (c *AuthServiceClient) SetNewPassword(ctx context.Context, req *pb.SetNewPasswordRequest) (*pb.SetNewPasswordResponse, error) {
+	return c.client.SetNewPassword(ctx, req)
 }

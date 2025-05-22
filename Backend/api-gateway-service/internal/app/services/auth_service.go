@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 
-	"Rewind-api-gateway-service/clients/auth"
+	auth "Rewind-api-gateway-service/clients/auth"
 	pb "Rewind-api-gateway-service/pkg/proto"
 )
 

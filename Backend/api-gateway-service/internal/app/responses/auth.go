@@ -55,3 +55,35 @@ type GetUserByIDResponse struct {
 	Email    string `json:"email"`    // Email address
 	Image    string `json:"image"`    // User image URL
 }
+
+type UpdateUsernameResponse struct {
+	Success bool `json:"success"`
+}
+
+type CheckPasswordResponse struct {
+	Success bool `json:"success"`
+}
+
+type UpdateEmailResponse struct {
+	Success bool `json:"success"`
+}
+
+type VerifyNewEmailCodeResponse struct {
+	Success bool `json:"success"`
+}
+
+type UpdateAvatarResponse struct {
+	Success bool `json:"success"`
+}
+
+type StartPasswordResetResponse struct {
+	Success bool `json:"success"`
+}
+
+type VerifyPasswordResetCodeResponse struct {
+	Success bool `json:"success"`
+}
+
+type SetNewPasswordResponse struct {
+	Success bool `json:"success"`
+}
