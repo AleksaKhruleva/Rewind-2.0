@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"math/rand"
 	"net/url"
 	"os"
 	"time"
@@ -61,7 +60,7 @@ func (s *AuthService) StartRegistration(ctx context.Context, req *pb.StartRegist
 
 	registrationID := uuid.New().String()
 
-	verificationCode := fmt.Sprintf("%04d", rand.Intn(10000)) // Генерирует случайное число от 0000 до 9999
+	verificationCode := utils.GenerateVerificationCode()
 
 	redisKey := fmt.Sprintf("registration:%s", registrationID)
 	expiryTime := time.Minute * 15 // Код действителен в течение 15 минут (настройте по необходимости)
@@ -606,4 +605,278 @@ func (s *AuthService) GetUserByID(ctx context.Context, req *pb.GetUserByIDReques
 
 	// Формирование и возврат ответа
 	return &pb.GetUserByIDResponse{User: pbUser}, nil
+}
+
+// UpdateUsername реализует RPC метод для обновления имени пользователя.
+func (s *AuthService) UpdateUsername(ctx context.Context, req *pb.UpdateUsernameRequest) (*pb.UpdateUsernameResponse, error) {
+	userID := req.GetUserId()
+	newUsername := req.GetNewUsername()
+
+	if err := s.validator.Var(newUsername, "required,min=3,max=50"); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid username")
+	}
+
+	_, err := s.userRepo.GetUserByID(nil, uint(userID))
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// Если запись не найдена, возвращаем статус NotFound
+			log.Printf("GetUserByID: User with ID %d not found: %v", userID, err)
+			return nil, status.Errorf(codes.NotFound, "User with ID %d not found", userID)
+		}
+		// Для всех остальных ошибок репозитория возвращаем статус Internal
+		log.Printf("GetUserByID: Failed to get user by ID %d from DB: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to retrieve user data")
+	}
+
+	err = s.userRepo.UpdateUsername(nil, uint(userID), newUsername)
+	if err != nil {
+		log.Printf("Failed to update username for user %d: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to update username")
+	}
+
+	return &pb.UpdateUsernameResponse{Success: true}, nil
+}
+
+// CheckPassword реализует RPC метод для проверки пароля пользователя.
+func (s *AuthService) CheckPassword(ctx context.Context, req *pb.CheckPasswordRequest) (*pb.CheckPasswordResponse, error) {
+	userID := req.GetUserId()
+	password := req.GetPassword()
+
+	err := s.userRepo.CheckPassword(nil, uint(userID), password)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, status.Errorf(codes.NotFound, "User not found")
+		}
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			return nil, status.Errorf(codes.Unauthenticated, "Invalid password")
+		}
+		log.Printf("Failed to check password for user %d: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to check password")
+	}
+	return &pb.CheckPasswordResponse{Success: true}, nil
+}
+
+// UpdateEmail реализует RPC метод для попытки обновления почты пользователя.
+func (s *AuthService) UpdateEmail(ctx context.Context, req *pb.UpdateEmailRequest) (*pb.UpdateEmailResponse, error) {
+	userID := req.GetUserId()
+	newEmail := req.GetNewEmail()
+
+	if err := s.validator.Var(newEmail, "required,email"); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid email format: %v", err)
+	}
+
+	_, err := s.userRepo.GetUserByID(nil, uint(userID))
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// Если запись не найдена, возвращаем статус NotFound
+			log.Printf("GetUserByID: User with ID %d not found: %v", userID, err)
+			return nil, status.Errorf(codes.NotFound, "User with ID %d not found", userID)
+		}
+		// Для всех остальных ошибок репозитория возвращаем статус Internal
+		log.Printf("GetUserByID: Failed to get user by ID %d from DB: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to retrieve user data")
+	}
+
+	verificationCode := utils.GenerateVerificationCode()
+
+	redisKey := fmt.Sprintf("email_verification:%d:%s", userID, newEmail)
+	expiryTime := time.Minute * 15
+
+	// Save verification code to Redis
+	err = s.redisRepo.Set(ctx, redisKey, verificationCode, expiryTime).Err()
+	if err != nil {
+		log.Printf("Error saving email verification code to Redis for user %d and email %s: %v", userID, newEmail, err)
+		return nil, status.Errorf(codes.Internal, "failed to store verification code")
+	}
+
+	// Publish event to send verification code via RabbitMQ
+	err = rabbitmq.PublishVerificationCode(newEmail, verificationCode)
+	if err != nil {
+		log.Printf("Error publishing verification code to RabbitMQ for email %s: %v", newEmail, err)
+		return nil, status.Errorf(codes.Internal, "failed to send verification email")
+	}
+
+	// Successful initiation of email update
+	return &pb.UpdateEmailResponse{Success: true}, nil
+}
+
+func (s *AuthService) VerifyNewEmailCode(ctx context.Context, req *pb.VerifyNewEmailCodeRequest) (*pb.VerifyNewEmailCodeResponse, error) {
+	userID := req.GetUserId()
+	newEmail := req.GetNewEmail()
+	verificationCode := req.GetVerificationCode()
+
+	storedCode, err := s.redisRepo.Get(ctx, fmt.Sprintf("email_verification:%d:%s", userID, newEmail)).Result()
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return nil, status.Errorf(codes.InvalidArgument, "Invalid or expired verification code")
+		}
+		log.Printf("Failed to retrieve email verification code from Redis: %v", err)
+		return nil, status.Errorf(codes.Internal, "Failed to verify email code")
+	}
+
+	if storedCode != verificationCode {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid or expired verification code")
+	}
+
+	_, err = s.userRepo.GetUserByID(nil, uint(userID))
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// Если запись не найдена, возвращаем статус NotFound
+			log.Printf("GetUserByID: User with ID %d not found: %v", userID, err)
+			return nil, status.Errorf(codes.NotFound, "User with ID %d not found", userID)
+		}
+		// Для всех остальных ошибок репозитория возвращаем статус Internal
+		log.Printf("GetUserByID: Failed to get user by ID %d from DB: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to retrieve user data")
+	}
+
+	// Update email in the database
+	err = s.userRepo.UpdateEmail(nil, uint(userID), newEmail)
+	if err != nil {
+		log.Printf("Failed to update email for user %d: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to update email")
+	}
+
+	// Clean up the verification code from Redis
+	s.redisRepo.Del(ctx, fmt.Sprintf("email_verification:%d:%s", userID, newEmail))
+
+	return &pb.VerifyNewEmailCodeResponse{Success: true}, nil
+}
+
+func (s *AuthService) StartPasswordReset(ctx context.Context, req *pb.StartPasswordResetRequest) (*pb.StartPasswordResetResponse, error) {
+	userID := req.GetUserId()
+
+	user, err := s.userRepo.GetUserByID(nil, uint(userID))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, status.Errorf(codes.NotFound, "user not found")
+		}
+		log.Printf("Failed to get user with ID %d: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "failed to retrieve user data")
+	}
+
+	verificationCode := utils.GenerateVerificationCode()
+	redisKey := fmt.Sprintf("password_change:%d", userID)
+	expiryTime := time.Minute * 15 // Code valid for 15 minutes
+
+	err = s.redisRepo.HSet(ctx, redisKey, map[string]interface{}{
+		"user_id": userID,
+		"code":    verificationCode,
+		"status":  "code_sent",
+	}).Err()
+	if err != nil {
+		log.Printf("Failed to store password reset data in Redis for user %d: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "failed to store password reset data")
+	}
+
+	err = s.redisRepo.Expire(ctx, redisKey, expiryTime).Err()
+	if err != nil {
+		log.Printf("Warning: failed to set expiry for Redis key %s: %v", redisKey, err)
+	}
+
+	// Publish event to send password reset code via RabbitMQ
+	err = rabbitmq.PublishVerificationCode(user.Email, verificationCode)
+	if err != nil {
+		log.Printf("Error publishing password reset code to RabbitMQ for email %s: %v", user.Email, err)
+		return nil, status.Errorf(codes.Internal, "failed to send password reset email")
+	}
+
+	return &pb.StartPasswordResetResponse{Success: true}, nil
+}
+
+func (s *AuthService) VerifyPasswordResetCode(ctx context.Context, req *pb.VerifyPasswordResetCodeRequest) (*pb.VerifyPasswordResetCodeResponse, error) {
+	userID := req.GetUserId()
+	verificationCode := req.GetVerificationCode()
+
+	redisKey := fmt.Sprintf("password_change:%d", userID)
+	result, err := s.redisRepo.HGetAll(ctx, redisKey).Result()
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return nil, status.Errorf(codes.InvalidArgument, "invalid or expired verification code")
+		}
+		log.Printf("Failed to retrieve password reset data from Redis for user %d: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "failed to retrieve password reset data")
+	}
+
+	if result["code"] != verificationCode || result["status"] != "code_sent" {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid or expired verification code")
+	}
+
+	err = s.redisRepo.HSet(ctx, redisKey, "status", "code_verified").Err()
+	if err != nil {
+		log.Printf("Failed to update password reset status in Redis for user %d: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "failed to update password reset status")
+	}
+
+	return &pb.VerifyPasswordResetCodeResponse{Success: true}, nil
+}
+
+func (s *AuthService) SetNewPassword(ctx context.Context, req *pb.SetNewPasswordRequest) (*pb.SetNewPasswordResponse, error) {
+	userID := req.GetUserId()
+	newPassword := req.GetNewPassword()
+
+	if err := s.validator.Var(newPassword, "required,min=8"); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid new password format")
+	}
+
+	redisKey := fmt.Sprintf("password_change:%d", userID)
+	result, err := s.redisRepo.HGetAll(ctx, redisKey).Result()
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return nil, status.Errorf(codes.InvalidArgument, "invalid or expired verification code")
+		}
+		log.Printf("Failed to retrieve password reset data from Redis for user %d: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "failed to retrieve password reset data")
+	}
+
+	if result["status"] != "code_verified" {
+		return nil, status.Errorf(codes.InvalidArgument, "verification code not verified")
+	}
+
+	// Hash and update the new password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		log.Printf("Failed to hash new password for user %d: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "failed to update password")
+	}
+
+	err = s.userRepo.UpdatePassword(nil, uint(userID), string(hashedPassword))
+	if err != nil {
+		log.Printf("Failed to update password for user %d: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "failed to update password")
+	}
+
+	// Clean up the verification data from Redis
+	err = s.redisRepo.Del(ctx, redisKey).Err()
+	if err != nil {
+		log.Printf("Warning: failed to delete password reset data from Redis for user %d: %v", userID, err)
+	}
+
+	return &pb.SetNewPasswordResponse{Success: true}, nil
+}
+
+func (s *AuthService) UpdateAvatar(ctx context.Context, req *pb.UpdateAvatarRequest) (*pb.UpdateAvatarResponse, error) {
+	userID := req.GetUserId()
+	image := req.GetImage()
+
+	if len(image) == 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "Image data is required")
+	}
+
+	// TODO:  Call image service to upload the image and get the URL
+	// imageUrl, err := s.mediaService.uploadImage(ctx, image)
+	// if err != nil {
+	//  return nil, err
+	// }
+
+	err := s.userRepo.UpdateAvatar(nil, uint(userID), "default")
+	if err != nil {
+		log.Printf("Failed to update avatar for user %d: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to update avatar")
+	}
+
+	return &pb.UpdateAvatarResponse{Success: true}, nil
 }
