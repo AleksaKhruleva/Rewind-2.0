@@ -15,6 +15,7 @@ public final class PlayerUIView: UIView {
     }
     
     var onToggle: (() -> Void)?
+    var onMuteToggle: (() -> Void)?
     
     private var isPlaying = false {
         didSet {
@@ -28,6 +29,7 @@ public final class PlayerUIView: UIView {
             let imageName = isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill"
             let image = UIImage(systemName: imageName)
             muteButton.setImage(image, for: .normal)
+            onMuteToggle?()
         }
     }
     
@@ -113,6 +115,10 @@ public final class PlayerUIView: UIView {
         } else {
             player?.pause()
         }
+    }
+    
+    func setMuted(_ muted: Bool) {
+        isMuted = muted
     }
     
     private func updateUI() {

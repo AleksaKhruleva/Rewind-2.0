@@ -122,7 +122,17 @@ public struct MediasUploadingView: View {
                     }
                 }
             case .video:
-                VideoUploadingView(media: media)
+                VideoUploadingView(media: media) { newMedia in
+                    if let index = viewModel.loadedMedias.firstIndex(where: { $0.id == newMedia.id }) {
+                        viewModel.loadedMedias[index] = newMedia
+                    }
+                    if let tags = newMedia.tags, !tags.isEmpty {
+                        viewModel.toggleDisabled = true
+                        viewModel.similarSettigns = false
+                    } else {
+                        viewModel.toggleDisabled = false
+                    }
+                }
             }
         }.toolbar(.hidden)
     }
