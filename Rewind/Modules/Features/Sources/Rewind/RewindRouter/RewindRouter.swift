@@ -1,4 +1,5 @@
 import SwiftUI
+import Domain
 
 @MainActor
 public final class RewindRouter {
@@ -12,8 +13,8 @@ public final class RewindRouter {
         appRouter?.navigate(to: .gallery, with: .pushFromBottom)
     }
     
-    func navigateToAccount() {
-        appRouter?.navigate(to: .account)
+    func navigateToAccount(user: User) {
+        appRouter?.navigate(to: .account(user))
     }
     
     func navigateToMediaDetails(_ image: UIImage) {

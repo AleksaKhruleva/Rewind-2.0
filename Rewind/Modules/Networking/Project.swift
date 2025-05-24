@@ -4,7 +4,8 @@ import ProjectDescriptionHelpers
 let networkingProject = Project.featureFramework(
     name: "Networking",
     dependencies: [
-        .external(name: "Moya"),
         .project(target: "Domain", path: "../Domain"),
+        .project(target: "Base", path: "../Base"),
+        .external(name: "Moya")
     ]
 )

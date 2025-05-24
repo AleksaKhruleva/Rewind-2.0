@@ -16,12 +16,13 @@ final class NetworkProvider<T: TargetType> {
 
     func request<D: Decodable>(_ target: T, type: D.Type) async throws -> D {
         try await withCheckedThrowingContinuation { continuation in
+            print(target.path)
             provider.request(target) { result in
                 switch result {
                 case .success(let response):
                     guard response.statusCode >= 200 && response.statusCode < 300 else {
-                        print(HTTPError(statusCode: response.statusCode, reason: response.debugDescription))
-                        continuation.resume(throwing: HTTPError(statusCode: response.statusCode, reason: response.debugDescription))
+                        let error = HTTPError(statusCode: response.statusCode, reason: response.debugDescription)
+                        continuation.resume(throwing: error)
                         return
                     }
                     do {

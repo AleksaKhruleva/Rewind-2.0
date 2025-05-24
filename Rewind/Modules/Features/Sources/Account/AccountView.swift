@@ -2,6 +2,8 @@ import SwiftUI
 import UIComponents
 import Base
 
+import Domain
+
 public struct AccountView: View {
     @State private var appIconsViewModel: AppIconsViewModel
     @State private var viewModel: AccountViewModel
@@ -17,9 +19,9 @@ public struct AccountView: View {
     @Environment(\.showToast)
     private var showToast
     
-    public init(router: AccountRouter) {
+    public init(user: User, router: AccountRouter) {
         appIconsViewModel = AppIconsViewModel()
-        viewModel = AccountViewModel(router: router)
+        viewModel = AccountViewModel(user: user, router: router)
     }
     
     public var body: some View {
@@ -109,8 +111,8 @@ public struct AccountView: View {
         .overlay {
             if blurredAvatarShown {
                 BlurredAvatarView(
-                    image: viewModel.user.image,
-                    isPresented: $blurredAvatarShown
+                    isPresented: $blurredAvatarShown,
+                    image: viewModel.imageBinding
                 )
             }
         }
@@ -211,5 +213,5 @@ public struct AccountView: View {
 
 #Preview {
     let router = AppRouter()
-    AccountView(router: .init(appRouter: router))
+    AccountView(user: User(name: "nae", email: "e,a"), router: .init(appRouter: router))
 }

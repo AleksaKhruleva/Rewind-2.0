@@ -1,5 +1,6 @@
 import Moya
 import Foundation
+import Base
 
 enum APIService {
     case register(email: String)
@@ -8,6 +9,8 @@ enum APIService {
     case login(email: String, password: String)
     case logout(refreshToken: String)
     case deleteUser(email: String)
+    case refresh(refreshToken: String)
+    case user(accessToken: String)
 }
 
 extension APIService: TargetType {
@@ -21,28 +24,36 @@ extension APIService: TargetType {
     var path: String {
         switch self {
         case .register:
-            "/auth/register"
+            return "/auth/register"
         case .verifyEmail:
-            "/auth/verify-email"
+            return "/auth/verify-email"
         case .finishRegister:
-            "/auth/finish-register"
+            return "/auth/finish-register"
         case .login:
-            "/auth/login"
+            return "/auth/login"
         case .logout:
-            "/auth/logout"
+            return "/auth/logout"
         case .deleteUser:
-            "/auth/delete-user"
+            return "/auth/delete-user"
+        case .refresh:
+            return "/auth/refresh"
+        case let .user(accessToken):
+            let id = JWTDecoderService().getUserId(from: accessToken) ?? "undefined"
+            return "users/\(id)"
         }
     }
     
     var method: Moya.Method {
         switch self {
+        case .user:
+            return .get
         case .register,
             .verifyEmail,
             .finishRegister,
             .login,
             .logout,
-            .deleteUser:
+            .deleteUser,
+            .refresh:
             return .post
         }
     }
@@ -71,10 +82,23 @@ extension APIService: TargetType {
         case let .deleteUser(email):
             let parameters = ["email": email]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+        case let .refresh(refreshToken):
+            let parameters = ["refresh_token": refreshToken]
+            return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+        case .user:
+            return .requestPlain
         }
     }
     
     var headers: [String : String]? {
-        ["Content-Type": "application/json"]
+        switch self {
+        case let .user(accessToken):
+            return [
+                "Authorization": "Bearer \(accessToken)",
+                "Content-Type": "application/json"
+            ]
+        default:
+            return ["Content-Type": "application/json"]
+        }
     }
 }

@@ -24,7 +24,7 @@ public final class AppRouter {
         case rewind
         case map
         
-        case account
+        case account(User)
         case gallery
         case quoteCreation
         case mediasUploading

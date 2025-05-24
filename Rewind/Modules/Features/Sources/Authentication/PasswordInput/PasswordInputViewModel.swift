@@ -57,12 +57,11 @@ final class PasswordInputViewModel {
                 state = .loading
                 do {
                     let response = try await backend.login(email: email, password: password)
-                    animateState(to: .ready)
                     if !CommandLine.arguments.contains("-testingAuth") {
                         KeychainService.shared.save(response.accessToken, for: .accessToken)
                         KeychainService.shared.save(response.refreshToken, for: .refreshToken)
-                        UserStorage.currentUser = User(name: "", email: email)
                     }
+                    animateState(to: .ready)
                 } catch {
                     animateState(to: .error(.responseError))
                 }

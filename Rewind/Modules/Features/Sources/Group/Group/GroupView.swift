@@ -50,8 +50,8 @@ public struct GroupView: View {
         .overlay {
             if isBlurredAvatarPresented {
                 BlurredAvatarView(
-                    image: UIComponentsAsset.groupAvatar.image,
-                    isPresented: $isBlurredAvatarPresented
+                    isPresented: $isBlurredAvatarPresented,
+                    image: .constant(UIComponentsAsset.groupAvatar.image)
                 )
             }
         }

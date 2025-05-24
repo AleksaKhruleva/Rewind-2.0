@@ -26,7 +26,6 @@ final class AccountNameEditingFlowViewModel {
         case let .submitName(name):
             withAnimation(.easeIn(duration: 0.3)) { isLoading = true }
             await simulateFakeLoad()
-            UserStorage.currentUser?.name = name
             state = .ready
         }
     }
