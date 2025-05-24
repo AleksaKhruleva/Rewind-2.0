@@ -10,6 +10,11 @@ public final class AudioPlayerManager {
     private init() {}
 
     public func load(url: URL) {
+        if let currentURLAsset = playerItem?.asset as? AVURLAsset, currentURLAsset.url == url {
+            print("same url")
+            return
+        }
+        
         playerItem = AVPlayerItem(url: url)
         player = AVPlayer(playerItem: playerItem)
         player?.automaticallyWaitsToMinimizeStalling = true
