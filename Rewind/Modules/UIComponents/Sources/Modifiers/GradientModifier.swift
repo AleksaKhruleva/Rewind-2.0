@@ -6,7 +6,7 @@ public struct GradientModifier: ViewModifier {
     private let startPoint: UnitPoint
     private let endPoint: UnitPoint
     private let applyToForeground: Bool
-    
+
     public init(
         colors: [Color],
         locations: [CGFloat],
@@ -20,7 +20,7 @@ public struct GradientModifier: ViewModifier {
         self.endPoint = endPoint
         self.applyToForeground = applyToForeground
     }
-    
+
     public func body(content: Content) -> some View {
         if applyToForeground {
             content

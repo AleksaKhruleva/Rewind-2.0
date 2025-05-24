@@ -4,15 +4,15 @@ public struct ColorPickerTableCell: View {
     var text: String
     @Binding
     var color: Color
-    
+
     @State
     private var showColorPicker = false
-    
+
     public init(text: String, color: Binding<Color>) {
         self.text = text
         self._color = color
     }
-    
+
     public var body: some View {
         HStack(spacing: 10) {
             Text(text)
@@ -24,11 +24,11 @@ public struct ColorPickerTableCell: View {
                     )
                 )
                 .padding(.leading, 5)
-            
+
             Spacer()
-            
+
             ColorPicker("", selection: $color, supportsOpacity: false).frame(width: 30)
-            
+
             Image(systemName: "chevron.right")
                 .font(.system(size: 17))
                 .fontWeight(.bold)

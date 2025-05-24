@@ -7,27 +7,27 @@ import Domain
 public struct AccountView: View {
     @State private var appIconsViewModel: AppIconsViewModel
     @State private var viewModel: AccountViewModel
-    
+
     @State private var imageEditingDialogShown = false
     @State private var photoPickerShown = false
     @State private var blurredAvatarShown = false
     @State private var signOutAlertShown = false
     @State private var deleteAccountAlertShown = false
-    
+
     @State private var genericSheetItem: GenericInputSheetItem?
-    
+
     @Environment(\.showToast)
     private var showToast
-    
+
     public init(user: User, router: AccountRouter) {
         appIconsViewModel = AppIconsViewModel()
         viewModel = AccountViewModel(user: user, router: router)
     }
-    
+
     public var body: some View {
         VStack(spacing: 0) {
             header
-            
+
             ScrollView {
                 VStack(spacing: 15) {
                     avatar.onTapGesture {
@@ -39,24 +39,24 @@ public struct AccountView: View {
                             blurredAvatarShown = true
                         }
                     }
-                    
+
                     groupsTable
-                    
+
                     activityTable
-                    
+
                     generalTable
-                    
+
                     VStack(alignment: .leading, spacing: 5) {
                         Text(UIComponentsStrings.Account.appicons)
                             .foregroundColor(.textSecondary)
                             .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .black))
                             .padding(.leading, 15)
-                        
+
                         appIconsTable
                     }
-                    
+
                     riskyTable
-                    
+
                     RewindNoteTextView(text: UIComponentsStrings.Account.Note.you(100))
                         .padding(.vertical, 4)
                 }
@@ -89,16 +89,16 @@ public struct AccountView: View {
         .sheet(item: $genericSheetItem) { item in
             switch item {
             case .name:
-                AccountNameEditingFlow() {
+                AccountNameEditingFlow {
                     Task { await viewModel.dispatch(.fetchUser) }
                     showToast(UIComponentsStrings.Account.Edit.Name.success)
                 }
             case .password:
-                AccountPasswordEditingFlow() {
+                AccountPasswordEditingFlow {
                     showToast(UIComponentsStrings.Account.Edit.Password.success)
                 }
             case .email:
-                AccountEmailEditingFlow() {
+                AccountEmailEditingFlow {
                     showToast(UIComponentsStrings.Account.Edit.Email.success)
                 }
             default: EmptyView()
@@ -133,7 +133,7 @@ public struct AccountView: View {
             }
         }
     }
-    
+
     var header: some View {
         RewindHeader {
             RewindButton(type: .leftChevron) { viewModel.router.dismiss() }
@@ -146,11 +146,11 @@ public struct AccountView: View {
             RewindButton(type: .leftChevron).hidden()
         }
     }
-    
+
     var avatar: some View {
         AvatarView(image: viewModel.user.image, text: viewModel.user.name)
     }
-    
+
     var appIconsTable: some View {
         ZStack {
             AppIconsGridView()
@@ -160,15 +160,15 @@ public struct AccountView: View {
         .background(Color.backgroundSecondary)
         .cornerRadius(23)
     }
-    
+
     var groupsTable: some View {
         InformationTable(title: UIComponentsStrings.Account.groups, data: AccountConstants.groups, isRisky: false)
     }
-    
+
     var activityTable: some View {
         InformationTable(title: UIComponentsStrings.Account.activity, data: AccountConstants.activities, isRisky: false)
     }
-    
+
     var generalTable: some View {
         InformationTable(
             title: UIComponentsStrings.Account.general,
@@ -194,7 +194,7 @@ public struct AccountView: View {
             isRisky: false
         )
     }
-    
+
     var riskyTable: some View {
         InformationTable(
             title: UIComponentsStrings.Account.risky,

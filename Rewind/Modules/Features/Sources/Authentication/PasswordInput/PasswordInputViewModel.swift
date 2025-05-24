@@ -12,16 +12,16 @@ final class PasswordInputViewModel {
         case error(LoginError)
         case ready
     }
-    
+
     enum Intent {
         case submitPassword
         case dismiss
     }
-    
+
     enum LoginError: Error {
         case responseError
         case invalid
-        
+
         var errorDescription: String {
             switch self {
             case .invalid:
@@ -37,16 +37,16 @@ final class PasswordInputViewModel {
     let registrationID: String?
     let router: AuthenticationRouter
     let flow: AuthFlow
-    
+
     private let backend: NetworkServiceProtocol
-    
+
     init(flow: AuthFlow, router: AuthenticationRouter, registrationID: String?) {
         self.flow = flow
         self.router = router
         self.registrationID = registrationID
         backend = NetworkService()
     }
-    
+
     func dispatch(_ intent: Intent) async {
         switch intent {
         case .submitPassword:
@@ -65,7 +65,7 @@ final class PasswordInputViewModel {
                 } catch {
                     animateState(to: .error(.responseError))
                 }
-                
+
                 if state == .ready {
                     router.navigateToRewind()
                 }
@@ -79,7 +79,7 @@ final class PasswordInputViewModel {
             }
         }
     }
-    
+
     func animateState(to state: PasswordState) {
         withAnimation(.spring(response: 0.2)) { self.state = state }
     }

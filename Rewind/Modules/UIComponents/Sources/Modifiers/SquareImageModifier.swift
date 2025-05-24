@@ -3,12 +3,12 @@ import SwiftUI
 struct SquareImageModifier: ViewModifier {
     let cornerRadius: CGFloat
     let image: UIImage
-    
+
     public init(cornerRadius: CGFloat, image: UIImage) {
         self.cornerRadius = cornerRadius
         self.image = image
     }
-    
+
     func body(content: Content) -> some View {
         content
             .foregroundStyle(.clear)

@@ -6,11 +6,11 @@ let uiComponentsProject = Project.featureFramework(
     resources: ["Resources/**"],
     infoPlist: .extendingDefault(with: [
         "UIAppFonts": [
-            "Fonts/AdvertisingScriptBold.ttf",
+            "Fonts/AdvertisingScriptBold.ttf"
         ]
     ]),
     dependencies: [
         .project(target: "Base", path: "../Base"),
-        .project(target: "AccessibilitySupport", path: "../AccessibilitySupport"),
+        .project(target: "AccessibilitySupport", path: "../AccessibilitySupport")
     ]
 )

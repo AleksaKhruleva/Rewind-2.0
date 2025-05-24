@@ -6,11 +6,11 @@ public struct BlurredTableCell: View {
     private var needChevron: Bool
     private var isRisky: Bool
     private var action: () -> Void = {}
-    
+
     private var foregroundColor: Color {
         isRisky ? .riskyPrimary : .textPrimary
     }
-    
+
     public init(
         icon: String,
         title: String,
@@ -24,13 +24,13 @@ public struct BlurredTableCell: View {
         self.isRisky = isRisky
         self.action = action
     }
-        
+
     public var body: some View {
         HStack(spacing: 18) {
             Image(systemName: icon)
                 .font(.system(size: 20))
                 .frame(width: 25, height: 25)
-            
+
             Text(title)
                 .modifier(
                     RoundFontModifier(
@@ -39,13 +39,13 @@ public struct BlurredTableCell: View {
                         foregroundColor: foregroundColor
                     )
                 )
-            
+
             if needChevron {
                 Spacer()
-                
+
                 Image(systemName: "chevron.right")
                     .font(.system(size: AccountConstants.defaultFontSize, weight: .bold))
-                    
+
             }
         }
         .foregroundColor(foregroundColor)
@@ -60,7 +60,7 @@ public struct BlurredTableCell: View {
 #Preview {
     ZStack {
         Color.gray.opacity(0.2).ignoresSafeArea(edges: .all)
-        
+
         VStack(spacing: -8) {
             BlurredTableCell(
                 icon: "photo",
@@ -69,7 +69,7 @@ public struct BlurredTableCell: View {
                     // TODO: smth
                 }
             )
-            
+
             BlurredTableCell(
                 icon: "square.and.arrow.down.fill",
                 title: "Save Image",
@@ -78,7 +78,7 @@ public struct BlurredTableCell: View {
                     // TODO: smth
                 }
             )
-            
+
             BlurredTableCell(
                 icon: "photo",
                 title: "Set new image",

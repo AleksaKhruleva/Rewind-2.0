@@ -8,19 +8,19 @@ import Base
 struct RewindApp: App {
     @State private var toastController = ToastController()
     @State private var appRouter = AppRouter()
-    
+
     init() {
         setupAudioSession()
     }
-    
+
     var body: some Scene {
         WindowGroup {
             let hasAccessToken = KeychainService.shared.read(for: .accessToken) != nil
             let hasRefreshToken = KeychainService.shared.read(for: .refreshToken) != nil
             let isAuthorized = hasAccessToken && hasRefreshToken
-            
+
             let testingAuth = CommandLine.arguments.contains("-testingAuth")
-            
+
             RootView(router: appRouter)
                 .onAppear {
                     let initial: AppRouter.Route = (isAuthorized && !testingAuth) ? .rewind : .welcome
@@ -35,7 +35,7 @@ struct RewindApp: App {
                 }
         }
     }
-    
+
     private func setupAudioSession() {
         do {
             let session = AVAudioSession.sharedInstance()

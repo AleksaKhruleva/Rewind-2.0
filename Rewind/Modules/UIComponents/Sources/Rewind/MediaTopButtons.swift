@@ -3,12 +3,12 @@ import SwiftUI
 public struct MediaTopButtons: View {
     let onDetailsTap: () -> Void
     let onSettingsTap: () -> Void
-    
+
     public init(onDetailsTap: @escaping () -> Void = {}, onSettingsTap: @escaping () -> Void = {}) {
         self.onDetailsTap = onDetailsTap
         self.onSettingsTap = onSettingsTap
     }
-    
+
     public var body: some View {
         HStack {
             Button(action: onSettingsTap) {
@@ -18,7 +18,7 @@ public struct MediaTopButtons: View {
                     .background(Color.backgroundSecondary)
                     .clipShape(Circle())
             }
-            
+
             Button(action: onDetailsTap) {
                 Text(UIComponentsStrings.Rewind.details)
                     .multilineTextAlignment(.center)

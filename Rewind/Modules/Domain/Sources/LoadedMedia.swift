@@ -6,13 +6,13 @@ public struct LoadedMedia: Hashable, Identifiable {
         case image(UIImage)
         case video(url: URL, firstFrame: UIImage)
     }
-    
+
     public let id: UUID
     public var content: Content
     public var tags: [String]?
     public var photosPickerItem: PhotosPickerItem?
     public var videoEditingSettings: VideoEditingSettings?
-    
+
     public init(
         content: Content,
         photosPickerItem: PhotosPickerItem? = nil,

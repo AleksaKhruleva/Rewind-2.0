@@ -10,7 +10,7 @@ public struct TrackRow: View {
     private let isLoading: Bool
     private let onPlayTap: () -> Void
     private let onRowTap: (Track) -> Void
-    
+
     public init(
         track: Track,
         showPlayButton: Bool = true,
@@ -26,7 +26,7 @@ public struct TrackRow: View {
         self.onPlayTap = onPlayTap
         self.onRowTap = onRowTap
     }
-    
+
     public var body: some View {
         HStack {
             HStack(spacing: 12) {
@@ -49,7 +49,7 @@ public struct TrackRow: View {
                 }
                 .frame(width: imageSize, height: imageSize)
                 .cornerRadius(8)
-                
+
                 VStack(alignment: .leading, spacing: 5) {
                     Text(track.title)
                         .modifier(RoundFontModifier(size: 15))
@@ -59,28 +59,28 @@ public struct TrackRow: View {
                             maxWidth: UIScreen.main.bounds.width / 1.5,
                             alignment: .leading
                         )
-                    
+
                     HStack {
                         Text(track.artist)
                             .lineLimit(1)
                             .truncationMode(.tail)
-                        
+
                         Image(systemName: "circle.fill")
                             .font(.system(size: 3))
                             .frame(width: 1)
-                        
+
                         Text(track.durationString)
                     }
                     .modifier(RoundFontModifier(size: 13, foregroundColor: .textTertiary))
                 }
-                
+
                 Spacer()
             }
             .contentShape(Rectangle())
             .onTapGesture {
                 onRowTap(track)
             }
-            
+
             if showPlayButton {
                 if isLoading {
                     ProgressView()

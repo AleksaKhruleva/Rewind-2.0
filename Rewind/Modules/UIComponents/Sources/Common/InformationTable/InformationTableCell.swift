@@ -6,17 +6,17 @@ struct InformationTableCell: View {
     var needChevron: Bool
     var isRisky: Bool
     var action: () -> Void
-    
+
     var foregroundColor: Color {
         isRisky ? .riskyPrimary : .textPrimary
     }
-    
+
     var body: some View {
         HStack(spacing: 10) {
             Image(systemName: icon)
                 .font(.system(size: 20))
                 .frame(width: 30, height: 30)
-            
+
             Text(text)
                 .modifier(
                     RoundFontModifier(
@@ -25,9 +25,9 @@ struct InformationTableCell: View {
                         foregroundColor: foregroundColor
                         )
                     )
-            
+
             Spacer()
-            
+
             if needChevron {
                 Image(systemName: "chevron.right")
                     .font(.system(size: 17))

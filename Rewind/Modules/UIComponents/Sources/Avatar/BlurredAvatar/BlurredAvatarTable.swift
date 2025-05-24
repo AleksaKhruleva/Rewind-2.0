@@ -3,7 +3,7 @@ import SwiftUI
 struct BlurredAvatarTable: View {
     @Binding var showPicker: Bool
     var saveImage: () -> Void
-    
+
     public var body: some View {
         VStack(alignment: .leading, spacing: -8) {
             BlurredTableCell(
@@ -13,7 +13,7 @@ struct BlurredAvatarTable: View {
                     showPicker = true
                 }
             )
-            
+
             BlurredTableCell(
                 icon: "square.and.arrow.down.fill",
                 title: UIComponentsStrings.BlurredAvatar.saveImage,
@@ -29,7 +29,7 @@ struct BlurredAvatarTable: View {
 #Preview {
     ZStack {
         Color.gray.opacity(0.2).ignoresSafeArea(edges: .all)
-        
+
         BlurredAvatarTable(showPicker: Binding.constant(false), saveImage: {})
     }
 }

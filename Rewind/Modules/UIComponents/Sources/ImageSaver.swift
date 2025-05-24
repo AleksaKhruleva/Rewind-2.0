@@ -1,11 +1,11 @@
 import Foundation
 import SwiftUI
 
-class ImageSaver: NSObject {
+final class ImageSaver: NSObject {
     public static var shared = ImageSaver()
-    
+
     private var completion: ((Result<Void, Error>) -> Void)?
-    
+
     func writeToPhotoAlbum(
         image: UIImage,
         completion: @escaping (Result<Void, Error>) -> Void
@@ -15,7 +15,11 @@ class ImageSaver: NSObject {
     }
 
     @objc
-    private func saveCompleted(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+    private func saveCompleted(
+        _ image: UIImage,
+        didFinishSavingWithError error: Error?,
+        contextInfo: UnsafeRawPointer
+    ) {
         if let error = error {
             completion?(.failure(error))
         } else {

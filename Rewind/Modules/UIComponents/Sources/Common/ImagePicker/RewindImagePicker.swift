@@ -8,11 +8,11 @@ struct RewindImagePicker<Content: View>: View {
     @Binding var cropedImage: UIImage?
     var cropType: CropType
     var onSuccess: () -> Void
-    
+
     @State private var pickerItem: PhotosPickerItem?
     @State private var selectedImage: UIImage?
     @State private var isImageEditorPresented: Bool = false
-    
+
     init(
         show: Binding<Bool>,
         croppedImage: Binding<UIImage?>,
@@ -26,14 +26,14 @@ struct RewindImagePicker<Content: View>: View {
         self.onSuccess = onSuccess
         self.content = content()
     }
-    
+
     var body: some View {
         content
             .photosPicker(isPresented: $show, selection: $pickerItem, matching: .images)
             .onChange(of: pickerItem) { _, newValue in
                 guard let newValue else { return }
                 Task {
-                    print(await MetaDataExtractor.shared.extractCoordinates(from: newValue))
+                    print(await MetaDataExtractor.shared.extractCoordinates(from: newValue) ?? "")
                     if let imageData = try? await newValue.loadTransferable(type: Data.self),
                        let image = UIImage(data: imageData) {
                         await MainActor.run {
@@ -58,6 +58,6 @@ struct RewindImagePicker<Content: View>: View {
 
 #Preview {
     RewindImageEditor(image: UIComponentsAsset.avatar.image, cropType: .circle) { _, _ in
-        
+
     }
 }

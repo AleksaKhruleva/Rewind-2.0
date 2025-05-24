@@ -8,29 +8,29 @@ public protocol SegmentedItem: Identifiable, Equatable {
 public struct SegmentedPicker<Item: SegmentedItem>: View {
     @Binding var selection: Item
     var items: [Item]
-    
+
     public init(selection: Binding<Item>, items: [Item]) {
         self._selection = selection
         self.items = items
     }
-    
+
     public var body: some View {
         ZStack(alignment: .topLeading) {
             HStack(spacing: 4) {
                 ForEach(items.reversed().drop(while: { $0.id != selection.id }).dropFirst()) {
                     makeItemView($0)
                 }.hidden()
-                
+
                 makeItemView(selection).hidden().background {
                     RoundedRectangle(cornerRadius: 10)
                         .foregroundColor(.background)
                 }
-                
+
                 ForEach(items.drop(while: { $0.id != selection.id }).dropFirst()) {
                     makeItemView($0)
                 }.hidden()
             }
-            
+
             HStack(spacing: 4) {
                 ForEach(items) { item in
                     makeItemView(item).simultaneousGesture(TapGesture().onEnded {
@@ -46,7 +46,7 @@ public struct SegmentedPicker<Item: SegmentedItem>: View {
         .background(Color.backgroundSecondary)
         .cornerRadius(12)
     }
-    
+
     private func makeItemView(_ item: Item) -> some View {
         HStack(spacing: 0) {
             Spacer(minLength: 0)

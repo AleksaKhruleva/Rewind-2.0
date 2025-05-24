@@ -7,18 +7,18 @@ final class CodeInputViewModel {
     enum Intent {
         case submitCode(code: String)
     }
-    
+
     enum CodeState: Equatable {
         case empty
         case loading
         case error(CodeError)
         case ready
     }
-    
+
     enum CodeError: Error {
         case responseError
         case incorrect
-        
+
         var errorDescription: String {
             switch self {
             case .responseError:
@@ -28,21 +28,21 @@ final class CodeInputViewModel {
             }
         }
     }
-     
+
     var state: CodeState = .empty
     let router: AuthenticationRouter
     let email: String
     let registrationID: String
-    
+
     private let backend: NetworkServiceProtocol
-    
+
     init(router: AuthenticationRouter, email: String, registrationID: String) {
         self.router = router
         self.email = email
         self.registrationID = registrationID
         backend = NetworkService()
     }
-    
+
     public func dispatch(_ intent: Intent) async {
         switch intent {
         case let .submitCode(code):
@@ -53,13 +53,13 @@ final class CodeInputViewModel {
             } catch {
                 animateState(to: .error(.responseError))
             }
-            
+
             if state == .ready {
                 router.navigateToPassword(for: .registration(email: email), registrationID: registrationID)
             }
         }
     }
-    
+
     func animateState(to state: CodeState) {
         withAnimation(.spring(response: 0.2)) { self.state = state }
     }

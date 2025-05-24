@@ -4,23 +4,23 @@ import PhotosUI
 import Domain
 
 public struct MediasUploadingView: View {
-    @State var viewModel: MediasUploadingViewModel
-    
+    @State private var viewModel: MediasUploadingViewModel
+
     private let router: AppRouter
-    
+
     @Environment(\.showToast)
     private var showToast
-    
+
     public init(router: AppRouter) {
         viewModel = .init()
         self.router = router
     }
-    
+
     public var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 header
-                
+
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 10) {
                         ForEach(viewModel.loadedMedias) { loadedMedia in
@@ -38,7 +38,7 @@ public struct MediasUploadingView: View {
                                     }
                                 }
                         }
-                        
+
                         photosPicker
                     }
                     .padding(.horizontal, 10)
@@ -48,13 +48,13 @@ public struct MediasUploadingView: View {
                 .background(Color.backgroundSecondary)
                 .cornerRadius(32)
                 .padding(.bottom, 8)
-                
+
                 settingsToggle
                     .padding(.bottom, 16)
-                
+
                 TagsSectionView(tags: $viewModel.tags)
                     .disabledWithOpacity(!viewModel.similarSettigns)
-                
+
                 Spacer()
             }
             .navigationDestination(item: $viewModel.viewingMedia) { media in
@@ -72,13 +72,13 @@ public struct MediasUploadingView: View {
             }
         }
     }
-    
+
     private var header: some View {
         RewindHeader(leftView: {
             RewindButton(type: .leftChevron) { router.pop() }
         })
     }
-    
+
     private var settingsToggle: some View {
         Toggle(isOn: $viewModel.similarSettigns) {
             Text("Similar settings for all media")
@@ -90,7 +90,7 @@ public struct MediasUploadingView: View {
         .background(Color.backgroundSecondary)
         .cornerRadius(25)
     }
-    
+
     private var photosPicker: some View {
         PhotosPicker(
             selection: $viewModel.selection
@@ -105,7 +105,7 @@ public struct MediasUploadingView: View {
                 }
         }
     }
-    
+
     private func mediaSettings(for media: LoadedMedia) -> some View {
         Group {
             switch media.content {
@@ -136,7 +136,7 @@ public struct MediasUploadingView: View {
             }
         }.toolbar(.hidden)
     }
-    
+
     private func badges(
         for item: LoadedMedia,
         onRemove: @escaping () -> Void
@@ -147,9 +147,9 @@ public struct MediasUploadingView: View {
                     badgeItem(icon: "video.fill")
                         .foregroundColor(.white)
                 }
-                
+
                 Spacer()
-                
+
                 Button {
                     onRemove()
                 } label: {
@@ -157,10 +157,10 @@ public struct MediasUploadingView: View {
                         .foregroundColor(.white)
                 }
             }
-            
+
             Spacer()
         }.padding(8)
-        
+
         func badgeItem(icon: String) -> some View {
             RoundedRectangle(cornerRadius: 13)
                 .fill(.ultraThinMaterial)

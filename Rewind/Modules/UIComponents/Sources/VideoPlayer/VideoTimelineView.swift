@@ -5,15 +5,15 @@ public struct VideoTimelineView: View {
     @Binding var currentTime: TimeInterval
     @Binding var trimStart: TimeInterval
     @Binding var trimEnd: TimeInterval
-    
+
     @State private var thumbnails: [UIImage] = []
     @State private var isBlurred: Bool = true
-    
+
     private let asset: AVAsset
     private let frameCount: Int
     private let duration: TimeInterval
     private let onTrimChanged: () -> Void
-    
+
     public init(
         currentTime: Binding<TimeInterval>,
         trimStart: Binding<TimeInterval>,
@@ -31,13 +31,13 @@ public struct VideoTimelineView: View {
         self.duration = duration
         self.onTrimChanged = onTrimChanged
     }
-    
+
     public var body: some View {
         GeometryReader { geo in
             let width = geo.size.width
             let squareSize = width / CGFloat(max(frameCount, 1))
             let thumbnailSize = CGSize(width: squareSize, height: squareSize)
-            
+
             ZStack(alignment: .leading) {
                 HStack(spacing: 0) {
                     ForEach(thumbnails.indices, id: \.self) { index in
@@ -51,16 +51,16 @@ public struct VideoTimelineView: View {
                 .blur(radius: isBlurred ? 4 : 0)
                 .animation(.easeOut(duration: 0.25), value: isBlurred)
                 .clipShape(RoundedRectangle(cornerRadius: 6))
-                
+
                 let trimStartX = CGFloat(trimStart / max(duration, 0.01)) * width
                 let trimEndX = CGFloat(trimEnd / max(duration, 0.01)) * width
                 let trimWidth = trimEndX - trimStartX
-                
+
                 RoundedRectangle(cornerRadius: 4)
                     .strokeBorder(Color.pinkPrimary, lineWidth: 2)
                     .frame(width: trimWidth, height: geo.size.height)
                     .offset(x: trimStartX)
-                
+
                 RoundedRectangle(cornerRadius: 6)
                     .fill(Color.pinkPrimary)
                     .frame(width: 10, height: geo.size.height)
@@ -102,7 +102,7 @@ public struct VideoTimelineView: View {
             }
         }
     }
-    
+
     private func prepareInitialPlaceholder(size: CGSize) {
         Task {
             do {
@@ -111,31 +111,27 @@ public struct VideoTimelineView: View {
                     self.thumbnails = Array(repeating: square, count: frameCount)
                 }
             } catch {
-                //                print("Ошибка генерации первого кадра: \(error)")
+                print("Ошибка генерации первого кадра: \(error)")
             }
         }
     }
-    
+
     private func generateThumbnails(size: CGSize) {
         Task {
             guard let duration = try? await asset.load(.duration) else {
                 isBlurred = false
                 return
             }
-            
+
             let step = CMTime(seconds: CMTimeGetSeconds(duration) / Double(frameCount), preferredTimescale: 600)
             let times: [CMTime] = (0..<frameCount).map { CMTimeMultiplyByFloat64(step, multiplier: Double($0)) }
-            
+
             var images: [UIImage] = []
             for time in times {
-                do {
-                    let square = try await generateThumbnail(at: time)
-                    images.append(square)
-                } catch {
-                    
-                }
+                let square = try await generateThumbnail(at: time)
+                images.append(square)
             }
-            
+
             DispatchQueue.main.async {
                 if !images.isEmpty {
                     self.thumbnails = images
@@ -144,12 +140,13 @@ public struct VideoTimelineView: View {
             }
         }
     }
-    
+
+    // swiftlint:disable line_length
     private func generateThumbnail(at time: CMTime) async throws -> UIImage {
         let generator = AVAssetImageGenerator(asset: asset)
         generator.appliesPreferredTrackTransform = true
         generator.maximumSize = CGSize(width: 1000, height: 1000)
-        
+
         let optionalCGImage = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<CGImage?, Error>) in
             generator.generateCGImageAsynchronously(for: time) { image, _, error in
                 if let error = error {
@@ -159,30 +156,31 @@ public struct VideoTimelineView: View {
                 }
             }
         }
-        
+
         guard let cgImage = optionalCGImage else {
             throw NSError(domain: "CGImageNil", code: 0, userInfo: [NSLocalizedDescriptionKey: "Unable to get CGImage"])
         }
-        
+
         let uiImage = UIImage(cgImage: cgImage, scale: UIScreen.main.scale, orientation: .up)
         return cropToSquare(image: uiImage)
     }
-    
+    // swiftlint:enable line_length
+
     private func cropToSquare(image: UIImage) -> UIImage {
         guard let cgImage = image.cgImage else { return image }
-        
+
         let width = CGFloat(cgImage.width)
         let height = CGFloat(cgImage.height)
         let side = min(width, height)
-        
+
         let originX = (width - side) / 2
         let originY = (height - side) / 2
         let cropRect = CGRect(x: originX, y: originY, width: side, height: side)
-        
+
         guard let croppedCGImage = cgImage.cropping(to: cropRect) else {
             return image
         }
-        
+
         return UIImage(cgImage: croppedCGImage, scale: image.scale, orientation: image.imageOrientation)
     }
 }

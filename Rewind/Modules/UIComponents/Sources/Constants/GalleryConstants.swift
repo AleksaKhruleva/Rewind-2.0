@@ -22,6 +22,6 @@ public enum GalleryConstants {
         UIComponentsAsset.media17.image,
         UIComponentsAsset.media18.image,
         UIComponentsAsset.media19.image,
-        UIComponentsAsset.media20.image,
+        UIComponentsAsset.media20.image
     ]
 }

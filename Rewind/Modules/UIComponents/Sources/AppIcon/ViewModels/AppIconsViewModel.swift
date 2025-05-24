@@ -5,9 +5,9 @@ public final class AppIconsViewModel: Identifiable {
     enum Intent {
         case change(icon: AppIconViewModel)
     }
-    
+
     var appIcons: [AppIconViewModel]
-    
+
     public init() {
         self.appIcons = [
             AppIconViewModel(appIcon: "RewindLight", task: "5 days", locked: true),
@@ -19,14 +19,14 @@ public final class AppIconsViewModel: Identifiable {
             AppIconViewModel(appIcon: "RewindSea", task: "5 days", locked: false)
         ]
     }
-    
+
     func dispatch(_ intent: Intent) {
         switch intent {
         case .change(let icon):
             changeAppIcon(icon: icon)
         }
     }
-    
+
     private func changeAppIcon(icon: AppIconViewModel) {
         guard UIApplication.shared.supportsAlternateIcons else { return }
         guard !icon.locked else { return }
@@ -35,7 +35,7 @@ public final class AppIconsViewModel: Identifiable {
             UIApplication.shared.setAlternateIconName(nil)
         }
         UIApplication.shared.setAlternateIconName(icon.name)
-        
+
         UserDefaults.standard.set(icon.name, forKey: "appIcon")
         for icon in self.appIcons {
             icon.dispatch(.change)

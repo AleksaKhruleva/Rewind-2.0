@@ -4,15 +4,15 @@ import UIComponents
 public struct CodeInputView: View {
     @State private var viewModel: CodeInputViewModel
     @State private var code: [String] = Array(repeating: "", count: 4)
-    
+
     public init(router: AuthenticationRouter, email: String, registrationID: String) {
         viewModel = .init(router: router, email: email, registrationID: registrationID)
     }
-    
+
     public var body: some View {
         ZStack(alignment: .topLeading) {
             Color.background.ignoresSafeArea()
-            
+
             RewindHeader(leftView: {
                 RewindButton(type: .leftChevron) {
                     hideKeyboard()
@@ -21,17 +21,21 @@ public struct CodeInputView: View {
                     }
                 }
             })
-            
+
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
                 Text(UIComponentsStrings.Code.title)
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
-                
-                CodeInputTextField(code: $code, error: nil, backgroundColor: UIComponentsAsset.backgroundSecondary.color) {
+
+                CodeInputTextField(
+                    code: $code,
+                    error: nil,
+                    backgroundColor: UIComponentsAsset.backgroundSecondary.color
+                ) {
                     Task {
                         await viewModel.dispatch(.submitCode(code: code.joined()))
                     }
                 }
-                
+
                 if viewModel.state == .loading {
                     ProgressView()
                 } else if case let .error(error) = viewModel.state {

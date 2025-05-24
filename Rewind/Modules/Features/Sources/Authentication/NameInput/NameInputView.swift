@@ -5,15 +5,15 @@ public struct NameInputView: View {
     @State private var viewModel: NameInputViewModel
     @State private var name: String = ""
     @FocusState private var isFocused: Bool
-    
+
     public init(router: AuthenticationRouter, email: String, password: String, registrationID: String) {
         viewModel = .init(router: router, email: email, password: password, registrationID: registrationID)
     }
-    
+
     public var body: some View {
         ZStack(alignment: .topLeading) {
             Color.background.ignoresSafeArea()
-            
+
             RewindHeader(leftView: {
                 RewindButton(type: .leftChevron) {
                     hideKeyboard()
@@ -22,11 +22,11 @@ public struct NameInputView: View {
                     }
                 }
             })
-            
+
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
                 Text(UIComponentsStrings.Name.title)
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
-                
+
                 StyledTextField(
                     text: $name,
                     placeholder: UIComponentsStrings.Name.placeholder
@@ -39,7 +39,7 @@ public struct NameInputView: View {
                         await viewModel.dispatch(.submitName(name))
                     }
                 }
-                
+
                 if viewModel.state == .loading {
                     ProgressView()
                 } else if case let .error(error) = viewModel.state {

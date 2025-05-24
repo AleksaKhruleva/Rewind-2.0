@@ -4,7 +4,7 @@ import ImageIO
 
 public final class MetaDataExtractor {
     public static let shared = MetaDataExtractor()
-    
+
     private init() {}
 
     public func extractCoordinates(from item: PhotosPickerItem) async -> (latitude: Double, longitude: Double)? {

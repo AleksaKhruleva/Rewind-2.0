@@ -8,9 +8,9 @@ final class RewindViewModel {
     enum Intent {
         case fetchUser
     }
-    
+
     var showToast: (String) -> Void
-    
+
     var fetchedUser: User?
     var user: User {
         get {
@@ -24,14 +24,14 @@ final class RewindViewModel {
             fetchedUser = newValue
         }
     }
-    
+
     private let backend: NetworkServiceProtocol
-    
+
     init() {
         showToast = { _ in }
         backend = NetworkService()
     }
-    
+
     func dispatch(_ intent: Intent) async {
         switch intent {
         case .fetchUser:
@@ -48,7 +48,7 @@ final class RewindViewModel {
             }
         }
     }
-    
+
     func set(showToast: @escaping (String) -> Void) {
         self.showToast = showToast
     }

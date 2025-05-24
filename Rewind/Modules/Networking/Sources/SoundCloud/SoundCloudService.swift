@@ -19,7 +19,7 @@ extension SoundCloudService: TargetType {
             return url.deletingLastPathComponent()
         }
     }
-    
+
     var path: String {
         switch self {
         case .fetchCharts:
@@ -30,11 +30,11 @@ extension SoundCloudService: TargetType {
             return url.lastPathComponent
         }
     }
-    
+
     var method: Moya.Method {
         return .get
     }
-    
+
     var task: Task {
         switch self {
         case let .fetchCharts(kind, genre, offset, limit):
@@ -48,7 +48,7 @@ extension SoundCloudService: TargetType {
                 ],
                 encoding: URLEncoding.default
             )
-            
+
         case .fetchStreamURL:
             return .requestParameters(
                 parameters: [
@@ -56,7 +56,7 @@ extension SoundCloudService: TargetType {
                 ],
                 encoding: URLEncoding.default
             )
-            
+
         case let .searchTracks(query, limit):
             return .requestParameters(
                 parameters: [
@@ -66,12 +66,12 @@ extension SoundCloudService: TargetType {
                 ],
                 encoding: URLEncoding.default
             )
-            
+
         case .fetchNextPage:
             return .requestPlain
         }
     }
-    
+
     var headers: [String: String]? {
         nil
     }

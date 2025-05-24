@@ -2,28 +2,28 @@ import SwiftUI
 import UIComponents
 
 public struct MediaDetailsView: View {
-    @State var tags: [String] = []
+    @State private var tags: [String] = []
     private let router: AppRouter
     var image: UIImage
-    
+
     public init(router: AppRouter, image: UIImage) {
         self.router = router
         self.image = image
     }
-    
+
     public var body: some View {
         VStack {
             header
-            
+
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     rewind
-                    
+
                     author
                         .padding(.leading)
-                    
+
                     TagsSectionView(tags: $tags)
-                    
+
                     riskyTable
                 }
                 .ignoresSafeArea()
@@ -34,7 +34,7 @@ public struct MediaDetailsView: View {
         }
         .background(Color.background)
     }
-    
+
     private var header: some View {
         RewindHeader {
             RewindButton(type: .leftChevron) { router.pop() }
@@ -46,11 +46,11 @@ public struct MediaDetailsView: View {
             RewindButton(type: .leftChevron).hidden()
         }
     }
-    
+
     private var rewind: some View {
         Rectangle().toSquare(image, cornerRadius: 40)
     }
-    
+
     private var author: some View {
         AuthorBadgeView(
             image: UIComponentsAsset.media15.image,
@@ -58,7 +58,7 @@ public struct MediaDetailsView: View {
             date: "23.11.2024"
         )
     }
-    
+
     private var riskyTable: some View {
         InformationTable(title: UIComponentsStrings.MediaDetails.risky, data: AccountConstants.risky, isRisky: true)
     }

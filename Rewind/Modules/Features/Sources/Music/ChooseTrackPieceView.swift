@@ -11,7 +11,7 @@ struct ChooseTrackPieceView: View {
     @Binding var shouldPlay: Bool
     @Binding var startTime: Double
     @Binding var selectorDuration: CGFloat
-    
+
     @State private var viewModel: ChooseTrackPieceViewModel
     @State private var progress: CGFloat = 0
     @State private var timer: Timer?
@@ -19,9 +19,9 @@ struct ChooseTrackPieceView: View {
     @State private var realTimeOffset: CGFloat = 0
     @State private var durationInPicker: CGFloat = 15
     @State private var showDurationPicker = false
-    
+
     private let onTrashTap: () -> Void
-    
+
     init(
         shouldPlay: Binding<Bool>,
         startTime: Binding<Double>,
@@ -35,7 +35,7 @@ struct ChooseTrackPieceView: View {
         self.onTrashTap = onTrashTap
         viewModel = ChooseTrackPieceViewModel(selectedTrack: selectedTrack)
     }
-    
+
     var body: some View {
         VStack {
             HStack(spacing: 12) {
@@ -48,7 +48,7 @@ struct ChooseTrackPieceView: View {
                         .frame(width: buttonSize, height: buttonSize)
                         .background(Circle().fill(Color.backgroundSecondary))
                 }
-                
+
                 Capsule()
                     .fill(Color.backgroundSecondary)
                     .frame(height: 8)
@@ -61,7 +61,7 @@ struct ChooseTrackPieceView: View {
                                 .animation(.linear(duration: 0.1), value: realTimeOffset)
                         }
                     )
-                
+
                 Button {
                     onTrashTap()
                 } label: {
@@ -70,7 +70,7 @@ struct ChooseTrackPieceView: View {
                         .frame(width: buttonSize, height: buttonSize)
                         .background(Circle().fill(Color.backgroundSecondary))
                 }
-                
+
                 Button {
                     if viewModel.isTrackPlaying {
                         viewModel.dispatch(.stopPlaying)
@@ -86,7 +86,7 @@ struct ChooseTrackPieceView: View {
                 }
             }
             .padding(.horizontal, 8)
-            
+
             ZStack {
                 // Progress Frame
                 RoundedRectangle(cornerRadius: 6)
@@ -99,7 +99,7 @@ struct ChooseTrackPieceView: View {
                         }
                     )
                     .allowsHitTesting(false)
-                
+
                 // Scroll View
                 CustomScrollView(
                     content: {
@@ -122,7 +122,7 @@ struct ChooseTrackPieceView: View {
                     }
                 )
                 .frame(height: 40)
-                
+
                 // Frame
                 RoundedRectangle(cornerRadius: 6)
                     .stroke(Color.textTertiary, lineWidth: 5)
@@ -143,11 +143,11 @@ struct ChooseTrackPieceView: View {
         .onChange(of: selectorDuration) { oldValue, newValue in
             let oldWaveformWidth = selectorWidth * (viewModel.selectedTrack.duration / oldValue)
             let newWaveformWidth = selectorWidth * (viewModel.selectedTrack.duration / newValue)
-            
+
             let relativeOffset = offset / oldWaveformWidth
             offset = newWaveformWidth * relativeOffset
         }
-        .onChange(of: shouldPlay) { _, newValue in
+        .onChange(of: shouldPlay) { _, _ in
             if shouldPlay {
                 startTime = computedStartTime
                 viewModel.dispatch(.playTrack(startTime: startTime))
@@ -166,46 +166,46 @@ struct ChooseTrackPieceView: View {
             viewModel.dispatch(.destroyPlayer)
         }
     }
-    
+
     private var sidePaddingWidth: CGFloat {
         let screenWidth = UIScreen.main.bounds.width
         return max((screenWidth - selectorWidth) / 2, 0)
     }
-    
+
     private var computedStartTime: Double {
         let waveformWidth = selectorWidth * (viewModel.selectedTrack.duration / selectorDuration)
         let secondsPerPoint = viewModel.selectedTrack.duration / waveformWidth
         let clampedOffset = max(0, min(offset, waveformWidth - selectorWidth))
         let result = Double(clampedOffset * secondsPerPoint)
-        
+
         let maxStartTime = max(0, viewModel.selectedTrack.duration - Double(selectorDuration))
         return min(result, maxStartTime)
     }
-    
+
     private func frameCapsuleWidth(capsuleWidth: CGFloat) -> CGFloat {
         let trackDuration = viewModel.selectedTrack.duration
         let durationRatio = selectorDuration / trackDuration
-        
+
         return capsuleWidth * durationRatio
     }
-    
+
     private func frameCapsuleOffset(capsuleWidth: CGFloat) -> CGFloat {
         let trackDuration = viewModel.selectedTrack.duration
         let ratio = realTimeOffset / (selectorWidth * (trackDuration / selectorDuration))
         return min(capsuleWidth - frameCapsuleWidth(capsuleWidth: capsuleWidth), max(0, ratio * capsuleWidth))
     }
-    
+
     private func startFill() {
         timer?.invalidate()
         progress = 0
-        
+
         let startDate = Date()
         let duration = selectorDuration
-        
-        timer = Timer.scheduledTimer(withTimeInterval: timerStep, repeats: true) { timer in
+
+        timer = Timer.scheduledTimer(withTimeInterval: timerStep, repeats: true) { _ in
             let elapsed = Date().timeIntervalSince(startDate)
             progress = min(CGFloat(elapsed) / duration, 1)
-            
+
             if progress >= 1 {
                 progress = 1
                 stopFill()
@@ -216,19 +216,19 @@ struct ChooseTrackPieceView: View {
             }
         }
     }
-    
+
     private func stopFill() {
         progress = 0
         timer?.invalidate()
         timer = nil
     }
-    
+
     private var durationPicker: some View {
         VStack {
             Text("Choose track duration")
                 .modifier(RoundFontModifier(size: 15))
                 .padding(.top)
-            
+
             Picker("Duration", selection: $durationInPicker) {
                 ForEach(5...15, id: \.self) { val in
                     Text("\(val) сек").tag(CGFloat(val))
@@ -237,7 +237,7 @@ struct ChooseTrackPieceView: View {
             .labelsHidden()
             .pickerStyle(.wheel)
             .frame(height: 160)
-            
+
             Button("Done") {
                 selectorDuration = durationInPicker
                 showDurationPicker = false

@@ -6,32 +6,32 @@ import UIComponents
 
 public struct VideoUploadingView: View {
     @State private var viewModel: VideoUploadingViewModel
-    
+
     @Environment(\.showToast)
     private var showToast
     @Environment(\.dismiss)
     private var dismiss
-    
+
     private var onSave: (LoadedMedia) -> Void
-    
+
     public init(media: LoadedMedia, onSave: @escaping (LoadedMedia) -> Void) {
         self.onSave = onSave
         viewModel = VideoUploadingViewModel(loadedMedia: media)
     }
-    
+
     public var body: some View {
         VStack(spacing: 0) {
             header
-            
+
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 16) {
                     if let player = viewModel.player {
                         videoPlayer(player: player)
-                        
+
                         if let asset = viewModel.videoAsset {
                             videoTimeline(asset: asset)
                         }
-                        
+
                         tagsSection
                     } else {
                         emptyVideoContent
@@ -57,7 +57,7 @@ public struct VideoUploadingView: View {
             RewindImageEditor(
                 image: identifiable.image,
                 cropType: .rectangle,
-                onCrop: { _,_ in },
+                onCrop: { _, _ in },
                 onVideoCrop: { scale, offset in
                     viewModel.dispatch(.applyCrop(scale: scale, offset: offset))
                 }
@@ -70,21 +70,21 @@ public struct VideoUploadingView: View {
         }
         .background(Color.background)
     }
-    
+
     private var trimStartBinding: Binding<TimeInterval> {
         Binding(
             get: { viewModel.trimStartAsSeconds },
             set: { viewModel.trimStartAsSeconds = $0 }
         )
     }
-    
+
     private var trimEndBinding: Binding<TimeInterval> {
         Binding(
             get: { viewModel.trimEndAsSeconds },
             set: { viewModel.trimEndAsSeconds = $0 }
         )
     }
-    
+
     private var header: some View {
         RewindHeader {
             RewindButton(type: .leftChevron) { dismiss() }
@@ -101,28 +101,28 @@ public struct VideoUploadingView: View {
             }
         }
     }
-    
+
     private var emptyVideoContent: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 40)
                 .fill(Color.backgroundSecondary)
                 .aspectRatio(1, contentMode: .fit)
-            
+
             VStack {
                 Image(systemName: "plus")
                     .font(.system(size: 130))
                     .foregroundColor(.textSecondary)
-                
+
                 Text(UIComponentsStrings.Video.hint)
                     .modifier(RoundFontModifier(size: 15, weight: .bold))
             }
         }
     }
-    
+
     private var tagsSection: some View {
         TagsSectionView(tags: $viewModel.tags)
     }
-    
+
     private var continueButton: some View {
         GradientButton(
             title: UIComponentsStrings.Video.save,
@@ -131,7 +131,7 @@ public struct VideoUploadingView: View {
             viewModel.dispatch(.saveSettings)
         }
     }
-    
+
     private func videoPlayer(player: AVPlayer) -> some View {
         CustomPlayerView(
             isPlaying: $viewModel.isPlaying,
@@ -148,7 +148,7 @@ public struct VideoUploadingView: View {
         .contentShape(RoundedRectangle(cornerRadius: 40))
         .id(viewModel.timelineID)
     }
-    
+
     private func videoTimeline(asset: AVURLAsset) -> some View {
         VideoTimelineView(
             currentTime: $viewModel.currentTime,

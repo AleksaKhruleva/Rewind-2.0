@@ -5,7 +5,7 @@ struct MemberRow: View {
     private let member: Member
     private let onTap: (Member) -> Void
     private let onRemove: () -> Void
-    
+
     init(
         member: Member,
         onTap: @escaping (Member) -> Void,
@@ -15,7 +15,7 @@ struct MemberRow: View {
         self.onTap = onTap
         self.onRemove = onRemove
     }
-    
+
     var body: some View {
         HStack {
             HStack(spacing: 12) {
@@ -24,10 +24,10 @@ struct MemberRow: View {
                     .scaledToFill()
                     .frame(width: 34, height: 34)
                     .clipShape(Circle())
-                
+
                 Text(member.name)
                     .modifier(RoundFontModifier(size: 16, foregroundColor: .textPrimary))
-                
+
                 if member.isUser {
                     Text(UIComponentsStrings.Group.Members.you)
                         .modifier(
@@ -35,7 +35,7 @@ struct MemberRow: View {
                         )
                         .padding(.leading, -8)
                 }
-                
+
                 Spacer()
             }
             .frame(height: 42)
@@ -44,7 +44,7 @@ struct MemberRow: View {
             .onTapGesture {
                 onTap(member)
             }
-            
+
             Group {
                 if member.isOwner {
                     Image(systemName: "star.fill")

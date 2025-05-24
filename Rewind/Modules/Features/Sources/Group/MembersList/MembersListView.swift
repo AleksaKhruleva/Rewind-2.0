@@ -4,9 +4,9 @@ import Domain
 
 public struct MembersListView: View {
     @State private var searchText = ""
-    
+
     private let router: MembersListRouter
-    
+
     // ochevidno vremenno
     private var filteredMembers: [Member] {
         if searchText.isEmpty {
@@ -17,19 +17,19 @@ public struct MembersListView: View {
             }
         }
     }
-    
+
     public init(router: MembersListRouter) {
         self.router = router
     }
-    
+
     public var body: some View {
         VStack {
             header
-            
+
             ScrollView {
                 VStack(spacing: 15) {
                     searchField
-                    
+
                     membersTable
                 }
                 .padding(.horizontal, 16)
@@ -38,7 +38,7 @@ public struct MembersListView: View {
         }
         .background(Color.background)
     }
-    
+
     private var header: some View {
         RewindHeader(centerView: {
             HeaderBadgeView(
@@ -51,11 +51,11 @@ public struct MembersListView: View {
             }
         })
     }
-    
+
     private var searchField: some View {
         RewindSearchField(text: $searchText, placeholder: UIComponentsStrings.Group.Members.Search.placeholder)
     }
-    
+
     private var membersTable: some View {
         MembersTable(
             title: UIComponentsStrings.Group.Members.count(filteredMembers.count),

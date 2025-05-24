@@ -5,15 +5,15 @@ import AccessibilitySupport
 public struct EmailInputView: View {
     @State private var viewModel: EmailInputViewModel
     @FocusState private var isFocused: Bool
-    
+
     public init(flow: AuthFlow, router: AuthenticationRouter) {
         viewModel = .init(flow: flow, router: router)
     }
-    
+
     public var body: some View {
         ZStack(alignment: .topLeading) {
             Color.background.ignoresSafeArea()
-            
+
             RewindHeader(leftView: {
                 RewindButton(type: .leftChevron) {
                     hideKeyboard()
@@ -22,11 +22,11 @@ public struct EmailInputView: View {
                     }
                 }
             })
-            
+
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
                 Text(UIComponentsStrings.Email.title)
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
-                
+
                 StyledTextField(
                     text: $viewModel.email,
                     placeholder: UIComponentsStrings.Email.placeholder,
@@ -40,7 +40,7 @@ public struct EmailInputView: View {
                         await viewModel.dispatch(.submitEmail)
                     }
                 }
-                
+
                 if viewModel.state == .loading {
                     ProgressView()
                 } else if case let .error(error) = viewModel.state {

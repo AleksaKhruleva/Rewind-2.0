@@ -5,20 +5,20 @@ public struct GenericInputSheetView: View {
     private var title: String
     private var placeholder: String?
     private var action: (String) -> Void
-    
+
     @State private var text: String = ""
     @FocusState private var isFocused: Bool
-    
+
     @Environment(\.dismiss)
     private var dismiss
-    
+
     private var keyboardType: UIKeyboardType {
         switch item {
         case .name, .password, .tag, .code: .default
         case .email: .emailAddress
         }
     }
-    
+
     public init(
         item: GenericInputSheetItem,
         title: String,
@@ -30,15 +30,15 @@ public struct GenericInputSheetView: View {
         self.placeholder = placeholder
         self.action = action
     }
-    
+
     public var body: some View {
         ZStack {
             Color.backgroundSecondary.ignoresSafeArea()
-            
+
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
                 Text(title)
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
-                
+
                 switch item {
                 case .name, .password, .email, .tag:
                     StyledTextField(

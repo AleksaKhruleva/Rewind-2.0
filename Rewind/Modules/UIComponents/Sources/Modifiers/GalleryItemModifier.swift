@@ -2,7 +2,7 @@ import SwiftUI
 
 public struct GalleryItemModifier: ViewModifier {
     public init() { }
-    
+
     public func body(content: Content) -> some View {
         content
             .frame(

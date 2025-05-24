@@ -2,11 +2,11 @@ import SwiftUI
 
 public struct VStackTopOffsetModifier: ViewModifier {
     private let topOffsetRatio: CGFloat
-    
+
     public init(topOffsetRatio: CGFloat) {
         self.topOffsetRatio = topOffsetRatio
     }
-    
+
     public func body(content: Content) -> some View {
         GeometryReader { geometry in
             VStack(spacing: 0) {

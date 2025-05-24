@@ -4,27 +4,27 @@ import Base
 
 public struct WelcomeView: View {
     @State private var textWidth: CGFloat = 0
-    
+
     private let router: AuthenticationRouter
-    
+
     public init(router: AuthenticationRouter) {
         self.router = router
     }
-    
+
     public var body: some View {
         ZStack {
             Color.background.ignoresSafeArea()
-            
+
             VStack {
                 GradientTitle(text: UIComponentsStrings.App.title, fontSize: 80)
             }
             .modifier(VStackTopOffsetModifier(topOffsetRatio: 0.39))
-            
+
             VStack(spacing: 12) {
                 GradientButton(title: UIComponentsStrings.Welcome.signUp, width: .generic) {
                     router.navigateToEmail(for: .registration())
                 }.rewindAccessibilityIdentifier(.auth(.button(.signup)))
-                
+
                 Button {
                     router.navigateToEmail(for: .login())
                 } label: {

@@ -10,16 +10,16 @@ final class EmailInputViewModel {
         case error(EmailError)
         case ready(registrationID: String)
     }
-    
+
     enum Intent {
         case submitEmail
     }
-    
+
     enum EmailError: Error {
         case responseError
         case invalid
         case existing
-        
+
         var errorDescription: String {
             switch self {
             case .invalid:
@@ -31,21 +31,21 @@ final class EmailInputViewModel {
             }
         }
     }
-     
+
     var state: EmailState = .empty
-    
+
     var email: String = ""
     let router: AuthenticationRouter
     let flow: AuthFlow
-    
+
     private let backend: NetworkServiceProtocol
-    
+
     init(flow: AuthFlow, router: AuthenticationRouter) {
         self.flow = flow
         self.router = router
         backend = NetworkService()
     }
-    
+
     func dispatch(_ intent: Intent) async {
         switch intent {
         case .submitEmail:
@@ -53,7 +53,7 @@ final class EmailInputViewModel {
                 animateState(to: .error(.invalid))
                 return
             }
-            
+
             state = .loading
             switch flow {
             case .registration:
@@ -65,7 +65,7 @@ final class EmailInputViewModel {
                 } catch {
                     animateState(to: .error(.responseError))
                 }
-                
+
                 if case let .ready(registrationID) = state {
                     router.navigateToCode(email: email, registrationID: registrationID)
                 }
@@ -74,7 +74,7 @@ final class EmailInputViewModel {
             }
         }
     }
-    
+
     func animateState(to state: EmailState) {
         withAnimation(.spring(response: 0.2)) { self.state = state }
     }
