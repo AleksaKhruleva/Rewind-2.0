@@ -12,6 +12,7 @@ public protocol NetworkServiceProtocol {
     func deleteUser(email: String) async throws -> SuccessResponse
     func refresh(refreshToken: String) async throws -> UserAccessTokenResponse
     func user(accessToken: String, refreshToken: String) async throws -> UserResponse
+    func updateName(accessToken: String, refreshToken: String, name: String) async throws -> SuccessResponse
 }
 
 public final class NetworkService: NetworkServiceProtocol {
@@ -100,7 +101,19 @@ public final class NetworkService: NetworkServiceProtocol {
             )
         }
     }
-
+    
+    public func updateName(accessToken: String, refreshToken: String, name: String) async throws -> SuccessResponse {
+        try await retryOnUnauthorized(refreshToken: refreshToken) { [unowned self] newToken in
+            try await self.provider.request(
+                .updateName(
+                    accessToken: newToken ?? accessToken,
+                    name: name
+                ),
+                type: SuccessResponse.self
+            )
+        }
+    }
+    
     private func retryOnUnauthorized<T>(
         refreshToken: String,
         _ perform: @escaping (String?) async throws -> T

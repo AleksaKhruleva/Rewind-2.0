@@ -39,14 +39,14 @@ extension View {
 
     @ViewBuilder
     public func loadingOverlayIfNeeded(_ condition: Bool) -> some View {
-        if condition {
-            self.overlay {
+        self.overlay {
+            if condition {
                 ZStack {
                     Color.backgroundSecondary.opacity(0.5)
 
                     ProgressView()
                 }
             }
-        } else { self }
+        }
     }
 }

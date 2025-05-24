@@ -11,6 +11,7 @@ enum APIService {
     case deleteUser(email: String)
     case refresh(refreshToken: String)
     case user(accessToken: String)
+    case updateName(accessToken: String, name: String)
 }
 
 extension APIService: TargetType {
@@ -40,6 +41,8 @@ extension APIService: TargetType {
         case let .user(accessToken):
             let id = JWTDecoderService().getUserId(from: accessToken) ?? "undefined"
             return "users/\(id)"
+        case .updateName:
+            return "users/username"
         }
     }
 
@@ -55,6 +58,8 @@ extension APIService: TargetType {
             .deleteUser,
             .refresh:
             return .post
+        case .updateName:
+            return .patch
         }
     }
 
@@ -87,12 +92,16 @@ extension APIService: TargetType {
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
         case .user:
             return .requestPlain
+        case let .updateName(_, name):
+            let parameters = ["new_username": name]
+            return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
         }
     }
 
     var headers: [String: String]? {
         switch self {
-        case let .user(accessToken):
+        case let .user(accessToken),
+            let .updateName(accessToken, _):
             return [
                 "Authorization": "Bearer \(accessToken)",
                 "Content-Type": "application/json"

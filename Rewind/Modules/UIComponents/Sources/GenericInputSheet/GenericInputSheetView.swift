@@ -5,7 +5,8 @@ public struct GenericInputSheetView: View {
     private var title: String
     private var placeholder: String?
     private var action: (String) -> Void
-
+    
+    @Binding var error: String?
     @State private var text: String = ""
     @FocusState private var isFocused: Bool
 
@@ -23,11 +24,13 @@ public struct GenericInputSheetView: View {
         item: GenericInputSheetItem,
         title: String,
         placeholder: String? = nil,
+        error: Binding<String?> = .constant(nil),
         action: @escaping (String) -> Void
     ) {
         self.item = item
         self.title = title
         self.placeholder = placeholder
+        self._error = error
         self.action = action
     }
 
@@ -70,6 +73,11 @@ public struct GenericInputSheetView: View {
                         action(text)
                     }
                     .allowsHitTesting(false)
+                }
+                
+                if let error {
+                    RewindNoteTextView(text: error)
+                        .multilineTextAlignment(.center)
                 }
             }
         }
