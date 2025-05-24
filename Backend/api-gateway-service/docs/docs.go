@@ -1108,6 +1108,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Permission Denied - Incorrect password\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Not Found - User not found\".",
                         "schema": {
@@ -1192,7 +1198,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/email-change": {
+        "/api/users/email/start-change": {
             "post": {
                 "security": [
                     {
@@ -1236,6 +1242,12 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found - User not found\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict - User already has this email\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }

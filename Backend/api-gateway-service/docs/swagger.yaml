@@ -1101,6 +1101,10 @@ paths:
           description: Bad Request - Invalid request body".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Permission Denied - Incorrect password".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
         "404":
           description: Not Found - User not found".
           schema:
@@ -1158,7 +1162,7 @@ paths:
       summary: Delete user account.
       tags:
       - users
-  /api/users/email-change:
+  /api/users/email/start-change:
     post:
       consumes:
       - application/json
@@ -1183,6 +1187,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
           description: Not Found - User not found".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "409":
+          description: Conflict - User already has this email".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":

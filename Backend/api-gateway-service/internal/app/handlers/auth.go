@@ -423,6 +423,7 @@ func (h *AuthHandler) UpdateUsername(w http.ResponseWriter, r *http.Request) {
 // @Param body body requests.CheckPasswordRequest true "User ID and password to check".
 // @Success 200 {object} responses.CheckPasswordResponse "Password check result".
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid request body".
+// @Failure 403 {object} responses.ErrorResponse "Permission Denied - Incorrect password".
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
@@ -448,7 +449,7 @@ func (h *AuthHandler) CheckPassword(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, responseBody)
 }
 
-// UpdateEmail обработчик для POST /api/users/email-change.
+// UpdateEmail обработчик для POST /api/users/email/start-change.
 // @Summary Send code to the new email.
 // @Description Sends a verification code to the new email for the specific user.
 // @Tags users
@@ -458,10 +459,11 @@ func (h *AuthHandler) CheckPassword(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} responses.UpdateEmailResponse "Email update initiated".
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid user ID or request body".
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found".
+// @Failure 409 {object} responses.ErrorResponse "Conflict - User already has this email".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
 // @Security ApiKeyAuth
-// @Router /api/users/email-change [post].
+// @Router /api/users/email/start-change [post].
 func (h *AuthHandler) UpdateEmail(w http.ResponseWriter, r *http.Request) {
 	var req requests.UpdateEmailRequest
 	if err := decodeJSONBody(r, &req); err != nil {

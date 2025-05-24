@@ -63,7 +63,7 @@ func NewServer(dependencies *di.Dependencies) *Server {
 		r.Get("/api/users/{id}", dependencies.AuthHandler.GetUserByID)
 		r.Patch("/api/users/username", dependencies.AuthHandler.UpdateUsername)
 		r.Post("/api/users/check-password", dependencies.AuthHandler.CheckPassword)
-		r.Post("/api/users/email-change", dependencies.AuthHandler.UpdateEmail)
+		r.Post("/api/users/email/start-change", dependencies.AuthHandler.UpdateEmail)
 		r.Patch("/api/users/email/verify-change", dependencies.AuthHandler.VerifyNewEmailCode)
 		r.Patch("/api/users/avatar", dependencies.AuthHandler.UpdateAvatar)
 		r.Post("/api/users/password/reset/start", dependencies.AuthHandler.StartPasswordReset)
