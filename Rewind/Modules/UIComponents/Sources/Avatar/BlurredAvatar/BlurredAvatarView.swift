@@ -1,15 +1,15 @@
 import SwiftUI
 
 public struct BlurredAvatarView: View {
-    @State private var image: UIImage?
     @State private var showPicker: Bool = false
+    @Binding var image: UIImage?
     @Binding var isPresented: Bool
     
     @Environment(\.showToast)
     private var showToast
 
-    public init(image: UIImage, isPresented: Binding<Bool>) {
-        self.image = image
+    public init(isPresented: Binding<Bool>, image: Binding<UIImage?>) {
+        self._image = image
         self._isPresented = isPresented
     }
 
@@ -51,7 +51,7 @@ public struct BlurredAvatarView: View {
 
 #Preview {
     BlurredAvatarView(
-        image: UIComponentsAsset.avatar.image,
-        isPresented: Binding.constant(true)
+        isPresented: Binding.constant(true),
+        image: .constant(UIComponentsAsset.avatar.image)
     )
 }

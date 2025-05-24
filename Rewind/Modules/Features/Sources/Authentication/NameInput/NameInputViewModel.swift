@@ -54,7 +54,6 @@ final class NameInputViewModel {
                 if !CommandLine.arguments.contains("-testingAuth") {
                     KeychainService.shared.save(response.accessToken, for: .accessToken)
                     KeychainService.shared.save(response.refreshToken, for: .refreshToken)
-                    UserStorage.currentUser = User(name: name, email: email)
                 }
             } catch {
                 animateState(to: .error(.responseError))

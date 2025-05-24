@@ -19,24 +19,25 @@ final class AccountViewModel {
     
     private let backend: NetworkServiceProtocol
     
-    var user: User {
-        didSet { UserStorage.currentUser = user }
+    var user: User
+    
+    var imageBinding: Binding<UIImage?> {
+        Binding {
+            self.user.image
+        } set: { newImage in
+            guard let newImage else {
+                self.showToast(UIComponentsStrings.Account.Edit.Image.Set.failure)
+                return
+            }
+            self.user.image = newImage
+        }
     }
     
-    init(router: AccountRouter) {
+    init(user: User, router: AccountRouter) {
+        self.user = user
         self.router = router
         showToast = { _ in }
         backend = NetworkService()
-        
-        guard let user = UserStorage.currentUser else {
-            self.user = .init(name: "", email: "")
-            return
-        }
-        self.user = user
-    }
-    
-    func set(showToast: @escaping (String) -> Void) {
-        self.showToast = showToast
     }
     
     func dispatch(_ intent: Intent) async {
@@ -48,14 +49,13 @@ final class AccountViewModel {
                     let response = try await backend.logout(refreshToken: refreshToken)
                     if response.success {
                         KeychainService.shared.clearAll()
-                        UserStorage.clear()
                         router.navigateToWelcome()
                         showToast(UIComponentsStrings.Toast.SignOut.success)
                     } else {
                         showErrorToast()
                     }
                 } catch {
-                    showErrorToast()
+                    showErrorToast(for: error)
                 }
             }
         case .deleteAccount:
@@ -63,24 +63,25 @@ final class AccountViewModel {
                 let response = try await backend.deleteUser(email: user.email)
                 if response.success {
                     KeychainService.shared.clearAll()
-                    UserStorage.clear()
                     router.navigateToWelcome()
                     showToast(UIComponentsStrings.Toast.DeleteAccount.success)
                 } else {
                     showErrorToast()
                 }
             } catch {
-                showErrorToast()
+                showErrorToast(for: error)
             }
         case .fetchUser:
-            // temporary
-            guard let user = UserStorage.currentUser else {
-                user = .init(name: "some flowykk", email: "some@email.ru")
-                return
-            }
-            self.user = user
-            if user.name.isEmpty {
-                self.user.name = "fake name"
+            do {
+                guard let access = KeychainService.shared.read(for: .accessToken),
+                      let refresh = KeychainService.shared.read(for: .refreshToken) else {
+                    router.navigateToWelcome()
+                    return
+                }
+                let response = try await backend.user(accessToken: access, refreshToken: refresh)
+                user = response.toUser()
+            } catch {
+                showErrorToast(for: error)
             }
         case .deleteImage:
             guard user.imageData == nil else {
@@ -100,12 +101,19 @@ final class AccountViewModel {
         }
     }
     
+    func set(showToast: @escaping (String) -> Void) {
+        self.showToast = showToast
+    }
+    
     private func clearLocalData() {
         KeychainService.shared.clearAll()
-        UserStorage.clear()
     }
     
     private func showErrorToast() {
         showToast(UIComponentsStrings.Toast.error)
+    }
+    
+    private func showErrorToast(for error: Error) {
+        showToast("\(error.localizedDescription) 😨")
     }
 }

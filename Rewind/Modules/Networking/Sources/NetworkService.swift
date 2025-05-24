@@ -1,6 +1,7 @@
 import Moya
 import Foundation
 import Domain
+import Base
 
 public protocol NetworkServiceProtocol {
     func register(email: String) async throws -> RegisterResponse
@@ -9,6 +10,8 @@ public protocol NetworkServiceProtocol {
     func login(email: String, password: String) async throws -> UserTokensResponse
     func logout(refreshToken: String) async throws -> SuccessResponse
     func deleteUser(email: String) async throws -> SuccessResponse
+    func refresh(refreshToken: String) async throws -> UserAccessTokenResponse
+    func user(accessToken: String, refreshToken: String) async throws -> UserResponse
 }
 
 public final class NetworkService: NetworkServiceProtocol {
@@ -72,5 +75,39 @@ public final class NetworkService: NetworkServiceProtocol {
             ),
             type: SuccessResponse.self
         )
+    }
+    
+    public func refresh(refreshToken: String) async throws -> UserAccessTokenResponse {
+        try await provider.request(
+            .refresh(
+                refreshToken: refreshToken
+            ),
+            type: UserAccessTokenResponse.self
+        )
+    }
+    
+    public func user(accessToken: String, refreshToken: String) async throws -> UserResponse {
+        try await retryOnUnauthorized(refreshToken: refreshToken) { [unowned self] newToken in
+            try await self.provider.request(
+                .user(
+                    accessToken: newToken ?? accessToken
+                ),
+                type: UserResponse.self
+            )
+        }
+    }
+    
+    private func retryOnUnauthorized<T>(
+        refreshToken: String,
+        _ perform: @escaping (String?) async throws -> T
+    ) async throws -> T {
+        do {
+            return try await perform(nil)
+        } catch let httpError as HTTPError where httpError == .unauthorized {
+            let newToken = try await refresh(refreshToken: refreshToken).accessToken
+            KeychainService.shared.save(newToken, for: .accessToken)
+            
+            return try await perform(newToken)
+        }
     }
 }

@@ -18,13 +18,12 @@ struct RewindApp: App {
             let hasAccessToken = KeychainService.shared.read(for: .accessToken) != nil
             let hasRefreshToken = KeychainService.shared.read(for: .refreshToken) != nil
             let isAuthorized = hasAccessToken && hasRefreshToken
-            let isUserSaved = UserStorage.currentUser != nil
             
             let testingAuth = CommandLine.arguments.contains("-testingAuth")
             
             RootView(router: appRouter)
                 .onAppear {
-                    let initial: AppRouter.Route = (isAuthorized && isUserSaved && !testingAuth) ? .rewind : .welcome
+                    let initial: AppRouter.Route = (isAuthorized && !testingAuth) ? .rewind : .welcome
                     appRouter.setInitial(initial)
                 }
                 .setupToast(toastController: toastController)

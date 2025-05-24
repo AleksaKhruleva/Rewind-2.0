@@ -22,9 +22,9 @@ public struct JWTDecoderService {
         return json
     }
     
-    public func getUserId(from jwtToken: String) -> Int? {
-        guard let payload = decode(jwtToken: jwtToken) else { return nil }
-        
-        return payload["user_id"] as? Int
+    public func getUserId(from jwtToken: String) -> String? {
+        guard let payload = decode(jwtToken: jwtToken),
+              let intId = payload["user_id"] as? Int else { return nil }
+        return String(intId)
     }
 }

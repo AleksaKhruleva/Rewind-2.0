@@ -3,6 +3,9 @@ import UIComponents
 import Base
 
 public struct RewindView: View {
+    @State private var viewModel: RewindViewModel
+    
+    // TODO: To VM
     @State private var rolls = 0
     @State private var currentIndex = 0
     @State private var filterSettingsShown = false
@@ -15,6 +18,7 @@ public struct RewindView: View {
     
     public init(router: RewindRouter) {
         self.router = router
+        viewModel = RewindViewModel()
     }
     
     // Временно, пока не появится ViewModel
@@ -75,6 +79,10 @@ public struct RewindView: View {
             }
             .safeAreaPadding(20)
         }
+        .onAppear {
+            viewModel.set(showToast: showToast)
+            Task { await viewModel.dispatch(.fetchUser) }
+        }
         .ignoresSafeArea(.keyboard)
         .sheet(isPresented: $isSelectGroupPresented) {
             SelectGroupView()
@@ -103,10 +111,12 @@ public struct RewindView: View {
                 router.navigateToMap()
             }
         } rightView: {
-            RoundImageView(image: UIComponentsAsset.avatar.image, size: 44)
+            RoundImageView(image: viewModel.user.image, size: 44)
                 .contentShape(Circle())
                 .onTapGesture {
-                    router.navigateToAccount()
+                    if !viewModel.user.isEmpty {
+                        router.navigateToAccount(user: viewModel.user)
+                    }
                 }
         }
     }
