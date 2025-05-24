@@ -26,13 +26,7 @@ const (
 // ExcludedPaths are the URL paths that do NOT require JWT authentication.
 // These should match the paths registered in your router setup that don't need a token.
 var ExcludedPaths = []string{
-	"/api/auth/register",
-	"/api/auth/verify-email",
-	"/api/auth/finish-register",
-	"/api/auth/login",
-	"/api/auth/refresh",
-	"/api/auth/forgot-password",
-	"/api/auth/reset-password",
+	"/api/auth/",
 	"/swagger/",
 }
 

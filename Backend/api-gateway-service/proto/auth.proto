@@ -13,10 +13,17 @@ service AuthService {
   rpc ForgotPassword(ForgotPasswordRequest) returns (ForgotPasswordResponse) {}
   rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse) {}
   rpc Logout(LogoutRequest) returns (LogoutResponse) {}
-  // TODO delete in future
   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {}
   rpc GetUsersByIDs(GetUsersByIDsRequest) returns (GetUsersByIDsResponse) {}
   rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse) {}
+  rpc UpdateUsername(UpdateUsernameRequest) returns (UpdateUsernameResponse) {}
+  rpc CheckPassword(CheckPasswordRequest) returns (CheckPasswordResponse) {}
+  rpc UpdateEmail(UpdateEmailRequest) returns (UpdateEmailResponse) {}
+  rpc VerifyNewEmailCode(VerifyNewEmailCodeRequest) returns (VerifyNewEmailCodeResponse) {}
+  rpc UpdateAvatar(UpdateAvatarRequest) returns (UpdateAvatarResponse) {}
+  rpc StartPasswordReset(StartPasswordResetRequest) returns (StartPasswordResetResponse) {}
+  rpc VerifyPasswordResetCode(VerifyPasswordResetCodeRequest) returns (VerifyPasswordResetCodeResponse) {}
+  rpc SetNewPassword(SetNewPasswordRequest) returns (SetNewPasswordResponse) {}
 }
 
 message User {
@@ -106,22 +113,89 @@ message DeleteUserResponse {
   bool success = 1;
 }
 
-// Запрос для получения информации о пользователях по списку их ID
 message GetUsersByIDsRequest {
-  repeated uint64 user_ids = 1; // Список ID пользователей, информацию о которых нужно получить
+  repeated uint64 user_ids = 1;
 }
 
-// Ответ с информацией о пользователях
 message GetUsersByIDsResponse {
-  repeated User users = 1; // Список сообщений User
+  repeated User users = 1;
 }
 
-// Запрос для получения информации о пользователе по ID
 message GetUserByIDRequest {
-  uint64 user_id = 1; // ID пользователя, информацию о котором нужно получить
+  uint64 user_id = 1;
 }
 
-// Ответ с информацией о пользователе
 message GetUserByIDResponse {
   User user = 1;
+}
+
+message UpdateUsernameRequest {
+  uint64 user_id = 1;
+  string new_username = 2;
+}
+
+message UpdateUsernameResponse {
+  bool success = 1;
+}
+
+message CheckPasswordRequest {
+  uint64 user_id = 1;
+  string password = 2;
+}
+
+message CheckPasswordResponse {
+  bool success = 1;
+}
+
+message UpdateEmailRequest {
+  uint64 user_id = 1;
+  string new_email = 2;
+}
+
+message UpdateEmailResponse {
+  bool success = 1;
+}
+
+message VerifyNewEmailCodeRequest {
+  uint64 user_id = 1;
+  string verification_code = 2;
+}
+
+message VerifyNewEmailCodeResponse {
+  bool success = 1;
+}
+
+message UpdateAvatarRequest {
+  uint64 user_id = 1;
+  bytes image = 2;
+}
+
+message UpdateAvatarResponse {
+  bool success = 1;
+}
+
+message StartPasswordResetRequest {
+  uint64 user_id = 1;
+}
+
+message StartPasswordResetResponse {
+  bool success = 1;
+}
+
+message VerifyPasswordResetCodeRequest {
+  uint64 user_id = 1;
+  string verification_code = 2;
+}
+
+message VerifyPasswordResetCodeResponse {
+  bool success = 1;
+}
+
+message SetNewPasswordRequest {
+  uint64 user_id = 1;
+  string new_password = 2;
+}
+
+message SetNewPasswordResponse {
+  bool success = 1;
 }

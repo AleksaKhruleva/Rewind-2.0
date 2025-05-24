@@ -1,4 +1,9 @@
 definitions:
+  requests.CheckPasswordRequest:
+    properties:
+      password:
+        type: string
+    type: object
   requests.CreateGroupInvitationRequest:
     properties:
       duration_seconds:
@@ -50,6 +55,11 @@ definitions:
       token:
         type: string
     type: object
+  requests.SetNewPasswordRequest:
+    properties:
+      new_password:
+        type: string
+    type: object
   requests.SetPasswordAndUsernameRequest:
     properties:
       password:
@@ -64,6 +74,11 @@ definitions:
       email:
         type: string
     type: object
+  requests.UpdateEmailRequest:
+    properties:
+      new_email:
+        type: string
+    type: object
   requests.UpdateGroupRequest:
     properties:
       image:
@@ -73,10 +88,25 @@ definitions:
         description: Optional group name
         type: string
     type: object
+  requests.UpdateUsernameRequest:
+    properties:
+      new_username:
+        type: string
+    type: object
   requests.VerifyEmailCodeRequest:
     properties:
       registration_id:
         type: string
+      verification_code:
+        type: string
+    type: object
+  requests.VerifyNewEmailCodeRequest:
+    properties:
+      verification_code:
+        type: string
+    type: object
+  requests.VerifyPasswordResetCodeRequest:
+    properties:
       verification_code:
         type: string
     type: object
@@ -90,6 +120,11 @@ definitions:
         allOf:
         - $ref: '#/definitions/responses.GroupMemberResponse'
         description: Details of the user's membership
+    type: object
+  responses.CheckPasswordResponse:
+    properties:
+      success:
+        type: boolean
     type: object
   responses.CreateGroupInvitationResponse:
     properties:
@@ -261,12 +296,22 @@ definitions:
       success:
         type: boolean
     type: object
+  responses.SetNewPasswordResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
   responses.SetPasswordAndUsernameResponse:
     properties:
       access_token:
         type: string
       refresh_token:
         type: string
+    type: object
+  responses.StartPasswordResetResponse:
+    properties:
+      success:
+        type: boolean
     type: object
   responses.StartRegistrationResponse:
     properties:
@@ -276,7 +321,32 @@ definitions:
       success:
         type: boolean
     type: object
+  responses.UpdateAvatarResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+  responses.UpdateEmailResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+  responses.UpdateUsernameResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
   responses.VerifyEmailCodeResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+  responses.VerifyNewEmailCodeResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+  responses.VerifyPasswordResetCodeResponse:
     properties:
       success:
         type: boolean
@@ -288,46 +358,6 @@ info:
   title: Rewind API Gateway
   version: "1.0"
 paths:
-  /api/auth/delete-user:
-    post:
-      consumes:
-      - application/json
-      description: Deletes a user account by email.
-      parameters:
-      - description: User email to delete
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/requests.DeleteUserRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: User account successfully deleted".
-          schema:
-            $ref: '#/definitions/responses.DeleteUserResponse'
-        "400":
-          description: Bad Request - Invalid email format or request body".
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "404":
-          description: Not Found - User not found".
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "500":
-          description: Internal Server Error".
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "503":
-          description: Service Unavailable".
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Delete user account.
-      tags:
-      - auth
   /api/auth/finish-register:
     post:
       consumes:
@@ -441,43 +471,6 @@ paths:
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       summary: User login.
-      tags:
-      - auth
-  /api/auth/logout:
-    post:
-      consumes:
-      - application/json
-      description: Logs out a user by invalidating the refresh token.
-      parameters:
-      - description: Refresh token to invalidate
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/requests.LogoutRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: User successfully logged out (success is true even if token
-            not found)".
-          schema:
-            $ref: '#/definitions/responses.LogoutResponse'
-        "400":
-          description: Bad Request - Invalid refresh token format or request body".
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "500":
-          description: Internal Server Error".
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "503":
-          description: Service Unavailable".
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: User logout.
       tags:
       - auth
   /api/auth/refresh:
@@ -1046,6 +1039,205 @@ paths:
       summary: Get user details by ID.
       tags:
       - users
+  /api/users/avatar:
+    patch:
+      consumes:
+      - multipart/form-data
+      description: Updates the avatar for a specific user.
+      parameters:
+      - description: New avatar image
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Avatar successfully updated".
+          schema:
+            $ref: '#/definitions/responses.UpdateAvatarResponse'
+        "400":
+          description: Bad Request - Invalid user ID or image upload error".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - User not found".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update user avatar.
+      tags:
+      - users
+  /api/users/check-password:
+    post:
+      consumes:
+      - application/json
+      description: Checks if the provided password matches the user's password.
+      parameters:
+      - description: User ID and password to check
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CheckPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password check result".
+          schema:
+            $ref: '#/definitions/responses.CheckPasswordResponse'
+        "400":
+          description: Bad Request - Invalid request body".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - User not found".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Check user password.
+      tags:
+      - users
+  /api/users/delete-user:
+    post:
+      consumes:
+      - application/json
+      description: Deletes a user account by email.
+      parameters:
+      - description: User email to delete
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.DeleteUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User account successfully deleted".
+          schema:
+            $ref: '#/definitions/responses.DeleteUserResponse'
+        "400":
+          description: Bad Request - Invalid email format or request body".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - User not found".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user account.
+      tags:
+      - users
+  /api/users/email:
+    patch:
+      consumes:
+      - application/json
+      description: Updates the email for a specific user.
+      parameters:
+      - description: New email and password
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateEmailRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Email update initiated".
+          schema:
+            $ref: '#/definitions/responses.UpdateEmailResponse'
+        "400":
+          description: Bad Request - Invalid user ID or request body".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - User not found".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update user email.
+      tags:
+      - users
+  /api/users/email/verify:
+    post:
+      consumes:
+      - application/json
+      description: Verifies the code sent to the new email address.
+      parameters:
+      - description: New email and verification code
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.VerifyNewEmailCodeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: New email verified".
+          schema:
+            $ref: '#/definitions/responses.VerifyNewEmailCodeResponse'
+        "400":
+          description: Bad Request - Invalid user ID or request body".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - User not found or invalid code".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Verify new email code.
+      tags:
+      - users
   /api/users/groups:
     get:
       produces:
@@ -1085,6 +1277,197 @@ paths:
       summary: List groups for a specific user
       tags:
       - groups
+  /api/users/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logs out a user by invalidating the refresh token.
+      parameters:
+      - description: Refresh token to invalidate
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.LogoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User successfully logged out (success is true even if token
+            not found)".
+          schema:
+            $ref: '#/definitions/responses.LogoutResponse'
+        "400":
+          description: Bad Request - Invalid refresh token format or request body".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: User logout.
+      tags:
+      - users
+  /api/users/password/reset/set:
+    post:
+      consumes:
+      - application/json
+      description: Sets a new password for the user after successful code verification.
+      parameters:
+      - description: User ID and new password
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.SetNewPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: New password set successfully".
+          schema:
+            $ref: '#/definitions/responses.SetNewPasswordResponse'
+        "400":
+          description: Bad Request - Invalid user ID or new password format".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - User not found or password reset process not initiated".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Set new password.
+      tags:
+      - users
+  /api/users/password/reset/start:
+    post:
+      consumes:
+      - application/json
+      description: Initiates the password reset process by sending a verification
+        code to the user's email.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password reset process initiated successfully".
+          schema:
+            $ref: '#/definitions/responses.StartPasswordResetResponse'
+        "400":
+          description: Bad Request - Invalid user ID format or request body".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - User not found".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Start password reset process.
+      tags:
+      - users
+  /api/users/password/reset/verify:
+    post:
+      consumes:
+      - application/json
+      description: Verifies the password reset code provided by the user.
+      parameters:
+      - description: User ID and verification code
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.VerifyPasswordResetCodeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password reset code verified successfully".
+          schema:
+            $ref: '#/definitions/responses.VerifyPasswordResetCodeResponse'
+        "400":
+          description: Bad Request - Invalid user ID or verification code format".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - User not found or invalid code".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Verify password reset code.
+      tags:
+      - users
+  /api/users/username:
+    patch:
+      consumes:
+      - application/json
+      description: Updates the username for a specific user.
+      parameters:
+      - description: New username
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateUsernameRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Username successfully updated".
+          schema:
+            $ref: '#/definitions/responses.UpdateUsernameResponse'
+        "400":
+          description: Bad Request - Invalid user ID or username format".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - User not found".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update username.
+      tags:
+      - users
 securityDefinitions:
   ApiKeyAuth:
     description: Enter your access token in the format "Bearer <token>"

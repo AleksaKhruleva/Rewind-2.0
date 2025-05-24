@@ -15,69 +15,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/auth/delete-user": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Deletes a user account by email.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Delete user account.",
-                "parameters": [
-                    {
-                        "description": "User email to delete",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.DeleteUserRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "User account successfully deleted\".",
-                        "schema": {
-                            "$ref": "#/definitions/responses.DeleteUserResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request - Invalid email format or request body\".",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found - User not found\".",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error\".",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable\".",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/api/auth/finish-register": {
             "post": {
                 "description": "Sets the user's password and username after email verification.",
@@ -233,63 +170,6 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized - Invalid credentials\".",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error\".",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable\".",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/auth/logout": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Logs out a user by invalidating the refresh token.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "User logout.",
-                "parameters": [
-                    {
-                        "description": "Refresh token to invalidate",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.LogoutRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "User successfully logged out (success is true even if token not found)\".",
-                        "schema": {
-                            "$ref": "#/definitions/responses.LogoutResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request - Invalid refresh token format or request body\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1125,6 +1005,319 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/users/avatar": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates the avatar for a specific user.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Update user avatar.",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "New avatar image",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Avatar successfully updated\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.UpdateAvatarResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid user ID or image upload error\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - User not found\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/check-password": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Checks if the provided password matches the user's password.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Check user password.",
+                "parameters": [
+                    {
+                        "description": "User ID and password to check",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.CheckPasswordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Password check result\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.CheckPasswordResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid request body\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - User not found\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/delete-user": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Deletes a user account by email.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Delete user account.",
+                "parameters": [
+                    {
+                        "description": "User email to delete",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.DeleteUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User account successfully deleted\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.DeleteUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid email format or request body\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - User not found\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/email": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates the email for a specific user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Update user email.",
+                "parameters": [
+                    {
+                        "description": "New email and password",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.UpdateEmailRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email update initiated\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.UpdateEmailResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid user ID or request body\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - User not found\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/email/verify": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Verifies the code sent to the new email address.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Verify new email code.",
+                "parameters": [
+                    {
+                        "description": "New email and verification code",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.VerifyNewEmailCodeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "New email verified\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.VerifyNewEmailCodeResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid user ID or request body\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - User not found or invalid code\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/users/groups": {
             "get": {
                 "security": [
@@ -1178,6 +1371,304 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/logout": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Logs out a user by invalidating the refresh token.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "User logout.",
+                "parameters": [
+                    {
+                        "description": "Refresh token to invalidate",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.LogoutRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User successfully logged out (success is true even if token not found)\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.LogoutResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid refresh token format or request body\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/password/reset/set": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Sets a new password for the user after successful code verification.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Set new password.",
+                "parameters": [
+                    {
+                        "description": "User ID and new password",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.SetNewPasswordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "New password set successfully\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.SetNewPasswordResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid user ID or new password format\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - User not found or password reset process not initiated\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/password/reset/start": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Initiates the password reset process by sending a verification code to the user's email.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Start password reset process.",
+                "responses": {
+                    "200": {
+                        "description": "Password reset process initiated successfully\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.StartPasswordResetResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid user ID format or request body\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - User not found\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/password/reset/verify": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Verifies the password reset code provided by the user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Verify password reset code.",
+                "parameters": [
+                    {
+                        "description": "User ID and verification code",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.VerifyPasswordResetCodeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Password reset code verified successfully\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.VerifyPasswordResetCodeResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid user ID or verification code format\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - User not found or invalid code\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/username": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates the username for a specific user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Update username.",
+                "parameters": [
+                    {
+                        "description": "New username",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.UpdateUsernameRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Username successfully updated\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.UpdateUsernameResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid user ID or username format\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - User not found\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1245,6 +1736,14 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "requests.CheckPasswordRequest": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
         "requests.CreateGroupInvitationRequest": {
             "type": "object",
             "properties": {
@@ -1324,6 +1823,14 @@ const docTemplate = `{
                 }
             }
         },
+        "requests.SetNewPasswordRequest": {
+            "type": "object",
+            "properties": {
+                "new_password": {
+                    "type": "string"
+                }
+            }
+        },
         "requests.SetPasswordAndUsernameRequest": {
             "type": "object",
             "properties": {
@@ -1346,6 +1853,14 @@ const docTemplate = `{
                 }
             }
         },
+        "requests.UpdateEmailRequest": {
+            "type": "object",
+            "properties": {
+                "new_email": {
+                    "type": "string"
+                }
+            }
+        },
         "requests.UpdateGroupRequest": {
             "type": "object",
             "properties": {
@@ -1359,12 +1874,36 @@ const docTemplate = `{
                 }
             }
         },
+        "requests.UpdateUsernameRequest": {
+            "type": "object",
+            "properties": {
+                "new_username": {
+                    "type": "string"
+                }
+            }
+        },
         "requests.VerifyEmailCodeRequest": {
             "type": "object",
             "properties": {
                 "registration_id": {
                     "type": "string"
                 },
+                "verification_code": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.VerifyNewEmailCodeRequest": {
+            "type": "object",
+            "properties": {
+                "verification_code": {
+                    "type": "string"
+                }
+            }
+        },
+        "requests.VerifyPasswordResetCodeRequest": {
+            "type": "object",
+            "properties": {
                 "verification_code": {
                     "type": "string"
                 }
@@ -1388,6 +1927,14 @@ const docTemplate = `{
                             "$ref": "#/definitions/responses.GroupMemberResponse"
                         }
                     ]
+                }
+            }
+        },
+        "responses.CheckPasswordResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
                 }
             }
         },
@@ -1636,6 +2183,14 @@ const docTemplate = `{
                 }
             }
         },
+        "responses.SetNewPasswordResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
         "responses.SetPasswordAndUsernameResponse": {
             "type": "object",
             "properties": {
@@ -1644,6 +2199,14 @@ const docTemplate = `{
                 },
                 "refresh_token": {
                     "type": "string"
+                }
+            }
+        },
+        "responses.StartPasswordResetResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
                 }
             }
         },
@@ -1659,7 +2222,47 @@ const docTemplate = `{
                 }
             }
         },
+        "responses.UpdateAvatarResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "responses.UpdateEmailResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "responses.UpdateUsernameResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
         "responses.VerifyEmailCodeResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "responses.VerifyNewEmailCodeResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "responses.VerifyPasswordResetCodeResponse": {
             "type": "object",
             "properties": {
                 "success": {

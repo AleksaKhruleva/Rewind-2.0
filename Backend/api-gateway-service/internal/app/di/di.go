@@ -1,7 +1,7 @@
 package di
 
 import (
-	"Rewind-api-gateway-service/clients/auth"
+	auth "Rewind-api-gateway-service/clients/auth"
 	"Rewind-api-gateway-service/clients/group"
 	"Rewind-api-gateway-service/internal/app/handlers"
 	"Rewind-api-gateway-service/internal/app/services"

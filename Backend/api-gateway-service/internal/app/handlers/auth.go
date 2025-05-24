@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"strconv" // For parsing ID from URL
@@ -265,10 +266,10 @@ func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, responseBody)
 }
 
-// Logout обработчик для POST /api/auth/logout.
+// Logout обработчик для POST /api/users/logout.
 // @Summary User logout.
 // @Description Logs out a user by invalidating the refresh token.
-// @Tags auth
+// @Tags users
 // @Accept json
 // @Produce json
 // @Param body body requests.LogoutRequest true "Refresh token to invalidate".
@@ -277,7 +278,7 @@ func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
 // @Security ApiKeyAuth
-// @Router /api/auth/logout [post].
+// @Router /api/users/logout [post].
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	var req requests.LogoutRequest
 	if err := decodeJSONBody(r, &req); err != nil {
@@ -299,10 +300,10 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, responseBody)
 }
 
-// DeleteUser обработчик для POST /api/auth/delete-user.
+// DeleteUser обработчик для POST /api/users/delete-user.
 // @Summary Delete user account.
 // @Description Deletes a user account by email.
-// @Tags auth
+// @Tags users
 // @Accept json
 // @Produce json
 // @Param body body requests.DeleteUserRequest true "User email to delete".
@@ -312,7 +313,7 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
 // @Security ApiKeyAuth
-// @Router /api/auth/delete-user [post].
+// @Router /api/users/delete-user [post].
 func (h *AuthHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	var req requests.DeleteUserRequest
 	if err := decodeJSONBody(r, &req); err != nil {
@@ -374,6 +375,287 @@ func (h *AuthHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 		Username: userPB.GetUsername(),
 		Email:    userPB.GetEmail(),
 		Image:    userPB.GetImage(),
+	}
+
+	respondJSON(w, http.StatusOK, responseBody)
+}
+
+// UpdateUsername обработчик для PATCH /api/users/username.
+// @Summary Update username.
+// @Description Updates the username for a specific user.
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param body body requests.UpdateUsernameRequest true "New username".
+// @Success 200 {object} responses.UpdateUsernameResponse "Username successfully updated".
+// @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid user ID or username format".
+// @Failure 404 {object} responses.ErrorResponse "Not Found - User not found".
+// @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
+// @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Security ApiKeyAuth
+// @Router /api/users/username [patch].
+func (h *AuthHandler) UpdateUsername(w http.ResponseWriter, r *http.Request) {
+	var req requests.UpdateUsernameRequest
+	if err := decodeJSONBody(r, &req); err != nil {
+		respondError(w, http.StatusBadRequest, fmt.Sprintf("Invalid request body: %v", err))
+		return
+	}
+
+	resp, err := h.authService.UpdateUsername(r.Context(), req.NewUsername)
+	if err != nil {
+		handleServiceError(w, err, "UpdateUsername")
+		return
+	}
+
+	responseBody := responses.UpdateUsernameResponse{
+		Success: resp.GetSuccess(),
+	}
+
+	respondJSON(w, http.StatusOK, responseBody)
+}
+
+// CheckPassword обработчик для POST /api/users/check-password.
+// @Summary Check user password.
+// @Description Checks if the provided password matches the user's password.
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param body body requests.CheckPasswordRequest true "User ID and password to check".
+// @Success 200 {object} responses.CheckPasswordResponse "Password check result".
+// @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid request body".
+// @Failure 404 {object} responses.ErrorResponse "Not Found - User not found".
+// @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
+// @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Security ApiKeyAuth
+// @Router /api/users/check-password [post].
+func (h *AuthHandler) CheckPassword(w http.ResponseWriter, r *http.Request) {
+	var req requests.CheckPasswordRequest
+	if err := decodeJSONBody(r, &req); err != nil {
+		respondError(w, http.StatusBadRequest, fmt.Sprintf("Invalid request body: %v", err))
+		return
+	}
+
+	resp, err := h.authService.CheckPassword(r.Context(), req.Password)
+	if err != nil {
+		handleServiceError(w, err, "CheckPassword")
+		return
+	}
+
+	responseBody := responses.CheckPasswordResponse{
+		Success: resp.GetSuccess(),
+	}
+
+	respondJSON(w, http.StatusOK, responseBody)
+}
+
+// UpdateEmail обработчик для PATCH /api/users/email.
+// @Summary Update user email.
+// @Description Updates the email for a specific user.
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param body body requests.UpdateEmailRequest true "New email and password".
+// @Success 200 {object} responses.UpdateEmailResponse "Email update initiated".
+// @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid user ID or request body".
+// @Failure 404 {object} responses.ErrorResponse "Not Found - User not found".
+// @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
+// @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Security ApiKeyAuth
+// @Router /api/users/email [patch].
+func (h *AuthHandler) UpdateEmail(w http.ResponseWriter, r *http.Request) {
+	var req requests.UpdateEmailRequest
+	if err := decodeJSONBody(r, &req); err != nil {
+		respondError(w, http.StatusBadRequest, fmt.Sprintf("Invalid request body: %v", err))
+		return
+	}
+
+	resp, err := h.authService.UpdateEmail(r.Context(), req.NewEmail)
+	if err != nil {
+		handleServiceError(w, err, "UpdateEmail")
+		return
+	}
+
+	responseBody := responses.UpdateEmailResponse{
+		Success: resp.GetSuccess(),
+	}
+
+	respondJSON(w, http.StatusOK, responseBody)
+}
+
+// VerifyNewEmailCode обработчик для POST /api/users/email/verify.
+// @Summary Verify new email code.
+// @Description Verifies the code sent to the new email address.
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param body body requests.VerifyNewEmailCodeRequest true "New email and verification code".
+// @Success 200 {object} responses.VerifyNewEmailCodeResponse "New email verified".
+// @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid user ID or request body".
+// @Failure 404 {object} responses.ErrorResponse "Not Found - User not found or invalid code".
+// @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
+// @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Security ApiKeyAuth
+// @Router /api/users/email/verify [post].
+func (h *AuthHandler) VerifyNewEmailCode(w http.ResponseWriter, r *http.Request) {
+	var req requests.VerifyNewEmailCodeRequest
+	if err := decodeJSONBody(r, &req); err != nil {
+		respondError(w, http.StatusBadRequest, fmt.Sprintf("Invalid request body: %v", err))
+		return
+	}
+
+	resp, err := h.authService.VerifyNewEmailCode(r.Context(), req.VerificationCode)
+	if err != nil {
+		handleServiceError(w, err, "VerifyNewEmailCode")
+		return
+	}
+
+	responseBody := responses.VerifyNewEmailCodeResponse{
+		Success: resp.GetSuccess(),
+	}
+
+	respondJSON(w, http.StatusOK, responseBody)
+}
+
+// UpdateAvatar обработчик для PATCH /api/users/avatar.
+// @Summary Update user avatar.
+// @Description Updates the avatar for a specific user.
+// @Tags users
+// @Accept multipart/form-data
+// @Produce json
+// @Param image formData file true "New avatar image".
+// @Success 200 {object} responses.UpdateAvatarResponse "Avatar successfully updated".
+// @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid user ID or image upload error".
+// @Failure 404 {object} responses.ErrorResponse "Not Found - User not found".
+// @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
+// @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Security ApiKeyAuth
+// @Router /api/users/avatar [patch].
+func (h *AuthHandler) UpdateAvatar(w http.ResponseWriter, r *http.Request) {
+	// Parse the multipart form with a maximum memory of 32MB
+	err := r.ParseMultipartForm(32 << 20)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, fmt.Sprintf("Invalid form data: %v", err))
+		return
+	}
+
+	// Get the file from the form data
+	file, _, err := r.FormFile("image")
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "Image file is required")
+		return
+	}
+	defer file.Close()
+
+	// Read the file into a byte slice
+	imageData, err := io.ReadAll(file)
+	if err != nil {
+		respondError(w, http.StatusInternalServerError, "Failed to read image data")
+		return
+	}
+
+	resp, err := h.authService.UpdateAvatar(r.Context(), imageData)
+	if err != nil {
+		handleServiceError(w, err, "UpdateAvatar")
+		return
+	}
+
+	responseBody := responses.UpdateAvatarResponse{
+		Success: resp.GetSuccess(),
+	}
+
+	respondJSON(w, http.StatusOK, responseBody)
+}
+
+// StartPasswordReset обработчик для POST /api/users/password/reset/start.
+// @Summary Start password reset process.
+// @Description Initiates the password reset process by sending a verification code to the user's email.
+// @Tags users
+// @Accept json
+// @Produce json
+// @Success 200 {object} responses.StartPasswordResetResponse "Password reset process initiated successfully".
+// @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid user ID format or request body".
+// @Failure 404 {object} responses.ErrorResponse "Not Found - User not found".
+// @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
+// @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Security ApiKeyAuth
+// @Router /api/users/password/reset/start [post].
+func (h *AuthHandler) StartPasswordReset(w http.ResponseWriter, r *http.Request) {
+	resp, err := h.authService.StartPasswordReset(r.Context())
+	if err != nil {
+		handleServiceError(w, err, "StartPasswordReset")
+		return
+	}
+
+	responseBody := responses.StartPasswordResetResponse{
+		Success: resp.GetSuccess(),
+	}
+
+	respondJSON(w, http.StatusOK, responseBody)
+}
+
+// VerifyPasswordResetCode обработчик для POST /api/auth/password/reset/verify.
+// @Summary Verify password reset code.
+// @Description Verifies the password reset code provided by the user.
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param body body requests.VerifyPasswordResetCodeRequest true "User ID and verification code".
+// @Success 200 {object} responses.VerifyPasswordResetCodeResponse "Password reset code verified successfully".
+// @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid user ID or verification code format".
+// @Failure 404 {object} responses.ErrorResponse "Not Found - User not found or invalid code".
+// @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
+// @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Security ApiKeyAuth
+// @Router /api/users/password/reset/verify [post].
+func (h *AuthHandler) VerifyPasswordResetCode(w http.ResponseWriter, r *http.Request) {
+	var req requests.VerifyPasswordResetCodeRequest
+	if err := decodeJSONBody(r, &req); err != nil {
+		respondError(w, http.StatusBadRequest, fmt.Sprintf("Invalid request body: %v", err))
+		return
+	}
+
+	resp, err := h.authService.VerifyPasswordResetCode(r.Context(), req.VerificationCode)
+	if err != nil {
+		handleServiceError(w, err, "VerifyPasswordResetCode")
+		return
+	}
+
+	responseBody := responses.VerifyPasswordResetCodeResponse{
+		Success: resp.GetSuccess(),
+	}
+
+	respondJSON(w, http.StatusOK, responseBody)
+}
+
+// SetNewPassword обработчик для POST /api/users/password/reset/set.
+// @Summary Set new password.
+// @Description Sets a new password for the user after successful code verification.
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param body body requests.SetNewPasswordRequest true "User ID and new password".
+// @Success 200 {object} responses.SetNewPasswordResponse "New password set successfully".
+// @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid user ID or new password format".
+// @Failure 404 {object} responses.ErrorResponse "Not Found - User not found or password reset process not initiated".
+// @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
+// @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Security ApiKeyAuth
+// @Router /api/users/password/reset/set [post].
+func (h *AuthHandler) SetNewPassword(w http.ResponseWriter, r *http.Request) {
+	var req requests.SetNewPasswordRequest
+	if err := decodeJSONBody(r, &req); err != nil {
+		respondError(w, http.StatusBadRequest, fmt.Sprintf("Invalid request body: %v", err))
+		return
+	}
+
+	resp, err := h.authService.SetNewPassword(r.Context(), req.NewPassword)
+	if err != nil {
+		handleServiceError(w, err, "SetNewPassword")
+		return
+	}
+
+	responseBody := responses.SetNewPasswordResponse{
+		Success: resp.GetSuccess(),
 	}
 
 	respondJSON(w, http.StatusOK, responseBody)

@@ -46,9 +46,9 @@ func NewGroupService(groupClient *groupClient.GroupServiceClient, authClient *au
 	}
 }
 
-// getRequestingUserIDFromContext извлекает ID пользователя из контекста.
+// GetRequestingUserIDFromContext извлекает ID пользователя из контекста.
 // Возвращает ID пользователя и ошибку, если ID отсутствует или имеет неверный тип.
-func (s *GroupService) getRequestingUserIDFromContext(ctx context.Context) (uint64, error) {
+func GetRequestingUserIDFromContext(ctx context.Context) (uint64, error) {
 	userID, ok := ctx.Value(cm.ContextKeyUserID).(uint64)
 	if !ok || userID == 0 {
 		return 0, status.Errorf(codes.Unauthenticated, "user ID not found in context")
@@ -77,7 +77,7 @@ func (s *GroupService) verifyUserExists(ctx context.Context, userID uint64) erro
 
 // CreateGroup вызывает RPC метод CreateGroup в Group-Service.
 func (s *GroupService) CreateGroup(ctx context.Context, name string, imageURL string) (*pb.CreateGroupResponse, error) {
-	requestingUserID, err := s.getRequestingUserIDFromContext(ctx)
+	requestingUserID, err := GetRequestingUserIDFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (s *GroupService) CreateGroup(ctx context.Context, name string, imageURL st
 
 // GetGroup вызывает RPC метод GetGroup в Group-Service.
 func (s *GroupService) GetGroup(ctx context.Context, groupID uint64) (*pb.GetGroupResponse, error) {
-	requestingUserID, err := s.getRequestingUserIDFromContext(ctx)
+	requestingUserID, err := GetRequestingUserIDFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func (s *GroupService) GetGroup(ctx context.Context, groupID uint64) (*pb.GetGro
 
 // UpdateGroup вызывает RPC метод UpdateGroup в Group-Service.
 func (s *GroupService) UpdateGroup(ctx context.Context, groupID uint64, name *string, image *string) (*pb.UpdateGroupResponse, error) {
-	requestingUserID, err := s.getRequestingUserIDFromContext(ctx)
+	requestingUserID, err := GetRequestingUserIDFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +145,7 @@ func (s *GroupService) UpdateGroup(ctx context.Context, groupID uint64, name *st
 
 // DeleteGroup вызывает RPC метод DeleteGroup в Group-Service.
 func (s *GroupService) DeleteGroup(ctx context.Context, groupID uint64) (*pb.DeleteGroupResponse, error) {
-	requestingUserID, err := s.getRequestingUserIDFromContext(ctx)
+	requestingUserID, err := GetRequestingUserIDFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +166,7 @@ func (s *GroupService) DeleteGroup(ctx context.Context, groupID uint64) (*pb.Del
 // ListGroupMembers вызывает RPC метод ListGroupMembers в Group-Service.
 // Group-Service, как предполагается, уже обогащает данные участников информацией о пользователях.
 func (s *GroupService) ListGroupMembers(ctx context.Context, groupID uint64) (*pb.ListGroupMembersResponse, error) {
-	requestingUserID, err := s.getRequestingUserIDFromContext(ctx)
+	requestingUserID, err := GetRequestingUserIDFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +186,7 @@ func (s *GroupService) ListGroupMembers(ctx context.Context, groupID uint64) (*p
 
 // RemoveGroupMember вызывает RPC метод RemoveGroupMember в Group-Service.
 func (s *GroupService) RemoveGroupMember(ctx context.Context, groupID uint64, userToRemoveID uint64) (*pb.RemoveGroupMemberResponse, error) {
-	requestingUserID, err := s.getRequestingUserIDFromContext(ctx)
+	requestingUserID, err := GetRequestingUserIDFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +214,7 @@ func (s *GroupService) RemoveGroupMember(ctx context.Context, groupID uint64, us
 
 // CreateGroupInvitation вызывает RPC метод CreateGroupInvitation в Group-Service.
 func (s *GroupService) CreateGroupInvitation(ctx context.Context, groupID uint64, duration *time.Duration) (*pb.CreateGroupInvitationResponse, error) {
-	requestingUserID, err := s.getRequestingUserIDFromContext(ctx)
+	requestingUserID, err := GetRequestingUserIDFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -240,7 +240,7 @@ func (s *GroupService) CreateGroupInvitation(ctx context.Context, groupID uint64
 
 // AcceptGroupInvitation вызывает RPC метод AcceptGroupInvitation в Group-Service.
 func (s *GroupService) AcceptGroupInvitation(ctx context.Context, invitationCode string) (*pb.AcceptGroupInvitationResponse, error) {
-	requestingUserID, err := s.getRequestingUserIDFromContext(ctx)
+	requestingUserID, err := GetRequestingUserIDFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -260,7 +260,7 @@ func (s *GroupService) AcceptGroupInvitation(ctx context.Context, invitationCode
 
 // ListUserGroups вызывает RPC метод ListUserGroups в Group-Service.
 func (s *GroupService) ListUserGroups(ctx context.Context) (*pb.ListUserGroupsResponse, error) {
-	requestingUserID, err := s.getRequestingUserIDFromContext(ctx)
+	requestingUserID, err := GetRequestingUserIDFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}

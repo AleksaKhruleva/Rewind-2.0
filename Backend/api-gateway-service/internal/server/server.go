@@ -40,7 +40,6 @@ func NewServer(dependencies *di.Dependencies) *Server {
 	mux.Use(middleware.Recoverer)                // Recovers from panics and logs the stack trace
 	mux.Use(middleware.Timeout(5 * time.Second)) // Sets a timeout for requests
 
-	// TODO: Add your custom authentication middleware here.
 	// This middleware should extract the token, validate it, and add the user ID to the request context.
 	mux.Use(cm.AuthMiddleware)
 
@@ -59,9 +58,17 @@ func NewServer(dependencies *di.Dependencies) *Server {
 		r.Post("/api/auth/refresh", dependencies.AuthHandler.RefreshToken)
 		r.Post("/api/auth/forgot-password", dependencies.AuthHandler.ForgotPassword)
 		r.Post("/api/auth/reset-password", dependencies.AuthHandler.ResetPassword)
-		r.Post("/api/auth/logout", dependencies.AuthHandler.Logout)
-		r.Delete("/api/auth/delete-user", dependencies.AuthHandler.DeleteUser)
+		r.Post("/api/users/logout", dependencies.AuthHandler.Logout)
+		r.Delete("/api/users/delete-user", dependencies.AuthHandler.DeleteUser)
 		r.Get("/api/users/{id}", dependencies.AuthHandler.GetUserByID)
+		r.Patch("/api/users/username", dependencies.AuthHandler.UpdateUsername)
+		r.Post("/api/users/check-password", dependencies.AuthHandler.CheckPassword)
+		r.Patch("/api/users/email", dependencies.AuthHandler.UpdateEmail)
+		r.Post("/api/users/email/verify", dependencies.AuthHandler.VerifyNewEmailCode)
+		r.Patch("/api/users/avatar", dependencies.AuthHandler.UpdateAvatar)
+		r.Post("/api/users/password/reset/start", dependencies.AuthHandler.StartPasswordReset)
+		r.Post("/api/users/password/reset/verify", dependencies.AuthHandler.VerifyPasswordResetCode)
+		r.Post("/api/users/password/reset/set", dependencies.AuthHandler.SetNewPassword)
 	})
 
 	// Group routes (typically require authentication middleware)
@@ -82,24 +89,6 @@ func NewServer(dependencies *di.Dependencies) *Server {
 		r.Get("/api/users/groups", dependencies.GroupHandler.ListUserGroups) // Assuming GET method
 	})
 
-	// TODO: Add routes for other services (Memory, Media, Stats, Notification)
-	// Example for Memory routes:
-	// mux.Group(func(r chi.Router) {
-	// 	r.Use(auth.RequireAuthentication) // Memory routes likely require authentication
-	// 	r.Post("/api/groups/{group_id}/memories", dependencies.MemoryHandler.CreateMemory)
-	// 	r.Get("/api/memories/{id}", dependencies.MemoryHandler.GetMemory)
-	// 	r.Get("/api/groups/{group_id}/memories", dependencies.MemoryHandler.ListMemories) // Filtered list
-	// 	r.Get("/api/groups/{group_id}/memories/random", dependencies.MemoryHandler.GetRandomMemory)
-	// 	r.Put("/api/memories/{id}", dependencies.MemoryHandler.UpdateMemory)
-	// 	r.Delete("/api/memories/{id}", dependencies.MemoryHandler.DeleteMemory)
-	// 	r.Post("/api/memories/{id}/reactions", dependencies.MemoryHandler.AddReaction) // Assuming POST for adding reaction
-	// 	r.Delete("/api/memories/{id}/reactions", dependencies.MemoryHandler.RemoveReaction) // Assuming DELETE
-	// 	r.Post("/api/memories/{id}/favorite", dependencies.MemoryHandler.AddFavorite) // Assuming POST for adding favorite
-	// 	r.Delete("/api/memories/{id}/favorite", dependencies.MemoryHandler.RemoveFavorite) // Assuming DELETE
-	// 	r.Get("/api/groups/{group_id}/memories/geolocated", dependencies.MemoryHandler.ListGeolocatedMemories)
-	// })
-
-	// Add handler for Swagger UI
 	mux.Handle("/swagger/*", httpSwagger.Handler(httpSwagger.URL("/swagger/doc.json")))
 
 	port := os.Getenv("API_GATEWAY_PORT")

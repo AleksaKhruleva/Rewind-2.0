@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 
-	"Rewind-api-gateway-service/clients/auth"
+	auth "Rewind-api-gateway-service/clients/auth"
 	pb "Rewind-api-gateway-service/pkg/proto"
 )
 
@@ -19,6 +19,14 @@ type AuthServiceInterface interface {
 	Logout(ctx context.Context, refreshToken string) (*pb.LogoutResponse, error)
 	DeleteUser(ctx context.Context, email string) (*pb.DeleteUserResponse, error)
 	GetUserByID(ctx context.Context, userID uint64) (*pb.GetUserByIDResponse, error)
+	UpdateUsername(ctx context.Context, newUsername string) (*pb.UpdateUsernameResponse, error)
+	CheckPassword(ctx context.Context, password string) (*pb.CheckPasswordResponse, error)
+	UpdateEmail(ctx context.Context, newEmail string) (*pb.UpdateEmailResponse, error)
+	VerifyNewEmailCode(ctx context.Context, verificationCode string) (*pb.VerifyNewEmailCodeResponse, error)
+	UpdateAvatar(ctx context.Context, imageData []byte) (*pb.UpdateAvatarResponse, error)
+	StartPasswordReset(ctx context.Context) (*pb.StartPasswordResetResponse, error)
+	VerifyPasswordResetCode(ctx context.Context, verificationCode string) (*pb.VerifyPasswordResetCodeResponse, error)
+	SetNewPassword(ctx context.Context, newPassword string) (*pb.SetNewPasswordResponse, error)
 }
 
 // AuthService представляет сервис для аутентификации.
@@ -77,4 +85,76 @@ func (s *AuthService) DeleteUser(ctx context.Context, email string) (*pb.DeleteU
 
 func (s *AuthService) GetUserByID(ctx context.Context, userID uint64) (*pb.GetUserByIDResponse, error) {
 	return s.authClient.GetUserByID(ctx, &pb.GetUserByIDRequest{UserId: userID})
+}
+
+// UpdateUsername вызывает метод UpdateUsername сервиса аутентификации.
+func (s *AuthService) UpdateUsername(ctx context.Context, newUsername string) (*pb.UpdateUsernameResponse, error) {
+	userID, err := GetRequestingUserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return s.authClient.UpdateUsername(ctx, &pb.UpdateUsernameRequest{UserId: userID, NewUsername: newUsername})
+}
+
+// CheckPassword вызывает метод CheckPassword сервиса аутентификации.
+func (s *AuthService) CheckPassword(ctx context.Context, password string) (*pb.CheckPasswordResponse, error) {
+	userID, err := GetRequestingUserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return s.authClient.CheckPassword(ctx, &pb.CheckPasswordRequest{UserId: userID, Password: password})
+}
+
+// UpdateEmail вызывает метод UpdateEmail сервиса аутентификации.
+func (s *AuthService) UpdateEmail(ctx context.Context, newEmail string) (*pb.UpdateEmailResponse, error) {
+	userID, err := GetRequestingUserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return s.authClient.UpdateEmail(ctx, &pb.UpdateEmailRequest{UserId: userID, NewEmail: newEmail})
+}
+
+// VerifyNewEmailCode вызывает метод VerifyNewEmailCode сервиса аутентификации.
+func (s *AuthService) VerifyNewEmailCode(ctx context.Context, verificationCode string) (*pb.VerifyNewEmailCodeResponse, error) {
+	userID, err := GetRequestingUserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return s.authClient.VerifyNewEmailCode(ctx, &pb.VerifyNewEmailCodeRequest{UserId: userID, VerificationCode: verificationCode})
+}
+
+// UpdateAvatar вызывает метод UpdateAvatar сервиса аутентификации.
+func (s *AuthService) UpdateAvatar(ctx context.Context, imageData []byte) (*pb.UpdateAvatarResponse, error) {
+	userID, err := GetRequestingUserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return s.authClient.UpdateAvatar(ctx, &pb.UpdateAvatarRequest{UserId: userID, Image: imageData})
+}
+
+// StartPasswordReset вызывает метод StartPasswordReset сервиса аутентификации.
+func (s *AuthService) StartPasswordReset(ctx context.Context) (*pb.StartPasswordResetResponse, error) {
+	userID, err := GetRequestingUserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return s.authClient.StartPasswordReset(ctx, &pb.StartPasswordResetRequest{UserId: userID})
+}
+
+// VerifyPasswordResetCode вызывает метод VerifyPasswordResetCode сервиса аутентификации.
+func (s *AuthService) VerifyPasswordResetCode(ctx context.Context, verificationCode string) (*pb.VerifyPasswordResetCodeResponse, error) {
+	userID, err := GetRequestingUserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return s.authClient.VerifyPasswordResetCode(ctx, &pb.VerifyPasswordResetCodeRequest{UserId: userID, VerificationCode: verificationCode})
+}
+
+// SetNewPassword вызывает метод SetNewPassword сервиса аутентификации.
+func (s *AuthService) SetNewPassword(ctx context.Context, newPassword string) (*pb.SetNewPasswordResponse, error) {
+	userID, err := GetRequestingUserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return s.authClient.SetNewPassword(ctx, &pb.SetNewPasswordRequest{UserId: userID, NewPassword: newPassword})
 }

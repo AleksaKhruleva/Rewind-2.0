@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 
 	"gorm.io/gorm"
 
@@ -21,6 +22,11 @@ type UserRepositoryInterface interface {
 	SaveDeleted(tx *gorm.DB, user *models.User) error
 	DeleteUser(tx *gorm.DB, email string) error
 	ListUsersByIDs(tx *gorm.DB, userIDs []uint) ([]*models.User, error)
+	UpdateUsername(tx *gorm.DB, userID uint, newUsername string) error
+	UpdateEmail(tx *gorm.DB, userID uint, newEmail string) error
+	UpdatePassword(tx *gorm.DB, userID uint, newPassword string) error
+	UpdateAvatar(tx *gorm.DB, userID uint, image string) error
+	CheckPassword(tx *gorm.DB, userID uint, password string) error
 }
 
 type UserRepository struct {
@@ -132,4 +138,46 @@ func (r *UserRepository) ListUsersByIDs(tx *gorm.DB, userIDs []uint) ([]*models.
 	var users []*models.User
 	result := tx.Where("id IN (?)", userIDs).Find(&users)
 	return users, result.Error
+}
+
+func (r *UserRepository) UpdateUsername(tx *gorm.DB, userID uint, newUsername string) error {
+	if tx == nil {
+		tx = r.db
+	}
+	return tx.Model(&models.User{}).Where("id = ?", userID).Update("username", newUsername).Error
+}
+
+func (r *UserRepository) CheckPassword(tx *gorm.DB, userID uint, password string) error {
+	if tx == nil {
+		tx = r.db
+	}
+	var user models.User
+	err := tx.Where("id = ?", userID).First(&user).Error
+	if err != nil {
+		return err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	return err
+}
+
+func (r *UserRepository) UpdateEmail(tx *gorm.DB, userID uint, newEmail string) error {
+	if tx == nil {
+		tx = r.db
+	}
+	return tx.Model(&models.User{}).Where("id = ?", userID).Update("email", newEmail).Error
+}
+
+func (r *UserRepository) UpdatePassword(tx *gorm.DB, userID uint, newPassword string) error {
+	if tx == nil {
+		tx = r.db
+	}
+	return tx.Model(&models.User{}).Where("id = ?", userID).Update("password", newPassword).Error
+}
+
+func (r *UserRepository) UpdateAvatar(tx *gorm.DB, userID uint, image string) error {
+	if tx == nil {
+		tx = r.db
+	}
+	return tx.Model(&models.User{}).Where("id = ?", userID).Update("image", image).Error
 }
