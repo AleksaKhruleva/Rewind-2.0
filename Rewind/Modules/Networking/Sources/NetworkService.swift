@@ -11,8 +11,12 @@ public protocol NetworkServiceProtocol {
     func logout(refreshToken: String) async throws -> SuccessResponse
     func deleteUser(email: String) async throws -> SuccessResponse
     func refresh(refreshToken: String) async throws -> UserAccessTokenResponse
-    func user(accessToken: String, refreshToken: String) async throws -> UserResponse
-    func updateName(accessToken: String, refreshToken: String, name: String) async throws -> SuccessResponse
+    func user(tokens: Tokens) async throws -> UserResponse
+    func updateName(tokens: Tokens, name: String) async throws -> SuccessResponse
+    
+    func passwordResetSet(tokens: Tokens, password: String) async throws -> SuccessResponse
+    func passwordResetStart(tokens: Tokens) async throws -> SuccessResponse
+    func passwordResetVerify(tokens: Tokens, verificationCode: String) async throws -> SuccessResponse
 }
 
 public final class NetworkService: NetworkServiceProtocol {
@@ -90,24 +94,59 @@ public final class NetworkService: NetworkServiceProtocol {
             type: UserAccessTokenResponse.self
         )
     }
-
-    public func user(accessToken: String, refreshToken: String) async throws -> UserResponse {
-        try await retryOnUnauthorized(refreshToken: refreshToken) { [unowned self] newToken in
+    
+    public func user(tokens: Tokens) async throws -> UserResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .user(
-                    accessToken: newToken ?? accessToken
+                    accessToken: newToken ?? tokens.accessToken
                 ),
                 type: UserResponse.self
             )
         }
     }
     
-    public func updateName(accessToken: String, refreshToken: String, name: String) async throws -> SuccessResponse {
-        try await retryOnUnauthorized(refreshToken: refreshToken) { [unowned self] newToken in
+    public func updateName(tokens: Tokens, name: String) async throws -> SuccessResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .updateName(
-                    accessToken: newToken ?? accessToken,
+                    accessToken: newToken ?? tokens.accessToken,
                     name: name
+                ),
+                type: SuccessResponse.self
+            )
+        }
+    }
+    
+    public func passwordResetSet(tokens: Tokens, password: String) async throws -> SuccessResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
+            try await self.provider.request(
+                .passwordResetSet(
+                    accessToken: tokens.accessToken,
+                    password: password
+                ),
+                type: SuccessResponse.self
+            )
+        }
+    }
+    
+    public func passwordResetStart(tokens: Tokens) async throws -> SuccessResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
+            try await self.provider.request(
+                .passwordResetStart(
+                    accessToken: tokens.accessToken
+                ),
+                type: SuccessResponse.self
+            )
+        }
+    }
+    
+    public func passwordResetVerify(tokens: Tokens, verificationCode: String) async throws -> SuccessResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
+            try await self.provider.request(
+                .passwordResetVerify(
+                    accessToken: tokens.accessToken,
+                    verificationCode: verificationCode
                 ),
                 type: SuccessResponse.self
             )

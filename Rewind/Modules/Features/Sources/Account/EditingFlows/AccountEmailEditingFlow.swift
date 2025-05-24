@@ -25,17 +25,17 @@ final class AccountEmailEditingFlowViewModel {
         case let .submitPassword(password):
             withAnimation(.easeIn(duration: 0.3)) { isLoading = true }
             print(password)
-            await simulateFakeLoad()
+//            await simulateFakeLoad()
             animateState(to: .email)
         case let .submitEmail(email):
             withAnimation(.easeIn(duration: 0.3)) { isLoading = true }
             print(email)
-            await simulateFakeLoad()
+//            await simulateFakeLoad()
             animateState(to: .code)
         case let .submitCode(code):
             withAnimation(.easeIn(duration: 0.3)) { isLoading = true }
             print(code)
-            await simulateFakeLoad()
+//            await simulateFakeLoad()
             animateState(to: .ready)
         }
     }

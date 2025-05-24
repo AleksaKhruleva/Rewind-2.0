@@ -12,6 +12,9 @@ enum APIService {
     case refresh(refreshToken: String)
     case user(accessToken: String)
     case updateName(accessToken: String, name: String)
+    case passwordResetSet(accessToken: String, password: String)
+    case passwordResetStart(accessToken: String)
+    case passwordResetVerify(accessToken: String, verificationCode: String)
 }
 
 extension APIService: TargetType {
@@ -43,6 +46,12 @@ extension APIService: TargetType {
             return "users/\(id)"
         case .updateName:
             return "users/username"
+        case .passwordResetSet:
+            return "users/password/reset/set"
+        case .passwordResetStart:
+            return "users/password/reset/start"
+        case .passwordResetVerify:
+            return "users/password/reset/verify"
         }
     }
 
@@ -51,12 +60,15 @@ extension APIService: TargetType {
         case .user:
             return .get
         case .register,
-            .verifyEmail,
-            .finishRegister,
-            .login,
-            .logout,
-            .deleteUser,
-            .refresh:
+                .verifyEmail,
+                .finishRegister,
+                .login,
+                .logout,
+                .deleteUser,
+                .refresh,
+                .passwordResetSet,
+                .passwordResetStart,
+                .passwordResetVerify:
             return .post
         case .updateName:
             return .patch
@@ -95,13 +107,24 @@ extension APIService: TargetType {
         case let .updateName(_, name):
             let parameters = ["new_username": name]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+        case let .passwordResetSet(_, password):
+            let parameters = ["new_password": password]
+            return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+        case .passwordResetStart:
+            return .requestPlain
+        case let .passwordResetVerify(_, verificationCode):
+            let parameters = ["verification_code": verificationCode]
+            return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
         }
     }
 
     var headers: [String: String]? {
         switch self {
         case let .user(accessToken),
-            let .updateName(accessToken, _):
+            let .updateName(accessToken, _),
+            let .passwordResetSet(accessToken, _),
+            let .passwordResetStart(accessToken),
+            let .passwordResetVerify(accessToken, _):
             return [
                 "Authorization": "Bearer \(accessToken)",
                 "Content-Type": "application/json"

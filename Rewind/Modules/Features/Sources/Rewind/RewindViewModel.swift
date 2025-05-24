@@ -36,12 +36,11 @@ final class RewindViewModel {
         switch intent {
         case .fetchUser:
             do {
-                guard let access = KeychainService.shared.read(for: .accessToken),
-                      let refresh = KeychainService.shared.read(for: .refreshToken) else {
+                guard let tokens = Tokens() else {
 //                        router.navigateToWelcome() // TODO: return when routing is ready
                     return
                 }
-                let response = try await backend.user(accessToken: access, refreshToken: refresh)
+                let response = try await backend.user(tokens: tokens)
                 user = response.toUser()
             } catch {
                 showToast("\(error.localizedDescription) 😨")

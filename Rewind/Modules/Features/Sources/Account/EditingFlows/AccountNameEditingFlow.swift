@@ -47,11 +47,9 @@ final class AccountNameEditingFlowViewModel {
         case let .submitName(name):
             animateState(to: .loading)
             do {
-                if let accessToken = KeychainService.shared.read(for: .accessToken),
-                   let refreshToken = KeychainService.shared.read(for: .refreshToken) {
+                if let tokens = Tokens() {
                     let response = try await backend.updateName(
-                        accessToken: accessToken,
-                        refreshToken: refreshToken,
+                        tokens: tokens,
                         name: name
                     )
                     if response.success {
