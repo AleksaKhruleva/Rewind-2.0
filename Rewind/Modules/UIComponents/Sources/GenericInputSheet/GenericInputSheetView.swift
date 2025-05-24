@@ -24,7 +24,7 @@ public struct GenericInputSheetView: View {
         item: GenericInputSheetItem,
         title: String,
         placeholder: String? = nil,
-        error: Binding<String?> = .constant(nil),
+        error: Binding<String?>,
         action: @escaping (String) -> Void
     ) {
         self.item = item

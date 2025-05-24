@@ -6,15 +6,24 @@ enum APIService {
     case register(email: String)
     case verifyEmail(registrationID: String, verificationCode: String)
     case finishRegister(password: String, registrationID: String, username: String)
+    
     case login(email: String, password: String)
+    
     case logout(refreshToken: String)
     case deleteUser(email: String)
+    
     case refresh(refreshToken: String)
     case user(accessToken: String)
+    
     case updateName(accessToken: String, name: String)
+    
     case passwordResetSet(accessToken: String, password: String)
     case passwordResetStart(accessToken: String)
     case passwordResetVerify(accessToken: String, verificationCode: String)
+    
+    case checkPassword(accessToken: String, password: String)
+    case emailStartChange(accessToken: String, email: String)
+    case emailVerifyChange(accessToken: String, verificationCode: String)
 }
 
 extension APIService: TargetType {
@@ -52,6 +61,12 @@ extension APIService: TargetType {
             return "users/password/reset/start"
         case .passwordResetVerify:
             return "users/password/reset/verify"
+        case .checkPassword:
+            return "users/check-password"
+        case .emailStartChange:
+            return "users/email/start-change"
+        case .emailVerifyChange:
+            return "users/email/verify-change"
         }
     }
 
@@ -66,11 +81,14 @@ extension APIService: TargetType {
                 .logout,
                 .deleteUser,
                 .refresh,
-                .passwordResetSet,
                 .passwordResetStart,
-                .passwordResetVerify:
+                .passwordResetVerify,
+                .checkPassword,
+                .emailStartChange:
             return .post
-        case .updateName:
+        case .updateName,
+                .passwordResetSet,
+                .emailVerifyChange:
             return .patch
         }
     }
@@ -115,6 +133,15 @@ extension APIService: TargetType {
         case let .passwordResetVerify(_, verificationCode):
             let parameters = ["verification_code": verificationCode]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+        case let .checkPassword(_, password):
+            let parameters = ["password": password]
+            return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+        case let .emailStartChange(_, email):
+            let parameters = ["new_email": email]
+            return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+        case let .emailVerifyChange(_, verificationCode):
+            let parameters = ["verification_code": verificationCode]
+            return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
         }
     }
 
@@ -124,7 +151,10 @@ extension APIService: TargetType {
             let .updateName(accessToken, _),
             let .passwordResetSet(accessToken, _),
             let .passwordResetStart(accessToken),
-            let .passwordResetVerify(accessToken, _):
+            let .passwordResetVerify(accessToken, _),
+            let .checkPassword(accessToken, _),
+            let .emailStartChange(accessToken, _),
+            let .emailVerifyChange(accessToken, _):
             return [
                 "Authorization": "Bearer \(accessToken)",
                 "Content-Type": "application/json"

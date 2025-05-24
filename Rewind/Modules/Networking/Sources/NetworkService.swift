@@ -7,16 +7,24 @@ public protocol NetworkServiceProtocol {
     func register(email: String) async throws -> RegisterResponse
     func verifyEmail(registrationID: String, verificationCode: String) async throws -> SuccessResponse
     func finishRegister(password: String, registrationID: String, username: String) async throws -> UserTokensResponse
+    
     func login(email: String, password: String) async throws -> UserTokensResponse
+    
     func logout(refreshToken: String) async throws -> SuccessResponse
     func deleteUser(email: String) async throws -> SuccessResponse
+    
     func refresh(refreshToken: String) async throws -> UserAccessTokenResponse
     func user(tokens: Tokens) async throws -> UserResponse
+    
     func updateName(tokens: Tokens, name: String) async throws -> SuccessResponse
     
     func passwordResetSet(tokens: Tokens, password: String) async throws -> SuccessResponse
     func passwordResetStart(tokens: Tokens) async throws -> SuccessResponse
     func passwordResetVerify(tokens: Tokens, verificationCode: String) async throws -> SuccessResponse
+    
+    func checkPassword(tokens: Tokens, password: String) async throws -> SuccessResponse
+    func emailStartChange(tokens: Tokens, email: String) async throws -> SuccessResponse
+    func emailVerifyChange(tokens: Tokens, verificationCode: String) async throws -> SuccessResponse
 }
 
 public final class NetworkService: NetworkServiceProtocol {
@@ -145,6 +153,42 @@ public final class NetworkService: NetworkServiceProtocol {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .passwordResetVerify(
+                    accessToken: tokens.accessToken,
+                    verificationCode: verificationCode
+                ),
+                type: SuccessResponse.self
+            )
+        }
+    }
+    
+    public func checkPassword(tokens: Tokens, password: String) async throws -> SuccessResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
+            try await self.provider.request(
+                .checkPassword(
+                    accessToken: tokens.accessToken,
+                    password: password
+                ),
+                type: SuccessResponse.self
+            )
+        }
+    }
+    
+    public func emailStartChange(tokens: Tokens, email: String) async throws -> SuccessResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
+            try await self.provider.request(
+                .emailStartChange(
+                    accessToken: tokens.accessToken,
+                    email: email
+                ),
+                type: SuccessResponse.self
+            )
+        }
+    }
+    
+    public func emailVerifyChange(tokens: Tokens, verificationCode: String) async throws -> SuccessResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
+            try await self.provider.request(
+                .emailVerifyChange(
                     accessToken: tokens.accessToken,
                     verificationCode: verificationCode
                 ),

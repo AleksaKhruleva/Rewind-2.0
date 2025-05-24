@@ -29,7 +29,8 @@ struct TagsView: View {
             GenericInputSheetView(
                 item: .tag,
                 title: UIComponentsStrings.GenericInput.NewTag.title,
-                placeholder: UIComponentsStrings.GenericInput.NewTag.placeholder
+                placeholder: UIComponentsStrings.GenericInput.NewTag.placeholder,
+                error: .constant(nil) // TODO: Use real data
             ) { tag in
                 tags.append(tag)
                 tagInputPresented = false
