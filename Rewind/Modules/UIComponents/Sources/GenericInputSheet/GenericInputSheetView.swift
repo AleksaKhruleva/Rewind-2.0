@@ -5,7 +5,6 @@ public struct GenericInputSheetView: View {
     private var title: String
     private var placeholder: String?
     private var action: (String) -> Void
-
     @Binding var error: String?
     @State private var text: String = ""
     @FocusState private var isFocused: Bool
@@ -74,7 +73,6 @@ public struct GenericInputSheetView: View {
                     }
                     .allowsHitTesting(false)
                 }
-
                 if let error {
                     RewindNoteTextView(text: error)
                         .multilineTextAlignment(.center)
