@@ -150,7 +150,6 @@ message CheckPasswordResponse {
 message UpdateEmailRequest {
   uint64 user_id = 1;
   string new_email = 2;
-  string password = 3;
 }
 
 message UpdateEmailResponse {
@@ -159,8 +158,7 @@ message UpdateEmailResponse {
 
 message VerifyNewEmailCodeRequest {
   uint64 user_id = 1;
-  string new_email = 2;
-  string verification_code = 3;
+  string verification_code = 2;
 }
 
 message VerifyNewEmailCodeResponse {

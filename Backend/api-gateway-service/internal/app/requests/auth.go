@@ -51,11 +51,9 @@ type CheckPasswordRequest struct {
 
 type UpdateEmailRequest struct {
 	NewEmail string `json:"new_email"`
-	Password string `json:"password"`
 }
 
 type VerifyNewEmailCodeRequest struct {
-	NewEmail         string `json:"new_email"`
 	VerificationCode string `json:"verification_code"`
 }
 

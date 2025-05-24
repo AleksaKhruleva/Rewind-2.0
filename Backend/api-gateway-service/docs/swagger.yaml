@@ -78,8 +78,6 @@ definitions:
     properties:
       new_email:
         type: string
-      password:
-        type: string
     type: object
   requests.UpdateGroupRequest:
     properties:
@@ -104,8 +102,6 @@ definitions:
     type: object
   requests.VerifyNewEmailCodeRequest:
     properties:
-      new_email:
-        type: string
       verification_code:
         type: string
     type: object
@@ -355,7 +351,7 @@ definitions:
       success:
         type: boolean
     type: object
-host: localhost:8080
+host: rewindapp.ru
 info:
   contact: {}
   description: This is the API Gateway for the Rewind application.

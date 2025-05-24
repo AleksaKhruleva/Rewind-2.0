@@ -26,6 +26,11 @@ import (
 	pb "Rewind-auth-service/pkg/proto"
 )
 
+const (
+	emailUpdateStagePasswordChecked = "password_checked"
+	emailUpdateStageCodeSent        = "code_sent"
+)
+
 type AuthService struct {
 	userRepo repositories.UserRepositoryInterface
 	pb.UnimplementedAuthServiceServer
@@ -643,21 +648,33 @@ func (s *AuthService) CheckPassword(ctx context.Context, req *pb.CheckPasswordRe
 	userID := req.GetUserId()
 	password := req.GetPassword()
 
-	err := s.userRepo.CheckPassword(nil, uint(userID), password)
+	user, err := s.userRepo.GetUserByID(nil, uint(userID))
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, status.Errorf(codes.NotFound, "User not found")
 		}
-		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			return nil, status.Errorf(codes.Unauthenticated, "Invalid password")
-		}
-		log.Printf("Failed to check password for user %d: %v", userID, err)
-		return nil, status.Errorf(codes.Internal, "Failed to check password")
+		log.Printf("Failed to get user %d: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to retrieve user data")
 	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return nil, status.Errorf(codes.PermissionDenied, "Invalid password")
+	}
+
+	// Store the fact that password has been checked in Redis
+	redisKey := fmt.Sprintf("email_update_flow:%d", userID)
+	err = s.redisRepo.HSet(ctx, redisKey, "stage", emailUpdateStagePasswordChecked).Err()
+	if err != nil {
+		log.Printf("Failed to store password check status in Redis for user %d: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to manage email update flow")
+	}
+	s.redisRepo.Expire(ctx, redisKey, time.Minute*30) // Expire the flow after a reasonable time
+
 	return &pb.CheckPasswordResponse{Success: true}, nil
 }
 
-// UpdateEmail реализует RPC метод для попытки обновления почты пользователя.
+// UpdateEmail реализует RPC метод для отправки кода подтверждения на новую почту во время смены почты.
 func (s *AuthService) UpdateEmail(ctx context.Context, req *pb.UpdateEmailRequest) (*pb.UpdateEmailResponse, error) {
 	userID := req.GetUserId()
 	newEmail := req.GetNewEmail()
@@ -666,26 +683,30 @@ func (s *AuthService) UpdateEmail(ctx context.Context, req *pb.UpdateEmailReques
 		return nil, status.Errorf(codes.InvalidArgument, "invalid email format: %v", err)
 	}
 
-	_, err := s.userRepo.GetUserByID(nil, uint(userID))
+	// Check if the password check stage is completed
+	redisKey := fmt.Sprintf("email_update_flow:%d", userID)
+	stage, err := s.redisRepo.HGet(ctx, redisKey, "stage").Result()
+	if err != nil || stage != emailUpdateStagePasswordChecked {
+		return nil, status.Errorf(codes.PermissionDenied, "Password must be verified before updating email")
+	}
 
+	_, err = s.userRepo.GetUserByID(nil, uint(userID))
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			// Если запись не найдена, возвращаем статус NotFound
 			log.Printf("GetUserByID: User with ID %d not found: %v", userID, err)
 			return nil, status.Errorf(codes.NotFound, "User with ID %d not found", userID)
 		}
-		// Для всех остальных ошибок репозитория возвращаем статус Internal
 		log.Printf("GetUserByID: Failed to get user by ID %d from DB: %v", userID, err)
 		return nil, status.Errorf(codes.Internal, "Failed to retrieve user data")
 	}
 
 	verificationCode := utils.GenerateVerificationCode()
 
-	redisKey := fmt.Sprintf("email_verification:%d:%s", userID, newEmail)
+	emailVerificationRedisKey := fmt.Sprintf("email_verification:%d:%s", userID, newEmail)
 	expiryTime := time.Minute * 15
 
 	// Save verification code to Redis
-	err = s.redisRepo.Set(ctx, redisKey, verificationCode, expiryTime).Err()
+	err = s.redisRepo.Set(ctx, emailVerificationRedisKey, verificationCode, expiryTime).Err()
 	if err != nil {
 		log.Printf("Error saving email verification code to Redis for user %d and email %s: %v", userID, newEmail, err)
 		return nil, status.Errorf(codes.Internal, "failed to store verification code")
@@ -698,16 +719,36 @@ func (s *AuthService) UpdateEmail(ctx context.Context, req *pb.UpdateEmailReques
 		return nil, status.Errorf(codes.Internal, "failed to send verification email")
 	}
 
+	// Mark the code as sent in the flow
+	err = s.redisRepo.HSet(ctx, redisKey, "stage", emailUpdateStageCodeSent, "new_email", newEmail).Err()
+	if err != nil {
+		log.Printf("Failed to store code sent status in Redis for user %d: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to manage email update flow")
+	}
+
 	// Successful initiation of email update
 	return &pb.UpdateEmailResponse{Success: true}, nil
 }
 
+// VerifyNewEmailCode реализует RPC метод для проверки кода во время изменения почты.
 func (s *AuthService) VerifyNewEmailCode(ctx context.Context, req *pb.VerifyNewEmailCodeRequest) (*pb.VerifyNewEmailCodeResponse, error) {
 	userID := req.GetUserId()
-	newEmail := req.GetNewEmail()
 	verificationCode := req.GetVerificationCode()
 
-	storedCode, err := s.redisRepo.Get(ctx, fmt.Sprintf("email_verification:%d:%s", userID, newEmail)).Result()
+	// Check if the code sent stage is completed
+	redisKey := fmt.Sprintf("email_update_flow:%d", userID)
+	stage, err := s.redisRepo.HGet(ctx, redisKey, "stage").Result()
+	if err != nil || stage != emailUpdateStageCodeSent {
+		return nil, status.Errorf(codes.NotFound, "Email update initiation required")
+	}
+	newEmail, err := s.redisRepo.HGet(ctx, redisKey, "new_email").Result() // Получаем newEmail из Redis
+	if err != nil {
+		log.Printf("Failed to retrieve new_email from Redis: %v", err)
+		return nil, status.Errorf(codes.Internal, "Failed to verify email code")
+	}
+
+	emailVerificationRedisKey := fmt.Sprintf("email_verification:%d:%s", userID, newEmail)
+	storedCode, err := s.redisRepo.Get(ctx, emailVerificationRedisKey).Result()
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
 			return nil, status.Errorf(codes.InvalidArgument, "Invalid or expired verification code")
@@ -721,14 +762,11 @@ func (s *AuthService) VerifyNewEmailCode(ctx context.Context, req *pb.VerifyNewE
 	}
 
 	_, err = s.userRepo.GetUserByID(nil, uint(userID))
-
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			// Если запись не найдена, возвращаем статус NotFound
 			log.Printf("GetUserByID: User with ID %d not found: %v", userID, err)
 			return nil, status.Errorf(codes.NotFound, "User with ID %d not found", userID)
 		}
-		// Для всех остальных ошибок репозитория возвращаем статус Internal
 		log.Printf("GetUserByID: Failed to get user by ID %d from DB: %v", userID, err)
 		return nil, status.Errorf(codes.Internal, "Failed to retrieve user data")
 	}
@@ -740,12 +778,14 @@ func (s *AuthService) VerifyNewEmailCode(ctx context.Context, req *pb.VerifyNewE
 		return nil, status.Errorf(codes.Internal, "Failed to update email")
 	}
 
-	// Clean up the verification code from Redis
-	s.redisRepo.Del(ctx, fmt.Sprintf("email_verification:%d:%s", userID, newEmail))
+	// Clean up the verification code and the flow from Redis
+	s.redisRepo.Del(ctx, emailVerificationRedisKey)
+	s.redisRepo.Del(ctx, redisKey)
 
 	return &pb.VerifyNewEmailCodeResponse{Success: true}, nil
 }
 
+// StartPasswordReset реализует RPC метод для начала смены пароля.
 func (s *AuthService) StartPasswordReset(ctx context.Context, req *pb.StartPasswordResetRequest) (*pb.StartPasswordResetResponse, error) {
 	userID := req.GetUserId()
 
@@ -787,6 +827,7 @@ func (s *AuthService) StartPasswordReset(ctx context.Context, req *pb.StartPassw
 	return &pb.StartPasswordResetResponse{Success: true}, nil
 }
 
+// VerifyPasswordResetCode реализует RPC метод для проверки кода подтверждения во время смены пароля.
 func (s *AuthService) VerifyPasswordResetCode(ctx context.Context, req *pb.VerifyPasswordResetCodeRequest) (*pb.VerifyPasswordResetCodeResponse, error) {
 	userID := req.GetUserId()
 	verificationCode := req.GetVerificationCode()
@@ -814,6 +855,7 @@ func (s *AuthService) VerifyPasswordResetCode(ctx context.Context, req *pb.Verif
 	return &pb.VerifyPasswordResetCodeResponse{Success: true}, nil
 }
 
+// SetNewPassword реализует RPC метод для нового пароля.
 func (s *AuthService) SetNewPassword(ctx context.Context, req *pb.SetNewPasswordRequest) (*pb.SetNewPasswordResponse, error) {
 	userID := req.GetUserId()
 	newPassword := req.GetNewPassword()
@@ -858,6 +900,7 @@ func (s *AuthService) SetNewPassword(ctx context.Context, req *pb.SetNewPassword
 	return &pb.SetNewPasswordResponse{Success: true}, nil
 }
 
+// UpdateAvatar реализует RPC метод для обновления изображения аккаунта пользователя.
 func (s *AuthService) UpdateAvatar(ctx context.Context, req *pb.UpdateAvatarRequest) (*pb.UpdateAvatarResponse, error) {
 	userID := req.GetUserId()
 	image := req.GetImage()

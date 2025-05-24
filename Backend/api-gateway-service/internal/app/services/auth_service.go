@@ -21,8 +21,8 @@ type AuthServiceInterface interface {
 	GetUserByID(ctx context.Context, userID uint64) (*pb.GetUserByIDResponse, error)
 	UpdateUsername(ctx context.Context, newUsername string) (*pb.UpdateUsernameResponse, error)
 	CheckPassword(ctx context.Context, password string) (*pb.CheckPasswordResponse, error)
-	UpdateEmail(ctx context.Context, newEmail, password string) (*pb.UpdateEmailResponse, error)
-	VerifyNewEmailCode(ctx context.Context, newEmail, verificationCode string) (*pb.VerifyNewEmailCodeResponse, error)
+	UpdateEmail(ctx context.Context, newEmail string) (*pb.UpdateEmailResponse, error)
+	VerifyNewEmailCode(ctx context.Context, verificationCode string) (*pb.VerifyNewEmailCodeResponse, error)
 	UpdateAvatar(ctx context.Context, imageData []byte) (*pb.UpdateAvatarResponse, error)
 	StartPasswordReset(ctx context.Context) (*pb.StartPasswordResetResponse, error)
 	VerifyPasswordResetCode(ctx context.Context, verificationCode string) (*pb.VerifyPasswordResetCodeResponse, error)
@@ -106,21 +106,21 @@ func (s *AuthService) CheckPassword(ctx context.Context, password string) (*pb.C
 }
 
 // UpdateEmail вызывает метод UpdateEmail сервиса аутентификации.
-func (s *AuthService) UpdateEmail(ctx context.Context, newEmail, password string) (*pb.UpdateEmailResponse, error) {
+func (s *AuthService) UpdateEmail(ctx context.Context, newEmail string) (*pb.UpdateEmailResponse, error) {
 	userID, err := GetRequestingUserIDFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return s.authClient.UpdateEmail(ctx, &pb.UpdateEmailRequest{UserId: userID, NewEmail: newEmail, Password: password})
+	return s.authClient.UpdateEmail(ctx, &pb.UpdateEmailRequest{UserId: userID, NewEmail: newEmail})
 }
 
 // VerifyNewEmailCode вызывает метод VerifyNewEmailCode сервиса аутентификации.
-func (s *AuthService) VerifyNewEmailCode(ctx context.Context, newEmail, verificationCode string) (*pb.VerifyNewEmailCodeResponse, error) {
+func (s *AuthService) VerifyNewEmailCode(ctx context.Context, verificationCode string) (*pb.VerifyNewEmailCodeResponse, error) {
 	userID, err := GetRequestingUserIDFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return s.authClient.VerifyNewEmailCode(ctx, &pb.VerifyNewEmailCodeRequest{UserId: userID, NewEmail: newEmail, VerificationCode: verificationCode})
+	return s.authClient.VerifyNewEmailCode(ctx, &pb.VerifyNewEmailCodeRequest{UserId: userID, VerificationCode: verificationCode})
 }
 
 // UpdateAvatar вызывает метод UpdateAvatar сервиса аутентификации.

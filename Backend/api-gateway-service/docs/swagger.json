@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8080",
+    "host": "rewindapp.ru",
     "paths": {
         "/api/auth/finish-register": {
             "post": {
@@ -1851,9 +1851,6 @@
             "properties": {
                 "new_email": {
                     "type": "string"
-                },
-                "password": {
-                    "type": "string"
                 }
             }
         },
@@ -1892,9 +1889,6 @@
         "requests.VerifyNewEmailCodeRequest": {
             "type": "object",
             "properties": {
-                "new_email": {
-                    "type": "string"
-                },
                 "verification_code": {
                     "type": "string"
                 }

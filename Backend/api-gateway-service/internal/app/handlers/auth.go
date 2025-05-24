@@ -469,7 +469,7 @@ func (h *AuthHandler) UpdateEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := h.authService.UpdateEmail(r.Context(), req.NewEmail, req.Password)
+	resp, err := h.authService.UpdateEmail(r.Context(), req.NewEmail)
 	if err != nil {
 		handleServiceError(w, err, "UpdateEmail")
 		return
@@ -503,7 +503,7 @@ func (h *AuthHandler) VerifyNewEmailCode(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	resp, err := h.authService.VerifyNewEmailCode(r.Context(), req.NewEmail, req.VerificationCode)
+	resp, err := h.authService.VerifyNewEmailCode(r.Context(), req.VerificationCode)
 	if err != nil {
 		handleServiceError(w, err, "VerifyNewEmailCode")
 		return
