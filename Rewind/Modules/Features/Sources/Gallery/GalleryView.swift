@@ -31,21 +31,17 @@ public struct GalleryView: View {
                     onAddingMedias:  { Task { await viewModel.dispatch(.showMediasDialog) } }
                 )
                 
+                let mediaSpacing: CGFloat = 3
                 ScrollView {
                     VStack {
-                        LazyVGrid(columns: [
-                            GridItem(.flexible()),
-                            GridItem(.flexible()),
-                            GridItem(.flexible())
-                        ], spacing: 3) {
+                        LazyVGrid(columns: Array(
+                            repeating: GridItem(.flexible(), spacing: mediaSpacing),
+                            count: 3
+                        ), spacing: mediaSpacing) {
                             let medias = GalleryConstants.galleryMedias
                             ForEach(medias, id: \.self) { media in
                                 Rectangle()
-                                    .toSquare(media, cornerRadius: 14)
-                                    .frame(
-                                        width: UIScreen.main.bounds.width / 3,
-                                        height: UIScreen.main.bounds.width / 3
-                                    )
+                                    .toSquare(media, cornerRadius: 10)
                                     .onTapGesture {
                                         Task {
                                             await viewModel.dispatch(.viewBlurredMedia(media))
