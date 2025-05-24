@@ -36,16 +36,15 @@ public struct PodiumBadgeView: View {
     public var body: some View {
         VStack(spacing: 5) {
             ZStack(alignment: .topTrailing) {
-                Image(uiImage: member.avatar)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: imageSize, height: imageSize)
-                    .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: cornerRadius)
-                            .stroke(Color.white, lineWidth: 3)
-                    )
-
+//                Image(uiImage: member.avatar)
+//                    .resizable()
+//                    .aspectRatio(contentMode: .fill)
+//                    .frame(width: imageSize, height: imageSize)
+//                    .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+//                    .overlay(
+//                        RoundedRectangle(cornerRadius: cornerRadius)
+//                            .stroke(Color.white, lineWidth: 3)
+//                    )
                 Text("\(rank)")
                     .modifier(RoundFontModifier(size: badgeSize * 0.5, foregroundColor: .white))
                     .frame(width: badgeSize, height: badgeSize)

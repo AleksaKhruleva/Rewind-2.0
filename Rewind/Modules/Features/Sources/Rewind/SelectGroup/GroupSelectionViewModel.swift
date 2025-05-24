@@ -8,21 +8,27 @@ final class GroupSelectionViewModel {
     enum Intent {
         case createGroup(String)
     }
-    
+
     var isLoading = false
     var isGroupCreationViewPresented = false
-    var shouldDismissSelf = false
-    
+    var currentGroupID: Int? {
+        GroupStorage.currentGroup?.id
+    }
+
+    private(set) var shouldDismissSelf = false
+    private(set) var groups: [Domain.Group]
+
     private let backend: NetworkServiceProtocol
     private let jwtDecoder: JWTDecoder
     private weak var router: RewindRouter?
-    
-    init(router: RewindRouter) {
+
+    init(groups: [Domain.Group], router: RewindRouter) {
+        self.groups = groups
+        self.router = router
         backend = NetworkService()
         jwtDecoder = JWTDecoder()
-        self.router = router
     }
-    
+
     func dispatch(_ intent: Intent) async {
         switch intent {
         case let .createGroup(name):
@@ -36,9 +42,9 @@ final class GroupSelectionViewModel {
                     isLoading = false
                     return
                 }
-                
+
                 let response = try await backend.createGroup(name: name)
-                
+
                 let group = Group(
                     id: response.groupID,
                     name: response.name,
@@ -47,21 +53,21 @@ final class GroupSelectionViewModel {
                         Member(
                             id: userID,
                             name: user.name,
-                            avatar: user.image,
+                            imageData: user.imageData,
                             isOwner: true,
                             isUser: true
                         )
                     ],
                     createdAt: DateParser.parseISODate(response.createdAt)
                 )
-                
+
                 GroupStorage.set(groupID: group.id, imageData: group.imageData)
-                
+
                 isGroupCreationViewPresented = false
-                
+
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
                     self?.shouldDismissSelf = true
-                    
+
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                         self?.router?.navigateToGroup(group)
                     }

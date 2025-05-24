@@ -14,15 +14,30 @@ final class RewindViewModel {
         case toggleTrackPlaying
         case showNextMediaItem
         case fetchGroups
+        case openGroup
     }
-    
+
+    enum UserGroupsState {
+        case ready
+        case notReady
+    }
+
+    enum CurrentGroupState {
+        case ready
+        case notReady
+    }
+
+    var currentGroupID: Int? {
+        GroupStorage.currentGroup?.id
+    }
+
     var showToast: (String) -> Void
     var isTrackPlaying = false
     var rolls = 0
-    private(set) var currentMediaItem: MediaItem
-    private(set) var isLoadingGroups = false
-    private(set) var groups: [Domain.Group] = []
-    
+    private(set) var groups = [Domain.Group]()
+    private(set) var userGroupsState = UserGroupsState.notReady
+    private(set) var currentGroupState = CurrentGroupState.ready
+
     var fetchedUser: User?
     var user: User {
         get {
@@ -36,12 +51,13 @@ final class RewindViewModel {
             fetchedUser = newValue
         }
     }
-    
+
+    private let router: RewindRouter
     private let backend: NetworkServiceProtocol
     private let audioManager: AudioPlayerManager
     private var mediaItems = [MediaItem]()
     private var currentIndex = 0
-    
+
     init() {
         showToast = { _ in }
         backend = NetworkService()
@@ -99,25 +115,98 @@ final class RewindViewModel {
                 currentMediaItem = mediaItems[currentIndex]
             }
         case .fetchGroups:
-            isLoadingGroups = true
-            defer { isLoadingGroups = false }
+            userGroupsState = .notReady
             do {
                 let responses = try await backend.fetchGroups()
-                groups = responses.map { response in
-                    Group(
-                        id: response.groupID,
-                        name: response.name,
-                        //                        imageData: Data(from: response.imageData)
-                    )
-                }
+                groups = sortedGroups(from: responses)
+                userGroupsState = .ready
             } catch {
                 groups = []
                 print(error)
-                // TODO: handle error (например, показать toast)
+                // TODO: handle error
+            }
+        case .openGroup:
+            currentGroupState = .notReady
+            do {
+                guard let currentGroupID,
+                      let accessToken = KeychainService.shared.read(for: .accessToken),
+                      let userID = jwtDecoder.getUserId(from: accessToken)
+                else {
+                    // TODO: throw error
+                    return
+                }
+
+                let response = try await backend.fetchFullGroupDetails(id: currentGroupID)
+
+                let members = sortedMembers(
+                    from: response.members,
+                    currentUserID: userID
+                )
+
+                let currentGroup = Domain.Group(
+                    id: currentGroupID,
+                    name: response.group.name,
+                    ownerID: response.group.ownerID,
+                    members: members,
+                    createdAt: DateParser.parseISODate(response.group.createdAt)
+                )
+
+                currentGroupState = .ready
+                router.navigateToGroup(currentGroup)
+            } catch {
+                print(error)
+                // TODO: handle error
             }
         }
     }
-    
+
+    private func sortedGroups(from responses: [GroupResponse]) -> [Domain.Group] {
+        var groups = responses
+            .map { response in
+                Group(
+                    id: response.groupID,
+                    name: response.name
+                    // imageData: ...
+                )
+            }
+            .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+
+        if let currentGroupID {
+            if let currentGroup = groups.first(where: { $0.id == currentGroupID }) {
+                groups.removeAll { $0.id == currentGroupID }
+                groups.insert(currentGroup, at: 0)
+            }
+        }
+
+        return groups
+    }
+
+    private func sortedMembers(from responses: [GroupMemberResponse], currentUserID: Int) -> [Member] {
+        let members = responses.map { response in
+            Member(
+                id: response.id,
+                name: response.name,
+                imageData: nil,
+                isOwner: response.isOwner,
+                isUser: response.id == currentUserID
+            )
+        }
+
+        return members.sorted { lhs, rhs in
+            switch (lhs.isOwner, rhs.isOwner) {
+            case (true, false): return true
+            case (false, true): return false
+            default:
+                switch (lhs.isUser, rhs.isUser) {
+                case (true, false): return true
+                case (false, true): return false
+                default:
+                    return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
+                }
+            }
+        }
+    }
+
     func set(showToast: @escaping (String) -> Void) {
         self.showToast = showToast
     }

@@ -7,7 +7,7 @@ public struct GroupView: View {
 
     private let group: Domain.Group
     private let router: GroupRouter
-    
+
     public init(group: Domain.Group, router: GroupRouter) {
         self.group = group
         self.router = router

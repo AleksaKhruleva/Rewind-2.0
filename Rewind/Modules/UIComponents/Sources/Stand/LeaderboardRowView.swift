@@ -25,11 +25,11 @@ public struct LeaderboardRowView: View {
                 .modifier(RoundFontModifier(size: 16, foregroundColor: .white))
                 .padding(.trailing, 8)
 
-            Image(uiImage: member.avatar)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 48, height: 48)
-                .cornerRadius(12)
+//            Image(uiImage: member.avatar)
+//                .resizable()
+//                .aspectRatio(contentMode: .fill)
+//                .frame(width: 48, height: 48)
+//                .cornerRadius(12)
 
             Text(member.name)
                 .modifier(RoundFontModifier(size: 16, foregroundColor: .white))

@@ -19,7 +19,7 @@ struct MemberRow: View {
     var body: some View {
         HStack {
             HStack(spacing: 12) {
-                Image(uiImage: member.avatar)
+                Image(uiImage: member.image)
                     .resizable()
                     .scaledToFill()
                     .frame(width: 34, height: 34)

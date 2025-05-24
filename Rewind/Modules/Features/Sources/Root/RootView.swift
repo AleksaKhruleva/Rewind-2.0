@@ -12,11 +12,12 @@ public struct RootView: View {
         ZStack {
             ForEach(Array(router.stack.enumerated()), id: \.element.id) { index, wrapper in
                 let isBelowTop = index == router.stack.count - 2
+                let isTop = index == router.stack.count - 1
 
                 screen(for: wrapper.route)
                     .transition(transition(for: wrapper.transition))
                     .zIndex(Double(index))
-
+                    .environment(\.isTopScreen, isTop)
                     .overlay {
                         if isBelowTop {
                             Color.black.opacity(0.2)

@@ -4,20 +4,30 @@ import SwiftUI
 public struct Member: Identifiable, Hashable {
     public let id: Int
     public let name: String
-    public let avatar: UIImage
+    public private(set) var imageData: Data?
     public let isOwner: Bool
     public let isUser: Bool
-
+    
+    public var image: UIImage {
+        get {
+            guard let imageData = imageData, let image = UIImage(data: imageData) else { return DomainAsset.userPlacholder.image }
+            return image
+        }
+        set {
+            imageData = newValue.pngData()
+        }
+    }
+    
     public init(
         id: Int,
         name: String,
-        avatar: UIImage,
+        imageData: Data? = nil,
         isOwner: Bool = false,
         isUser: Bool = false
     ) {
         self.id = id
         self.name = name
-        self.avatar = avatar
+        self.imageData = imageData
         self.isOwner = isOwner
         self.isUser = isUser
     }

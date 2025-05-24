@@ -28,7 +28,7 @@ public struct MediaTopButtons: View {
                     .background(Color.backgroundSecondary)
                     .clipShape(Capsule())
             }
-            
+
             // для центрирования
             Circle()
                 .foregroundStyle(.clear)

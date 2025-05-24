@@ -6,7 +6,7 @@ public enum DateParser {
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         return formatter
     }()
-    
+
     public static func parseISODate(_ string: String) -> Date? {
         iso8601WithFractional.date(from: string)
     }

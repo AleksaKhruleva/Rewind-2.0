@@ -28,9 +28,10 @@ public protocol NetworkServiceProtocol {
     func checkPassword(tokens: Tokens, password: String) async throws -> SuccessResponse
     func emailStartChange(tokens: Tokens, email: String) async throws -> SuccessResponse
     func emailVerifyChange(tokens: Tokens, verificationCode: String) async throws -> SuccessResponse
-    
-    func createGroup(name: String) async throws -> GroupResponse
-    func fetchGroups() async throws -> [GroupResponse]
+
+    func createGroup(tokens: Tokens, name: String) async throws -> GroupResponse
+    func fetchGroups(tokens: Tokens) async throws -> [GroupResponse]
+    func fetchFullGroupDetails(tokens: Tokens, id: Int) async throws -> GroupDetails
 }
 
 public final class NetworkService: NetworkServiceProtocol {
@@ -231,7 +232,8 @@ public final class NetworkService: NetworkServiceProtocol {
 
             return try await perform(newToken)
         }
-    
+    }
+
     public func createGroup(name: String) async throws -> GroupResponse {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
             try await provider.request(
@@ -240,7 +242,7 @@ public final class NetworkService: NetworkServiceProtocol {
             )
         }
     }
-    
+
     public func fetchGroups() async throws -> [GroupResponse] {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
             let response = try await provider.request(
@@ -249,5 +251,26 @@ public final class NetworkService: NetworkServiceProtocol {
             )
             return response.groups
         }
+    }
+
+    private func fetchGroup(id: Int) async throws -> GroupResponse {
+        try await provider.request(
+            .fetchGroup(id: id),
+            type: GroupResponse.self
+        )
+    }
+
+    private func fetchGroupMembers(id: Int) async throws -> [GroupMemberResponse] {
+        let response = try await provider.request(
+            .fetchGroupMembers(id: id),
+            type: GroupMembersListResponse.self
+        )
+        return response.members
+    }
+
+    public func fetchFullGroupDetails(id: Int) async throws -> GroupDetails {
+        async let group = fetchGroup(id: id)
+        async let members = fetchGroupMembers(id: id)
+        return GroupDetails(group: try await group, members: try await members)
     }
 }

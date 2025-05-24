@@ -1,5 +1,6 @@
 import SwiftUI
 import UIComponents
+import Domain
 
 let imageSize: CGFloat = 90
 
@@ -7,24 +8,21 @@ struct GroupSelectionView: View {
     @State private var viewModel: GroupSelectionViewModel
     @State private var searchText = ""
     @Environment(\.dismiss) private var dismiss
-    
-    private var filteredGroups: [RewindGroup] {
+
+    private var filteredGroups: [Domain.Group] {
         if searchText.isEmpty {
-            return groupsForTest
+            return viewModel.groups
         } else {
-            return groupsForTest.filter { group in
+            return viewModel.groups.filter { group in
                 group.name.lowercased().contains(searchText.lowercased())
             }
         }
     }
-    
-    private let router: RewindRouter
-    
-    init(router: RewindRouter) {
-        self.router = router
-        viewModel = GroupSelectionViewModel(router: router)
+
+    init(groups: [Domain.Group], router: RewindRouter) {
+        viewModel = GroupSelectionViewModel(groups: groups, router: router)
     }
-    
+
     var body: some View {
         ZStack {
             Color.backgroundSecondary.ignoresSafeArea()
@@ -68,7 +66,7 @@ struct GroupSelectionView: View {
 
     private var groupsScroll: some View {
         VStack(alignment: .leading, spacing: 5) {
-            Text(UIComponentsStrings.Group.Select.count(images.count))
+            Text(UIComponentsStrings.Group.Select.count(viewModel.groups.count))
                 .modifier(RoundFontModifier(size: 17, foregroundColor: .textSecondary))
                 .padding(.leading, 16)
 
@@ -76,10 +74,14 @@ struct GroupSelectionView: View {
                 RoundedRectangle(cornerRadius: 35, style: .continuous)
                     .fill(Color.background)
 
-                GroupsScrollView(groups: filteredGroups, imageSize: imageSize)
-                    .frame(height: imageSize + 20)
-                    .clipShape(RoundedRectangle(cornerRadius: 40, style: .continuous))
-                    .padding(.horizontal, 15)
+                GroupsScrollView(
+                    groups: filteredGroups,
+                    imageSize: imageSize,
+                    selectedGroupID: viewModel.currentGroupID
+                )
+                .frame(height: imageSize + 20)
+                .clipShape(RoundedRectangle(cornerRadius: 40, style: .continuous))
+                .padding(.horizontal, 15)
             }
             .frame(height: imageSize + 40)
         }
@@ -107,7 +109,7 @@ struct GroupSelectionView: View {
                 )
                 suggestionRow(
                     icon: "person.2.fill",
-                    title: UIComponentsStrings.Group.Select.count(images.count),
+                    title: UIComponentsStrings.Group.Select.count(viewModel.groups.count),
                     action: {
                         // aboba
                     }

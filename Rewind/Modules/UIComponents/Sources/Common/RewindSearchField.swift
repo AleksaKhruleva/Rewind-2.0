@@ -4,7 +4,7 @@ public struct RewindSearchField: View {
     @Binding var text: String
     private let placeholder: String
     private let backgroundColor: Color
-    
+
     public init(
         text: Binding<String>,
         placeholder: String,
@@ -14,13 +14,13 @@ public struct RewindSearchField: View {
         self.placeholder = placeholder
         self.backgroundColor = backgroundColor
     }
-    
+
     public var body: some View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
                 .modifier(RoundFontModifier(size: 20))
                 .frame(width: 34, height: 34)
-            
+
             TextField(placeholder, text: $text)
                 .textInputAutocapitalization(.never)
                 .disableAutocorrection(true)
@@ -28,7 +28,7 @@ public struct RewindSearchField: View {
                 .padding(.trailing, text.isEmpty ? 0 : 8)
                 .tint(.pinkPrimary)
                 .submitLabel(.search)
-            
+
             if !text.isEmpty {
                 Button {
                     text = ""

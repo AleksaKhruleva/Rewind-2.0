@@ -10,11 +10,9 @@ public struct MembersListView: View {
     // ochevidno vremenno
     private var filteredMembers: [Member] {
         if searchText.isEmpty {
-            return membersForTest
+            return []
         } else {
-            return membersForTest.filter { member in
-                member.name.lowercased().contains(searchText.lowercased())
-            }
+            return []
         }
     }
 

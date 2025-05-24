@@ -49,7 +49,7 @@ extension View {
             }
         }
     }
-
+    
     @ViewBuilder
     func `if`<Content: View>(_ condition: Bool, apply: (Self) -> Content) -> some View {
         if condition {
@@ -66,5 +66,8 @@ extension View {
         } else {
             self
         }
+        
+    public func onTopAppear(perform: @escaping () -> Void) -> some View {
+        modifier(OnTopAppearModifier(perform: perform))
     }
 }

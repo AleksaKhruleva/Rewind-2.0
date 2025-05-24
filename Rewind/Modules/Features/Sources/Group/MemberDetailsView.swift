@@ -42,7 +42,7 @@ public struct MemberDetailsView: View {
 
     private var header: some View {
         RewindHeader(centerView: {
-            HeaderBadgeView(image: member.avatar, text: member.name)
+            HeaderBadgeView(image: member.image, text: member.name)
         }, rightView: {
             RewindButton(type: .rightChevron) {
                 router?.pop()
@@ -51,7 +51,7 @@ public struct MemberDetailsView: View {
     }
 
     private var avatar: some View {
-        AvatarView(image: member.avatar, text: member.name)
+        AvatarView(image: member.image, text: member.name)
     }
 
     private var groupsTable: some View {

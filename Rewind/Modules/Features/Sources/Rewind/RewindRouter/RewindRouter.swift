@@ -24,7 +24,7 @@ public final class RewindRouter {
     func navigateToMap() {
         appRouter?.navigate(to: .map)
     }
-    
+
     func navigateToGroup(_ group: Domain.Group) {
         appRouter?.navigate(to: .group(group), with: .pushFromLeft)
     }

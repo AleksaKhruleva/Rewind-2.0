@@ -1,17 +1,6 @@
 import SwiftUI
 import UIKit
-
-// временно тут
-public struct RewindGroup: Identifiable, Hashable {
-    public let id: UUID = UUID()
-    public let image: UIImage
-    public let name: String
-
-    public init(image: UIImage, name: String) {
-        self.image = image
-        self.name = name
-    }
-}
+import Domain
 
 // MARK: - Constants
 
@@ -25,12 +14,18 @@ private enum Constants {
 // MARK: - GroupsScrollView
 
 public struct GroupsScrollView: UIViewRepresentable {
-    private let groups: [RewindGroup]
+    private let groups: [Domain.Group]
     private let imageSize: CGFloat
+    private let selectedGroupID: Int?
 
-    public init(groups: [RewindGroup], imageSize: CGFloat) {
+    public init(
+        groups: [Domain.Group],
+        imageSize: CGFloat,
+        selectedGroupID: Int?
+    ) {
         self.groups = groups
         self.imageSize = imageSize
+        self.selectedGroupID = selectedGroupID
     }
 
     public func makeUIView(context: Context) -> UICollectionView {
@@ -54,7 +49,7 @@ public struct GroupsScrollView: UIViewRepresentable {
     }
 
     public func updateUIView(_ uiView: UICollectionView, context: Context) {
-        context.coordinator.update(groups: groups)
+        context.coordinator.update(groups: groups, selectedGroupID: selectedGroupID)
     }
 
     public func makeCoordinator() -> Coordinator {
@@ -65,8 +60,9 @@ public struct GroupsScrollView: UIViewRepresentable {
 // MARK: - Coordinator
 
 public final class Coordinator {
-    private var dataSource: UICollectionViewDiffableDataSource<Int, RewindGroup>?
+    private var dataSource: UICollectionViewDiffableDataSource<Int, Domain.Group>?
     private let imageSize: CGFloat
+    private var selectedGroupID: Int?
 
     init(imageSize: CGFloat) {
         self.imageSize = imageSize
@@ -74,20 +70,16 @@ public final class Coordinator {
 
     // swiftlint:disable force_cast
     func configureDataSource(for collectionView: UICollectionView) {
-        dataSource = UICollectionViewDiffableDataSource<Int, RewindGroup>(
-            collectionView: collectionView
-        ) { collectionView, indexPath, group in
-            let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: Cell.reuseIdentifier, for: indexPath
-            ) as! Cell
-            cell.configure(with: group, imageSize: self.imageSize)
+        dataSource = UICollectionViewDiffableDataSource<Int, Domain.Group>(collectionView: collectionView) { collectionView, indexPath, group in
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Cell.reuseIdentifier, for: indexPath) as! Cell
+            cell.configure(with: group, imageSize: self.imageSize, isSelected: group.id == self.selectedGroupID)
             return cell
         }
     }
-    // swiftlint:enable force_cast
 
-    func update(groups: [RewindGroup]) {
-        var snapshot = NSDiffableDataSourceSnapshot<Int, RewindGroup>()
+    func update(groups: [Domain.Group], selectedGroupID: Int?) {
+        self.selectedGroupID = selectedGroupID
+        var snapshot = NSDiffableDataSourceSnapshot<Int, Domain.Group>()
         snapshot.appendSections([0])
         snapshot.appendItems(groups, toSection: 0)
         dataSource?.apply(snapshot, animatingDifferences: true)
@@ -113,11 +105,19 @@ public final class Cell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(with group: RewindGroup, imageSize: CGFloat) {
+    func configure(with group: Domain.Group, imageSize: CGFloat, isSelected: Bool) {
         imageView.image = group.image
         titleLabel.text = group.name
-
         widthConstraint?.constant = imageSize
+
+        if isSelected {
+            imageView.layer.borderColor = UIComponentsAsset.pinkPrimary.color.cgColor
+            imageView.layer.borderWidth = 3
+            titleLabel.textColor = UIComponentsAsset.pinkPrimary.color
+        } else {
+            imageView.layer.borderWidth = 0
+            titleLabel.textColor = UIComponentsAsset.textPrimary.color
+        }
     }
 
     private func setupViews() {
