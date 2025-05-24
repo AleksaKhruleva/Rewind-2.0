@@ -6,18 +6,21 @@ public enum MediaType {
     case video
 }
 
-public struct MediaItem {
+public struct MediaItem: Identifiable {
+    public let id: UUID
     public let type: MediaType
-    public let image: UIImage?
+    public let image: UIImage
     public let track: Track?
     public let videoURL: URL?
     
     public init(
+        id: UUID = UUID(),
         type: MediaType,
-        image: UIImage? = nil,
+        image: UIImage,
         track: Track? = nil,
         videoURL: URL? = nil
     ) {
+        self.id = id
         self.type = type
         self.image = image
         self.track = track

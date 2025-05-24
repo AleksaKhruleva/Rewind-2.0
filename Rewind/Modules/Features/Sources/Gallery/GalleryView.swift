@@ -5,17 +5,17 @@ import Domain
 
 public struct GalleryView: View {
     @State private var viewModel: GalleryViewModel
-
+    
     private let router: GalleryRouter
-
+    
     @Environment(\.showToast)
     private var showToast
-
+    
     public init(router: GalleryRouter) {
         viewModel = .init()
         self.router = router
     }
-
+    
     public var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -30,7 +30,7 @@ public struct GalleryView: View {
                     onAddingQuote: router.navigateToQuoteCreation,
                     onAddingMedias: { Task { await viewModel.dispatch(.showMediasDialog) } }
                 )
-
+                
                 let mediaSpacing: CGFloat = 3
                 ScrollView {
                     VStack {
@@ -38,18 +38,17 @@ public struct GalleryView: View {
                             repeating: GridItem(.flexible(), spacing: mediaSpacing),
                             count: 3
                         ), spacing: mediaSpacing) {
-                            let medias = GalleryConstants.galleryMedias
-                            ForEach(medias, id: \.self) { media in
+                            ForEach(viewModel.mediaItems) { mediaItem in
                                 Rectangle()
-                                    .toSquare(media, cornerRadius: 10)
+                                    .toSquare(mediaItem.image, cornerRadius: 10)
                                     .onTapGesture {
                                         Task {
-                                            await viewModel.dispatch(.viewBlurredMedia(media))
+                                            await viewModel.dispatch(.viewBlurredMedia(mediaItem))
                                         }
                                     }
                             }
                         }
-
+                        
                         RewindNoteTextView(text: UIComponentsStrings.Note.end)
                             .padding(.vertical, 4)
                     }
@@ -60,7 +59,7 @@ public struct GalleryView: View {
                         footer
                     }
                 }
-
+                
                 Spacer(minLength: 0)
             }
             .background(Color.background)
@@ -72,8 +71,8 @@ public struct GalleryView: View {
             .overlay {
                 if let selectedMedia = viewModel.viewingBlurredMedia {
                     BlurredMediaView(
-                        image: selectedMedia,
                         isPresented: $viewModel.blurredMediaShown,
+                        mediaItem: selectedMedia,
                         showMediaDetails: router.navigateToMediaDetails
                     )
                 }
@@ -107,7 +106,7 @@ public struct GalleryView: View {
             }
         }
     }
-
+    
     @ViewBuilder
     private func uploadingMediaDestination(
         for media: LoadedMedia,
@@ -120,7 +119,7 @@ public struct GalleryView: View {
             VideoUploadingView(media: media, onSave: onSave)
         }
     }
-
+    
     private var footer: some View {
         ZStack {
             HStack {
@@ -129,13 +128,13 @@ public struct GalleryView: View {
                     onAddingQuote: router.navigateToQuoteCreation,
                     onAddingMedias: { Task { await viewModel.dispatch(.showMediasDialog) } }
                 )
-
+                
                 Spacer()
-
+                
                 RewindMediaButton(size: 60, fontSize: 28, type: .rewind) { router.dismiss() }
-
+                
                 Spacer()
-
+                
                 RewindMediaButton(size: 50, fontSize: 28, type: .settings) {
                     Task { await viewModel.dispatch(.openFilters) }
                 }

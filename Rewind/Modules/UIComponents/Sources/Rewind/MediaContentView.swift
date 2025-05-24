@@ -29,32 +29,28 @@ public struct MediaContentView: View {
         ZStack {
             switch mediaItem.type {
             case .image:
-                if let image = mediaItem.image {
-                    Rectangle()
-                        .toSquare(image, cornerRadius: cornerRadius)
-                }
+                Rectangle()
+                    .toSquare(mediaItem.image, cornerRadius: cornerRadius)
             case .imageWithMusic:
-                if let image = mediaItem.image {
-                    Rectangle()
-                        .toSquare(image, cornerRadius: cornerRadius)
-                        .overlay(alignment: .topTrailing) {
-                            if mediaItem.type == .imageWithMusic {
-                                Button {
-                                    onToggleSound()
-                                } label: {
-                                    ZStack {
-                                        Image(systemName: "speaker.wave.2.fill").opacity(isTrackPlaying ? 1 : 0)
-                                        Image(systemName: "speaker.slash.fill").opacity(isTrackPlaying ? 0 : 1)
-                                    }
-                                    .modifier(RoundFontModifier(size: 14, weight: .regular, foregroundColor: .white))
-                                    .padding(7.5)
-                                    .background(Color.black.opacity(0.5))
-                                    .clipShape(Circle())
+                Rectangle()
+                    .toSquare(mediaItem.image, cornerRadius: cornerRadius)
+                    .overlay(alignment: .topTrailing) {
+                        if mediaItem.type == .imageWithMusic {
+                            Button {
+                                onToggleSound()
+                            } label: {
+                                ZStack {
+                                    Image(systemName: "speaker.wave.2.fill").opacity(isTrackPlaying ? 1 : 0)
+                                    Image(systemName: "speaker.slash.fill").opacity(isTrackPlaying ? 0 : 1)
                                 }
-                                .padding(12)
+                                .modifier(RoundFontModifier(size: 14, weight: .regular, foregroundColor: .white))
+                                .padding(7.5)
+                                .background(Color.black.opacity(0.5))
+                                .clipShape(Circle())
                             }
+                            .padding(12)
                         }
-                }
+                    }
             case .video:
                 Text("Not Implemented Yet")
             }

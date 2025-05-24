@@ -1,23 +1,25 @@
 import SwiftUI
+import Domain
 
 public struct BlurredMediaView: View {
-    @State private var image: UIImage
     @Binding var isPresented: Bool
-    var showMediaDetails: (UIImage) -> Void
-
+    @State private var mediaItem: MediaItem
+    @State private var isTrackPlaying: Bool = false
+    private var showMediaDetails: (UIImage) -> Void
+    
     @Environment(\.showToast)
     private var showToast
-
+    
     public init(
-        image: UIImage,
         isPresented: Binding<Bool>,
+        mediaItem: MediaItem,
         showMediaDetails: @escaping (UIImage) -> Void
     ) {
-        self.image = image
         self._isPresented = isPresented
+        self.mediaItem = mediaItem
         self.showMediaDetails = showMediaDetails
     }
-
+    
     public var body: some View {
         Rectangle()
             .fill(.ultraThinMaterial)
@@ -31,63 +33,66 @@ public struct BlurredMediaView: View {
                 content
             }
     }
-
+    
     private var content: some View {
         VStack {
             author
-
+            
             mediaView
                 .overlay {
                     RewindMediaButtonsOverlay {
                         // TODO: smth
                     } saveAction: {
-                        saveImage(image: image)
+                        // TODO: сделать сохранение фото или видео
                     }
                 }
-
+            
             actionsTable
-
+            
             riskyCell
         }
         .padding(.horizontal, 8)
     }
-
+    
     private var author: some View {
-        AuthorBadgeView(
-            image: UIComponentsAsset.avatar.image,
-            name: "flowykk",
-            date: "23.11.2024"
-        )
-        .frame(width: 220)
-        .padding(.vertical, 4)
+        HStack {
+            AuthorBadgeView(
+                image: UIComponentsAsset.avatar.image,
+                name: "flowykk",
+                date: "23.11.2024",
+                track: mediaItem.track
+            )
+            .padding(.leading, 6)
+            Spacer()
+        }
+        .padding(.vertical, 6)
         .background(Color.background)
-        .cornerRadius(14)
+        .cornerRadius(18)
     }
-
+    
     private var mediaView: some View {
-        Rectangle().toSquare(image, cornerRadius: 40)
+        MediaContentView(
+            mediaItem: mediaItem,
+            onSave: {},
+            onLike: {},
+            onToggleSound: {},
+            isTrackPlaying: $isTrackPlaying
+        )
     }
-
+    
     private var actionsTable: some View {
         VStack(alignment: .leading, spacing: -8) {
             BlurredTableCell(
                 icon: "gearshape.fill",
                 title: UIComponentsStrings.Media.Blurred.title,
                 needChevron: true,
-                action: { showMediaDetails(image) }
-            )
-
-            BlurredTableCell(
-                icon: "square.and.arrow.down.fill",
-                title: UIComponentsStrings.Media.Blurred.save,
-                needChevron: true,
-                action: { saveImage(image: image) }
+                action: { /*showMediaDetails(image)*/ }
             )
         }
         .background(Color.background)
         .modifier(BlurredMediaTableModifier())
     }
-
+    
     private var riskyCell: some View {
         BlurredTableCell(
             icon: "trash.fill",
@@ -101,7 +106,7 @@ public struct BlurredMediaView: View {
         .background(Color.riskyBackground)
         .modifier(BlurredMediaTableModifier())
     }
-
+    
     private func saveImage(image: UIImage) {
         saveImageWithToast(image: image) { message in
             showToast(message)
