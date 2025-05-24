@@ -35,14 +35,6 @@ public struct GroupSettingsView: View {
             }
         }
         .background(Color.background)
-//        .overlay {
-//            if isBlurredAvatarPresented {
-//                BlurredAvatarView(
-//                    isPresented: $isBlurredAvatarPresented,
-//                    image: .constant(UIComponentsAsset.groupAvatar.image)
-//                )
-//            }
-//        }
     }
     
     private var header: some View {
