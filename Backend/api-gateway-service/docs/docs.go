@@ -1192,14 +1192,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/email": {
-            "patch": {
+        "/api/users/email-change": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Updates the email for a specific user.",
+                "description": "Sends a verification code to the new email for the specific user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1209,7 +1209,7 @@ const docTemplate = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "Update user email.",
+                "summary": "Send code to the new email.",
                 "parameters": [
                     {
                         "description": "New email and password",
@@ -1255,14 +1255,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/email/verify": {
-            "post": {
+        "/api/users/email/verify-change": {
+            "patch": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Verifies the code sent to the new email address.",
+                "description": "Verifies the code sent to the new email address and changes user email.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1272,7 +1272,7 @@ const docTemplate = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "Verify new email code.",
+                "summary": "Verify new email code and change user email.",
                 "parameters": [
                     {
                         "description": "New email and verification code",
@@ -1436,7 +1436,7 @@ const docTemplate = `{
             }
         },
         "/api/users/password/reset/set": {
-            "post": {
+            "patch": {
                 "security": [
                     {
                         "ApiKeyAuth": []
