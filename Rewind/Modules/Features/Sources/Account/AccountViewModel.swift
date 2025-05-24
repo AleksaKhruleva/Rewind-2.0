@@ -19,8 +19,30 @@ final class AccountViewModel {
     
     private let backend: NetworkServiceProtocol
     
+    var fetchedUser: User?
     var user: User {
-        didSet { UserStorage.currentUser = user }
+        get {
+            guard let fetchedUser else {
+                router.navigateToWelcome()
+                return User(name: "", email: "")
+            }
+            return fetchedUser
+        }
+        set {
+            fetchedUser = newValue
+        }
+    }
+    
+    var imageBinding: Binding<UIImage?> {
+        Binding {
+            self.user.image
+        } set: { newImage in
+            guard let newImage else {
+                self.showToast(UIComponentsStrings.Account.Edit.Image.Set.failure)
+                return
+            }
+            self.user.image = newImage
+        }
     }
     
     init(router: AccountRouter) {
@@ -33,10 +55,6 @@ final class AccountViewModel {
             return
         }
         self.user = user
-    }
-    
-    func set(showToast: @escaping (String) -> Void) {
-        self.showToast = showToast
     }
     
     func dispatch(_ intent: Intent) async {
@@ -55,7 +73,7 @@ final class AccountViewModel {
                         showErrorToast()
                     }
                 } catch {
-                    showErrorToast()
+                    showErrorToast(for: error)
                 }
             }
         case .deleteAccount:
@@ -70,17 +88,19 @@ final class AccountViewModel {
                     showErrorToast()
                 }
             } catch {
-                showErrorToast()
+                showErrorToast(for: error)
             }
         case .fetchUser:
-            // temporary
-            guard let user = UserStorage.currentUser else {
-                user = .init(name: "some flowykk", email: "some@email.ru")
-                return
-            }
-            self.user = user
-            if user.name.isEmpty {
-                self.user.name = "fake name"
+            do {
+                guard let access = KeychainService.shared.read(for: .accessToken),
+                      let refresh = KeychainService.shared.read(for: .refreshToken) else {
+                    router.navigateToWelcome()
+                    return
+                }
+                let response = try await backend.user(accessToken: access, refreshToken: refresh)
+                user = response.toUser()
+            } catch {
+                showErrorToast(for: error)
             }
         case .deleteImage:
             guard user.imageData == nil else {
@@ -100,6 +120,10 @@ final class AccountViewModel {
         }
     }
     
+    func set(showToast: @escaping (String) -> Void) {
+        self.showToast = showToast
+    }
+    
     private func clearLocalData() {
         KeychainService.shared.clearAll()
         UserStorage.clear()
@@ -107,5 +131,9 @@ final class AccountViewModel {
     
     private func showErrorToast() {
         showToast(UIComponentsStrings.Toast.error)
+    }
+    
+    private func showErrorToast(for error: Error) {
+        showToast("\(error.localizedDescription) 😨")
     }
 }

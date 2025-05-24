@@ -2,6 +2,8 @@ import SwiftUI
 import UIComponents
 import Base
 
+import Domain
+
 public struct AccountView: View {
     @State private var appIconsViewModel: AppIconsViewModel
     @State private var viewModel: AccountViewModel
@@ -109,8 +111,8 @@ public struct AccountView: View {
         .overlay {
             if blurredAvatarShown {
                 BlurredAvatarView(
-                    image: viewModel.user.image,
-                    isPresented: $blurredAvatarShown
+                    isPresented: $blurredAvatarShown,
+                    image: viewModel.imageBinding
                 )
             }
         }

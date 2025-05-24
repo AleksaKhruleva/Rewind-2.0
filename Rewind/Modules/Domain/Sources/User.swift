@@ -21,3 +21,14 @@ public struct User: Codable {
         self.imageData = image?.pngData()
     }
 }
+
+public struct UserResponse: Codable {
+    public let email: String
+    public let id: Int
+    public let image: String
+    public let username: String
+    
+    public func toUser() -> User {
+        return User(name: username, email: email, image: nil)
+    }
+}
