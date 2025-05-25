@@ -51,7 +51,12 @@ final class QuoteCreationViewModel {
             isSelectedTrackPlaying = true
         case let .saveQuote(content):
             let renderer = ImageRenderer(content: content)
-
+            renderer.scale = UIScreen.main.scale
+            renderer.proposedSize = .init(CGSize(
+                width: UIScreen.main.bounds.width,
+                height: UIScreen.main.bounds.width
+            ))
+            
             saveImageWithToast(image: renderer.uiImage) { message in
                 print(message)
             }
