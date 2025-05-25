@@ -1,9 +1,11 @@
 import SwiftUI
+import AccessibilitySupport
 
 public struct GenericInputSheetView: View {
     private var item: GenericInputSheetItem
     private var title: String
     private var placeholder: String?
+    private var accessibilityElement: RewindElement?
     private var action: (String) -> Void
 
     @Binding var error: String?
@@ -25,12 +27,14 @@ public struct GenericInputSheetView: View {
         title: String,
         placeholder: String? = nil,
         error: Binding<String?>,
+        accessibilityElement: RewindElement? = nil,
         action: @escaping (String) -> Void
     ) {
         self.item = item
         self.title = title
         self.placeholder = placeholder
         self._error = error
+        self.accessibilityElement = accessibilityElement
         self.action = action
     }
 
@@ -55,6 +59,9 @@ public struct GenericInputSheetView: View {
                     .onSubmit {
                         action(text)
                     }
+                    .ifLet(accessibilityElement) { view, value in
+                        view.rewindAccessibilityIdentifier(value)
+                    }
                 case .code:
                     CodeInputTextField(
                         code: Binding<[String]>(
@@ -68,7 +75,8 @@ public struct GenericInputSheetView: View {
                             }
                         ),
                         error: nil,
-                        backgroundColor: UIComponentsAsset.background.color
+                        backgroundColor: UIComponentsAsset.background.color,
+                        accessibilityElement: accessibilityElement
                     ) {
                         action(text)
                     }

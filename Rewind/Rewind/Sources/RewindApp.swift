@@ -15,15 +15,12 @@ struct RewindApp: App {
 
     var body: some Scene {
         WindowGroup {
-            let hasAccessToken = KeychainService.shared.read(for: .accessToken) != nil
-            let hasRefreshToken = KeychainService.shared.read(for: .refreshToken) != nil
-            let isAuthorized = hasAccessToken && hasRefreshToken
-
+            let hasTokens = Tokens() != nil
             let testingAuth = CommandLine.arguments.contains("-testingAuth")
 
             RootView(router: appRouter)
                 .onAppear {
-                    let initial: AppRouter.Route = (isAuthorized && !testingAuth) ? .rewind : .welcome
+                    let initial: AppRouter.Route = (hasTokens && !testingAuth) ? .rewind : .welcome
                     appRouter.setInitial(initial)
                 }
                 .setupToast(toastController: toastController)

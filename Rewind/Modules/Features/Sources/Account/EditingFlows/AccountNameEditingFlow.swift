@@ -2,6 +2,7 @@ import SwiftUI
 import UIComponents
 import Base
 import Networking
+import AccessibilitySupport
 
 @MainActor @Observable
 final class AccountNameEditingFlowViewModel {
@@ -89,7 +90,8 @@ struct AccountNameEditingFlow: View {
             item: .name,
             title: UIComponentsStrings.GenericInput.NewName.title,
             placeholder: UIComponentsStrings.GenericInput.NewName.placeholder,
-            error: $viewModel.error
+            error: $viewModel.error,
+            accessibilityElement: .account(.editFlow(.name(.name)))
         ) { name in
             Task {
                 await viewModel.dispatch(.submitName(name))

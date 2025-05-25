@@ -2,6 +2,7 @@ import SwiftUI
 import UIComponents
 import Networking
 import Base
+import AccessibilitySupport
 
 @MainActor @Observable
 final class AccountPasswordEditingFlowViewModel {
@@ -127,7 +128,8 @@ struct AccountPasswordEditingFlow: View {
                 GenericInputSheetView(
                     item: .code,
                     title: UIComponentsStrings.GenericInput.VerificationCode.title,
-                    error: $viewModel.error
+                    error: $viewModel.error,
+                    accessibilityElement: .account(.editFlow(.password(.code())))
                 ) { code in
                     Task {
                         await viewModel.dispatch(.submitCode(code))
@@ -138,7 +140,8 @@ struct AccountPasswordEditingFlow: View {
                     item: .password,
                     title: UIComponentsStrings.GenericInput.NewPassword.title,
                     placeholder: UIComponentsStrings.GenericInput.NewPassword.placeholder,
-                    error: $viewModel.error
+                    error: $viewModel.error,
+                    accessibilityElement: .account(.editFlow(.password(.password)))
                 ) { password in
                     Task {
                         await viewModel.dispatch(.submitPassword(password))

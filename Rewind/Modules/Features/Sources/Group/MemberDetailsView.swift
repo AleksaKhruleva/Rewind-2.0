@@ -2,12 +2,12 @@ import SwiftUI
 import UIComponents
 import Domain
 
-let nilAction: (() -> Void)? = nil // temporary
-let groupsData = [("person.2.fill", UIComponentsStrings.Account.Groups.count(8), nilAction)]
+// let nilAction: (() -> Void)? = nil // temporary
+let groupsData = [("person.2.fill", UIComponentsStrings.Account.Groups.count(8), nilAccessibility, nilAction)]
 let activitiesData = [
-    ("photo.fill.on.rectangle.fill", UIComponentsStrings.Account.Activity.rewinds(245), nilAction),
-    ("person.fill", UIComponentsStrings.Account.Activity.people(15), nil),
-    ("forward.fill", UIComponentsStrings.Account.Activity.rolls(92), nil)
+    ("photo.fill.on.rectangle.fill", UIComponentsStrings.Account.Activity.rewinds(245), nilAccessibility, nilAction),
+    ("person.fill", UIComponentsStrings.Account.Activity.people(15), nilAccessibility, nil),
+    ("forward.fill", UIComponentsStrings.Account.Activity.rolls(92), nilAccessibility, nil)
 ]
 
 public struct MemberDetailsView: View {

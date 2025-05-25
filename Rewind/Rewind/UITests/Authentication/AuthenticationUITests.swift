@@ -3,7 +3,7 @@ import Vapor
 
 final class AuthenticationUITests: XCTestCase {
     func testRegistration() throws {
-        let responseFactory = AuthenticationResponseFactory.make(host: "localhost")
+        let responseFactory = AuthenticationResponseFactory.make()
         let backend = try MockBackend(
             configuration: { routes in
                 try routes.register(
@@ -22,7 +22,7 @@ final class AuthenticationUITests: XCTestCase {
     }
 
     func testLogin() throws {
-        let responseFactory = AuthenticationResponseFactory.make(host: "localhost")
+        let responseFactory = AuthenticationResponseFactory.make()
         let backend = try MockBackend(
             configuration: { routes in
                 try routes.register(

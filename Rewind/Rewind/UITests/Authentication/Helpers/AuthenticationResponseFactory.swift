@@ -3,8 +3,8 @@ import Vapor
 struct AuthenticationResponseFactory {
     let host: String
 
-    static func make(host: String) -> AuthenticationResponseFactory {
-        AuthenticationResponseFactory(host: host)
+    static func make() -> AuthenticationResponseFactory {
+        AuthenticationResponseFactory(host: "localhost")
     }
 
     func makeRegisterResponse() -> Response {

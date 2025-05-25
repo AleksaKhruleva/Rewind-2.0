@@ -1,13 +1,19 @@
 import SwiftUI
+import AccessibilitySupport
 
 public struct InformationTable: View {
     private let title: String
-    private let data: [(icon: String, title: String, action: (() -> Void)?)]
+    private let data: [(
+        icon: String,
+        title: String,
+        accessibilityElement: RewindElement?,
+        action: (() -> Void)?
+    )]
     private let isRisky: Bool
 
     public init(
         title: String,
-        data: [(String, String, (() -> Void)?)],
+        data: [(String, String, RewindElement?, (() -> Void)?)],
         isRisky: Bool
     ) {
         self.title = title
@@ -33,6 +39,7 @@ public struct InformationTable: View {
                         text: item.title,
                         needChevron: item.action != nil,
                         isRisky: isRisky,
+                        accessibilityElement: item.accessibilityElement,
                         action: {
                             item.action?()
                         }
@@ -50,19 +57,19 @@ public struct InformationTable: View {
         InformationTable(
             title: "Risky Zone",
             data: [
-                ("star.fill", "Chevron there", {}),
-                ("star.fill", "Chevron there", {})
+                ("star.fill", "Chevron there", nil, {}),
+                ("star.fill", "Chevron there", nil, {})
             ],
             isRisky: true
         )
 
-        InformationTable(title: "Table", data: [("person.fill", "Smth", nil)], isRisky: false)
+        InformationTable(title: "Table", data: [("person.fill", "Smth", nil, nil)], isRisky: false)
 
         InformationTable(
             title: "Table",
             data: [
-                ("star.fill", "Chevron there", {}),
-                ("star.fill", "Chevron there", {})
+                ("star.fill", "Chevron there", nil, {}),
+                ("star.fill", "Chevron there", nil, {})
             ],
             isRisky: false
         )
