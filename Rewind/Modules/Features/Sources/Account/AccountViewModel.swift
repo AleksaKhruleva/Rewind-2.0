@@ -43,10 +43,9 @@ final class AccountViewModel {
     func dispatch(_ intent: Intent) async {
         switch intent {
         case .signOut:
-            if let refreshToken = KeychainService.shared.read(for: .refreshToken),
-               KeychainService.shared.read(for: .accessToken) != nil {
+            if let tokens = Tokens() {
                 do {
-                    let response = try await backend.logout(refreshToken: refreshToken)
+                    let response = try await backend.logout(tokens: tokens)
                     if response.success {
                         KeychainService.shared.clearAll()
                         router.navigateToWelcome()
@@ -73,12 +72,11 @@ final class AccountViewModel {
             }
         case .fetchUser:
             do {
-                guard let access = KeychainService.shared.read(for: .accessToken),
-                      let refresh = KeychainService.shared.read(for: .refreshToken) else {
+                guard let tokens = Tokens() else {
                     router.navigateToWelcome()
                     return
                 }
-                let response = try await backend.user(accessToken: access, refreshToken: refresh)
+                let response = try await backend.user(tokens: tokens)
                 user = response.toUser()
             } catch {
                 showErrorToast(for: error)
@@ -93,11 +91,17 @@ final class AccountViewModel {
             }
             showToast(UIComponentsStrings.Account.Edit.Image.Delete.success)
         case let .setImage(newImage):
-            guard let newImage else {
-                showToast(UIComponentsStrings.Account.Edit.Image.Set.failure)
-                return
+            do {
+                if let tokens = Tokens(), let newImage {
+                    let response = try await backend.updateUserAvatar(tokens: tokens, avatar: newImage)
+                    if response.success {
+                        showToast(UIComponentsStrings.Account.Edit.Image.Set.failure)
+                        user.image = newImage
+                    }
+                }
+            } catch {
+                showErrorToast(for: error)
             }
-            user.image = newImage
         }
     }
 

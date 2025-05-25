@@ -1,6 +1,18 @@
 import Foundation
 import Security
 
+public struct Tokens {
+    public let accessToken: String
+    public let refreshToken: String
+
+    public init?() {
+        guard let accessToken = KeychainService.shared.read(for: .accessToken),
+              let refreshToken = KeychainService.shared.read(for: .refreshToken) else { return nil }
+        self.accessToken = accessToken
+        self.refreshToken = refreshToken
+    }
+}
+
 public final class KeychainService {
     public static let shared = KeychainService()
 
