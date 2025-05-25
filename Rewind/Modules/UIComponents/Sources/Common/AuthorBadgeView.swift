@@ -1,5 +1,4 @@
 import SwiftUI
-import SwiftUI
 import Domain
 
 public struct AuthorBadgeView: View {
@@ -7,17 +6,17 @@ public struct AuthorBadgeView: View {
     private let name: String
     private let date: String
     private let track: Track?
-    
+
     @State private var showTrack = true
     private let timer = Timer.publish(every: 3.5, on: .main, in: .common).autoconnect()
-    
+
     public init(image: UIImage, name: String, date: String, track: Track? = nil) {
         self.image = image
         self.name = name
         self.date = date
         self.track = track
     }
-    
+
     public var body: some View {
         HStack(spacing: 8) {
             Image(uiImage: image)
@@ -25,7 +24,7 @@ public struct AuthorBadgeView: View {
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 30, height: 30)
                 .cornerRadius(20)
-            
+
             VStack(alignment: .leading, spacing: 0) {
                 Text(name)
                     .modifier(RoundFontModifier(
@@ -33,7 +32,7 @@ public struct AuthorBadgeView: View {
                         weight: .black,
                         foregroundColor: .textPrimary
                     ))
-                
+
                 Group {
                     if let track, showTrack {
                         HStack(spacing: 4) {

@@ -13,34 +13,34 @@ final class GalleryViewModel {
         case viewBlurredMedia(MediaItem)
         case openFilters
     }
-    
+
     var mediaPickerPresented: Bool = false
     var mediaSelection: PhotosPickerItem?
-    
+
     var mediaUploadingDialogShown: Bool = false
     var uploadingMedia: LoadedMedia?
-    
+
     var filterSettingsShown = false
     var blurredMediaShown = false
     var blurredMediaSelection: MediaItem?
-    
+
     var showToast: (String) -> Void
-    
+
     private(set) var mediaItems = [MediaItem]()
-    
+
     private let transformer: PhotosPickerItemTransformer
-    
+
     var viewingBlurredMedia: MediaItem? {
         guard let blurredMediaSelection, blurredMediaShown else {
             return nil
         }
         return blurredMediaSelection
     }
-    
+
     init() {
         transformer = .init()
         showToast = { _ in }
-        
+
         // временно
         let items = [
             MediaItem(
@@ -53,10 +53,10 @@ final class GalleryViewModel {
                 image: UIComponentsAsset.media16.image
             )
         ]
-        
+
         mediaItems = items
     }
-    
+
     func dispatch(_ intent: Intent) async {
         switch intent {
         case .viewGallery:
@@ -80,11 +80,11 @@ final class GalleryViewModel {
             filterSettingsShown = true
         }
     }
-    
+
     func set(showToast: @escaping (String) -> Void) {
         self.showToast = showToast
     }
-    
+
     // временно
     private static func fetchTrack() -> Track? {
         let json = """
@@ -114,12 +114,9 @@ final class GalleryViewModel {
           }
         }
         """
-        
+
         let data = Data(json.utf8)
-        var track = try? JSONDecoder().decode(Track.self, from: data)
-        track?.streamURL = URL(
-            string: "https://cf-media.sndcdn.com/wHq5ExUUltpj.128.mp3?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiKjovL2NmLW1lZGlhLnNuZGNkbi5jb20vd0hxNUV4VVVsdHBqLjEyOC5tcDMqIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzQ4MDg5MjMzfX19XX0_&Signature=Ot8fvGNEmq8ZpTgxBYq5xsFGxajYpv9dcy9O07JbGgR228szn6G1t0hJ2mUNF0qKnIhKOgcAR0R93Xu8xk7FXGIg4xQiXzKypgKYUDIBMN7bNyBFCVXNBYBDwEldoDSGCFzj9oxCp~JtQ0JNkFTWOpMRGP6PnVSw-qZpbbImYSI4BHFJQi7e1vgU9zhwhjtWTninbPW7mEfGCZnJQwZD7jEFqycxDR4mLvqFPUJiO9Lvrw4vIsLkSxbCMF~AohobcgQz6IEESAHL8gHSEllpjc4yF5bM0Y5hpvltJaJiJQAUPAsVypnjreyt6yg36VUOINx98OIRVuAQZ1QomPdiNQ__&Key-Pair-Id=APKAI6TU7MMXM5DG6EPQ"
-        )
+        let track = try? JSONDecoder().decode(Track.self, from: data)
         return track
     }
 }

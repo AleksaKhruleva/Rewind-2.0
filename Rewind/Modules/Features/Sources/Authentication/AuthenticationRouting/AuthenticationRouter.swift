@@ -22,11 +22,7 @@ public final class AuthenticationRouter {
 
     func navigateToName(email: String, password: String, registrationID: String) {
         appRouter?.navigate(to: .name(email: email, password: password, registrationID: registrationID))
-    }
-
-    func navigateToMediaDetails(_ image: UIImage) {
-        appRouter?.navigate(to: .mediaDetails(image))
-    }
+    } 
 
     func navigateToRewind() {
         appRouter?.navigate(to: .rewind)

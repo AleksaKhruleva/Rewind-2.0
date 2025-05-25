@@ -6,7 +6,7 @@ public enum MediaType {
     case video
 }
 
-public struct MediaItem: Identifiable {
+public struct MediaItem: Identifiable, Hashable {
     public let id: UUID
     public let type: MediaType
     public let image: UIImage

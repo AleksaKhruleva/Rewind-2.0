@@ -5,34 +5,32 @@ import Domain
 
 public struct RewindView: View {
     @State private var viewModel: RewindViewModel
-    
-    // TODO: To VM
     @State private var filterSettingsShown = false
     @State private var isSelectGroupPresented = false
-    
+
     private let router: RewindRouter
-    
+
     @Environment(\.showToast)
     private var showToast
-    
+
     public init(router: RewindRouter) {
         self.router = router
         viewModel = RewindViewModel()
     }
-    
+
     public var body: some View {
         ZStack {
             Color.background.ignoresSafeArea()
-            
+
             VStack(spacing: 10) {
                 MediaTopButtons {
-                    //                    router.navigateToMediaDetails(mediaImages[currentIndex])
+                    router.navigateToMediaDetails(viewModel.currentMediaItem)
                 } onSettingsTap: {
                     filterSettingsShown = true
                 }
-                
+
                 mediaView
-                
+
                 HStack {
                     author
                     Spacer()
@@ -41,12 +39,12 @@ public struct RewindView: View {
             }
             .modifier(VStackTopOffsetModifier(topOffsetRatio: 0.15))
             .padding(.horizontal, 8)
-            
+
             VStack {
                 header
                 Spacer()
             }
-            
+
             VStack {
                 Spacer()
                 GalleryPreview(
@@ -82,7 +80,7 @@ public struct RewindView: View {
             }
         }
     }
-    
+
     private var header: some View {
         RewindHeader {
             RoundImageView(image: UIComponentsAsset.media5.image, size: 44)
@@ -106,7 +104,7 @@ public struct RewindView: View {
                 }
         }
     }
-    
+
     private var mediaView: some View {
         MediaContentView(
             mediaItem: viewModel.currentMediaItem,
@@ -121,7 +119,7 @@ public struct RewindView: View {
             viewModel.dispatch(.showNextMediaItem)
         }
     }
-    
+
     private var author: some View {
         HStack {
             AuthorBadgeView(

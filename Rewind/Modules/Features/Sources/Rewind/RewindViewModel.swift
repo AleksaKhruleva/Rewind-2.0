@@ -14,12 +14,12 @@ final class RewindViewModel {
         case toggleTrackPlaying
         case showNextMediaItem
     }
-    
+
     var showToast: (String) -> Void
     var isTrackPlaying = false
     var rolls = 0
     private(set) var currentMediaItem: MediaItem
-    
+
     var fetchedUser: User?
     var user: User {
         get {
@@ -33,17 +33,17 @@ final class RewindViewModel {
             fetchedUser = newValue
         }
     }
-    
+
     private let backend: NetworkServiceProtocol
     private let audioManager: AudioPlayerManager
     private var mediaItems = [MediaItem]()
     private var currentIndex = 0
-    
+
     init() {
         showToast = { _ in }
         backend = NetworkService()
         audioManager = AudioPlayerManager.shared
-        
+
         // временно
         let items = [
             MediaItem(
@@ -56,11 +56,11 @@ final class RewindViewModel {
                 image: UIComponentsAsset.media16.image
             )
         ]
-        
+
         mediaItems = items
         currentMediaItem = items[0]
     }
-    
+
     func dispatch(_ intent: Intent) {
         switch intent {
         case .fetchUser:
@@ -97,16 +97,16 @@ final class RewindViewModel {
             }
         }
     }
-    
+
     func set(showToast: @escaping (String) -> Void) {
         self.showToast = showToast
     }
-    
+
     private func stopPlayer() {
         isTrackPlaying = false
         audioManager.stop()
     }
-    
+
     // временно
     private static func fetchTrack() -> Track? {
         let json = """
@@ -136,12 +136,9 @@ final class RewindViewModel {
           }
         }
         """
-        
+
         let data = Data(json.utf8)
-        var track = try? JSONDecoder().decode(Track.self, from: data)
-        track?.streamURL = URL(
-            string: "https://cf-media.sndcdn.com/wHq5ExUUltpj.128.mp3?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiKjovL2NmLW1lZGlhLnNuZGNkbi5jb20vd0hxNUV4VVVsdHBqLjEyOC5tcDMqIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzQ4MDg5MjMzfX19XX0_&Signature=Ot8fvGNEmq8ZpTgxBYq5xsFGxajYpv9dcy9O07JbGgR228szn6G1t0hJ2mUNF0qKnIhKOgcAR0R93Xu8xk7FXGIg4xQiXzKypgKYUDIBMN7bNyBFCVXNBYBDwEldoDSGCFzj9oxCp~JtQ0JNkFTWOpMRGP6PnVSw-qZpbbImYSI4BHFJQi7e1vgU9zhwhjtWTninbPW7mEfGCZnJQwZD7jEFqycxDR4mLvqFPUJiO9Lvrw4vIsLkSxbCMF~AohobcgQz6IEESAHL8gHSEllpjc4yF5bM0Y5hpvltJaJiJQAUPAsVypnjreyt6yg36VUOINx98OIRVuAQZ1QomPdiNQ__&Key-Pair-Id=APKAI6TU7MMXM5DG6EPQ"
-        )
+        let track = try? JSONDecoder().decode(Track.self, from: data)
         return track
     }
 }

@@ -8,7 +8,7 @@ public struct MediaContentView: View {
     private let onLike: () -> Void
     private let onToggleSound: () -> Void
     @Binding var isTrackPlaying: Bool
-    
+
     public init(
         mediaItem: MediaItem,
         cornerRadius: CGFloat = 35,
@@ -24,7 +24,7 @@ public struct MediaContentView: View {
         self.onToggleSound = onToggleSound
         self._isTrackPlaying = isTrackPlaying
     }
-    
+
     public var body: some View {
         ZStack {
             switch mediaItem.type {
