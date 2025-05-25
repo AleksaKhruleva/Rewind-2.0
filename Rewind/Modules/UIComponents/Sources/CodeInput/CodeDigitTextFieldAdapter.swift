@@ -109,7 +109,9 @@ public final class CodeDigitTextField: UITextField {
     var onBackspace: ((Bool) -> Void)?
 
     public override func deleteBackward() {
-        onBackspace?(text?.isEmpty == true)
+        if let text {
+            onBackspace?(text.isEmpty)
+        }
         super.deleteBackward()
     }
 }
