@@ -22,6 +22,8 @@ final class QuoteCreationViewModel {
 
     var quoteInputPresented = false
     var authorInputPresented = false
+    var backgroundColor: Color = .random
+    var textColor: Color = .random
     var findTrackViewPresented = false
     var isSelectedTrackPlaying = true
 

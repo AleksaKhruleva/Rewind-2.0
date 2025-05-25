@@ -4,9 +4,6 @@ import UIComponents
 public struct QuoteCreationView: View {
     @State private var viewModel = QuoteCreationViewModel()
 
-    @State private var backgroundColor: Color = .random
-    @State private var textColor: Color = .random
-
     @Environment(\.showToast)
     private var showToast
 
@@ -24,10 +21,10 @@ public struct QuoteCreationView: View {
                 VStack(spacing: 16) {
                     quoteContent
                         .cornerRadius(40)
+                        .padding(.horizontal, 8)
                         .onTapGesture {
                             viewModel.dispatch(.presentQuoteInput)
                         }
-                        .padding(.horizontal, 8)
 
                     generalTable
                         .padding(.horizontal, 8)
@@ -74,13 +71,12 @@ public struct QuoteCreationView: View {
     }
 
     private var quoteContent: some View {
-        RoundedRectangle(cornerRadius: 40)
-            .fill(Color.backgroundSecondary)
-            .aspectRatio(1, contentMode: .fit)
-            .foregroundColor(
+        Rectangle()
+            .fill(
                 viewModel.quoteState == .empty ?
-                    .backgroundSecondary : backgroundColor
+                    Color.backgroundSecondary : viewModel.backgroundColor
             )
+            .aspectRatio(1, contentMode: .fit)
             .overlay {
                 switch viewModel.quoteState {
                 case .empty: emptyQuoteContent
@@ -90,19 +86,13 @@ public struct QuoteCreationView: View {
     }
 
     private var emptyQuoteContent: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 40)
-                .fill(Color.backgroundSecondary)
-                .aspectRatio(1, contentMode: .fit)
+        VStack {
+            Image(systemName: "quote.bubble.fill")
+                .font(.system(size: 130))
+                .foregroundColor(.textSecondary)
 
-            VStack {
-                Image(systemName: "quote.bubble.fill")
-                    .font(.system(size: 130))
-                    .foregroundColor(.textSecondary)
-
-                Text(UIComponentsStrings.Quote.hint)
-                    .modifier(RoundFontModifier(size: 15, weight: .bold))
-            }
+            Text(UIComponentsStrings.Quote.hint)
+                .modifier(RoundFontModifier(size: 15, weight: .bold))
         }
     }
 
@@ -120,7 +110,7 @@ public struct QuoteCreationView: View {
                 }
             }
         }
-        .foregroundColor(textColor)
+        .foregroundColor(viewModel.textColor)
         .padding(24)
     }
 
@@ -148,8 +138,14 @@ public struct QuoteCreationView: View {
                 .padding(.leading, 15)
 
             VStack(alignment: .leading, spacing: 0) {
-                ColorPickerTableCell(text: UIComponentsStrings.Quote.Customizing.background, color: $backgroundColor)
-                ColorPickerTableCell(text: UIComponentsStrings.Quote.Customizing.text, color: $textColor)
+                ColorPickerTableCell(
+                    text: UIComponentsStrings.Quote.Customizing.background,
+                    color: $viewModel.backgroundColor
+                )
+                ColorPickerTableCell(
+                    text: UIComponentsStrings.Quote.Customizing.text,
+                    color: $viewModel.textColor
+                )
             }
             .background(Color.backgroundSecondary)
             .cornerRadius(24)
