@@ -1108,6 +1108,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Permission Denied - Incorrect password\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Not Found - User not found\".",
                         "schema": {
@@ -1192,14 +1198,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/email": {
-            "patch": {
+        "/api/users/email/start-change": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Updates the email for a specific user.",
+                "description": "Sends a verification code to the new email for the specific user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1209,7 +1215,7 @@ const docTemplate = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "Update user email.",
+                "summary": "Send code to the new email.",
                 "parameters": [
                     {
                         "description": "New email and password",
@@ -1240,6 +1246,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
+                    "409": {
+                        "description": "Conflict - User already has this email\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error\".",
                         "schema": {
@@ -1255,14 +1267,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/email/verify": {
-            "post": {
+        "/api/users/email/verify-change": {
+            "patch": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Verifies the code sent to the new email address.",
+                "description": "Verifies the code sent to the new email address and changes user email.",
                 "consumes": [
                     "application/json"
                 ],
@@ -1272,7 +1284,7 @@ const docTemplate = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "Verify new email code.",
+                "summary": "Verify new email code and change user email.",
                 "parameters": [
                     {
                         "description": "New email and verification code",
@@ -1299,6 +1311,12 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found - User not found or invalid code\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict - User with this email already exists\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1436,7 +1454,7 @@ const docTemplate = `{
             }
         },
         "/api/users/password/reset/set": {
-            "post": {
+            "patch": {
                 "security": [
                     {
                         "ApiKeyAuth": []

@@ -423,6 +423,7 @@ func (h *AuthHandler) UpdateUsername(w http.ResponseWriter, r *http.Request) {
 // @Param body body requests.CheckPasswordRequest true "User ID and password to check".
 // @Success 200 {object} responses.CheckPasswordResponse "Password check result".
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid request body".
+// @Failure 403 {object} responses.ErrorResponse "Permission Denied - Incorrect password".
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
@@ -448,9 +449,9 @@ func (h *AuthHandler) CheckPassword(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, responseBody)
 }
 
-// UpdateEmail обработчик для PATCH /api/users/email.
-// @Summary Update user email.
-// @Description Updates the email for a specific user.
+// UpdateEmail обработчик для POST /api/users/email/start-change.
+// @Summary Send code to the new email.
+// @Description Sends a verification code to the new email for the specific user.
 // @Tags users
 // @Accept json
 // @Produce json
@@ -458,10 +459,11 @@ func (h *AuthHandler) CheckPassword(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} responses.UpdateEmailResponse "Email update initiated".
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid user ID or request body".
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found".
+// @Failure 409 {object} responses.ErrorResponse "Conflict - User already has this email".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
 // @Security ApiKeyAuth
-// @Router /api/users/email [patch].
+// @Router /api/users/email/start-change [post].
 func (h *AuthHandler) UpdateEmail(w http.ResponseWriter, r *http.Request) {
 	var req requests.UpdateEmailRequest
 	if err := decodeJSONBody(r, &req); err != nil {
@@ -482,9 +484,9 @@ func (h *AuthHandler) UpdateEmail(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, responseBody)
 }
 
-// VerifyNewEmailCode обработчик для POST /api/users/email/verify.
-// @Summary Verify new email code.
-// @Description Verifies the code sent to the new email address.
+// VerifyNewEmailCode обработчик для PATCH /api/users/email/verify-change.
+// @Summary Verify new email code and change user email.
+// @Description Verifies the code sent to the new email address and changes user email.
 // @Tags users
 // @Accept json
 // @Produce json
@@ -492,10 +494,11 @@ func (h *AuthHandler) UpdateEmail(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} responses.VerifyNewEmailCodeResponse "New email verified".
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid user ID or request body".
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found or invalid code".
+// @Failure 409 {object} responses.ErrorResponse "Conflict - User with this email already exists".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
 // @Security ApiKeyAuth
-// @Router /api/users/email/verify [post].
+// @Router /api/users/email/verify-change [patch].
 func (h *AuthHandler) VerifyNewEmailCode(w http.ResponseWriter, r *http.Request) {
 	var req requests.VerifyNewEmailCodeRequest
 	if err := decodeJSONBody(r, &req); err != nil {
@@ -627,7 +630,7 @@ func (h *AuthHandler) VerifyPasswordResetCode(w http.ResponseWriter, r *http.Req
 	respondJSON(w, http.StatusOK, responseBody)
 }
 
-// SetNewPassword обработчик для POST /api/users/password/reset/set.
+// SetNewPassword обработчик для PATCH /api/users/password/reset/set.
 // @Summary Set new password.
 // @Description Sets a new password for the user after successful code verification.
 // @Tags users
@@ -640,7 +643,7 @@ func (h *AuthHandler) VerifyPasswordResetCode(w http.ResponseWriter, r *http.Req
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
 // @Security ApiKeyAuth
-// @Router /api/users/password/reset/set [post].
+// @Router /api/users/password/reset/set [patch].
 func (h *AuthHandler) SetNewPassword(w http.ResponseWriter, r *http.Request) {
 	var req requests.SetNewPasswordRequest
 	if err := decodeJSONBody(r, &req); err != nil {

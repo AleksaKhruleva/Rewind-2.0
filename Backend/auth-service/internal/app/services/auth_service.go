@@ -683,6 +683,20 @@ func (s *AuthService) UpdateEmail(ctx context.Context, req *pb.UpdateEmailReques
 		return nil, status.Errorf(codes.InvalidArgument, "invalid email format: %v", err)
 	}
 
+	user, err := s.userRepo.GetUserByID(nil, uint(userID))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("GetUserByID: User with ID %d not found: %v", userID, err)
+		}
+		log.Printf("GetUserByID: Failed to get user by ID %d from DB: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to retrieve user data")
+	}
+
+	if newEmail == user.Email {
+		log.Printf("UpdateEmail: User with ID %d email unchanged", userID)
+		return nil, status.Errorf(codes.AlreadyExists, "User already has this email")
+	}
+
 	// Check if the password check stage is completed
 	redisKey := fmt.Sprintf("email_update_flow:%d", userID)
 	stage, err := s.redisRepo.HGet(ctx, redisKey, "stage").Result()
@@ -774,6 +788,10 @@ func (s *AuthService) VerifyNewEmailCode(ctx context.Context, req *pb.VerifyNewE
 	// Update email in the database
 	err = s.userRepo.UpdateEmail(nil, uint(userID), newEmail)
 	if err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			log.Printf("UpdateEmail: User with ID %d already exists", userID)
+			return nil, status.Errorf(codes.AlreadyExists, "User with ID %d already exists", userID)
+		}
 		log.Printf("Failed to update email for user %d: %v", userID, err)
 		return nil, status.Errorf(codes.Internal, "Failed to update email")
 	}

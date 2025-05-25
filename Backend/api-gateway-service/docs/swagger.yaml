@@ -1101,6 +1101,10 @@ paths:
           description: Bad Request - Invalid request body".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Permission Denied - Incorrect password".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
         "404":
           description: Not Found - User not found".
           schema:
@@ -1158,11 +1162,11 @@ paths:
       summary: Delete user account.
       tags:
       - users
-  /api/users/email:
-    patch:
+  /api/users/email/start-change:
+    post:
       consumes:
       - application/json
-      description: Updates the email for a specific user.
+      description: Sends a verification code to the new email for the specific user.
       parameters:
       - description: New email and password
         in: body
@@ -1185,6 +1189,10 @@ paths:
           description: Not Found - User not found".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "409":
+          description: Conflict - User already has this email".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
         "500":
           description: Internal Server Error".
           schema:
@@ -1195,14 +1203,15 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Update user email.
+      summary: Send code to the new email.
       tags:
       - users
-  /api/users/email/verify:
-    post:
+  /api/users/email/verify-change:
+    patch:
       consumes:
       - application/json
-      description: Verifies the code sent to the new email address.
+      description: Verifies the code sent to the new email address and changes user
+        email.
       parameters:
       - description: New email and verification code
         in: body
@@ -1225,6 +1234,10 @@ paths:
           description: Not Found - User not found or invalid code".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "409":
+          description: Conflict - User with this email already exists".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
         "500":
           description: Internal Server Error".
           schema:
@@ -1235,7 +1248,7 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
       security:
       - ApiKeyAuth: []
-      summary: Verify new email code.
+      summary: Verify new email code and change user email.
       tags:
       - users
   /api/users/groups:
@@ -1315,7 +1328,7 @@ paths:
       tags:
       - users
   /api/users/password/reset/set:
-    post:
+    patch:
       consumes:
       - application/json
       description: Sets a new password for the user after successful code verification.
