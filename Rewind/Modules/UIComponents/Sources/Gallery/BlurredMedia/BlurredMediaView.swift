@@ -5,7 +5,7 @@ public struct BlurredMediaView: View {
     @Binding var isPresented: Bool
     @State private var mediaItem: MediaItem
     @State private var isTrackPlaying: Bool = false
-    private var showMediaDetails: (UIImage) -> Void
+    private var showMediaDetails: (MediaItem) -> Void
 
     @Environment(\.showToast)
     private var showToast
@@ -13,7 +13,7 @@ public struct BlurredMediaView: View {
     public init(
         isPresented: Binding<Bool>,
         mediaItem: MediaItem,
-        showMediaDetails: @escaping (UIImage) -> Void
+        showMediaDetails: @escaping (MediaItem) -> Void
     ) {
         self._isPresented = isPresented
         self.mediaItem = mediaItem
@@ -86,7 +86,7 @@ public struct BlurredMediaView: View {
                 icon: "gearshape.fill",
                 title: UIComponentsStrings.Media.Blurred.title,
                 needChevron: true,
-                action: { /*showMediaDetails(image)*/ }
+                action: { showMediaDetails(mediaItem) }
             )
         }
         .background(Color.background)

@@ -36,9 +36,7 @@ public struct MediaContentView: View {
                     .toSquare(mediaItem.image, cornerRadius: cornerRadius)
                     .overlay(alignment: .topTrailing) {
                         if mediaItem.type == .imageWithMusic {
-                            Button {
-                                onToggleSound()
-                            } label: {
+                            Button(action: {}) {
                                 ZStack {
                                     Image(systemName: "speaker.wave.2.fill").opacity(isTrackPlaying ? 1 : 0)
                                     Image(systemName: "speaker.slash.fill").opacity(isTrackPlaying ? 0 : 1)
@@ -49,6 +47,12 @@ public struct MediaContentView: View {
                                 .clipShape(Circle())
                             }
                             .padding(12)
+                            .simultaneousGesture(
+                                TapGesture().onEnded {
+                                    onToggleSound()
+                                    print("toggle sound")
+                                }
+                            )
                         }
                     }
             case .video:
