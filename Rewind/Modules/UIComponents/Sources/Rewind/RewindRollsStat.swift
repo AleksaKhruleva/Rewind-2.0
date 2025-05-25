@@ -2,11 +2,11 @@ import SwiftUI
 
 public struct RewindRollsStat: View {
     @Binding var rolls: Int
-    
+
     public init(rolls: Binding<Int>) {
         self._rolls = rolls
     }
-    
+
     public var body: some View {
         HStack {
             Text("\(rolls)")
@@ -19,7 +19,7 @@ public struct RewindRollsStat: View {
                     )
                 )
                 .padding(.vertical, -10)
-            
+
             Text(UIComponentsStrings.Rewind.rolls)
                 .modifier(RoundFontModifier(size: 15))
         }

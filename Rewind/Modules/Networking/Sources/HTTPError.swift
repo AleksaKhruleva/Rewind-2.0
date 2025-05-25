@@ -1,3 +1,4 @@
+// swiftlint:disable all
 import Foundation
 
 // All codes from http://www.iana.org/assignments/http-status-codes
@@ -73,7 +74,7 @@ public enum HTTPError: Error, Equatable {
     case loopDetected
     case notExtended
     case networkAuthenticationRequired
-    
+
     public init(statusCode: Int, reason: String = "") {
         switch statusCode {
         case 100: self = .`continue`
@@ -140,3 +141,4 @@ public enum HTTPError: Error, Equatable {
         }
     }
 }
+// swiftlint:enable all

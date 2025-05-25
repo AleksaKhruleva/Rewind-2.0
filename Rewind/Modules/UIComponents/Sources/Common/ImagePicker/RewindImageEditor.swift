@@ -9,18 +9,18 @@ public enum CropType {
 public struct RewindImageEditor: View {
     var image: UIImage?
     var cropType: CropType
-    var onCrop: (UIImage?, Bool) -> ()
+    var onCrop: (UIImage?, Bool) -> Void
     var onVideoCrop: ((CGFloat, CGSize) -> Void)?
-    
+
     @State private var scale: CGFloat = 1
     @State private var lastScale: CGFloat = 0
     @State private var offset: CGSize = .zero
     @State private var lastOffset: CGSize = .zero
     @GestureState private var isInteracting: Bool = false
-    
+
     @Environment(\.dismiss)
     private var dismiss
-    
+
     public init(
         image: UIImage?,
         cropType: CropType,
@@ -32,7 +32,7 @@ public struct RewindImageEditor: View {
         self.onCrop = onCrop
         self.onVideoCrop = onVideoCrop
     }
-    
+
     public var body: some View {
         NavigationStack {
             ZStack(alignment: .top) {
@@ -41,13 +41,13 @@ public struct RewindImageEditor: View {
                     imageMask
                 }
                 .ignoresSafeArea()
-                
+
                 header
             }
             .background(Color.background)
         }
     }
-    
+
     var header: some View {
         RewindHeader {
             RewindButton(type: .leftChevron) { dismiss() }
@@ -58,10 +58,13 @@ public struct RewindImageEditor: View {
         } rightView: {
             RewindButton(type: .checkmark) {
                 let renderer = ImageRenderer(content: imageView)
-                renderer.proposedSize = .init(CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width))
-                
+                renderer.proposedSize = .init(CGSize(
+                    width: UIScreen.main.bounds.width,
+                    height: UIScreen.main.bounds.width
+                ))
+
                 onVideoCrop?(scale, offset)
-                
+
                 if let image = renderer.uiImage {
                     onCrop(image, true)
                 } else {
@@ -71,7 +74,7 @@ public struct RewindImageEditor: View {
             }
         }
     }
-    
+
     var imageMask: some View {
         GeometryReader { geometry in
             let width = geometry.size.width
@@ -87,17 +90,17 @@ public struct RewindImageEditor: View {
                 .allowsHitTesting(false)
         }
     }
-    
+
     @ViewBuilder
     var imageView: some View {
         let cropSize = CGSize(
             width: UIScreen.main.bounds.width,
             height: UIScreen.main.bounds.width
         )
-        
+
         GeometryReader {
             let size = $0.size
-            
+
             if let image {
                 Image(uiImage: image)
                     .resizable()
@@ -105,7 +108,7 @@ public struct RewindImageEditor: View {
                     .overlay {
                         GeometryReader { proxy in
                             let rect = proxy.frame(in: .named("CROPVIEW"))
-                            
+
                             Color.clear
                                 .onChange(of: isInteracting) { _, newValue in
                                     withAnimation(.easeInOut) {
@@ -157,7 +160,7 @@ public struct RewindImageEditor: View {
                 }).onChanged({ value in
                     let updatedScale = value + lastScale
                     scale = (updatedScale < 1 ? 1 : updatedScale)
-                }).onEnded({ value in
+                }).onEnded({ _ in
                     withAnimation(.easeInOut) {
                         if scale < 1 {
                             scale = 1

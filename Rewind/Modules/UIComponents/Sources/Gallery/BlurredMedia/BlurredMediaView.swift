@@ -4,7 +4,7 @@ public struct BlurredMediaView: View {
     @State private var image: UIImage
     @Binding var isPresented: Bool
     var showMediaDetails: (UIImage) -> Void
-    
+
     @Environment(\.showToast)
     private var showToast
 
@@ -17,7 +17,7 @@ public struct BlurredMediaView: View {
         self._isPresented = isPresented
         self.showMediaDetails = showMediaDetails
     }
-    
+
     public var body: some View {
         Rectangle()
             .fill(.ultraThinMaterial)
@@ -31,11 +31,11 @@ public struct BlurredMediaView: View {
                 content
             }
     }
-    
+
     private var content: some View {
         VStack {
             author
-            
+
             mediaView
                 .overlay {
                     RewindMediaButtonsOverlay {
@@ -44,14 +44,14 @@ public struct BlurredMediaView: View {
                         saveImage(image: image)
                     }
                 }
-                
+
             actionsTable
-                
+
             riskyCell
         }
         .padding(.horizontal, 8)
     }
-    
+
     private var author: some View {
         AuthorBadgeView(
             image: UIComponentsAsset.avatar.image,
@@ -63,11 +63,11 @@ public struct BlurredMediaView: View {
         .background(Color.background)
         .cornerRadius(14)
     }
-    
+
     private var mediaView: some View {
         Rectangle().toSquare(image, cornerRadius: 40)
     }
-    
+
     private var actionsTable: some View {
         VStack(alignment: .leading, spacing: -8) {
             BlurredTableCell(
@@ -76,7 +76,7 @@ public struct BlurredMediaView: View {
                 needChevron: true,
                 action: { showMediaDetails(image) }
             )
-            
+
             BlurredTableCell(
                 icon: "square.and.arrow.down.fill",
                 title: UIComponentsStrings.Media.Blurred.save,
@@ -87,7 +87,7 @@ public struct BlurredMediaView: View {
         .background(Color.background)
         .modifier(BlurredMediaTableModifier())
     }
-    
+
     private var riskyCell: some View {
         BlurredTableCell(
             icon: "trash.fill",
@@ -101,7 +101,7 @@ public struct BlurredMediaView: View {
         .background(Color.riskyBackground)
         .modifier(BlurredMediaTableModifier())
     }
-    
+
     private func saveImage(image: UIImage) {
         saveImageWithToast(image: image) { message in
             showToast(message)

@@ -4,6 +4,6 @@ import ProjectDescriptionHelpers
 let baseProject = Project.featureFramework(
     name: "Base",
     dependencies: [
-        .project(target: "Domain", path: "../Domain"),
-    ]
+        .project(target: "Domain", path: "../Domain")
+    ],
 )

@@ -9,19 +9,19 @@ final class AddMemberViewModel {
         case shareLink
         case generateQR(color: Color, colorScheme: ColorScheme)
     }
-    
+
     enum QRCodeImageState {
         case requested
         case ready(UIImage)
         case failed
     }
-    
+
     var toastMessage: String?
     var showShareSheet = false
     let link = "https://rewindapp.ru/swagger/index.html"
-    
+
     private(set) var qrCodeImageState: QRCodeImageState = .requested
-    
+
     func dispatch(_ intent: Intent) {
         switch intent {
         case .copyLink:
@@ -32,21 +32,21 @@ final class AddMemberViewModel {
             generateQR(color: color, colorScheme: colorScheme)
         }
     }
-    
+
     private func copyLink() {
         UIPasteboard.general.string = link
         toastMessage = UIComponentsStrings.Group.AddMember.linkCopied
     }
-    
+
     private func generateQR(color: Color, colorScheme: ColorScheme) {
         qrCodeImageState = .requested
-        
+
         guard let generatedQR = QRCodeGenerator.generate(from: link, pixelColor: color, colorScheme: colorScheme) else {
             toastMessage = UIComponentsStrings.Group.AddMember.QrCodeGeneration.failure
             qrCodeImageState = .failed
             return
         }
-        
+
         withAnimation {
             qrCodeImageState = .ready(generatedQR)
         }

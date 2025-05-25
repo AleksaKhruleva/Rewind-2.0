@@ -1,0 +1,62 @@
+disabled_rules:
+  - nesting
+  - cyclomatic_complexity
+  - function_body_length
+  - multiple_closures_with_trailing_closure
+  - large_tuple
+
+included:
+  - Rewind
+  - Modules
+
+excluded:
+  - Modules/Domain/**
+
+line_length:
+  warning: 120
+  error: 120
+
+reporter: xcode
+
+custom_rules:
+  no_split_mainactor_observable:
+    name: "MainActor & Observable must be on same line"
+    regex: "@MainActor\\s*\\n\\s*@Observable"
+    severity: error
+
+  final_before_class:
+    name: "Class must be final"
+    regex: "(?<!final\\s)class\\s+\\w+"
+    severity: error
+
+  no_empty_line_after_open_brace:
+    name: "No empty line after open brace"
+    regex: "\\{\\s*\\n\\s*\\n"
+    severity: error
+
+  state_access:
+    name: "State should be private only"
+    regex: '(@State\s+var)'
+    capture_group: 1
+    severity: error
+
+  already_true:
+    regex: "== true"
+    message: "Don't compare to true, just use the bool value."
+    severity: warning
+
+  already_bool:
+    regex: "== false"
+    message: "Don't compare to false, just use !value."
+    severity: warning
+
+  no_print:
+    name: "No print statements"
+    regex: "\\bprint\\s*\\("
+    severity: warning
+
+  no_empty_catch:
+    name: "No empty catch"
+    regex: "catch\\s*\\{\\s*\\}"
+    message: "Пустой catch блок запрещён"
+    severity: error

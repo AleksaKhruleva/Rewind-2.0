@@ -5,16 +5,16 @@ import UIComponents
 public struct RewindsMap: View {
     @State private var viewModel: RewindsMapViewModel
     @State private var badgeWidth: CGFloat = .zero
-    
+
     @State private var isRewindsListPresented = false
-    
+
     private let router: AppRouter
-    
+
     public init(router: AppRouter) {
         viewModel = RewindsMapViewModel()
         self.router = router
     }
-    
+
     public var body: some View {
         ZStack(alignment: .top) {
             map.simultaneousGesture(TapGesture().onEnded({ _ in
@@ -24,9 +24,9 @@ public struct RewindsMap: View {
                 viewModel.dispatch(.updateVisiblePoints)
                 viewModel.calculateClusters()
             }
-            
+
             zoomButtons
-            
+
             header
                 .padding(.horizontal, 16)
         }
@@ -56,7 +56,7 @@ public struct RewindsMap: View {
             viewModel.calculateClusters()
         }
     }
-    
+
     private var map: some View {
         Map(position: $viewModel.cameraPosition) {
             ForEach(viewModel.clusters) { cluster in
@@ -70,14 +70,14 @@ public struct RewindsMap: View {
             }
         }
     }
-    
+
     private var header: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20)
                 .fill(.ultraThinMaterial)
                 .border(ViewBorder(color: .textTertiaryLight, width: 1, cornerRadius: 20))
                 .frame(maxWidth: .infinity, maxHeight: 70)
-            
+
             HStack {
                 makeButton("chevron.left") { router.pop() }
                 Spacer()
@@ -102,7 +102,7 @@ public struct RewindsMap: View {
             .padding(.horizontal, 9)
         }
     }
-    
+
     private var zoomButtons: some View {
         HStack {
             Spacer()
@@ -115,7 +115,7 @@ public struct RewindsMap: View {
             .padding(.trailing, 8)
         }
     }
-    
+
     private func makeButton(_ icon: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             RoundedRectangle(cornerRadius: 15)

@@ -6,13 +6,13 @@ struct ClusterView: View {
     var cluster: ClusteredPoint
     var isSelected: Bool
     var action: () -> Void
-    
+
     @State private var animate = false
     @State private var currentColor: Color = .red
-    @State var badgeWidth: CGFloat = .zero
-    
+    @State private var badgeWidth: CGFloat = .zero
+
     private let colors: [Color] = Array(repeating: .random, count: 15)
-    
+
     var body: some View {
         VStack(spacing: 4) {
             Button(action: action) {
@@ -30,14 +30,14 @@ struct ClusterView: View {
                                 animate: animate
                             )
                     }
-                    
+
                     if cluster.points.count > 1 {
                         makeClusterMark(cluster.points.count)
                             .offset(x: -5, y: 5)
                     }
                 }
             }
-            
+
             if isSelected {
                 makeSelectedBadge(
                     image: UIComponentsAsset.avatar.image,
@@ -51,7 +51,7 @@ struct ClusterView: View {
             startColorCycle()
         }
     }
-    
+
     private func makeClusterMark(_ count: Int) -> some View {
         Circle()
             .frame(30)
@@ -62,21 +62,21 @@ struct ClusterView: View {
                     .padding(6)
             }
     }
-    
+
     private func makeSelectedBadge(image: UIImage, name: String, date: String) -> some View {
         ZStack(alignment: .topLeading) {
             RoundedRectangle(cornerRadius: 20)
                 .fill(.ultraThinMaterial)
                 .frame(width: badgeWidth + 16, height: 50)
                 .border(ViewBorder(color: .textTertiaryLight, width: 2, cornerRadius: 22))
-            
+
             AuthorBadgeView(image: image, name: name, date: date)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
                 .modifier(MeasureWidthModifier(width: $badgeWidth))
         }
     }
-    
+
     private func startColorCycle() {
         Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { _ in
             withAnimation(.easeInOut(duration: 2)) {

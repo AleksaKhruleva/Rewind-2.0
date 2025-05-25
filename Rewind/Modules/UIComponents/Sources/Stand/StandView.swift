@@ -10,27 +10,27 @@ let podiumMembers = [
 public struct StandView: View {
     private let title: String
     private let counterType: CounterType
-    
+
     public init(title: String, counterType: CounterType) {
         self.title = title
         self.counterType = counterType
     }
-    
+
     public var body: some View {
         ZStack {
             gradientBackground
-            
+
             ScrollView(.vertical, showsIndicators: false) {
                 header
-                
+
                 VStack(spacing: 6) {
                     Text(title)
                         .modifier(RoundFontModifier(size: 22, foregroundColor: .white))
-                    
+
                     Text(UIComponentsStrings.Stand.rank(3))
                         .modifier(RoundFontModifier(size: 16, foregroundColor: .white))
                 }
-                
+
                 HStack(alignment: .bottom) {
                     ForEach(podiumMembers, id: \.index) { podiumMember in
                         PodiumBadgeView(
@@ -44,7 +44,7 @@ public struct StandView: View {
                         )
                     }
                 }
-                
+
                 ForEach(membersForTest.indices.dropFirst(3), id: \.self) { index in
                     LeaderboardRowView(
                         rank: index + 1,
@@ -56,17 +56,17 @@ public struct StandView: View {
             }
         }
     }
-    
+
     private var gradientBackground: some View {
         TimelineView(.animation) { timeline in
-            let x = (sin(timeline.date.timeIntervalSince1970) + 1) / 2
-            
+            let sinValue = (sin(timeline.date.timeIntervalSince1970) + 1) / 2
+
             let background = Color(hex: "000000")
             let accent = Color(hex: "0061ff")
-            
+
             MeshGradient(width: 3, height: 3, points: [
                 [0, 0], [0.5, 0], [1, 0],
-                [0, 0.5], [Float(x), 0.5], [1, 0.5],
+                [0, 0.5], [Float(sinValue), 0.5], [1, 0.5],
                 [0, 1], [0.5, 1], [1, 1]
             ], colors: [
                 background, background, background,
@@ -76,7 +76,7 @@ public struct StandView: View {
             .ignoresSafeArea()
         }
     }
-    
+
     private var header: some View {
         RewindHeader(backgroundColor: .clear, rightView: {
             RewindButton(type: .rightChevron, tint: .white) {

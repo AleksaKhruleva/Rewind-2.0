@@ -34,5 +34,5 @@ public let membersForTest: [Member] = [
         id: UUID(),
         name: "Matthew",
         avatar: UIComponentsAsset.matthewMcConaughey.image
-    ),
+    )
 ]

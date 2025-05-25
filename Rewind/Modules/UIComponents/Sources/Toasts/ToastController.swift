@@ -8,7 +8,7 @@ public final class ToastController {
         get { state }
         set { withAnimation(.spring) { state = newValue } }
     }
-    
+
     public init(
         state: ToastState = ToastState.empty,
         hideSnackbarTask: Task<Void, Error>? = nil
@@ -16,7 +16,7 @@ public final class ToastController {
         self.state = state
         self.hideTask = hideTask
     }
-    
+
     public func present(with title: String) {
         if state.isPresented {
             state.title = title
@@ -27,15 +27,15 @@ public final class ToastController {
                 title: title
             )
         }
-        
+
         hideTask = Task {
             try await Task.sleep(nanoseconds: 3_500_000_000)
             try Task.checkCancellation()
-            
+
             animatedState = .empty
         }
     }
-    
+
     func hide() {
         hideTask?.cancel()
         animatedState = .empty

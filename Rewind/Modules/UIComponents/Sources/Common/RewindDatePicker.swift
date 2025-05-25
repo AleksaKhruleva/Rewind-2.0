@@ -3,19 +3,19 @@ import SwiftUI
 public struct RewindDatePicker: View {
     var title: String
     @Binding var date: Date?
-    
+
     public init(title: String, date: Binding<Date?>) {
         self.title = title
         self._date = date
     }
-    
+
     public var body: some View {
         HStack {
             Text(title)
                 .foregroundColor(.textSecondary)
                 .modifier(RoundFontModifier(size: 17, weight: .black))
                 .padding(.leading, 16)
-            
+
             HStack(spacing: 2) {
                 Text(
                     dateBinding.wrappedValue
@@ -38,7 +38,7 @@ public struct RewindDatePicker: View {
                 .labelsHidden()
                 .colorMultiply(.clear)
             }
-            
+
             if date != nil {
                 Button {
                     withAnimation { date = nil }
@@ -53,7 +53,7 @@ public struct RewindDatePicker: View {
             }
         }
     }
-        
+
     var dateBinding: Binding<Date> {
         Binding {
             return date ?? Date()

@@ -11,16 +11,16 @@ final class AuthenticationUITests: XCTestCase {
                 )
             }
         )
-        
+
         let rewind = try launchAuthenticationRewind(mockBackend: backend)
-        
+
         rewind.tapSignUpButton()
         rewind.inputEmail()
         rewind.inputCode()
         rewind.inputPassword()
         rewind.inputName()
     }
-    
+
     func testLogin() throws {
         let responseFactory = AuthenticationResponseFactory.make(host: "localhost")
         let backend = try MockBackend(
@@ -30,9 +30,9 @@ final class AuthenticationUITests: XCTestCase {
                 )
             }
         )
-        
+
         let rewind = try launchAuthenticationRewind(mockBackend: backend)
-        
+
         rewind.tapSignInButton()
         rewind.inputEmail()
         rewind.inputPassword()

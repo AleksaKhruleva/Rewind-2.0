@@ -5,18 +5,18 @@ public struct PasswordInputView: View {
     @State private var viewModel: PasswordInputViewModel
     @State private var showNotice = false
     @State private var canResend = false
-    @State private var timer: Timer? = nil
+    @State private var timer: Timer?
     @State private var secondsLeft = 60
     @FocusState private var isFocused: Bool
-    
+
     public init(flow: AuthFlow, router: AuthenticationRouter, registrationID: String?) {
         viewModel = PasswordInputViewModel(flow: flow, router: router, registrationID: registrationID)
     }
-    
+
     public var body: some View {
         ZStack(alignment: .topLeading) {
             Color.background.ignoresSafeArea()
-            
+
             RewindButton(type: .leftChevron) {
                 hideKeyboard()
                 DispatchQueue.main.asyncAfter(deadline: .now() + AuthConstants.keyboardHideDelay) {
@@ -25,11 +25,11 @@ public struct PasswordInputView: View {
                     }
                 }
             }
-            
+
             VStack(alignment: .center, spacing: AuthConstants.fieldSpacing) {
                 Text(UIComponentsStrings.Password.title)
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
-                
+
                 StyledTextField(
                     text: $viewModel.password,
                     placeholder: UIComponentsStrings.Password.placeholder,
@@ -43,14 +43,14 @@ public struct PasswordInputView: View {
                         await viewModel.dispatch(.submitPassword)
                     }
                 }
-                
+
                 if viewModel.state == .loading {
                     ProgressView()
                 } else if case let .error(error) = viewModel.state {
                     RewindNoteTextView(text: error.errorDescription)
                         .multilineTextAlignment(.center)
                 }
-                
+
                 if case .login = viewModel.flow {
                     if showNotice {
                         notice
@@ -70,7 +70,7 @@ public struct PasswordInputView: View {
         .hideKeyboardOnTap()
         .hideKeyboardOnDrag()
     }
-    
+
     private var forgotPasswordButton: some View {
         Button {
             showNotice = true
@@ -80,7 +80,7 @@ public struct PasswordInputView: View {
                 .modifier(RoundFontModifier(size: 13, foregroundColor: .pinkPrimaryLight))
         }
     }
-    
+
     private var notice: some View {
         VStack(spacing: 8) {
             VStack {
@@ -89,7 +89,7 @@ public struct PasswordInputView: View {
                     .foregroundStyle(Color.pinkPrimaryLight)
             }
             .modifier(RoundFontModifier(size: 13))
-            
+
             VStack {
                 if canResend {
                     resendButton
@@ -105,7 +105,7 @@ public struct PasswordInputView: View {
             }
         }
     }
-    
+
     private var resendButton: some View {
         Button {
             // TODO: send reset link to email later
@@ -115,7 +115,7 @@ public struct PasswordInputView: View {
                 .modifier(RoundFontModifier(size: 13, foregroundColor: .pinkPrimaryLight))
         }
     }
-    
+
     private func startTimer() {
         canResend = false
         secondsLeft = 60

@@ -3,15 +3,14 @@ import Testing
 
 @MainActor
 struct QuoteCreationViewModelTests {
-    
     typealias QuoteState = QuoteCreationViewModel.QuoteState
-    
-    private var vm: QuoteCreationViewModel!
-    
+
+    private var viewModel: QuoteCreationViewModel!
+
     init() {
-        vm = .init()
+        viewModel = .init()
     }
-    
+
     @Test(arguments: [
         ("", "", QuoteState.empty),
         ("q", "", QuoteState.empty),
@@ -19,58 +18,58 @@ struct QuoteCreationViewModelTests {
         ("q", "a", QuoteState.ready)
     ])
     func testQuoteState(quote: String, author: String, expected: QuoteState) {
-        vm.quote = quote
-        vm.author = author
-        
-        #expect(vm.quoteState == expected)
+        viewModel.quote = quote
+        viewModel.author = author
+
+        #expect(viewModel.quoteState == expected)
     }
-    
+
     @Test
     func testPresentQuoteInput() {
-        vm.dispatch(.presentQuoteInput)
-        
-        #expect(vm.quoteInputPresented == true)
+        viewModel.dispatch(.presentQuoteInput)
+
+        #expect(viewModel.quoteInputPresented)
     }
-    
+
     @Test(arguments: [
         ("", false),
         ("aboba", true)
     ])
     func testPresentAuthorInput(quote: String, expectedAuthorInputPresented: Bool) {
-        vm.quote = quote
-        
-        vm.dispatch(.presentAuthorInput)
-        
-        #expect(vm.authorInputPresented == expectedAuthorInputPresented)
+        viewModel.quote = quote
+
+        viewModel.dispatch(.presentAuthorInput)
+
+        #expect(viewModel.authorInputPresented == expectedAuthorInputPresented)
     }
-    
+
     @Test(arguments: [
         ("", "", true),
         ("q", "a", false)
     ])
     func testDismissAll(quote: String, author: String, expectedQuoteInputPresented: Bool) {
-        vm.quote = quote
-        vm.author = author
-        vm.quoteInputPresented = true
-        
-        vm.dispatch(.dismissAll)
-        
-        #expect(vm.quoteInputPresented == expectedQuoteInputPresented)
+        viewModel.quote = quote
+        viewModel.author = author
+        viewModel.quoteInputPresented = true
+
+        viewModel.dispatch(.dismissAll)
+
+        #expect(viewModel.quoteInputPresented == expectedQuoteInputPresented)
     }
-    
+
     @Test
     func testSaveQuotePrintsSomething() {
         // TODO: will be here later
     }
-    
+
     @Test
     func testResetQuote() {
-        vm.quote = "q"
-        vm.author = "a"
-        
-        vm.dispatch(.resetQuote)
-        
-        #expect(vm.quote.isEmpty)
-        #expect(vm.author.isEmpty)
+        viewModel.quote = "q"
+        viewModel.author = "a"
+
+        viewModel.dispatch(.resetQuote)
+
+        #expect(viewModel.quote.isEmpty)
+        #expect(viewModel.author.isEmpty)
     }
 }

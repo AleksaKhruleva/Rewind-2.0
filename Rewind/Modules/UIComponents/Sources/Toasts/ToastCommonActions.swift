@@ -6,7 +6,7 @@ public func saveImageWithToast(image: UIImage?, toastAction: @escaping (String) 
         toastAction(UIComponentsStrings.Toast.ImageSaving.failure)
         return
     }
-    
+
     ImageSaver.shared.writeToPhotoAlbum(image: image) { result in
         switch result {
         case .success:

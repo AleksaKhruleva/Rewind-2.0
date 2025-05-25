@@ -7,7 +7,7 @@ public struct Member: Identifiable, Hashable {
     public let avatar: UIImage
     public let isOwner: Bool
     public let isUser: Bool
-    
+
     public init(
         id: UUID,
         name: String,

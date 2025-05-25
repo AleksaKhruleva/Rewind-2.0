@@ -13,33 +13,33 @@ final class GalleryViewModel {
         case viewBlurredMedia(UIImage)
         case openFilters
     }
-    
+
     var mediaPickerPresented: Bool = false
     var mediaSelection: PhotosPickerItem?
-    
+
     var mediaUploadingDialogShown: Bool = false
     var uploadingMedia: LoadedMedia?
-    
+
     var filterSettingsShown = false
     var blurredMediaShown = false
     var blurredMediaSelection: UIImage?
-    
+
     var showToast: (String) -> Void
-    
+
     private let transformer: PhotosPickerItemTransformer
-    
+
     var viewingBlurredMedia: UIImage? {
         guard let blurredMediaSelection, blurredMediaShown else {
             return nil
         }
         return blurredMediaSelection
     }
-    
+
     init() {
         transformer = .init()
         showToast = { _ in }
     }
-    
+
     func dispatch(_ intent: Intent) async {
         switch intent {
         case .viewGallery:
@@ -59,11 +59,11 @@ final class GalleryViewModel {
                 blurredMediaSelection = media
                 blurredMediaShown = true
             }
-        case let .openFilters:
+        case .openFilters:
             filterSettingsShown = true
         }
     }
-    
+
     func set(showToast: @escaping (String) -> Void) {
         self.showToast = showToast
     }

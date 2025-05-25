@@ -5,7 +5,7 @@ public struct MembersTableButton: View {
     private let title: String
     private let imageSize: CGFloat
     private let action: () -> Void
-    
+
     public init(
         systemImageName: String,
         title: String,
@@ -17,19 +17,19 @@ public struct MembersTableButton: View {
         self.imageSize = imageSize
         self.action = action
     }
-    
+
     public var body: some View {
         Button(action: action) {
             HStack(spacing: 12) {
                 Image(systemName: systemImageName)
                     .modifier(RoundFontModifier(size: imageSize))
                     .frame(width: 34, height: 34)
-                
+
                 Text(title)
                     .modifier(RoundFontModifier(size: 16, foregroundColor: .textPrimary))
-                
+
                 Spacer()
-                
+
                 Image(systemName: "chevron.right")
                     .modifier(RoundFontModifier(size: 14))
                     .padding(.trailing, 3)
@@ -53,7 +53,7 @@ public struct MembersTableButton: View {
     ) {
         print("Add members plz")
     }
-    
+
     MembersTableButton(
         systemImageName: "eye.fill",
         title: "7 members",

@@ -3,7 +3,7 @@ import SwiftUI
 public struct RewindMediaButtonsOverlay: View {
     private let likeAction: () -> Void
     private let saveAction: () -> Void
-    
+
     public init(
         likeAction: @escaping () -> Void,
         saveAction: @escaping () -> Void
@@ -11,7 +11,7 @@ public struct RewindMediaButtonsOverlay: View {
         self.likeAction = likeAction
         self.saveAction = saveAction
     }
-    
+
     public var body: some View {
         VStack {
             Spacer()

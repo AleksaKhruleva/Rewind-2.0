@@ -4,7 +4,7 @@ public struct BlurredAvatarView: View {
     @State private var showPicker: Bool = false
     @Binding var image: UIImage?
     @Binding var isPresented: Bool
-    
+
     @Environment(\.showToast)
     private var showToast
 
@@ -29,14 +29,14 @@ public struct BlurredAvatarView: View {
               showToast(UIComponentsStrings.Account.Edit.Image.Set.success)
           }
     }
-    
+
     public var content: some View {
         VStack(spacing: 16) {
             Image(uiImage: image ?? UIComponentsAsset.avatar.image)
                 .resizable()
                 .frame(width: 320, height: 320)
                 .clipShape(Circle())
-            
+
             BlurredAvatarTable(
                 showPicker: $showPicker,
                 saveImage: {

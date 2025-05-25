@@ -4,16 +4,16 @@ public struct ToastView: View {
     @State
     private var controller: ToastController
     private var title: String
-    
+
     public init(controller: ToastController) {
         self.controller = controller
         title = controller.state.title
     }
-    
+
     public var body: some View {
         VStack(spacing: 0) {
             Spacer()
-            
+
             if controller.state.isPresented {
                 content
                     .padding(.horizontal, 8)
@@ -25,13 +25,13 @@ public struct ToastView: View {
             }
         }
     }
-    
+
     private var content: some View {
         HStack(alignment: .center, spacing: 8) {
             Text(title)
                 .modifier(RoundFontModifier(size: 14, weight: .black, foregroundColor: .textPrimaryInverted))
                 .padding(.vertical)
-            
+
             Spacer()
         }
         .padding(.leading)

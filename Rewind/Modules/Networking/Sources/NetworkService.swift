@@ -16,9 +16,9 @@ public protocol NetworkServiceProtocol {
 
 public final class NetworkService: NetworkServiceProtocol {
     private let provider = NetworkProvider<APIService>()
-    
+
     public init() {}
-    
+
     public func register(email: String) async throws -> RegisterResponse {
         try await provider.request(
             .register(
@@ -27,7 +27,7 @@ public final class NetworkService: NetworkServiceProtocol {
             type: RegisterResponse.self
         )
     }
-    
+
     public func verifyEmail(registrationID: String, verificationCode: String) async throws -> SuccessResponse {
         try await provider.request(
             .verifyEmail(
@@ -37,8 +37,12 @@ public final class NetworkService: NetworkServiceProtocol {
             type: SuccessResponse.self
         )
     }
-    
-    public func finishRegister(password: String, registrationID: String, username: String) async throws -> UserTokensResponse {
+
+    public func finishRegister(
+        password: String,
+        registrationID: String,
+        username: String
+    ) async throws -> UserTokensResponse {
         try await provider.request(
             .finishRegister(
                 password: password,
@@ -48,7 +52,7 @@ public final class NetworkService: NetworkServiceProtocol {
             type: UserTokensResponse.self
         )
     }
-    
+
     public func login(email: String, password: String) async throws -> UserTokensResponse {
         try await provider.request(
             .login(
@@ -58,7 +62,7 @@ public final class NetworkService: NetworkServiceProtocol {
             type: UserTokensResponse.self
         )
     }
-    
+
     public func logout(refreshToken: String) async throws -> SuccessResponse {
         try await provider.request(
             .logout(
@@ -67,7 +71,7 @@ public final class NetworkService: NetworkServiceProtocol {
             type: SuccessResponse.self
         )
     }
-    
+
     public func deleteUser(email: String) async throws -> SuccessResponse {
         try await provider.request(
             .deleteUser(
@@ -76,7 +80,7 @@ public final class NetworkService: NetworkServiceProtocol {
             type: SuccessResponse.self
         )
     }
-    
+
     public func refresh(refreshToken: String) async throws -> UserAccessTokenResponse {
         try await provider.request(
             .refresh(
@@ -85,7 +89,7 @@ public final class NetworkService: NetworkServiceProtocol {
             type: UserAccessTokenResponse.self
         )
     }
-    
+
     public func user(accessToken: String, refreshToken: String) async throws -> UserResponse {
         try await retryOnUnauthorized(refreshToken: refreshToken) { [unowned self] newToken in
             try await self.provider.request(
@@ -96,7 +100,7 @@ public final class NetworkService: NetworkServiceProtocol {
             )
         }
     }
-    
+
     private func retryOnUnauthorized<T>(
         refreshToken: String,
         _ perform: @escaping (String?) async throws -> T
@@ -106,7 +110,7 @@ public final class NetworkService: NetworkServiceProtocol {
         } catch let httpError as HTTPError where httpError == .unauthorized {
             let newToken = try await refresh(refreshToken: refreshToken).accessToken
             KeychainService.shared.save(newToken, for: .accessToken)
-            
+
             return try await perform(newToken)
         }
     }

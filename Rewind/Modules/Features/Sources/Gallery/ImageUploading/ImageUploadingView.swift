@@ -3,23 +3,23 @@ import UIComponents
 import Domain
 
 public struct ImageUploadingView: View {
-    @State var viewModel: ImageUploadingViewModel
+    @State private var viewModel: ImageUploadingViewModel
     var onSave: (LoadedMedia) -> Void
-    
+
     @Environment(\.showToast)
     private var showToast
     @Environment(\.dismiss)
     private var dismiss
-    
+
     public init(media: LoadedMedia? = nil, onSave: @escaping (LoadedMedia) -> Void) {
         viewModel = .init(loadedMedia: media)
         self.onSave = onSave
     }
-    
+
     public var body: some View {
         VStack(spacing: 0) {
             header
-            
+
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 16) {
                     if let image = viewModel.image {
@@ -33,10 +33,10 @@ public struct ImageUploadingView: View {
                             }
                             .padding(.horizontal, 8)
                     }
-                    
+
                     Group {
                         musicSection
-                        
+
                         TagsSectionView(tags: viewModel.loadedMediaTagsBinding)
                             .padding(.horizontal, 8)
                     }.disabledWithOpacity(!viewModel.ready)
@@ -69,7 +69,7 @@ public struct ImageUploadingView: View {
             }
         }
     }
-    
+
     private var header: some View {
         RewindHeader {
             RewindButton(type: .leftChevron) { dismiss() }
@@ -84,24 +84,24 @@ public struct ImageUploadingView: View {
             }
         }
     }
-    
+
     private var emptyImageContent: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 40)
                 .fill(Color.backgroundSecondary)
                 .aspectRatio(1, contentMode: .fit)
-            
+
             VStack {
                 Image(systemName: "photo")
                     .font(.system(size: 130))
                     .foregroundColor(.textSecondary)
-                
+
                 Text(UIComponentsStrings.Video.hint)
                     .modifier(RoundFontModifier(size: 15, weight: .bold))
             }
         }
     }
-    
+
     private var musicSection: some View {
         VStack {
             MusicSectionView(
@@ -109,7 +109,7 @@ public struct ImageUploadingView: View {
                     viewModel.dispatch(.findTrack)
                 }
                 .padding(.horizontal, 8)
-            
+
             if let selectedTrack = viewModel.selectedTrack {
                 ChooseTrackPieceView(
                     shouldPlay: $viewModel.isSelectedTrackPlaying,
@@ -126,7 +126,7 @@ public struct ImageUploadingView: View {
             }
         }
     }
-    
+
     private var continueButton: some View {
         GradientButton(title: "Save image", width: .given(200)) {
             if let loadedMedia = viewModel.loadedMedia {
@@ -136,9 +136,9 @@ public struct ImageUploadingView: View {
                     viewModel.selectedStartTime,
                     viewModel.selectedDuration
                 )
-                
+
                 print(trackInfo)
-                
+
                 onSave(loadedMedia)
                 dismiss()
             }

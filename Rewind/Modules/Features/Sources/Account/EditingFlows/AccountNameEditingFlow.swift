@@ -8,22 +8,20 @@ final class AccountNameEditingFlowViewModel {
     enum Intent {
         case submitName(String)
     }
-    
+
     enum EditingState {
         case empty
         case ready
     }
-    
-    enum EditingError {
-        
-    }
-    
+
+    enum EditingError { }
+
     var state: EditingState = .empty
     var isLoading: Bool = false
-    
+
     func dispatch(_ intent: Intent) async {
         switch intent {
-        case let .submitName(name):
+        case .submitName:
             withAnimation(.easeIn(duration: 0.3)) { isLoading = true }
             await simulateFakeLoad()
             state = .ready
@@ -32,17 +30,17 @@ final class AccountNameEditingFlowViewModel {
 }
 
 struct AccountNameEditingFlow: View {
-    @State var viewModel: AccountNameEditingFlowViewModel
+    @State private var viewModel: AccountNameEditingFlowViewModel
     var afterSuccess: (() -> Void)?
-    
+
     @Environment(\.dismiss)
     private var dismiss
-    
+
     init(afterSuccess: (() -> Void)? = nil) {
         viewModel = AccountNameEditingFlowViewModel()
         self.afterSuccess = afterSuccess
     }
-    
+
     var body: some View {
         GenericInputSheetView(
             item: .name,

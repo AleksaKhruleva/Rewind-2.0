@@ -6,7 +6,7 @@ public struct WaveformView: View {
     @Binding var selectorDuration: CGFloat
     private let trackDuration: CGFloat
     private let sidePaddingWidth: CGFloat
-    
+
     public init(
         selectorDuration: Binding<CGFloat>,
         trackDuration: CGFloat,
@@ -16,28 +16,28 @@ public struct WaveformView: View {
         self.trackDuration = trackDuration
         self.sidePaddingWidth = sidePaddingWidth
     }
-    
+
     public var body: some View {
         HStack(spacing: 6) {
             Rectangle()
                 .fill(Color.clear)
                 .frame(width: sidePaddingWidth)
-            
-            ForEach(0 ..< barCount, id: \.self) { i in
-                let coef: CGFloat = i % 2 == 0 ? 0.5 : 1
+
+            ForEach(0 ..< barCount, id: \.self) { count in
+                let coef: CGFloat = count % 2 == 0 ? 0.5 : 1
                 SoundBar(coefficient: coef, color: .pinkPrimaryLight)
             }
-            
+
             Rectangle()
                 .fill(Color.clear)
                 .frame(width: sidePaddingWidth)
         }
     }
-    
+
     private var totalWidth: CGFloat {
         selectorWidth * (trackDuration / selectorDuration)
     }
-    
+
     private var barCount: Int {
         Int(totalWidth / 11)
     }

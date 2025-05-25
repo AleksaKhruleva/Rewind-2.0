@@ -6,39 +6,39 @@ private let color = Color.background
 
 public struct AddMemberView: View {
     @State private var viewModel: AddMemberViewModel
-    
+
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.showToast) private var showToast
-    
+
     private let groupName: String
-    
+
     private weak var router: AppRouter?
-    
+
     public init(groupName: String, router: AppRouter) {
         self.groupName = groupName
         self.router = router
         viewModel = AddMemberViewModel()
     }
-    
+
     public var body: some View {
         VStack {
             header
-            
+
             VStack(spacing: 12) {
                 title
-                
+
                 qrCode
-                
+
                 HStack(spacing: 12) {
                     makeButton(title: UIComponentsStrings.Group.AddMember.copyLink) {
                         viewModel.dispatch(.copyLink)
                     }
-                    
+
                     makeButton(title: UIComponentsStrings.Group.AddMember.shareLink) {
                         viewModel.dispatch(.shareLink)
                     }
                 }
-                
+
                 Spacer()
             }
             .modifier(VStackTopOffsetModifier(topOffsetRatio: 0.15))
@@ -78,7 +78,7 @@ public struct AddMemberView: View {
             }
         }
     }
-    
+
     private var header: some View {
         RewindHeader(backgroundColor: .clear, rightView: {
             RewindButton(type: .rightChevron) {
@@ -86,7 +86,7 @@ public struct AddMemberView: View {
             }
         })
     }
-    
+
     private var title: some View {
         Text(UIComponentsStrings.Group.AddMember.join(groupName))
             .modifier(
@@ -96,7 +96,7 @@ public struct AddMemberView: View {
                 )
             )
     }
-    
+
     @ViewBuilder
     private var qrCode: some View {
         switch viewModel.qrCodeImageState {
@@ -111,14 +111,14 @@ public struct AddMemberView: View {
                             colors: [
                                 Color(hex: "FF3299"),
                                 Color(hex: "FF65B5"),
-                                Color(hex: "FF8FC7"),
+                                Color(hex: "FF8FC7")
                             ],
                             startPoint: .leading,
                             endPoint: .trailing
                         )
                     )
                     .frame(width: width, height: width)
-                
+
                 Image(uiImage: qrCodeImage)
                     .resizable()
                     .interpolation(.none)
@@ -129,12 +129,12 @@ public struct AddMemberView: View {
             EmptyView()
         }
     }
-    
+
     private func makeButton(title: String, onTap: @escaping () -> Void) -> some View {
         ZStack {
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color.backgroundSecondary)
-            
+
             Button {
                 onTap()
             } label: {

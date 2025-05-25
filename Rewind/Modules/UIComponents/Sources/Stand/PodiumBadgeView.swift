@@ -14,7 +14,7 @@ public struct PodiumBadgeView: View {
     private let counterType: CounterType
     private let badgeSize: CGFloat
     private let badgeColor: Color
-    
+
     public init(
         rank: Int,
         member: Member,
@@ -32,7 +32,7 @@ public struct PodiumBadgeView: View {
         self.badgeSize = badgeSize
         self.badgeColor = badgeColor
     }
-    
+
     public var body: some View {
         VStack(spacing: 5) {
             ZStack(alignment: .topTrailing) {
@@ -45,7 +45,7 @@ public struct PodiumBadgeView: View {
                         RoundedRectangle(cornerRadius: cornerRadius)
                             .stroke(Color.white, lineWidth: 3)
                     )
-                
+
                 Text("\(rank)")
                     .modifier(RoundFontModifier(size: badgeSize * 0.5, foregroundColor: .white))
                     .frame(width: badgeSize, height: badgeSize)
@@ -55,17 +55,17 @@ public struct PodiumBadgeView: View {
                     )
                     .offset(x: 7, y: -7)
             }
-            
+
             Text(member.name)
                 .modifier(RoundFontModifier(size: 16, foregroundColor: .white))
                 .padding(.top, 4)
-            
+
             Text("\(count) \(counterType)")
                 .modifier(RoundFontModifier(size: 12, foregroundColor: .textTertiary))
         }
         .padding()
     }
-    
+
     private var cornerRadius: CGFloat {
         imageSize * 0.25
     }

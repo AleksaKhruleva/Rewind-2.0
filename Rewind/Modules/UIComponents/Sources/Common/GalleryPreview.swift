@@ -3,17 +3,17 @@ import SwiftUI
 public struct GalleryPreview: View {
     private let gallerySize: Int
     private let images: [UIImage]
-    
+
     public init(gallerySize: Int, images: [UIImage]) {
         self.gallerySize = gallerySize
         self.images = images
     }
-    
+
     public var body: some View {
         VStack(spacing: 5) {
             Text(UIComponentsStrings.Gallery.Media.count(gallerySize))
                 .modifier(RoundFontModifier(size: 17))
-            
+
             if !images.isEmpty {
                 HStack(spacing: -8) {
                     ForEach(Array(images.prefix(4).enumerated()), id: \.offset) { index, image in
@@ -35,7 +35,7 @@ public struct GalleryPreview: View {
             }
         }
     }
-    
+
     private func rotation(for count: Int, at index: Int) -> Angle {
         switch count {
         case 1:
@@ -50,7 +50,7 @@ public struct GalleryPreview: View {
             return .zero
         }
     }
-    
+
     private func verticalOffset(for count: Int, at index: Int) -> CGFloat {
         switch count {
         case 3:
@@ -70,7 +70,7 @@ public struct GalleryPreview: View {
         UIComponentsAsset.media3.image,
         UIComponentsAsset.media4.image
     ]
-    
+
     VStack {
         GalleryPreview(gallerySize: 0, images: Array(images.prefix(0)))
         GalleryPreview(gallerySize: 1, images: Array(images.prefix(1)))

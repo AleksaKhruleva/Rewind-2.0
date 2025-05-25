@@ -5,7 +5,7 @@ public struct RewindHeader<LeftContent: View, CenterContent: View, RightContent:
     private let leftView: LeftContent
     private let centerView: CenterContent
     private let rightView: RightContent
-    
+
     public init(
         backgroundColor: Color = Color.background,
         @ViewBuilder leftView: () -> LeftContent = { EmptyView() },
@@ -30,4 +30,3 @@ public struct RewindHeader<LeftContent: View, CenterContent: View, RightContent:
         .background(.clear)
     }
 }
-

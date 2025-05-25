@@ -5,11 +5,11 @@ public struct CustomPlayerView: UIViewRepresentable {
     @Binding var isPlaying: Bool
     @Binding var isMuted: Bool
     @Binding var shouldSeekToStartTime: Bool
-    
+
     private let player: AVPlayer
     private let startTime: CMTime
     private let onSeekComplete: () -> Void
-    
+
     public init(
         isPlaying: Binding<Bool>,
         isMuted: Binding<Bool>,
@@ -25,7 +25,7 @@ public struct CustomPlayerView: UIViewRepresentable {
         self.startTime = startTime
         self.onSeekComplete = onSeekComplete
     }
-    
+
     public func makeUIView(context: Context) -> PlayerUIView {
         let view = PlayerUIView(player: player)
         view.setMuted(isMuted)
@@ -37,10 +37,10 @@ public struct CustomPlayerView: UIViewRepresentable {
         }
         return view
     }
-    
+
     public func updateUIView(_ uiView: PlayerUIView, context: Context) {
         uiView.player = player
-        
+
         if isPlaying {
             if shouldSeekToStartTime {
                 player.seek(to: startTime, toleranceBefore: .zero, toleranceAfter: .zero) { _ in

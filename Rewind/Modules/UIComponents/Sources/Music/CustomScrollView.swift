@@ -5,7 +5,7 @@ public struct CustomScrollView<Content: View>: UIViewRepresentable {
     private let onBeginDragging: (() -> Void)
     private let onEndDragging: ((_ offset: CGFloat) -> Void)
     private let onScroll: ((_ offset: CGFloat) -> Void)
-    
+
     public init(
         @ViewBuilder content: () -> Content,
         onBeginDragging: @escaping (() -> Void),
@@ -17,7 +17,7 @@ public struct CustomScrollView<Content: View>: UIViewRepresentable {
         self.onEndDragging = onEndDragging
         self.onScroll = onScroll
     }
-    
+
     public func makeCoordinator() -> Coordinator {
         Coordinator(
             onBeginDragging: onBeginDragging,
@@ -25,18 +25,18 @@ public struct CustomScrollView<Content: View>: UIViewRepresentable {
             onScroll: onScroll
         )
     }
-    
+
     public func makeUIView(context: Context) -> UIScrollView {
         let scrollView = UIScrollView()
         scrollView.delegate = context.coordinator
         scrollView.decelerationRate = .fast
-        
+
         let hostedView = UIHostingController(rootView: content)
         hostedView.view.translatesAutoresizingMaskIntoConstraints = false
         hostedView.view.backgroundColor = .clear
-        
+
         scrollView.addSubview(hostedView.view)
-        
+
         NSLayoutConstraint.activate([
             hostedView.view.topAnchor.constraint(equalTo: scrollView.topAnchor),
             hostedView.view.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
@@ -44,24 +44,24 @@ public struct CustomScrollView<Content: View>: UIViewRepresentable {
             hostedView.view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             hostedView.view.heightAnchor.constraint(equalTo: scrollView.heightAnchor)
         ])
-        
+
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.alwaysBounceHorizontal = true
         scrollView.isPagingEnabled = false
         scrollView.isDirectionalLockEnabled = true
-        
+
         return scrollView
     }
-    
+
     public func updateUIView(_ uiView: UIScrollView, context: Context) {
         uiView.subviews.forEach { $0.removeFromSuperview() }
-        
+
         let hostedView = UIHostingController(rootView: content)
         hostedView.view.translatesAutoresizingMaskIntoConstraints = false
         hostedView.view.backgroundColor = .clear
-        
+
         uiView.addSubview(hostedView.view)
-        
+
         NSLayoutConstraint.activate([
             hostedView.view.topAnchor.constraint(equalTo: uiView.topAnchor),
             hostedView.view.bottomAnchor.constraint(equalTo: uiView.bottomAnchor),
@@ -70,12 +70,12 @@ public struct CustomScrollView<Content: View>: UIViewRepresentable {
             hostedView.view.heightAnchor.constraint(equalTo: uiView.heightAnchor)
         ])
     }
-    
-    public class Coordinator: NSObject, UIScrollViewDelegate {
+
+    public final class Coordinator: NSObject, UIScrollViewDelegate {
         private let onBeginDragging: (() -> Void)?
         private let onEndDragging: ((_ offset: CGFloat) -> Void)?
         private let onScroll: ((_ offset: CGFloat) -> Void)?
-        
+
         init(
             onBeginDragging: (() -> Void)?,
             onEndDragging: ((_ offset: CGFloat) -> Void)?,
@@ -85,19 +85,19 @@ public struct CustomScrollView<Content: View>: UIViewRepresentable {
             self.onEndDragging = onEndDragging
             self.onScroll = onScroll
         }
-        
+
         public func scrollViewDidScroll(_ scrollView: UIScrollView) {
             onScroll?(scrollView.contentOffset.x)
         }
-        
+
         public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
             onBeginDragging?()
         }
-        
+
         public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
             onEndDragging?(scrollView.contentOffset.x)
         }
-        
+
         public func scrollViewDidEndDragging(
             _ scrollView: UIScrollView,
             willDecelerate decelerate: Bool

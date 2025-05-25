@@ -24,7 +24,7 @@ let groupsForTest: [RewindGroup] = zip(images, groupNames).map { image, name in
 
 struct SelectGroupView: View {
     @State private var searchText = ""
-    
+
     private var filteredGroups: [RewindGroup] {
         if searchText.isEmpty {
             return groupsForTest
@@ -34,25 +34,25 @@ struct SelectGroupView: View {
             }
         }
     }
-    
+
     var body: some View {
         ZStack {
             Color.backgroundSecondary.ignoresSafeArea()
-            
+
             VStack(spacing: 20) {
                 Text(UIComponentsStrings.Group.Select.title)
                     .modifier(RoundFontModifier(size: 21))
-                
+
                 searchField
-                
+
                 groupsScroll
-                
+
                 suggestionsTable
             }
             .padding(.horizontal)
         }
     }
-    
+
     private var searchField: some View {
         RewindSearchField(
             text: $searchText,
@@ -60,17 +60,17 @@ struct SelectGroupView: View {
             backgroundColor: Color.background
         )
     }
-    
+
     private var groupsScroll: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text(UIComponentsStrings.Group.Select.count(images.count))
                 .modifier(RoundFontModifier(size: 17, foregroundColor: .textSecondary))
                 .padding(.leading, 16)
-            
+
             ZStack(alignment: .trailing) {
                 RoundedRectangle(cornerRadius: 35, style: .continuous)
                     .fill(Color.background)
-                
+
                 GroupsScrollView(groups: filteredGroups, imageSize: imageSize)
                     .frame(height: imageSize + 20)
                     .clipShape(RoundedRectangle(cornerRadius: 40, style: .continuous))
@@ -79,7 +79,7 @@ struct SelectGroupView: View {
             .frame(height: imageSize + 40)
         }
     }
-    
+
     // временно
     private var suggestionsTable: some View {
         VStack(alignment: .leading, spacing: 5) {
@@ -91,7 +91,7 @@ struct SelectGroupView: View {
                     )
                 )
                 .padding(.leading, 15)
-            
+
             VStack(alignment: .leading, spacing: 0) {
                 suggestionRow(icon: "plus", title: UIComponentsStrings.Group.Select.add)
                 suggestionRow(icon: "person.2.fill", title: UIComponentsStrings.Group.Select.count(images.count))
@@ -100,19 +100,19 @@ struct SelectGroupView: View {
             .cornerRadius(20)
         }
     }
-    
+
     // временно
     private func suggestionRow(icon: String, title: String) -> some View {
         HStack(spacing: 10) {
             Image(systemName: icon)
                 .modifier(RoundFontModifier(size: 20))
                 .frame(width: 34, height: 34)
-            
+
             Text(title)
                 .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize))
-            
+
             Spacer()
-            
+
             Image(systemName: "chevron.right")
                 .modifier(RoundFontModifier(size: 17))
                 .frame(width: 30, height: 30)

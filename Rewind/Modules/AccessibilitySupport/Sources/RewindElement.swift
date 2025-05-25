@@ -5,7 +5,7 @@ public enum RewindElement {
             case password
             case name
             case code(Int)
-            
+
             var rawValue: String {
                 switch self {
                 case .email: "email"
@@ -15,15 +15,15 @@ public enum RewindElement {
                 }
             }
         }
-        
+
         public enum Button: String {
-            case signup = "signup"
-            case signin = "signin"
+            case signup
+            case signin
         }
-        
+
         case input(Input)
         case button(Button)
-        
+
         var rawValue: String {
             switch self {
             case let .input(input):
@@ -33,9 +33,9 @@ public enum RewindElement {
             }
         }
     }
-    
+
     case auth(Auth)
-    
+
     public var accessibilityID: String {
         switch self {
         case let .auth(element):

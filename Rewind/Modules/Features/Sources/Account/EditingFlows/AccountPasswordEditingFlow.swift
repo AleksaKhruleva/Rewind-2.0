@@ -6,7 +6,9 @@ import Networking
 public func simulateFakeLoad() async {
     do {
         try await Task.sleep(for: .seconds(1))
-    } catch { }
+    } catch {
+        print("Ошибочка вышла")
+    }
 }
 
 @MainActor @Observable
@@ -15,16 +17,16 @@ final class AccountPasswordEditingFlowViewModel {
         case submitCode(String)
         case submitPassword(String)
     }
-    
+
     enum EditingState {
         case code
         case password
         case ready
     }
-    
+
     var state: EditingState = .code
     var isLoading: Bool = false
-    
+
     func dispatch(_ intent: Intent) async {
         switch intent {
         case let .submitCode(code):
@@ -39,7 +41,7 @@ final class AccountPasswordEditingFlowViewModel {
             animateState(to: .ready)
         }
     }
-    
+
     private func animateState(to state: EditingState) {
         withAnimation(.spring(response: 0.3)) {
             self.state = state
@@ -49,17 +51,17 @@ final class AccountPasswordEditingFlowViewModel {
 }
 
 struct AccountPasswordEditingFlow: View {
-    @State var viewModel: AccountPasswordEditingFlowViewModel
+    @State private var viewModel: AccountPasswordEditingFlowViewModel
     var afterSuccess: (() -> Void)?
-    
+
     @Environment(\.dismiss)
     private var dismiss
-    
+
     init(afterSuccess: (() -> Void)?) {
         viewModel = AccountPasswordEditingFlowViewModel()
         self.afterSuccess = afterSuccess
     }
-    
+
     var body: some View {
         Group {
             switch viewModel.state {

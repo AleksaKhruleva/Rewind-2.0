@@ -3,11 +3,11 @@ import Foundation
 
 final class NetworkProvider<T: TargetType> {
     private let provider: MoyaProvider<T>
-    
+
     init(stub: Bool = false, timeout: TimeInterval = 5) {
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = timeout
-        
+
         self.provider = MoyaProvider<T>(
             stubClosure: stub ? MoyaProvider.immediatelyStub : MoyaProvider.neverStub,
             session: Session(configuration: configuration)

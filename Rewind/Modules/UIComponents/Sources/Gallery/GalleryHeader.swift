@@ -6,7 +6,7 @@ public struct GalleryHeader: View {
     private let onDismiss: () -> Void
     private let onAddingQuote: () -> Void
     private let onAddingMedias: () -> Void
-    
+
     public init(
         image: UIImage,
         groupName: String,
@@ -20,7 +20,7 @@ public struct GalleryHeader: View {
         self.onAddingQuote = onAddingQuote
         self.onAddingMedias = onAddingMedias
     }
-    
+
     public var body: some View {
         RewindHeader {
             RewindButton(type: .xmark) { onDismiss() }

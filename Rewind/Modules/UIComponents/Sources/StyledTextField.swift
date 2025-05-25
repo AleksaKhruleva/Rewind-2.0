@@ -8,7 +8,7 @@ public struct StyledTextField: View {
     private let isSecure: Bool
     private let frameWidth: CGFloat?
     private let frameHeight: CGFloat?
-    
+
     public init(
         text: Binding<String>,
         placeholder: String,
@@ -26,7 +26,7 @@ public struct StyledTextField: View {
         self.frameWidth = frameWidth
         self.frameHeight = frameHeight
     }
-    
+
     public var body: some View {
         ZStack(alignment: .trailing) {
             if isSecure {
@@ -61,7 +61,7 @@ public struct StyledTextField: View {
             placeholder: "email@email.ru",
             keyboardType: .emailAddress
         )
-        
+
         StyledTextField(
             text: .constant(""),
             placeholder: "password",

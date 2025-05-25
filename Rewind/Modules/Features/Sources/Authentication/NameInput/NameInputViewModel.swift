@@ -9,17 +9,17 @@ final class NameInputViewModel {
     enum Intent {
         case submitName(String)
     }
-    
+
     enum NameState: Equatable {
         case loading
         case empty
         case error(NameError)
         case ready
     }
-    
+
     enum NameError: Error {
         case responseError
-        
+
         var errorDescription: String {
             switch self {
             case .responseError:
@@ -27,15 +27,15 @@ final class NameInputViewModel {
             }
         }
     }
-    
+
     var state: NameState = .empty
     let router: AuthenticationRouter
-    
+
     private let email: String
     private let password: String
     private let registrationID: String
     private let backend: NetworkServiceProtocol
-    
+
     init(router: AuthenticationRouter, email: String, password: String, registrationID: String) {
         self.router = router
         self.email = email
@@ -43,13 +43,17 @@ final class NameInputViewModel {
         self.registrationID = registrationID
         backend = NetworkService()
     }
-    
+
     func dispatch(_ intent: Intent) async {
         switch intent {
         case let .submitName(name):
             animateState(to: .loading)
             do {
-                let response = try await backend.finishRegister(password: password, registrationID: registrationID, username: name)
+                let response = try await backend.finishRegister(
+                    password: password,
+                    registrationID: registrationID,
+                    username: name
+                )
                 animateState(to: .ready)
                 if !CommandLine.arguments.contains("-testingAuth") {
                     KeychainService.shared.save(response.accessToken, for: .accessToken)
@@ -58,13 +62,13 @@ final class NameInputViewModel {
             } catch {
                 animateState(to: .error(.responseError))
             }
-            
+
             if state == .ready {
                 router.navigateToRewind()
             }
         }
     }
-    
+
     func animateState(to state: NameState) {
         withAnimation(.spring(response: 0.2)) { self.state = state }
     }

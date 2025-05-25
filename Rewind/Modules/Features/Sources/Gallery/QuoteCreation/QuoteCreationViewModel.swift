@@ -8,7 +8,7 @@ final class QuoteCreationViewModel {
         case empty
         case ready
     }
-    
+
     enum Intent {
         case presentQuoteInput
         case presentAuthorInput
@@ -19,24 +19,24 @@ final class QuoteCreationViewModel {
         case trackSelected(Track)
         case resumePlayback
     }
-    
+
     var quoteInputPresented = false
     var authorInputPresented = false
     var findTrackViewPresented = false
     var isSelectedTrackPlaying = true
-    
+
     var quote: String = ""
     var author: String = ""
     var tags: [String] = []
-    
+
     var selectedTrack: Track?
     var selectedStartTime: Double = 0
     var selectedDuration: CGFloat = 15
-    
+
     var quoteState: QuoteState {
         !quote.isEmpty && !author.isEmpty ? .ready : .empty
     }
-    
+
     func dispatch(_ intent: Intent) {
         switch intent {
         case .presentQuoteInput:
@@ -51,7 +51,7 @@ final class QuoteCreationViewModel {
             isSelectedTrackPlaying = true
         case let .saveQuote(content):
             let renderer = ImageRenderer(content: content)
-            
+
             saveImageWithToast(image: renderer.uiImage) { message in
                 print(message)
             }

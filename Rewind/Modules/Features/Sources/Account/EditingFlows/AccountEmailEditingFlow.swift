@@ -9,17 +9,17 @@ final class AccountEmailEditingFlowViewModel {
         case submitEmail(String)
         case submitCode(String)
     }
-    
+
     enum EditingState {
         case password
         case email
         case code
         case ready
     }
-    
+
     var state: EditingState = .password
     var isLoading: Bool = false
-    
+
     func dispatch(_ intent: Intent) async {
         switch intent {
         case let .submitPassword(password):
@@ -39,7 +39,7 @@ final class AccountEmailEditingFlowViewModel {
             animateState(to: .ready)
         }
     }
-    
+
     private func animateState(to state: EditingState) {
         withAnimation(.spring(response: 0.3)) {
             self.state = state
@@ -49,17 +49,17 @@ final class AccountEmailEditingFlowViewModel {
 }
 
 struct AccountEmailEditingFlow: View {
-    @State var viewModel: AccountEmailEditingFlowViewModel
+    @State private var viewModel: AccountEmailEditingFlowViewModel
     var onSuccess: (() -> Void)?
-    
+
     @Environment(\.dismiss)
     private var dismiss
-    
+
     init(onSuccess: (() -> Void)? = nil) {
         viewModel = AccountEmailEditingFlowViewModel()
         self.onSuccess = onSuccess
     }
-    
+
     var body: some View {
         Group {
             switch viewModel.state {

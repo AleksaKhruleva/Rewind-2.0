@@ -4,7 +4,7 @@ public struct RoundFontModifier: ViewModifier {
     private let size: CGFloat
     private let weight: Font.Weight
     private let foregroundColor: Color
-    
+
     public init(
         size: CGFloat,
         weight: Font.Weight = .heavy,
@@ -14,7 +14,7 @@ public struct RoundFontModifier: ViewModifier {
         self.weight = weight
         self.foregroundColor = foregroundColor
     }
-    
+
     public func body(content: Content) -> some View {
         content
             .font(.system(size: size, weight: weight, design: .rounded))

@@ -2,16 +2,16 @@ import SwiftUI
 import UIComponents
 
 public struct FilterView: View {
-    @State var viewModel: FilterViewModel
+    @State private var viewModel: FilterViewModel
     var title: String
     var onSave: (FilterSettings) -> Void
-    
+
     @State private var date = Date()
     @State private var invalidDatesShown = false
-    
+
     @Environment(\.dismiss)
     private var dismiss
-    
+
     public init(
         title: String,
         onSave: @escaping (FilterSettings) -> Void
@@ -20,31 +20,31 @@ public struct FilterView: View {
         self.onSave = onSave
         viewModel = FilterViewModel()
     }
-    
+
     public var body: some View {
         ZStack {
             Color.backgroundSecondary.ignoresSafeArea()
-            
+
             VStack(spacing: 0) {
                 header
                     .padding(.top, 24)
-                
+
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
                         mediasToggle
-                        
+
                         favoritesToggle
-                        
+
                         RewindDatePicker(
                             title: UIComponentsStrings.FilterSettings.fromDate,
                             date: $viewModel.startDate
                         )
-                        
+
                         RewindDatePicker(
                             title: UIComponentsStrings.FilterSettings.toDate,
                             date: $viewModel.endDate
                         )
-                        
+
                         TagsSectionView(tags: $viewModel.tags, useInvertedColors: true)
                     }
                     .padding(.horizontal, 8)
@@ -62,7 +62,7 @@ public struct FilterView: View {
             continueButton
         }
     }
-    
+
     private var header: some View {
         RewindHeader(centerView: {
             Text(title)
@@ -70,7 +70,7 @@ public struct FilterView: View {
                 .foregroundColor(.textPrimary)
         })
     }
-    
+
     private var mediasToggle: some View {
         VStack(spacing: -8) {
             RewindToggle(
@@ -92,7 +92,7 @@ public struct FilterView: View {
         .background(Color.background)
         .cornerRadius(22)
     }
-    
+
     private var favoritesToggle: some View {
         RewindToggle(
             title: UIComponentsStrings.FilterSettings.Toggle.favourites,
@@ -101,7 +101,7 @@ public struct FilterView: View {
         .background(Color.background)
         .cornerRadius(22)
     }
-    
+
     private var continueButton: some View {
         GradientButton(
             title: UIComponentsStrings.FilterSettings.save,

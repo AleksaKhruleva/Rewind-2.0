@@ -5,12 +5,12 @@ let maxTags = 5
 public struct TagsSectionView: View {
     @Binding var tags: [String]
     var useInvertedColors: Bool
-    
+
     public init(tags: Binding<[String]>, useInvertedColors: Bool = false) {
         self._tags = tags
         self.useInvertedColors = useInvertedColors
     }
-    
+
     public var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -18,14 +18,14 @@ public struct TagsSectionView: View {
                     .foregroundColor(.textSecondary)
                     .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .black))
                     .padding(.leading, 16)
-                
+
                 Text("\(tags.count)/\(maxTags)")
                     .foregroundColor(.textTertiary)
                     .modifier(RoundFontModifier(size: 14, weight: .black))
                     .padding(.leading, 4)
-                
+
                 Spacer()
-                
+
                 Button(UIComponentsStrings.Tags.Section.autogenerate) {
                     withAnimation { tags.shuffle() }
                 }
@@ -35,7 +35,7 @@ public struct TagsSectionView: View {
                 .padding(.trailing, 16)
                 .disabledWithOpacity(tags.isEmpty)
             }
-            
+
             TagsView(tags: $tags, useInvertedColors: useInvertedColors)
         }
     }

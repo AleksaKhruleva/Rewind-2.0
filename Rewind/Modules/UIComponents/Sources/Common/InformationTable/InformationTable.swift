@@ -4,7 +4,7 @@ public struct InformationTable: View {
     private let title: String
     private let data: [(icon: String, title: String, action: (() -> Void)?)]
     private let isRisky: Bool
-    
+
     public init(
         title: String,
         data: [(String, String, (() -> Void)?)],
@@ -14,7 +14,7 @@ public struct InformationTable: View {
         self.data = data
         self.isRisky = isRisky
     }
-    
+
     public var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text(title)
@@ -25,7 +25,7 @@ public struct InformationTable: View {
                         foregroundColor: isRisky ? .riskySecondary : .textSecondary)
                     )
                 .padding(.leading, 15)
-            
+
             VStack(alignment: .leading, spacing: 0) {
                 ForEach(data, id: \.1) { item in
                     InformationTableCell(
@@ -55,9 +55,9 @@ public struct InformationTable: View {
             ],
             isRisky: true
         )
-        
+
         InformationTable(title: "Table", data: [("person.fill", "Smth", nil)], isRisky: false)
-        
+
         InformationTable(
             title: "Table",
             data: [

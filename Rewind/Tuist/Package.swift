@@ -16,6 +16,7 @@ let package = Package(
     name: "Rewind",
     dependencies: [
         .package(url: "https://github.com/Moya/Moya", .upToNextMajor(from: "15.0.0")),
+        .package(url: "https://github.com/realm/SwiftLint", .upToNextMajor(from: "0.59.1")),
         .package(url: "https://github.com/vapor/vapor.git", .upToNextMajor(from: "4.114.0")),
     ]
 )

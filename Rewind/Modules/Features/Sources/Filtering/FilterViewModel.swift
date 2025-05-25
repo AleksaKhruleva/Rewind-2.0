@@ -6,21 +6,21 @@ final class FilterViewModel {
     var photos: Bool = true
     var videos: Bool = true
     var quotes: Bool = true
-    
+
     var favourites: Bool = false
-    
+
     var startDate: Date?
     var endDate: Date?
-    
+
     var tags: [String] = []
-    
+
     var invalidDates: Bool {
         let comparingStartDate = startDate ?? Date()
         let comparingEndDate = endDate ?? Date()
-        
+
         return comparingStartDate >= comparingEndDate
     }
-    
+
     public func generateFilters() -> FilterSettings {
         FilterSettings(
             photos: photos,

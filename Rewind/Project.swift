@@ -23,13 +23,22 @@ let project = Project(
             sources: ["Rewind/Sources/**"],
             resources: ["Rewind/Resources/**"],
             entitlements: "Rewind.entitlements",
+            scripts: [
+                .pre(
+                    script: """
+                    /opt/homebrew/bin/swiftlint --config ${PROJECT_DIR}/.swiftlint.yml --reporter xcode || echo 'SwiftLint not found'
+                    """,
+                    name: "SwiftLint",
+                    basedOnDependencyAnalysis: false
+                )
+            ],
             dependencies: [
                 .project(target: "UIComponents", path: "Modules/UIComponents"),
                 .project(target: "Features", path: "Modules/Features"),
                 .project(target: "Networking", path: "Modules/Networking"),
                 .project(target: "Domain", path: "Modules/Domain"),
                 .project(target: "Base", path: "Modules/Base"),
-                .project(target: "AccessibilitySupport", path: "Modules/AccessibilitySupport")
+                .project(target: "AccessibilitySupport", path: "Modules/AccessibilitySupport"),
             ],
             settings: .settings(
                 base: [
@@ -58,7 +67,7 @@ let project = Project(
             resources: [],
             dependencies: [
                 .target(name: "Rewind"),
-                .external(name: "Vapor")
+                .external(name: "Vapor"),
             ]
         ),
     ],

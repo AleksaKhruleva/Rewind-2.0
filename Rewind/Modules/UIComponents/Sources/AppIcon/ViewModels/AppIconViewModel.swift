@@ -6,7 +6,7 @@ public final class AppIconViewModel: Identifiable {
     enum Event {
         case change
     }
-    
+
     let name: String
     let task: String
     let needTitle: Bool
@@ -20,7 +20,7 @@ public final class AppIconViewModel: Identifiable {
         self.needTitle = needTitle
         self.selected = appIcon == UserDefaults.standard.string(forKey: "appIcon") ? true : false
     }
-    
+
     func dispatch(_ event: Event) {
         switch event {
         case .change:

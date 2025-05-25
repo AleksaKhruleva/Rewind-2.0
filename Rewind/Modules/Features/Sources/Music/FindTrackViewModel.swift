@@ -12,33 +12,33 @@ final class FindTrackViewModel: ObservableObject {
         case togglePlayback(track: Track)
         case loadMoreTracks(currentTrack: Track)
     }
-    
+
     @Published var searchText = ""
-    
+
     @Published private(set) var tracks = [Track]()
     @Published private(set) var currentlyPlayingTrackID: Int?
     @Published private(set) var currentlyLoadingTrackID: Int?
-    
+
     @Published private(set) var isLoadingMore = false
     @Published private(set) var hasReachedEnd = false
-    
+
     private var isShowingDefaultTracks = true
-    
+
     private var defaultTracks = [Track]()
     private var defaultNextHref: String?
-    
+
     private var cancellables = Set<AnyCancellable>()
-    private var player: AVPlayer? = nil
+    private var player: AVPlayer?
     private var endObserver: NSObjectProtocol?
     private var nextHref: String?
-    
+
     private let backend: SoundCloudServiceProtocol
-    
+
     init() {
         self.backend = SoundCloudNetworkService()
         setupSearchTextDebounce()
     }
-    
+
     func dispatch(_ intent: Intent) {
         switch intent {
         case .loadTracks:
@@ -49,7 +49,7 @@ final class FindTrackViewModel: ObservableObject {
             loadMoreTracksIfNeeded(currentTrack: currentTrack)
         }
     }
-    
+
     private func setupSearchTextDebounce() {
         $searchText
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
@@ -63,10 +63,10 @@ final class FindTrackViewModel: ObservableObject {
             }
             .store(in: &cancellables)
     }
-    
+
     private func search(for query: String) async {
         let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        
+
         if trimmedQuery.isEmpty {
             tracks = defaultTracks
             nextHref = defaultNextHref
@@ -74,7 +74,7 @@ final class FindTrackViewModel: ObservableObject {
             isShowingDefaultTracks = true
             return
         }
-        
+
         do {
             let response = try await backend.searchTracks(query: trimmedQuery, limit: 30)
             self.tracks = response.collection
@@ -90,28 +90,28 @@ final class FindTrackViewModel: ObservableObject {
             // TODO: show error
         }
     }
-    
+
     private func loadDefaultTracks() {
         if let (cachedTracks, cachedNextHref) = DefaultTracksCache.shared.retrieve(), cachedTracks.count > 0 {
             defaultTracks = cachedTracks
             defaultNextHref = cachedNextHref
             isShowingDefaultTracks = true
-            
+
             tracks = defaultTracks
             nextHref = defaultNextHref
             hasReachedEnd = (defaultNextHref == nil)
             return
         }
-        
+
         Task {
             do {
                 let response = try await backend.fetchCharts(limit: 30)
                 defaultTracks = response.collection
                 defaultNextHref = response.next_href
                 isShowingDefaultTracks = true
-                
+
                 DefaultTracksCache.shared.store(tracks: defaultTracks, nextHref: defaultNextHref)
-                
+
                 tracks = defaultTracks
                 nextHref = defaultNextHref
                 hasReachedEnd = (defaultNextHref == nil)
@@ -120,31 +120,31 @@ final class FindTrackViewModel: ObservableObject {
             }
         }
     }
-    
+
     private func loadMoreTracksIfNeeded(currentTrack: Track) {
         guard !isLoadingMore,
               !hasReachedEnd,
               currentTrack.id == tracks.last?.id
         else { return }
-        
+
         guard let hrefToUse = nextHref else { return }
-        
+
         isLoadingMore = true
-        
+
         Task {
             defer { isLoadingMore = false }
-            
+
             do {
                 let response = try await backend.fetchNextPage(
                     from: hrefToUse,
                     for: isShowingDefaultTracks ? .charts : .search
                 )
-                
+
                 if isShowingDefaultTracks {
                     defaultTracks.append(contentsOf: response.collection)
                     defaultNextHref = response.next_href
                     tracks = defaultTracks
-                    
+
                     DefaultTracksCache.shared.store(
                         tracks: defaultTracks,
                         nextHref: defaultNextHref
@@ -152,7 +152,7 @@ final class FindTrackViewModel: ObservableObject {
                 } else {
                     tracks.append(contentsOf: response.collection)
                 }
-                
+
                 self.nextHref = response.next_href
                 self.hasReachedEnd = (response.next_href == nil)
             } catch {
@@ -161,22 +161,22 @@ final class FindTrackViewModel: ObservableObject {
             }
         }
     }
-    
+
     private func toggleTrackPlayback(_ track: Track) {
         if currentlyPlayingTrackID == track.id {
             player?.pause()
             currentlyPlayingTrackID = nil
             return
         }
-        
+
         currentlyLoadingTrackID = track.id
-        
+
         Task {
             defer { currentlyLoadingTrackID = nil }
-            
+
             do {
                 let streamURL: URL
-                
+
                 if let cachedURL = track.streamURL {
                     streamURL = cachedURL
                 } else {
@@ -184,19 +184,19 @@ final class FindTrackViewModel: ObservableObject {
                         return
                     }
                     streamURL = fetchedURL
-                    
+
                     if let index = tracks.firstIndex(where: { $0.id == track.id }) {
                         tracks[index].streamURL = fetchedURL
                     }
                 }
-                
+
                 let playerItem = AVPlayerItem(url: streamURL)
-                
+
                 await MainActor.run {
                     if let endObserver {
                         NotificationCenter.default.removeObserver(endObserver)
                     }
-                    
+
                     endObserver = NotificationCenter.default.addObserver(
                         forName: .AVPlayerItemDidPlayToEndTime,
                         object: playerItem,
@@ -206,11 +206,11 @@ final class FindTrackViewModel: ObservableObject {
                             self?.currentlyPlayingTrackID = nil
                         }
                     }
-                    
+
                     if player == nil {
                         player = AVPlayer()
                     }
-                    
+
                     player?.replaceCurrentItem(with: playerItem)
                     player?.playImmediately(atRate: 1.0)
                     currentlyPlayingTrackID = track.id

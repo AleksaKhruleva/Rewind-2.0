@@ -13,14 +13,14 @@ final class AccountViewModel {
         case deleteImage
         case setImage(UIImage?)
     }
-    
+
     var showToast: (String) -> Void
     let router: AccountRouter
-    
+
     private let backend: NetworkServiceProtocol
-    
+
     var user: User
-    
+
     var imageBinding: Binding<UIImage?> {
         Binding {
             self.user.image
@@ -32,19 +32,19 @@ final class AccountViewModel {
             self.user.image = newImage
         }
     }
-    
+
     init(user: User, router: AccountRouter) {
         self.user = user
         self.router = router
         showToast = { _ in }
         backend = NetworkService()
     }
-    
+
     func dispatch(_ intent: Intent) async {
         switch intent {
         case .signOut:
             if let refreshToken = KeychainService.shared.read(for: .refreshToken),
-               let _ = KeychainService.shared.read(for: .accessToken) {
+               KeychainService.shared.read(for: .accessToken) != nil {
                 do {
                     let response = try await backend.logout(refreshToken: refreshToken)
                     if response.success {
@@ -100,19 +100,19 @@ final class AccountViewModel {
             user.image = newImage
         }
     }
-    
+
     func set(showToast: @escaping (String) -> Void) {
         self.showToast = showToast
     }
-    
+
     private func clearLocalData() {
         KeychainService.shared.clearAll()
     }
-    
+
     private func showErrorToast() {
         showToast(UIComponentsStrings.Toast.error)
     }
-    
+
     private func showErrorToast(for error: Error) {
         showToast("\(error.localizedDescription) 😨")
     }

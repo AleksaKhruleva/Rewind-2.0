@@ -14,21 +14,21 @@ let riskyData = [
 
 public struct GroupSettingsView: View {
     private let router: GroupSettingsRouter
-    
+
     public init(router: GroupSettingsRouter) {
         self.router = router
     }
-    
+
     public var body: some View {
         VStack {
             header
-            
+
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 15) {
                     avatar
-                    
+
                     generalTable
-                    
+
                     riskyTable
                 }
                 .padding(.horizontal, 16)
@@ -36,7 +36,7 @@ public struct GroupSettingsView: View {
         }
         .background(Color.background)
     }
-    
+
     private var header: some View {
         RewindHeader {
             RewindButton(type: .rightChevron).hidden()
@@ -51,15 +51,15 @@ public struct GroupSettingsView: View {
             }
         }
     }
-    
+
     private var avatar: some View {
         AvatarView(image: UIComponentsAsset.groupAvatar.image, text: "Friends")
     }
-    
+
     private var generalTable: some View {
         InformationTable(title: UIComponentsStrings.Group.Settings.general, data: generalData, isRisky: false)
     }
-    
+
     private var riskyTable: some View {
         InformationTable(title: UIComponentsStrings.Group.Settings.risky, data: riskyData, isRisky: true)
     }

@@ -11,18 +11,18 @@ final class MediasUploadingViewModel {
         case removeMedia(LoadedMedia)
         case showMediaSettings(LoadedMedia)
     }
-    
+
     var similarSettigns: Bool
     var toggleDisabled: Bool
     var tags: [String]
     var loadedMedias: [LoadedMedia]
     var selection: [PhotosPickerItem]
     var showToast: (String) -> Void
-    
+
     var viewingMedia: LoadedMedia?
-    
+
     private let transformer: PhotosPickerItemTransformer
-    
+
     init() {
         similarSettigns = false
         toggleDisabled = false
@@ -32,17 +32,17 @@ final class MediasUploadingViewModel {
         showToast = { _ in }
         transformer = PhotosPickerItemTransformer()
     }
-    
+
     func dispatch(_ intent: Intent) async {
         switch intent {
         case let .importMedias(items):
             do {
                 let importedPickerItemsSet = Set(loadedMedias.compactMap { $0.photosPickerItem })
                 let itemsSet = Set(items)
-                
+
                 let newItems = itemsSet.subtracting(importedPickerItemsSet)
                 let orderedNewItems = items.filter { newItems.contains($0) }
-                
+
                 for item in orderedNewItems {
                     let newItem = try await self.transformer.transform(source: item)
                     withAnimation {
@@ -57,7 +57,7 @@ final class MediasUploadingViewModel {
                let selectionItemIndex = selection.firstIndex(of: needed) {
                 selection.tryRemove(at: selectionItemIndex)
             }
-            
+
             withAnimation {
                 if let index = loadedMedias.firstIndex(where: { $0.photosPickerItem == item.photosPickerItem }) {
                     loadedMedias.tryRemove(at: index)
@@ -67,7 +67,7 @@ final class MediasUploadingViewModel {
             viewingMedia = media
         }
     }
-    
+
     func set(showToast: @escaping (String) -> Void) {
         self.showToast = showToast
     }

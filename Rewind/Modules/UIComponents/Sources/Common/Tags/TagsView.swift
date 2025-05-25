@@ -5,7 +5,7 @@ struct TagsView: View {
     @State private var totalHeight: CGFloat
     @State private var tagInputPresented: Bool
     var useInvertedColors: Bool
-    
+
     init(
         tags: Binding<[String]>,
         totalHeight: Double = CGFloat.zero,
@@ -37,33 +37,33 @@ struct TagsView: View {
         }
     }
 
+    // swiftlint:disable function_body_length
     private func generateContent(in geometry: GeometryProxy) -> some View {
         var width: CGFloat = 0
         var height: CGFloat = 0
-        
+
         var lastWidth: CGFloat = 0
         var lastHeight: CGFloat = 0
-        
+
         return ZStack(alignment: .topLeading) {
             ForEach(self.tags, id: \.self) { tag in
                 self.item(for: tag)
                     .padding([.vertical, .trailing], 4)
-                    .alignmentGuide(.leading) { d in
-                        if (abs(width - d.width) > geometry.size.width)
-                        {
+                    .alignmentGuide(.leading) { dimension in
+                        if abs(width - dimension.width) > geometry.size.width {
                             width = 0
-                            height -= d.height
+                            height -= dimension.height
                         }
                         let result = width
                         if let lastTag = self.tags.last, tag == lastTag {
-                            lastWidth = -abs(width - d.width)
+                            lastWidth = -abs(width - dimension.width)
                             width = 0
                         } else {
-                            width -= d.width
+                            width -= dimension.width
                         }
                         return result
                     }
-                    .alignmentGuide(.top) { d in
+                    .alignmentGuide(.top) { _ in
                         let result = height
                         if let lastTag = self.tags.last, tag == lastTag {
                             lastHeight = height
@@ -72,7 +72,7 @@ struct TagsView: View {
                         return result
                     }
             }
-            
+
             Image(systemName: "plus")
                 .font(.system(size: 18, weight: .black))
                 .frame(width: 38, height: 38)
@@ -80,10 +80,10 @@ struct TagsView: View {
                 .foregroundColor(Color.textPrimary)
                 .clipShape(Circle())
                 .padding([.vertical, .trailing], 4)
-                .alignmentGuide(.leading) { d in
-                    if (abs(lastWidth - d.width) > geometry.size.width) {
+                .alignmentGuide(.leading) { dimension in
+                    if abs(lastWidth - dimension.width) > geometry.size.width {
                         lastWidth = 0
-                        lastHeight -= d.height
+                        lastHeight -= dimension.height
                     }
                     return lastWidth
                 }
@@ -101,6 +101,7 @@ struct TagsView: View {
             }
         }
     }
+    // swiftlint:enable function_body_length
 
     private func item(for text: String) -> some View {
         HStack {

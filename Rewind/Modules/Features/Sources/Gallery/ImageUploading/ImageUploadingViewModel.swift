@@ -8,7 +8,7 @@ final class ImageUploadingViewModel {
             case hard
             case soft
         }
-        
+
         case viewGallery
         case cropImage
         case changeImage(UIImage?, ChangeImageType = .soft)
@@ -16,25 +16,25 @@ final class ImageUploadingViewModel {
         case trackSelected(Track)
         case resumePlayback
     }
-    
+
     var loadedMedia: LoadedMedia?
     var initialImage: UIImage?
     var imagePickerPresented: Bool = false
     var imageEditorPresented: Bool = false
     var findTrackViewPresented: Bool = false
     var isSelectedTrackPlaying: Bool = true
-    
+
     var selectedTrack: Track?
     var selectedStartTime: Double = 0
     var selectedDuration: CGFloat = 15
-    
+
     var image: UIImage? {
         guard let loadedMedia, case let .image(image) = loadedMedia.content else {
             return nil
         }
         return image
     }
-    
+
     var loadedMediaTagsBinding: Binding<[String]> {
         Binding {
             return self.loadedMedia?.tags ?? []
@@ -44,7 +44,7 @@ final class ImageUploadingViewModel {
             }
         }
     }
-    
+
     var imageBinding: Binding<UIImage?> {
         Binding {
             return self.image
@@ -54,18 +54,18 @@ final class ImageUploadingViewModel {
             }
         }
     }
-    
+
     var ready: Bool {
         image != nil
     }
-    
+
     init(loadedMedia: LoadedMedia?) {
         self.loadedMedia = loadedMedia
         if case let .image(image) = loadedMedia?.content {
             initialImage = image
         }
     }
-    
+
     func dispatch(_ intent: Intent) {
         switch intent {
         case .viewGallery:

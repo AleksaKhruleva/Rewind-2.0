@@ -4,13 +4,13 @@ public struct AuthorBadgeView: View {
     private let image: UIImage
     private let name: String
     private let date: String
-    
+
     public init(image: UIImage, name: String, date: String) {
         self.image = image
         self.name = name
         self.date = date
     }
-    
+
     public var body: some View {
         HStack(spacing: 8) {
             Image(uiImage: image)
@@ -18,7 +18,7 @@ public struct AuthorBadgeView: View {
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 30, height: 30)
                 .cornerRadius(20)
-            
+
             VStack(alignment: .leading) {
                 Text(name)
                     .modifier(RoundFontModifier(
@@ -26,7 +26,7 @@ public struct AuthorBadgeView: View {
                             weight: .black,
                             foregroundColor: .textPrimary
                         ))
-                
+
                 Text(date)
                     .modifier(RoundFontModifier(
                             size: 10,

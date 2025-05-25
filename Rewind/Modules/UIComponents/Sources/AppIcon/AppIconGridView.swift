@@ -6,7 +6,7 @@ public struct AppIconsGridView: View {
     public init() {
         viewModel = AppIconsViewModel()
     }
-    
+
     public var body: some View {
         let columns = [
             GridItem(.flexible()),

@@ -8,7 +8,7 @@ public struct MembersTable: View {
     private let onAddMemberTap: () -> Void
     private let onMemberTap: (Member) -> Void
     private let onShowAllMembersTap: (() -> Void)?
-    
+
     public init(
         title: String = "Members",
         members: [Member],
@@ -24,14 +24,14 @@ public struct MembersTable: View {
         self.onMemberTap = onMemberTap
         self.onShowAllMembersTap = onShowAllMembersTap
     }
-    
+
     public var body: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text(title)
                 .modifier(
                     RoundFontModifier(size: 17, foregroundColor: .textSecondary))
                 .padding(.leading, 15)
-            
+
             VStack(alignment: .leading, spacing: 0) {
                 MembersTableButton(
                     systemImageName: "person.fill.badge.plus",
@@ -40,7 +40,7 @@ public struct MembersTable: View {
                 ) {
                     onAddMemberTap()
                 }
-                
+
                 ForEach(members) { member in
                     MemberRow(member: member) { member in
                         onMemberTap(member)
@@ -49,7 +49,7 @@ public struct MembersTable: View {
                         print("remove")
                     }
                 }
-                
+
                 if isShortened {
                     MembersTableButton(
                         systemImageName: "eye.fill",

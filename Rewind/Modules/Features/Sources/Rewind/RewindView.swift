@@ -4,23 +4,23 @@ import Base
 
 public struct RewindView: View {
     @State private var viewModel: RewindViewModel
-    
+
     // TODO: To VM
     @State private var rolls = 0
     @State private var currentIndex = 0
     @State private var filterSettingsShown = false
     @State private var isSelectGroupPresented = false
-    
+
     private let router: RewindRouter
-    
+
     @Environment(\.showToast)
     private var showToast
-    
+
     public init(router: RewindRouter) {
         self.router = router
         viewModel = RewindViewModel()
     }
-    
+
     // Временно, пока не появится ViewModel
     private let mediaImages: [UIImage] = [
         UIComponentsAsset.media21.image,
@@ -31,22 +31,22 @@ public struct RewindView: View {
         UIComponentsAsset.media5.image,
         UIComponentsAsset.media14.image,
         UIComponentsAsset.media15.image,
-        UIComponentsAsset.media16.image,
+        UIComponentsAsset.media16.image
     ]
-    
+
     public var body: some View {
         ZStack {
             Color.background.ignoresSafeArea()
-            
+
             VStack(spacing: 10) {
                 MediaTopButtons {
                     router.navigateToMediaDetails(mediaImages[currentIndex])
                 } onSettingsTap: {
                     filterSettingsShown = true
                 }
-                
+
                 mediaView
-                
+
                 HStack {
                     author
                     Spacer()
@@ -55,12 +55,12 @@ public struct RewindView: View {
             }
             .modifier(VStackTopOffsetModifier(topOffsetRatio: 0.15))
             .padding(.horizontal, 8)
-            
+
             VStack {
                 header
                 Spacer()
             }
-            
+
             VStack {
                 Spacer()
                 GalleryPreview(
@@ -96,7 +96,7 @@ public struct RewindView: View {
             }
         }
     }
-    
+
     private var header: some View {
         RewindHeader {
             RoundImageView(image: UIComponentsAsset.media5.image, size: 44)
@@ -120,7 +120,7 @@ public struct RewindView: View {
                 }
         }
     }
-    
+
     private var mediaView: some View {
         Rectangle()
             .toSquare(mediaImages[currentIndex % mediaImages.count], cornerRadius: 40)
@@ -140,7 +140,7 @@ public struct RewindView: View {
                 }
             }
     }
-    
+
     private var author: some View {
         HStack {
             AuthorBadgeView(

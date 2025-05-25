@@ -10,12 +10,12 @@ public struct GalleryView: View {
 
     @Environment(\.showToast)
     private var showToast
-    
+
     public init(router: GalleryRouter) {
         viewModel = .init()
         self.router = router
     }
-    
+
     public var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -28,9 +28,9 @@ public struct GalleryView: View {
                         }
                     },
                     onAddingQuote: router.navigateToQuoteCreation,
-                    onAddingMedias:  { Task { await viewModel.dispatch(.showMediasDialog) } }
+                    onAddingMedias: { Task { await viewModel.dispatch(.showMediasDialog) } }
                 )
-                
+
                 let mediaSpacing: CGFloat = 3
                 ScrollView {
                     VStack {
@@ -49,7 +49,7 @@ public struct GalleryView: View {
                                     }
                             }
                         }
-                        
+
                         RewindNoteTextView(text: UIComponentsStrings.Note.end)
                             .padding(.vertical, 4)
                     }
@@ -60,7 +60,7 @@ public struct GalleryView: View {
                         footer
                     }
                 }
-                
+
                 Spacer(minLength: 0)
             }
             .background(Color.background)
@@ -100,14 +100,14 @@ public struct GalleryView: View {
             }
             .photosPicker(isPresented: $viewModel.mediaPickerPresented, selection: $viewModel.mediaSelection)
             .navigationDestination(item: $viewModel.uploadingMedia) { media in
-                uploadingMediaDestination(for: media) { readyMedia in
+                uploadingMediaDestination(for: media) { _ in
                     // TODO: Saving here
                     print("Saving")
                 }.toolbar(.hidden)
             }
         }
     }
-    
+
     @ViewBuilder
     private func uploadingMediaDestination(
         for media: LoadedMedia,
@@ -120,22 +120,22 @@ public struct GalleryView: View {
             VideoUploadingView(media: media, onSave: onSave)
         }
     }
-    
+
     private var footer: some View {
         ZStack {
             HStack {
                 GalleryMenu(
                     label: { RewindMediaButton(size: 50, fontSize: 28, type: .plus) {} },
                     onAddingQuote: router.navigateToQuoteCreation,
-                    onAddingMedias:  { Task { await viewModel.dispatch(.showMediasDialog) } }
+                    onAddingMedias: { Task { await viewModel.dispatch(.showMediasDialog) } }
                 )
-                
+
                 Spacer()
-                
+
                 RewindMediaButton(size: 60, fontSize: 28, type: .rewind) { router.dismiss() }
-                
+
                 Spacer()
-                
+
                 RewindMediaButton(size: 50, fontSize: 28, type: .settings) {
                     Task { await viewModel.dispatch(.openFilters) }
                 }

@@ -20,7 +20,7 @@ extension APIService: TargetType {
         }
         return URL(string: "https://rewindapp.ru/api")!
     }
-    
+
     var path: String {
         switch self {
         case .register:
@@ -42,7 +42,7 @@ extension APIService: TargetType {
             return "users/\(id)"
         }
     }
-    
+
     var method: Moya.Method {
         switch self {
         case .user:
@@ -57,7 +57,7 @@ extension APIService: TargetType {
             return .post
         }
     }
-    
+
     var task: Moya.Task {
         switch self {
         case let .register(email):
@@ -89,8 +89,8 @@ extension APIService: TargetType {
             return .requestPlain
         }
     }
-    
-    var headers: [String : String]? {
+
+    var headers: [String: String]? {
         switch self {
         case let .user(accessToken):
             return [

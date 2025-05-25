@@ -1,24 +1,24 @@
 import SwiftUI
 
 public struct AppIconView: View {
-    @State var viewModel: AppIconViewModel
+    @State private var viewModel: AppIconViewModel
 
     public init(viewModel: AppIconViewModel) {
         self.viewModel = viewModel
     }
-    
+
     public var body: some View {
         ZStack {
             icon
-            
+
             availability
-            
+
             if viewModel.locked {
                 taskTitle
             }
         }
     }
-    
+
     public var icon: some View {
         Image(viewModel.name)
             .resizable()
@@ -26,7 +26,7 @@ public struct AppIconView: View {
             .frame(width: 70, height: 70)
             .cornerRadius(18)
     }
-    
+
     @ViewBuilder
     public var availability: some View {
         Group {
@@ -45,7 +45,7 @@ public struct AppIconView: View {
         .fontWeight(.bold)
         .offset(x: 25, y: -25)
     }
-    
+
     public var taskTitle: some View {
         Text(viewModel.task)
             .modifier(AppIconTaskModifier())

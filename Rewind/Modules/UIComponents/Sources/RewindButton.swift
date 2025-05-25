@@ -13,11 +13,11 @@ public struct RewindButton: View {
         case selectVideo = "film.stack.fill"
         case photo = "photo.fill"
     }
-    
+
     private let type: ButtonType
     private let tint: Color
     private let action: () -> Void
-    
+
     public init(
         type: ButtonType,
         tint: Color = .textPrimary,
@@ -27,7 +27,7 @@ public struct RewindButton: View {
         self.tint = tint
         self.action = action
     }
-    
+
     public var body: some View {
         Button(action: action) {
             Image(systemName: type.rawValue)

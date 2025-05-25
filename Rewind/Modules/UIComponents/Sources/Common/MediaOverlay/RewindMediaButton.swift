@@ -8,16 +8,16 @@ public struct RewindMediaButton: View {
         case rewind = "arrowtriangle.right.fill"
         case settings = "gearshape.fill"
     }
-    
+
     private let size: CGFloat
     private let fontSize: CGFloat
     private let type: ButtonType
     private let fillable: Bool
     private let filledColor: Color
     private let action: () -> Void
-    
+
     @State private var filled: Bool = false
-    
+
     public init(
         size: CGFloat = 40,
         fontSize: CGFloat = 22,
@@ -33,7 +33,7 @@ public struct RewindMediaButton: View {
         self.filledColor = filledColor
         self.action = action
     }
-    
+
     public var body: some View {
         Image(systemName: imageName)
             .font(.system(size: fontSize, weight: .bold))
@@ -55,18 +55,18 @@ extension RewindMediaButton {
         if fillable {
             return type.rawValue + (filled ? ".fill" : "")
         }
-        
+
         return type.rawValue
     }
-    
+
     private var foregroundColor: Color {
         if fillable {
             return filled ? filledColor : .white
         }
-        
+
         return .white
     }
-    
+
     private func toggle() {
         withAnimation(.easeInOut(duration: 0.1)) {
             filled.toggle()
@@ -77,12 +77,12 @@ extension RewindMediaButton {
 #Preview {
     ZStack {
         Color.black.opacity(0.9).ignoresSafeArea()
-        
+
         HStack {
             RewindMediaButton(type: .like, fillable: true) {
                 print("like")
             }
-            
+
             RewindMediaButton(type: .save) {
                 print("save")
             }

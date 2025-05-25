@@ -5,17 +5,17 @@ public struct GradientButton: View {
         case generic
         case given(CGFloat)
     }
-    
+
     private let title: String
     private let width: Width
     private let action: () -> Void
-    
+
     public init(title: String, width: Width, action: @escaping () -> Void) {
         self.width = width
         self.title = title
         self.action = action
     }
-    
+
     public var body: some View {
         Button(action: action) {
             Text(title)
@@ -57,7 +57,7 @@ extension View {
     GradientButton(title: "Зарегистрироваться", width: .given(100)) {
         print("Tapped")
     }
-    
+
     GradientButton(title: "Register", width: .given(100)) {
         print("Tapped")
     }
