@@ -1,3 +1,4 @@
+import SwiftUI
 import Moya
 import Foundation
 import Domain
@@ -16,7 +17,9 @@ public protocol NetworkServiceProtocol {
     func refresh(refreshToken: String) async throws -> UserAccessTokenResponse
     func user(tokens: Tokens) async throws -> UserResponse
     
-    func updateName(tokens: Tokens, name: String) async throws -> SuccessResponse
+    func updateUserName(tokens: Tokens, name: String) async throws -> SuccessResponse
+    
+    func updateUserAvatar(tokens: Tokens, avatar: UIImage) async throws -> SuccessResponse
     
     func passwordResetSet(tokens: Tokens, password: String) async throws -> SuccessResponse
     func passwordResetStart(tokens: Tokens) async throws -> SuccessResponse
@@ -115,12 +118,24 @@ public final class NetworkService: NetworkServiceProtocol {
         }
     }
     
-    public func updateName(tokens: Tokens, name: String) async throws -> SuccessResponse {
+    public func updateUserName(tokens: Tokens, name: String) async throws -> SuccessResponse {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
-                .updateName(
+                .updateUserName(
                     accessToken: newToken ?? tokens.accessToken,
                     name: name
+                ),
+                type: SuccessResponse.self
+            )
+        }
+    }
+    
+    public func updateUserAvatar(tokens: Tokens, avatar: UIImage) async throws -> SuccessResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
+            try await self.provider.request(
+                .updateUserAvatar(
+                    accessToken: newToken ?? tokens.accessToken,
+                    avatar: avatar
                 ),
                 type: SuccessResponse.self
             )
