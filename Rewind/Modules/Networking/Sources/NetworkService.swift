@@ -12,7 +12,7 @@ public protocol NetworkServiceProtocol {
     func login(email: String, password: String) async throws -> UserTokensResponse
 
     func logout(tokens: Tokens) async throws -> SuccessResponse
-    func deleteUser(email: String) async throws -> SuccessResponse
+    func deleteUser(tokens: Tokens, email: String) async throws -> SuccessResponse
 
     func refresh(refreshToken: String) async throws -> UserAccessTokenResponse
     func user(tokens: Tokens) async throws -> UserResponse
@@ -89,13 +89,16 @@ public final class NetworkService: NetworkServiceProtocol {
         )
     }
 
-    public func deleteUser(email: String) async throws -> SuccessResponse {
-        try await provider.request(
-            .deleteUser(
-                email: email
-            ),
-            type: SuccessResponse.self
-        )
+    public func deleteUser(tokens: Tokens, email: String) async throws -> SuccessResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
+            try await self.provider.request(
+                .deleteUser(
+                    accessToken: newToken ?? tokens.accessToken,
+                    email: email
+                ),
+                type: SuccessResponse.self
+            )
+        }
     }
 
     public func refresh(refreshToken: String) async throws -> UserAccessTokenResponse {
