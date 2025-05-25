@@ -44,7 +44,9 @@
 
 "account.sign_out.alert.title" = "Ты уверен, что хочешь выйти?";
 
-"account.delete_account.alert.title" = "Ты уверен, что хочешь удалить аккаунт? Это действие необратимо.";
+"account.delete_account.alert.title" = "Ты уверен, что хочешь удалить аккаунт? Это действие необратимо";
+
+"account.help.alert.title" = "С любыми вопросами или идеями по развитию Rewind ты можешь обращаться к нам на robot@rewindapp.ru";
 
 "account.edit.image.dialog.title" = "Что ты хочешь сделать с фото профиля?";
 
