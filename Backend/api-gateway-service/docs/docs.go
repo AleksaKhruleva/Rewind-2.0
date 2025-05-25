@@ -1315,6 +1315,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
+                    "409": {
+                        "description": "Conflict - User with this email already exists\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error\".",
                         "schema": {

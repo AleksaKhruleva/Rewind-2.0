@@ -494,6 +494,7 @@ func (h *AuthHandler) UpdateEmail(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} responses.VerifyNewEmailCodeResponse "New email verified".
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid user ID or request body".
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found or invalid code".
+// @Failure 409 {object} responses.ErrorResponse "Conflict - User with this email already exists".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
 // @Security ApiKeyAuth

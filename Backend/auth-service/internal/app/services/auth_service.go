@@ -788,6 +788,10 @@ func (s *AuthService) VerifyNewEmailCode(ctx context.Context, req *pb.VerifyNewE
 	// Update email in the database
 	err = s.userRepo.UpdateEmail(nil, uint(userID), newEmail)
 	if err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			log.Printf("UpdateEmail: User with ID %d already exists", userID)
+			return nil, status.Errorf(codes.AlreadyExists, "User with ID %d already exists", userID)
+		}
 		log.Printf("Failed to update email for user %d: %v", userID, err)
 		return nil, status.Errorf(codes.Internal, "Failed to update email")
 	}
