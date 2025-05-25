@@ -58,6 +58,7 @@ public struct RewindImageEditor: View {
         } rightView: {
             RewindButton(type: .checkmark) {
                 let renderer = ImageRenderer(content: imageView)
+                renderer.scale = UIScreen.main.scale
                 renderer.proposedSize = .init(CGSize(
                     width: UIScreen.main.bounds.width,
                     height: UIScreen.main.bounds.width
