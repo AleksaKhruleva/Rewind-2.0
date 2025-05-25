@@ -10,7 +10,7 @@ public protocol NetworkServiceProtocol {
     
     func login(email: String, password: String) async throws -> UserTokensResponse
     
-    func logout(refreshToken: String) async throws -> SuccessResponse
+    func logout(tokens: Tokens) async throws -> SuccessResponse
     func deleteUser(email: String) async throws -> SuccessResponse
     
     func refresh(refreshToken: String) async throws -> UserAccessTokenResponse
@@ -75,11 +75,12 @@ public final class NetworkService: NetworkServiceProtocol {
             type: UserTokensResponse.self
         )
     }
-
-    public func logout(refreshToken: String) async throws -> SuccessResponse {
+    
+    public func logout(tokens: Tokens) async throws -> SuccessResponse {
         try await provider.request(
             .logout(
-                refreshToken: refreshToken
+                accessToken: tokens.accessToken,
+                refreshToken: tokens.refreshToken
             ),
             type: SuccessResponse.self
         )
