@@ -43,10 +43,9 @@ final class AccountViewModel {
     func dispatch(_ intent: Intent) async {
         switch intent {
         case .signOut:
-            if let refreshToken = KeychainService.shared.read(for: .refreshToken),
-               KeychainService.shared.read(for: .accessToken) != nil {
+            if let tokens = Tokens() {
                 do {
-                    let response = try await backend.logout(refreshToken: refreshToken)
+                    let response = try await backend.logout(tokens: tokens)
                     if response.success {
                         KeychainService.shared.clearAll()
                         router.navigateToWelcome()
