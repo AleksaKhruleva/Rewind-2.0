@@ -2,6 +2,7 @@ import SwiftUI
 import UIComponents
 import Base
 import Domain
+import AccessibilitySupport
 
 public struct RewindView: View {
     @State private var viewModel: RewindViewModel
@@ -95,13 +96,14 @@ public struct RewindView: View {
                 router.navigateToMap()
             }
         } rightView: {
-            RoundImageView(image: viewModel.user.image, size: 44)
-                .contentShape(Circle())
-                .onTapGesture {
-                    if !viewModel.user.isEmpty {
-                        router.navigateToAccount(user: viewModel.user)
-                    }
+            Button {
+                if !viewModel.user.isEmpty {
+                    router.navigateToAccount(user: viewModel.user)
                 }
+            } label: {
+                RoundImageView(image: viewModel.user.image, size: 44)
+                    .contentShape(Circle())
+            }.rewindAccessibilityIdentifier(.rewind(.button(.account)))
         }
     }
 

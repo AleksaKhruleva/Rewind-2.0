@@ -3,13 +3,13 @@ import UIComponents
 
 // vremenno
 let generalData = [
-    ("photo.fill", UIComponentsStrings.Group.Settings.General.name, {}),
-    ("pencil", UIComponentsStrings.Group.Settings.General.image, {})
+    ("photo.fill", UIComponentsStrings.Group.Settings.General.name, nilAccessibility, {}),
+    ("pencil", UIComponentsStrings.Group.Settings.General.image, nilAccessibility, {})
 ]
 
 let riskyData = [
-    ("rectangle.portrait.and.arrow.right.fill", UIComponentsStrings.Group.Settings.Risky.leave, {}),
-    ("trash.fill", UIComponentsStrings.Group.Settings.Risky.delete, {})
+    ("rectangle.portrait.and.arrow.right.fill", UIComponentsStrings.Group.Settings.Risky.leave, nilAccessibility, {}),
+    ("trash.fill", UIComponentsStrings.Group.Settings.Risky.delete, nilAccessibility, {})
 ]
 
 public struct GroupSettingsView: View {

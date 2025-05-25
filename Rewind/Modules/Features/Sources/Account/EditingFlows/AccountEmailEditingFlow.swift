@@ -2,6 +2,7 @@ import SwiftUI
 import UIComponents
 import Networking
 import Base
+import AccessibilitySupport
 
 @MainActor @Observable
 final class AccountEmailEditingFlowViewModel {
@@ -36,8 +37,8 @@ final class AccountEmailEditingFlowViewModel {
             }
         }
     }
-    var visibleState: EditingState = .password
 
+    var visibleState: EditingState = .password
     var error: String? {
         get {
             if case let .error(editingError) = state {
@@ -135,7 +136,8 @@ struct AccountEmailEditingFlow: View {
                     item: .password,
                     title: UIComponentsStrings.GenericInput.YourPassword.title,
                     placeholder: UIComponentsStrings.GenericInput.YourPassword.placeholder,
-                    error: $viewModel.error
+                    error: $viewModel.error,
+                    accessibilityElement: .account(.editFlow(.email(.password)))
                 ) { password in
                     Task {
                         await viewModel.dispatch(.submitPassword(password))
@@ -146,7 +148,8 @@ struct AccountEmailEditingFlow: View {
                     item: .email,
                     title: UIComponentsStrings.GenericInput.NewEmail.title,
                     placeholder: UIComponentsStrings.GenericInput.NewEmail.placeholder,
-                    error: $viewModel.error
+                    error: $viewModel.error,
+                    accessibilityElement: .account(.editFlow(.email(.email)))
                 ) { email in
                     Task {
                         await viewModel.dispatch(.submitEmail(email))
@@ -156,7 +159,8 @@ struct AccountEmailEditingFlow: View {
                 GenericInputSheetView(
                     item: .code,
                     title: UIComponentsStrings.GenericInput.VerificationCode.title,
-                    error: $viewModel.error
+                    error: $viewModel.error,
+                    accessibilityElement: .account(.editFlow(.email(.code())))
                 ) { code in
                     Task {
                         await viewModel.dispatch(.submitCode(code))

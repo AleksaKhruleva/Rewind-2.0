@@ -29,7 +29,8 @@ public struct CodeInputView: View {
                 CodeInputTextField(
                     code: $code,
                     error: nil,
-                    backgroundColor: UIComponentsAsset.backgroundSecondary.color
+                    backgroundColor: UIComponentsAsset.backgroundSecondary.color,
+                    accessibilityElement: .auth(.input(.code()))
                 ) {
                     Task {
                         await viewModel.dispatch(.submitCode(code: code.joined()))

@@ -1,6 +1,7 @@
 import SwiftUI
 import UIComponents
 import Base
+import AccessibilitySupport
 
 import Domain
 
@@ -72,12 +73,12 @@ public struct AccountView: View {
         ) {
             Button(UIComponentsStrings.Account.Edit.Image.Dialog.setNew) {
                 photoPickerShown = true
-            }
+            }.rewindAccessibilityIdentifier(.account(.button(.editImageDialog(.set))))
             Button(UIComponentsStrings.Account.Edit.Image.Dialog.delete, role: .destructive) {
                 Task {
                     await viewModel.dispatch(.deleteImage)
                 }
-            }
+            }.rewindAccessibilityIdentifier(.account(.button(.editImageDialog(.delete))))
         }
         .customImagePicker(show: $photoPickerShown, croppedImage: Binding {
             return viewModel.user.image
@@ -173,21 +174,21 @@ public struct AccountView: View {
         InformationTable(
             title: UIComponentsStrings.Account.general,
             data: [
-                ("photo.fill", UIComponentsStrings.Account.General.image, {
+                ("photo.fill", UIComponentsStrings.Account.General.image, .account(.button(.editImage)), {
                     imageEditingDialogShown = true
                 }),
-                ("pencil", UIComponentsStrings.Account.General.name, {
+                ("pencil", UIComponentsStrings.Account.General.name, .account(.button(.editName)), {
                     genericSheetItem = .name
                 }),
-                ("key.fill", UIComponentsStrings.Account.General.password, {
+                ("key.fill", UIComponentsStrings.Account.General.password, .account(.button(.editPassword)), {
                     genericSheetItem = .password
                 }),
-                ("envelope.fill", UIComponentsStrings.Account.General.email, {
+                ("envelope.fill", UIComponentsStrings.Account.General.email, .account(.button(.editEmail)), {
                     genericSheetItem = .email
                 }),
-                ("gift.fill", UIComponentsStrings.Account.General.widget, {}),
-                ("questionmark.circle.fill", UIComponentsStrings.Account.General.help, {}),
-                ("globe", UIComponentsStrings.Account.General.git, {
+                ("gift.fill", UIComponentsStrings.Account.General.widget, nil, {}),
+                ("questionmark.circle.fill", UIComponentsStrings.Account.General.help, nil, {}),
+                ("globe", UIComponentsStrings.Account.General.git, nil, {
                     UIApplication.shared.open(URL(string: "https://github.com/AleksaKhruleva/Rewind-2.0")!)
                 })
             ],
@@ -199,10 +200,10 @@ public struct AccountView: View {
         InformationTable(
             title: UIComponentsStrings.Account.risky,
             data: [
-                ("rectangle.portrait.and.arrow.right.fill", UIComponentsStrings.Account.Risky.signout, {
+                ("rectangle.portrait.and.arrow.right.fill", UIComponentsStrings.Account.Risky.signout, nil, {
                     signOutAlertShown = true
                 }),
-                ("trash.fill", UIComponentsStrings.Account.Risky.delete, {
+                ("trash.fill", UIComponentsStrings.Account.Risky.delete, nil, {
                     deleteAccountAlertShown = true
                 })
             ],

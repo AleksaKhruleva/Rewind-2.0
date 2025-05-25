@@ -71,6 +71,8 @@ extension XCUIElement {
                 case .password: secureTextFields[element.accessibilityID]
                 }
             }
+        case .account, .rewind:
+            firstMatch
         }
     }
 }

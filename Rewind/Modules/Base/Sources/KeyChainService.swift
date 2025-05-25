@@ -6,10 +6,17 @@ public struct Tokens {
     public let refreshToken: String
 
     public init?() {
-        guard let accessToken = KeychainService.shared.read(for: .accessToken),
-              let refreshToken = KeychainService.shared.read(for: .refreshToken) else { return nil }
-        self.accessToken = accessToken
-        self.refreshToken = refreshToken
+        if CommandLine.arguments.contains("-fakeTokens") {
+            accessToken = "fakeAccessToken"
+            refreshToken = "fakeRefreshToken"
+            KeychainService.shared.save(accessToken, for: .fakeAccessToken)
+            KeychainService.shared.save(refreshToken, for: .fakeRefreshToken)
+        } else {
+            guard let accessToken = KeychainService.shared.read(for: .accessToken),
+                  let refreshToken = KeychainService.shared.read(for: .refreshToken) else { return nil }
+            self.accessToken = accessToken
+            self.refreshToken = refreshToken
+        }
     }
 }
 
@@ -21,6 +28,9 @@ public final class KeychainService {
     public enum Key: String {
         case accessToken = "access_token"
         case refreshToken = "refresh_token"
+
+        case fakeAccessToken = "fake_access_token"
+        case fakeRefreshToken = "fake_refresh_token"
     }
 
     @discardableResult
