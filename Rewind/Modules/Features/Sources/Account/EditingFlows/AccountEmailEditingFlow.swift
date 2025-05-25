@@ -10,7 +10,7 @@ final class AccountEmailEditingFlowViewModel {
         case submitEmail(String)
         case submitCode(String)
     }
-    
+
     enum EditingState: Equatable {
         case password
         case email
@@ -19,13 +19,14 @@ final class AccountEmailEditingFlowViewModel {
         case error(EditingError)
         case ready
     }
-    
-    enum EditingError {
+
+    enum EditingError: Equatable {
+        case custom(String?)
         case responseError
         case invalidPassword
         case existingEmail
     }
-    
+
     var state: EditingState = .password {
         didSet {
             if state == .email {
@@ -36,7 +37,7 @@ final class AccountEmailEditingFlowViewModel {
         }
     }
     var visibleState: EditingState = .password
-    
+
     var error: String? {
         get {
             if case let .error(editingError) = state {
@@ -47,19 +48,23 @@ final class AccountEmailEditingFlowViewModel {
                     return "Your password is invalid"
                 case .existingEmail:
                     return "This email is already registered"
+                case let .custom(error):
+                    return error
                 }
             }
             return nil
         }
-        set {}
+        set {
+            state = .error(.custom(newValue))
+        }
     }
-    
+
     private let backend: NetworkServiceProtocol
-    
+
     init() {
         backend = NetworkService()
     }
-    
+
     func dispatch(_ intent: Intent) async {
         switch intent {
         case let .submitPassword(password):
@@ -74,7 +79,7 @@ final class AccountEmailEditingFlowViewModel {
             } catch let httpError as HTTPError where httpError == .forbidden {
                 animateState(to: .error(.invalidPassword))
             } catch {
-                
+                animateState(to: .error(.responseError))
             }
         case let .submitEmail(email):
             animateState(to: .loading)

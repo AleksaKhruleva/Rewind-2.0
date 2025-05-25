@@ -4,7 +4,7 @@ import Security
 public struct Tokens {
     public let accessToken: String
     public let refreshToken: String
-    
+
     public init?() {
         guard let accessToken = KeychainService.shared.read(for: .accessToken),
               let refreshToken = KeychainService.shared.read(for: .refreshToken) else { return nil }

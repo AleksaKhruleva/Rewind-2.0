@@ -10,7 +10,7 @@ final class AccountPasswordEditingFlowViewModel {
         case submitCode(String)
         case submitPassword(String)
     }
-    
+
     enum EditingState: Equatable {
         case code
         case password
@@ -18,20 +18,21 @@ final class AccountPasswordEditingFlowViewModel {
         case error(EditingError)
         case ready
     }
-    
-    enum EditingError {
+
+    enum EditingError: Equatable {
+        case custom(String?)
         case responseError
         case invalidCode
         case invalidPasswordForamt
     }
-    
+
     var state: EditingState = .code {
         didSet {
             if state == .password { visibleState = .password }
         }
     }
     var visibleState: EditingState = .code
-    
+
     var error: String? {
         get {
             if case let .error(editingError) = state {
@@ -42,25 +43,29 @@ final class AccountPasswordEditingFlowViewModel {
                     return "Your code is incorrect"
                 case .invalidPasswordForamt:
                     return "Your password format is incorrect"
+                case let .custom(error):
+                    return error
                 }
             }
             return nil
         }
-        set {}
+        set {
+            state = .error(.custom(newValue))
+        }
     }
-    
+
     private let backend: NetworkServiceProtocol
-    
+
     init() {
         backend = NetworkService()
     }
-    
+
     func dispatch(_ intent: Intent) async {
         switch intent {
         case .sendCode:
             do {
                 if let tokens = Tokens() {
-                    let _ = try await backend.passwordResetStart(tokens: tokens)
+                    _ = try await backend.passwordResetStart(tokens: tokens)
                 }
             } catch {
                 animateState(to: .error(.responseError))
@@ -109,7 +114,7 @@ struct AccountPasswordEditingFlow: View {
     private var dismiss
     @Environment(\.showToast)
     private var showToast
-    
+
     init(afterSuccess: (() -> Void)?) {
         viewModel = AccountPasswordEditingFlowViewModel()
         self.afterSuccess = afterSuccess

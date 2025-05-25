@@ -7,23 +7,23 @@ enum APIService {
     case register(email: String)
     case verifyEmail(registrationID: String, verificationCode: String)
     case finishRegister(password: String, registrationID: String, username: String)
-    
+
     case login(email: String, password: String)
-    
+
     case logout(accessToken: String, refreshToken: String)
     case deleteUser(email: String)
-    
+
     case refresh(refreshToken: String)
     case user(accessToken: String)
-    
+
     case updateUserName(accessToken: String, name: String)
-    
+
     case updateUserAvatar(accessToken: String, avatar: UIImage)
-    
+
     case passwordResetSet(accessToken: String, password: String)
     case passwordResetStart(accessToken: String)
     case passwordResetVerify(accessToken: String, verificationCode: String)
-    
+
     case checkPassword(accessToken: String, password: String)
     case emailStartChange(accessToken: String, email: String)
     case emailVerifyChange(accessToken: String, verificationCode: String)

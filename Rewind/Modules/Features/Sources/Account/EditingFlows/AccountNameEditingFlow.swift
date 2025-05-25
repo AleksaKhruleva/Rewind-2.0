@@ -8,40 +8,45 @@ final class AccountNameEditingFlowViewModel {
     enum Intent {
         case submitName(String)
     }
-    
+
     enum EditingState: Equatable {
         case empty
         case loading
         case error(EditingError)
         case ready
     }
-    
-    enum EditingError {
+
+    enum EditingError: Equatable {
+        case custom(String?)
         case responseError
     }
-    
+
     var state: EditingState = .empty
     var isLoading: Bool = false
-    
+
     var error: String? {
         get {
             if case let .error(editingError) = state {
                 switch editingError {
                 case .responseError:
                     return UIComponentsStrings.Toast.error
+                case let .custom(error):
+                    return error
                 }
             }
             return nil
         }
-        set {}
+        set {
+            state = .error(.custom(newValue))
+        }
     }
-    
+
     private let backend: NetworkServiceProtocol
-    
+
     init() {
         backend = NetworkService()
     }
-    
+
     func dispatch(_ intent: Intent) async {
         switch intent {
         case let .submitName(name):
@@ -61,7 +66,7 @@ final class AccountNameEditingFlowViewModel {
             }
         }
     }
-    
+
     private func animateState(to state: EditingState) {
         withAnimation(.spring(response: 0.3)) { self.state = state }
     }
