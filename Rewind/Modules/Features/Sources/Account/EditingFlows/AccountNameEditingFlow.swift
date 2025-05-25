@@ -8,6 +8,7 @@ final class AccountNameEditingFlowViewModel {
     enum Intent {
         case submitName(String)
     }
+
     enum EditingState: Equatable {
         case empty
         case loading
@@ -65,6 +66,7 @@ final class AccountNameEditingFlowViewModel {
             }
         }
     }
+
     private func animateState(to state: EditingState) {
         withAnimation(.spring(response: 0.3)) { self.state = state }
     }

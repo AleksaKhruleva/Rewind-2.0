@@ -10,6 +10,7 @@ final class AccountPasswordEditingFlowViewModel {
         case submitCode(String)
         case submitPassword(String)
     }
+
     enum EditingState: Equatable {
         case code
         case password
@@ -24,12 +25,14 @@ final class AccountPasswordEditingFlowViewModel {
         case invalidCode
         case invalidPasswordForamt
     }
+
     var state: EditingState = .code {
         didSet {
             if state == .password { visibleState = .password }
         }
     }
     var visibleState: EditingState = .code
+
     var error: String? {
         get {
             if case let .error(editingError) = state {
@@ -111,6 +114,7 @@ struct AccountPasswordEditingFlow: View {
     private var dismiss
     @Environment(\.showToast)
     private var showToast
+
     init(afterSuccess: (() -> Void)?) {
         viewModel = AccountPasswordEditingFlowViewModel()
         self.afterSuccess = afterSuccess

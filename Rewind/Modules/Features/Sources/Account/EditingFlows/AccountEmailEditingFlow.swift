@@ -10,6 +10,7 @@ final class AccountEmailEditingFlowViewModel {
         case submitEmail(String)
         case submitCode(String)
     }
+
     enum EditingState: Equatable {
         case password
         case email
@@ -25,6 +26,7 @@ final class AccountEmailEditingFlowViewModel {
         case invalidPassword
         case existingEmail
     }
+
     var state: EditingState = .password {
         didSet {
             if state == .email {
@@ -34,6 +36,7 @@ final class AccountEmailEditingFlowViewModel {
             }
         }
     }
+
     var visibleState: EditingState = .password
     var error: String? {
         get {

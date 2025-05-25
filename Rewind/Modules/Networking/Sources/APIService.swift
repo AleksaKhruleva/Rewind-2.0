@@ -9,6 +9,7 @@ enum APIService {
     case finishRegister(password: String, registrationID: String, username: String)
 
     case login(email: String, password: String)
+
     case logout(accessToken: String, refreshToken: String)
     case deleteUser(email: String)
 
