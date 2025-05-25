@@ -35,7 +35,7 @@ public final class AppRouter {
         case groupSettings
         case addMember(String)
         case memberDetails(Member)
-        case membersList
+        case membersList([Member])
 
         case rewindsStand
         case rollsStand

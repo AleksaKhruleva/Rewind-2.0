@@ -14,18 +14,18 @@ private enum Constants {
 // MARK: - GroupsScrollView
 
 public struct GroupsScrollView: UIViewRepresentable {
+    @Binding var selectedGroupID: Int?
     private let groups: [Domain.Group]
     private let imageSize: CGFloat
-    private let selectedGroupID: Int?
 
     public init(
+        selectedGroupID: Binding<Int?>,
         groups: [Domain.Group],
-        imageSize: CGFloat,
-        selectedGroupID: Int?
+        imageSize: CGFloat
     ) {
+        self._selectedGroupID = selectedGroupID
         self.groups = groups
         self.imageSize = imageSize
-        self.selectedGroupID = selectedGroupID
     }
 
     public func makeUIView(context: Context) -> UICollectionView {
@@ -42,6 +42,7 @@ public struct GroupsScrollView: UIViewRepresentable {
         collectionView.backgroundColor = .clear
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.alwaysBounceHorizontal = true
+        collectionView.delegate = context.coordinator
 
         context.coordinator.configureDataSource(for: collectionView)
 
@@ -59,7 +60,7 @@ public struct GroupsScrollView: UIViewRepresentable {
 
 // MARK: - Coordinator
 
-public final class Coordinator {
+public final class Coordinator: NSObject, UICollectionViewDelegate {
     private var dataSource: UICollectionViewDiffableDataSource<Int, Domain.Group>?
     private let imageSize: CGFloat
     private var selectedGroupID: Int?
@@ -83,6 +84,16 @@ public final class Coordinator {
         snapshot.appendSections([0])
         snapshot.appendItems(groups, toSection: 0)
         dataSource?.apply(snapshot, animatingDifferences: true)
+    }
+
+    // MARK: - UICollectionViewDelegate
+
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let group = dataSource?.itemIdentifier(for: indexPath) else { return }
+
+        if selectedGroupID != group.id {
+            selectedGroupID = group.id
+        }
     }
 }
 

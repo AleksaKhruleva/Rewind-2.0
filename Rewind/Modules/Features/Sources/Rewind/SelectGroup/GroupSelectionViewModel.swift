@@ -12,17 +12,24 @@ final class GroupSelectionViewModel {
     var isLoading = false
     var isGroupCreationViewPresented = false
     var currentGroupID: Int? {
-        GroupStorage.currentGroup?.id
+        get { GroupStorage.currentGroup?.id }
+        set {
+            if let newValue {
+                GroupStorage.set(groupID: newValue, imageData: nil)
+            }
+        }
     }
 
     private(set) var shouldDismissSelf = false
     private(set) var groups: [Domain.Group]
 
+    private let user: User
     private let backend: NetworkServiceProtocol
     private let jwtDecoder: JWTDecoder
     private weak var router: RewindRouter?
 
-    init(groups: [Domain.Group], router: RewindRouter) {
+    init(user: User, groups: [Domain.Group], router: RewindRouter) {
+        self.user = user
         self.groups = groups
         self.router = router
         backend = NetworkService()
@@ -34,13 +41,13 @@ final class GroupSelectionViewModel {
         case let .createGroup(name):
             isLoading = true
             do {
-                guard let accessToken = KeychainService.shared.read(for: .accessToken),
-                      let userID = jwtDecoder.getUserId(from: accessToken),
-                      let user = UserStorage.currentUser,
-                      let tokens = Tokens()
-                else {
+                guard let tokens = Tokens() else {
                     // TODO: handle error
                     isLoading = false
+                    return
+                }
+
+                guard let userID = jwtDecoder.getUserId(from: tokens.accessToken) else {
                     return
                 }
 

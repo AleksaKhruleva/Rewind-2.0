@@ -21,8 +21,8 @@ public final class GroupRouter {
         appRouter?.navigate(to: .memberDetails(member), with: .pushFromLeft)
     }
 
-    func navigateToMembersList() {
-        appRouter?.navigate(to: .membersList, with: .pushFromLeft)
+    func navigateToMembersList(_ members: [Member]) {
+        appRouter?.navigate(to: .membersList(members), with: .pushFromLeft)
     }
 
     func navigateToRewindsStand() {

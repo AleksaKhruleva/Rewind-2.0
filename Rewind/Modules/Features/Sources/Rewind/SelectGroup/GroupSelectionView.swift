@@ -19,8 +19,8 @@ struct GroupSelectionView: View {
         }
     }
 
-    init(groups: [Domain.Group], router: RewindRouter) {
-        viewModel = GroupSelectionViewModel(groups: groups, router: router)
+    init(user: User, groups: [Domain.Group], router: RewindRouter) {
+        viewModel = GroupSelectionViewModel(user: user, groups: groups, router: router)
     }
 
     var body: some View {
@@ -75,9 +75,9 @@ struct GroupSelectionView: View {
                     .fill(Color.background)
 
                 GroupsScrollView(
+                    selectedGroupID: $viewModel.currentGroupID,
                     groups: filteredGroups,
-                    imageSize: imageSize,
-                    selectedGroupID: viewModel.currentGroupID
+                    imageSize: imageSize
                 )
                 .frame(height: imageSize + 20)
                 .clipShape(RoundedRectangle(cornerRadius: 40, style: .continuous))

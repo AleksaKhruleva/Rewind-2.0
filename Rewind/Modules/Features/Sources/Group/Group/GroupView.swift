@@ -80,7 +80,7 @@ public struct GroupView: View {
                 router.navigateToMemberDetails(member)
             },
             onShowAllMembersTap: {
-                router.navigateToMembersList()
+                router.navigateToMembersList(group.members ?? [])
             }
         )
     }

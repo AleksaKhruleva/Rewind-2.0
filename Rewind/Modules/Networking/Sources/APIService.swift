@@ -198,7 +198,9 @@ extension APIService: TargetType {
             let .emailStartChange(accessToken, _),
             let .emailVerifyChange(accessToken, _),
             let .createGroup(accessToken, _),
-            let .fetchGroups(accessToken):
+            let .fetchGroups(accessToken),
+            let .fetchGroup(accessToken, _),
+            let .fetchGroupMembers(accessToken, _):
             return [
                 "Authorization": "Bearer \(accessToken)",
                 "Content-Type": "application/json"

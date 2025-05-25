@@ -69,7 +69,11 @@ public struct RewindView: View {
         }
         .ignoresSafeArea(.keyboard)
         .sheet(isPresented: $isSelectGroupPresented) {
-            GroupSelectionView(groups: viewModel.groups, router: viewModel.router)
+            GroupSelectionView(
+                user: viewModel.user,
+                groups: viewModel.groups,
+                router: viewModel.router
+            )
                 .presentationCornerRadius(30)
                 .presentationDragIndicator(.visible)
                 .presentationDetents([.height(450)])

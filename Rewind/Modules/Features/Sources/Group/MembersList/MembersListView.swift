@@ -6,17 +6,24 @@ public struct MembersListView: View {
     @State private var searchText = ""
 
     private let router: MembersListRouter
+    private let members: [Member]
 
-    // ochevidno vremenno
     private var filteredMembers: [Member] {
         if searchText.isEmpty {
-            return []
+            return members
         } else {
-            return []
+            let searchQuery = searchText
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .localizedLowercase
+
+            return members.filter { member in
+                member.name.localizedCaseInsensitiveContains(searchQuery)
+            }
         }
     }
 
-    public init(router: MembersListRouter) {
+    public init(members: [Member], router: MembersListRouter) {
+        self.members = members
         self.router = router
     }
 
@@ -45,7 +52,10 @@ public struct MembersListView: View {
             )
         }, rightView: {
             RewindButton(type: .rightChevron) {
-                router.dismiss()
+                hideKeyboard()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    router.dismiss()
+                }
             }
         })
     }
