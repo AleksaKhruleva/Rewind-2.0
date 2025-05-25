@@ -1,3 +1,4 @@
+import SwiftUI
 import Moya
 import Foundation
 import Base
@@ -15,7 +16,9 @@ enum APIService {
     case refresh(refreshToken: String)
     case user(accessToken: String)
     
-    case updateName(accessToken: String, name: String)
+    case updateUserName(accessToken: String, name: String)
+    
+    case updateUserAvatar(accessToken: String, avatar: UIImage)
     
     case passwordResetSet(accessToken: String, password: String)
     case passwordResetStart(accessToken: String)
@@ -53,8 +56,10 @@ extension APIService: TargetType {
         case let .user(accessToken):
             let id = JWTDecoderService().getUserId(from: accessToken) ?? "undefined"
             return "users/\(id)"
-        case .updateName:
+        case .updateUserName:
             return "users/username"
+        case .updateUserAvatar:
+            return "users/avatar"
         case .passwordResetSet:
             return "users/password/reset/set"
         case .passwordResetStart:
@@ -86,7 +91,8 @@ extension APIService: TargetType {
                 .checkPassword,
                 .emailStartChange:
             return .post
-        case .updateName,
+        case .updateUserName,
+                .updateUserAvatar,
                 .passwordResetSet,
                 .emailVerifyChange:
             return .patch
@@ -122,9 +128,21 @@ extension APIService: TargetType {
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
         case .user:
             return .requestPlain
-        case let .updateName(_, name):
+        case let .updateUserName(_, name):
             let parameters = ["new_username": name]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+        case let .updateUserAvatar(_, avatar):
+            guard let imageData = avatar.jpegData(compressionQuality: 1) else {
+                return .requestPlain
+            }
+
+            let formData = MultipartFormData(
+                provider: .data(imageData),
+                name: "image",
+                fileName: "image.jpg",
+                mimeType: "image/jpeg"
+            )
+            return .uploadMultipart([formData])
         case let .passwordResetSet(_, password):
             let parameters = ["new_password": password]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
@@ -149,7 +167,8 @@ extension APIService: TargetType {
         switch self {
         case let .logout(accessToken, _),
             let .user(accessToken),
-            let .updateName(accessToken, _),
+            let .updateUserName(accessToken, _),
+            let .updateUserAvatar(accessToken, _),
             let .passwordResetSet(accessToken, _),
             let .passwordResetStart(accessToken),
             let .passwordResetVerify(accessToken, _),

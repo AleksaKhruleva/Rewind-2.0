@@ -48,7 +48,7 @@ final class AccountNameEditingFlowViewModel {
             animateState(to: .loading)
             do {
                 if let tokens = Tokens() {
-                    let response = try await backend.updateName(
+                    let response = try await backend.updateUserName(
                         tokens: tokens,
                         name: name
                     )

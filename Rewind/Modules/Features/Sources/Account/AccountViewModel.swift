@@ -91,11 +91,17 @@ final class AccountViewModel {
             }
             showToast(UIComponentsStrings.Account.Edit.Image.Delete.success)
         case let .setImage(newImage):
-            guard let newImage else {
-                showToast(UIComponentsStrings.Account.Edit.Image.Set.failure)
-                return
+            do {
+                if let tokens = Tokens(), let newImage {
+                    let response = try await backend.updateUserAvatar(tokens: tokens, avatar: newImage)
+                    if response.success {
+                        showToast(UIComponentsStrings.Account.Edit.Image.Set.failure)
+                        user.image = newImage
+                    }
+                }
+            } catch {
+                showErrorToast(for: error)
             }
-            user.image = newImage
         }
     }
 
