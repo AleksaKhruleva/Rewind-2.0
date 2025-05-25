@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Track: Decodable, Identifiable {
+public struct Track: Decodable, Identifiable, Hashable {
     public let id: Int
     public let title: String
     public let artist: String

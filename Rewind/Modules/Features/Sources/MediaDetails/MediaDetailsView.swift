@@ -1,14 +1,16 @@
 import SwiftUI
 import UIComponents
+import Domain
 
 public struct MediaDetailsView: View {
     @State private var tags: [String] = []
+    @State private var isTrackPlaying: Bool = false
+    private let mediaItem: MediaItem
     private let router: AppRouter
-    var image: UIImage
 
-    public init(router: AppRouter, image: UIImage) {
+    public init(mediaItem: MediaItem, router: AppRouter) {
+        self.mediaItem = mediaItem
         self.router = router
-        self.image = image
     }
 
     public var body: some View {
@@ -48,14 +50,21 @@ public struct MediaDetailsView: View {
     }
 
     private var rewind: some View {
-        Rectangle().toSquare(image, cornerRadius: 40)
+        MediaContentView(
+            mediaItem: mediaItem,
+            onSave: {},
+            onLike: {},
+            onToggleSound: {},
+            isTrackPlaying: $isTrackPlaying
+        )
     }
 
     private var author: some View {
         AuthorBadgeView(
             image: UIComponentsAsset.media15.image,
             name: "flowykk",
-            date: "23.11.2024"
+            date: "23.11.2024",
+            track: mediaItem.track
         )
     }
 

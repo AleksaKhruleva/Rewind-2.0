@@ -67,7 +67,3 @@ public struct MemberDetailsView: View {
             .padding(.vertical, 4)
     }
 }
-
-#Preview {
-    MemberDetailsView(member: membersForTest.first!, router: AppRouter())
-}

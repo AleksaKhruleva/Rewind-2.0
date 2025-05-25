@@ -10,7 +10,7 @@ final class GalleryViewModel {
         case viewGallery
         case showMediasDialog
         case selectOneMedia(PhotosPickerItem)
-        case viewBlurredMedia(UIImage)
+        case viewBlurredMedia(MediaItem)
         case openFilters
     }
 
@@ -22,13 +22,15 @@ final class GalleryViewModel {
 
     var filterSettingsShown = false
     var blurredMediaShown = false
-    var blurredMediaSelection: UIImage?
+    var blurredMediaSelection: MediaItem?
 
     var showToast: (String) -> Void
 
+    private(set) var mediaItems = [MediaItem]()
+
     private let transformer: PhotosPickerItemTransformer
 
-    var viewingBlurredMedia: UIImage? {
+    var viewingBlurredMedia: MediaItem? {
         guard let blurredMediaSelection, blurredMediaShown else {
             return nil
         }
@@ -38,6 +40,21 @@ final class GalleryViewModel {
     init() {
         transformer = .init()
         showToast = { _ in }
+
+        // временно
+        let items = [
+            MediaItem(
+                type: .imageWithMusic,
+                image: UIComponentsAsset.media21.image,
+                track: Self.fetchTrack()
+            ),
+            MediaItem(
+                type: .image,
+                image: UIComponentsAsset.media16.image
+            )
+        ]
+
+        mediaItems = items
     }
 
     func dispatch(_ intent: Intent) async {
@@ -66,5 +83,40 @@ final class GalleryViewModel {
 
     func set(showToast: @escaping (String) -> Void) {
         self.showToast = showToast
+    }
+
+    // временно
+    private static func fetchTrack() -> Track? {
+        let json = """
+        {
+          "id": 2026794888,
+          "title": "миражи — кружок хора (>∆<)",
+          "artwork_url": "https://i1.sndcdn.com/artworks-1WyHHVfSQvKviNzI-bP1zeA-large.jpg",
+          "duration": 247063,
+          "media": {
+            "transcodings": [
+              {
+                "url": "https://api-v2.soundcloud.com/media/soundcloud:tracks:2026794888/cf1a0f7f-7d0e-4ce8-b601-656593f23ab3/stream/progressive",
+                "preset": "mp3_1_0",
+                "duration": 247066,
+                "snipped": false,
+                "format": {
+                  "protocol": "progressive",
+                  "mime_type": "audio/mpeg"
+                },
+                "quality": "sq",
+                "is_legacy_transcoding": true
+              }
+            ]
+          },
+          "user": {
+            "username": "skibidi rizz"
+          }
+        }
+        """
+
+        let data = Data(json.utf8)
+        let track = try? JSONDecoder().decode(Track.self, from: data)
+        return track
     }
 }

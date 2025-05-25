@@ -1,13 +1,10 @@
 import SwiftUI
 import UIComponents
 import Base
+import Domain
 
 public struct RewindView: View {
     @State private var viewModel: RewindViewModel
-
-    // TODO: To VM
-    @State private var rolls = 0
-    @State private var currentIndex = 0
     @State private var filterSettingsShown = false
     @State private var isSelectGroupPresented = false
 
@@ -21,26 +18,13 @@ public struct RewindView: View {
         viewModel = RewindViewModel()
     }
 
-    // Временно, пока не появится ViewModel
-    private let mediaImages: [UIImage] = [
-        UIComponentsAsset.media21.image,
-        UIComponentsAsset.media1.image,
-        UIComponentsAsset.media2.image,
-        UIComponentsAsset.media3.image,
-        UIComponentsAsset.media4.image,
-        UIComponentsAsset.media5.image,
-        UIComponentsAsset.media14.image,
-        UIComponentsAsset.media15.image,
-        UIComponentsAsset.media16.image
-    ]
-
     public var body: some View {
         ZStack {
             Color.background.ignoresSafeArea()
 
             VStack(spacing: 10) {
                 MediaTopButtons {
-                    router.navigateToMediaDetails(mediaImages[currentIndex])
+                    router.navigateToMediaDetails(viewModel.currentMediaItem)
                 } onSettingsTap: {
                     filterSettingsShown = true
                 }
@@ -50,7 +34,7 @@ public struct RewindView: View {
                 HStack {
                     author
                     Spacer()
-                    RewindRollsStat(rolls: $rolls)
+                    RewindRollsStat(rolls: $viewModel.rolls)
                 }
             }
             .modifier(VStackTopOffsetModifier(topOffsetRatio: 0.15))
@@ -81,7 +65,7 @@ public struct RewindView: View {
         }
         .onAppear {
             viewModel.set(showToast: showToast)
-            Task { await viewModel.dispatch(.fetchUser) }
+            viewModel.dispatch(.fetchUser)
         }
         .ignoresSafeArea(.keyboard)
         .sheet(isPresented: $isSelectGroupPresented) {
@@ -122,23 +106,18 @@ public struct RewindView: View {
     }
 
     private var mediaView: some View {
-        Rectangle()
-            .toSquare(mediaImages[currentIndex % mediaImages.count], cornerRadius: 40)
-            .onTapGesture {
-                withAnimation {
-                    rolls += 1
-                    currentIndex = (currentIndex + 1) % mediaImages.count
-                }
-            }
-            .overlay {
-                RewindMediaButtonsOverlay {
-                    // TODO: like action
-                } saveAction: {
-                    saveImageWithToast(image: mediaImages[currentIndex]) { message in
-                        showToast(message)
-                    }
-                }
-            }
+        MediaContentView(
+            mediaItem: viewModel.currentMediaItem,
+            onSave: {},
+            onLike: {},
+            onToggleSound: {
+                viewModel.dispatch(.toggleTrackPlaying)
+            },
+            isTrackPlaying: $viewModel.isTrackPlaying
+        )
+        .onTapGesture {
+            viewModel.dispatch(.showNextMediaItem)
+        }
     }
 
     private var author: some View {
@@ -146,8 +125,13 @@ public struct RewindView: View {
             AuthorBadgeView(
                 image: UIComponentsAsset.sasha.image,
                 name: "sasha",
-                date: "22.04.2025"
+                date: "22.04.2025",
+                track: viewModel.currentMediaItem.track
             )
         }
     }
+}
+
+#Preview {
+    RewindView(router: RewindRouter(appRouter: AppRouter()))
 }

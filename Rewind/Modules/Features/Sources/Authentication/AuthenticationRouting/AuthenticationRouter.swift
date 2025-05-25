@@ -24,10 +24,6 @@ public final class AuthenticationRouter {
         appRouter?.navigate(to: .name(email: email, password: password, registrationID: registrationID))
     }
 
-    func navigateToMediaDetails(_ image: UIImage) {
-        appRouter?.navigate(to: .mediaDetails(image))
-    }
-
     func navigateToRewind() {
         appRouter?.navigate(to: .rewind)
     }

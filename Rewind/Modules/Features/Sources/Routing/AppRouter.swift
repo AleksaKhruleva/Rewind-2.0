@@ -28,7 +28,7 @@ public final class AppRouter {
         case gallery
         case quoteCreation
         case mediasUploading
-        case mediaDetails(UIImage)
+        case mediaDetails(MediaItem)
 
         case group
         case groupSettings

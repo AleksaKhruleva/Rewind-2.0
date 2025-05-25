@@ -1,20 +1,22 @@
 import SwiftUI
+import Domain
 
 public struct BlurredMediaView: View {
-    @State private var image: UIImage
     @Binding var isPresented: Bool
-    var showMediaDetails: (UIImage) -> Void
+    @State private var mediaItem: MediaItem
+    @State private var isTrackPlaying: Bool = false
+    private var showMediaDetails: (MediaItem) -> Void
 
     @Environment(\.showToast)
     private var showToast
 
     public init(
-        image: UIImage,
         isPresented: Binding<Bool>,
-        showMediaDetails: @escaping (UIImage) -> Void
+        mediaItem: MediaItem,
+        showMediaDetails: @escaping (MediaItem) -> Void
     ) {
-        self.image = image
         self._isPresented = isPresented
+        self.mediaItem = mediaItem
         self.showMediaDetails = showMediaDetails
     }
 
@@ -41,7 +43,7 @@ public struct BlurredMediaView: View {
                     RewindMediaButtonsOverlay {
                         // TODO: smth
                     } saveAction: {
-                        saveImage(image: image)
+                        // TODO: сделать сохранение фото или видео
                     }
                 }
 
@@ -53,19 +55,29 @@ public struct BlurredMediaView: View {
     }
 
     private var author: some View {
-        AuthorBadgeView(
-            image: UIComponentsAsset.avatar.image,
-            name: "flowykk",
-            date: "23.11.2024"
-        )
-        .frame(width: 220)
-        .padding(.vertical, 4)
+        HStack {
+            AuthorBadgeView(
+                image: UIComponentsAsset.avatar.image,
+                name: "flowykk",
+                date: "23.11.2024",
+                track: mediaItem.track
+            )
+            .padding(.leading, 6)
+            Spacer()
+        }
+        .padding(.vertical, 6)
         .background(Color.background)
-        .cornerRadius(14)
+        .cornerRadius(18)
     }
 
     private var mediaView: some View {
-        Rectangle().toSquare(image, cornerRadius: 40)
+        MediaContentView(
+            mediaItem: mediaItem,
+            onSave: {},
+            onLike: {},
+            onToggleSound: {},
+            isTrackPlaying: $isTrackPlaying
+        )
     }
 
     private var actionsTable: some View {
@@ -74,14 +86,7 @@ public struct BlurredMediaView: View {
                 icon: "gearshape.fill",
                 title: UIComponentsStrings.Media.Blurred.title,
                 needChevron: true,
-                action: { showMediaDetails(image) }
-            )
-
-            BlurredTableCell(
-                icon: "square.and.arrow.down.fill",
-                title: UIComponentsStrings.Media.Blurred.save,
-                needChevron: true,
-                action: { saveImage(image: image) }
+                action: { showMediaDetails(mediaItem) }
             )
         }
         .background(Color.background)

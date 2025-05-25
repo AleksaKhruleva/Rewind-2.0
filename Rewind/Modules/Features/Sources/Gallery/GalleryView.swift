@@ -19,48 +19,8 @@ public struct GalleryView: View {
     public var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                GalleryHeader(
-                    image: UIComponentsAsset.media5.image,
-                    groupName: "Group name",
-                    onDismiss: {
-                        DispatchQueue.main.async {
-                            router.dismiss()
-                        }
-                    },
-                    onAddingQuote: router.navigateToQuoteCreation,
-                    onAddingMedias: { Task { await viewModel.dispatch(.showMediasDialog) } }
-                )
-
-                let mediaSpacing: CGFloat = 3
-                ScrollView {
-                    VStack {
-                        LazyVGrid(columns: Array(
-                            repeating: GridItem(.flexible(), spacing: mediaSpacing),
-                            count: 3
-                        ), spacing: mediaSpacing) {
-                            let medias = GalleryConstants.galleryMedias
-                            ForEach(medias, id: \.self) { media in
-                                Rectangle()
-                                    .toSquare(media, cornerRadius: 10)
-                                    .onTapGesture {
-                                        Task {
-                                            await viewModel.dispatch(.viewBlurredMedia(media))
-                                        }
-                                    }
-                            }
-                        }
-
-                        RewindNoteTextView(text: UIComponentsStrings.Note.end)
-                            .padding(.vertical, 4)
-                    }
-                }
-                .scrollIndicators(.hidden)
-                .safeAreaInset(edge: .bottom) {
-                    ZStack(alignment: .bottom) {
-                        footer
-                    }
-                }
-
+                headerView
+                mediaGridView
                 Spacer(minLength: 0)
             }
             .background(Color.background)
@@ -72,8 +32,8 @@ public struct GalleryView: View {
             .overlay {
                 if let selectedMedia = viewModel.viewingBlurredMedia {
                     BlurredMediaView(
-                        image: selectedMedia,
                         isPresented: $viewModel.blurredMediaShown,
+                        mediaItem: selectedMedia,
                         showMediaDetails: router.navigateToMediaDetails
                     )
                 }
@@ -101,9 +61,63 @@ public struct GalleryView: View {
             .photosPicker(isPresented: $viewModel.mediaPickerPresented, selection: $viewModel.mediaSelection)
             .navigationDestination(item: $viewModel.uploadingMedia) { media in
                 uploadingMediaDestination(for: media) { _ in
-                    // TODO: Saving here
                     print("Saving")
                 }.toolbar(.hidden)
+            }
+        }
+    }
+
+    private var headerView: some View {
+        GalleryHeader(
+            image: UIComponentsAsset.media5.image,
+            groupName: "Group name",
+            onDismiss: {
+                DispatchQueue.main.async {
+                    router.dismiss()
+                }
+            },
+            onAddingQuote: router.navigateToQuoteCreation,
+            onAddingMedias: { Task { await viewModel.dispatch(.showMediasDialog) } }
+        )
+    }
+
+    private var mediaGridView: some View {
+        let mediaSpacing: CGFloat = 3
+        return ScrollView {
+            VStack {
+                LazyVGrid(columns: Array(
+                    repeating: GridItem(.flexible(), spacing: mediaSpacing),
+                    count: 3
+                ), spacing: mediaSpacing) {
+                    ForEach(viewModel.mediaItems) { mediaItem in
+                        Rectangle()
+                            .toSquare(mediaItem.image, cornerRadius: 10)
+                            .onTapGesture {
+                                Task {
+                                    await viewModel.dispatch(.viewBlurredMedia(mediaItem))
+                                }
+                            }
+                    }
+                }
+
+                RewindNoteTextView(text: UIComponentsStrings.Note.end)
+                    .padding(.vertical, 4)
+            }
+        }
+        .scrollIndicators(.hidden)
+        .safeAreaInset(edge: .bottom) {
+            footer
+        }
+    }
+
+    private var blurredMediaOverlay: some View {
+        Group {
+            if let selectedMedia = viewModel.viewingBlurredMedia {
+                BlurredMediaView(
+                    isPresented: $viewModel.blurredMediaShown,
+                    mediaItem: selectedMedia,
+                    showMediaDetails: router.navigateToMediaDetails
+                )
             }
         }
     }

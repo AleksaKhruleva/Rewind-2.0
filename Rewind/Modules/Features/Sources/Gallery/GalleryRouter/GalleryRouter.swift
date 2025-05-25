@@ -1,4 +1,5 @@
 import SwiftUI
+import Domain
 
 @MainActor
 public final class GalleryRouter {
@@ -16,8 +17,8 @@ public final class GalleryRouter {
         appRouter?.navigate(to: .mediasUploading)
     }
 
-    func navigateToMediaDetails(_ image: UIImage) {
-        appRouter?.navigate(to: .mediaDetails(image))
+    func navigateToMediaDetails(_ mediaItem: MediaItem) {
+        appRouter?.navigate(to: .mediaDetails(mediaItem))
     }
 
     func dismiss() {

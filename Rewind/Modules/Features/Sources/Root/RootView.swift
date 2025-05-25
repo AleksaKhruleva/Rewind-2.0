@@ -47,7 +47,7 @@ public struct RootView: View {
         case .gallery: GalleryView(router: GalleryRouter(appRouter: router))
         case .quoteCreation: QuoteCreationView(router: router)
         case .mediasUploading: MediasUploadingView(router: router)
-        case let .mediaDetails(image): MediaDetailsView(router: router, image: image)
+        case let .mediaDetails(mediaItem): MediaDetailsView(mediaItem: mediaItem, router: router)
 
         case .group: GroupView(router: GroupRouter(appRouter: router))
         case .groupSettings: GroupSettingsView(router: GroupSettingsRouter(appRouter: router))
