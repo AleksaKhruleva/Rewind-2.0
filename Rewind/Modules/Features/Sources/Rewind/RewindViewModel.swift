@@ -37,6 +37,8 @@ final class RewindViewModel {
     private(set) var groups = [Domain.Group]()
     private(set) var userGroupsState = UserGroupsState.notReady
     private(set) var currentGroupState = CurrentGroupState.ready
+    private(set) var currentMediaItem: MediaItem
+    let router: RewindRouter
 
     var fetchedUser: User?
     var user: User {
@@ -52,15 +54,17 @@ final class RewindViewModel {
         }
     }
 
-    private let router: RewindRouter
     private let backend: NetworkServiceProtocol
+    private let jwtDecoder: JWTDecoder
     private let audioManager: AudioPlayerManager
     private var mediaItems = [MediaItem]()
     private var currentIndex = 0
 
-    init() {
+    init(router: RewindRouter) {
+        self.router = router
         showToast = { _ in }
         backend = NetworkService()
+        jwtDecoder = JWTDecoder()
         audioManager = AudioPlayerManager.shared
 
         // временно
@@ -80,20 +84,18 @@ final class RewindViewModel {
         currentMediaItem = items[0]
     }
 
-    func dispatch(_ intent: Intent) {
+    func dispatch(_ intent: Intent) async {
         switch intent {
         case .fetchUser:
-            Task {
-                do {
-                    guard let tokens = Tokens() else {
-                        //                        router.navigateToWelcome() // TODO: return when routing is ready
-                        return
-                    }
-                    let response = try await backend.user(tokens: tokens)
-                    user = response.toUser()
-                } catch {
-                    showToast("\(error.localizedDescription) 😨")
+            do {
+                guard let tokens = Tokens() else {
+                    //                        router.navigateToWelcome() // TODO: return when routing is ready
+                    return
                 }
+                let response = try await backend.user(tokens: tokens)
+                user = response.toUser()
+            } catch {
+                showToast("\(error.localizedDescription) 😨")
             }
         case .toggleTrackPlaying:
             if !isTrackPlaying {
@@ -117,7 +119,8 @@ final class RewindViewModel {
         case .fetchGroups:
             userGroupsState = .notReady
             do {
-                let responses = try await backend.fetchGroups()
+                guard let tokens = Tokens() else { return }
+                let responses = try await backend.fetchGroups(tokens: tokens)
                 groups = sortedGroups(from: responses)
                 userGroupsState = .ready
             } catch {
@@ -129,14 +132,17 @@ final class RewindViewModel {
             currentGroupState = .notReady
             do {
                 guard let currentGroupID,
-                      let accessToken = KeychainService.shared.read(for: .accessToken),
-                      let userID = jwtDecoder.getUserId(from: accessToken)
+                      let tokens = Tokens(),
+                      let userID = jwtDecoder.getUserId(from: tokens.accessToken)
                 else {
                     // TODO: throw error
                     return
                 }
 
-                let response = try await backend.fetchFullGroupDetails(id: currentGroupID)
+                let response = try await backend.fetchFullGroupDetails(
+                    tokens: tokens,
+                    id: currentGroupID
+                )
 
                 let members = sortedMembers(
                     from: response.members,
@@ -181,14 +187,14 @@ final class RewindViewModel {
         return groups
     }
 
-    private func sortedMembers(from responses: [GroupMemberResponse], currentUserID: Int) -> [Member] {
+    private func sortedMembers(from responses: [GroupMemberResponse], currentUserID: String) -> [Member] {
         let members = responses.map { response in
             Member(
-                id: response.id,
+                id: String(response.id),
                 name: response.name,
                 imageData: nil,
                 isOwner: response.isOwner,
-                isUser: response.id == currentUserID
+                isUser: String(response.id) == currentUserID
             )
         }
 

@@ -63,6 +63,9 @@ public struct RewindView: View {
         }
         .onAppear {
             viewModel.set(showToast: showToast)
+            Task {
+                await viewModel.dispatch(.fetchUser)
+            }
         }
         .ignoresSafeArea(.keyboard)
         .sheet(isPresented: $isSelectGroupPresented) {
@@ -118,13 +121,13 @@ public struct RewindView: View {
                 mapButton
             }
         } rightView: {
-            Button {
-                if !viewModel.user.isEmpty {
-                    router.navigateToAccount(user: viewModel.user)
+            RoundImageView(image: viewModel.user.image, size: 44)
+                .contentShape(Circle())
+                .onTapGesture {
+                    if !viewModel.user.isEmpty {
+                        viewModel.router.navigateToAccount(user: viewModel.user)
+                    }
                 }
-            } label: {
-                RoundImageView(image: viewModel.user.image, size: 44)
-                    .contentShape(Circle())
             }.rewindAccessibilityIdentifier(.rewind(.button(.account)))
         }
     }
@@ -144,11 +147,12 @@ public struct RewindView: View {
                     .font(.system(size: 15, weight: .black))
                     .padding(.trailing, 4)
             }
-            .padding(.horizontal, groupImage == nil ? 0 : 10)
+            .padding(.horizontal, 10)
             .frame(height: 44)
             .background(Color.backgroundSecondary)
             .clipShape(Capsule())
         }
+        .padding(.horizontal, groupImage == nil ? -8 : 0)
         .foregroundStyle(Color.textPrimary)
         .blur(radius: viewModel.userGroupsState == .notReady ? 3 : 0)
         .animation(.easeInOut(duration: 0.2), value: viewModel.userGroupsState)
@@ -174,12 +178,16 @@ public struct RewindView: View {
             onSave: {},
             onLike: {},
             onToggleSound: {
-                viewModel.dispatch(.toggleTrackPlaying)
+                Task {
+                    await viewModel.dispatch(.toggleTrackPlaying)
+                }
             },
             isTrackPlaying: $viewModel.isTrackPlaying
         )
         .onTapGesture {
-            viewModel.dispatch(.showNextMediaItem)
+            Task {
+                await viewModel.dispatch(.showNextMediaItem)
+            }
         }
     }
 

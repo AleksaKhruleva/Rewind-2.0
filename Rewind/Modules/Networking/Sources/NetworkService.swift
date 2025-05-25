@@ -220,6 +220,33 @@ public final class NetworkService: NetworkServiceProtocol {
         }
     }
 
+    public func createGroup(tokens: Tokens, name: String) async throws -> GroupResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+            try await provider.request(
+                .createGroup(accessToken: tokens.accessToken, name: name),
+                type: GroupResponse.self
+            )
+        }
+    }
+
+    public func fetchGroups(tokens: Tokens, ) async throws -> [GroupResponse] {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+            let response = try await provider.request(
+                .fetchGroups(accessToken: tokens.accessToken),
+                type: GroupsListResponse.self
+            )
+            return response.groups
+        }
+    }
+
+    public func fetchFullGroupDetails(tokens: Tokens, id: Int) async throws -> GroupDetails {
+        async let group = fetchGroup(tokens: tokens, id: id)
+        async let members = fetchGroupMembers(tokens: tokens, id: id)
+        return GroupDetails(group: try await group, members: try await members)
+    }
+}
+
+extension NetworkService {
     private func retryOnUnauthorized<T>(
         refreshToken: String,
         _ perform: @escaping (String?) async throws -> T
@@ -234,43 +261,22 @@ public final class NetworkService: NetworkServiceProtocol {
         }
     }
 
-    public func createGroup(name: String) async throws -> GroupResponse {
+    private func fetchGroup(tokens: Tokens, id: Int) async throws -> GroupResponse {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
             try await provider.request(
-                .createGroup(name: name),
+                .fetchGroup(accessToken: tokens.accessToken, id: id),
                 type: GroupResponse.self
             )
         }
     }
 
-    public func fetchGroups() async throws -> [GroupResponse] {
+    private func fetchGroupMembers(tokens: Tokens, id: Int) async throws -> [GroupMemberResponse] {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
             let response = try await provider.request(
-                .fetchGroups,
-                type: GroupsListResponse.self
+                .fetchGroupMembers(accessToken: tokens.accessToken, id: id),
+                type: GroupMembersListResponse.self
             )
-            return response.groups
+            return response.members
         }
-    }
-
-    private func fetchGroup(id: Int) async throws -> GroupResponse {
-        try await provider.request(
-            .fetchGroup(id: id),
-            type: GroupResponse.self
-        )
-    }
-
-    private func fetchGroupMembers(id: Int) async throws -> [GroupMemberResponse] {
-        let response = try await provider.request(
-            .fetchGroupMembers(id: id),
-            type: GroupMembersListResponse.self
-        )
-        return response.members
-    }
-
-    public func fetchFullGroupDetails(id: Int) async throws -> GroupDetails {
-        async let group = fetchGroup(id: id)
-        async let members = fetchGroupMembers(id: id)
-        return GroupDetails(group: try await group, members: try await members)
     }
 }

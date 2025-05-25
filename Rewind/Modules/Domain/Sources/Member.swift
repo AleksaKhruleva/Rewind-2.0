@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 public struct Member: Identifiable, Hashable {
-    public let id: Int
+    public let id: String
     public let name: String
     public private(set) var imageData: Data?
     public let isOwner: Bool
@@ -19,7 +19,7 @@ public struct Member: Identifiable, Hashable {
     }
     
     public init(
-        id: Int,
+        id: String,
         name: String,
         imageData: Data? = nil,
         isOwner: Bool = false,

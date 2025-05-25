@@ -36,14 +36,15 @@ final class GroupSelectionViewModel {
             do {
                 guard let accessToken = KeychainService.shared.read(for: .accessToken),
                       let userID = jwtDecoder.getUserId(from: accessToken),
-                      let user = UserStorage.currentUser
+                      let user = UserStorage.currentUser,
+                      let tokens = Tokens()
                 else {
                     // TODO: handle error
                     isLoading = false
                     return
                 }
 
-                let response = try await backend.createGroup(name: name)
+                let response = try await backend.createGroup(tokens: tokens, name: name)
 
                 let group = Group(
                     id: response.groupID,

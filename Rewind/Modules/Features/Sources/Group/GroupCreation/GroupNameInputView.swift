@@ -13,7 +13,7 @@ struct GroupNameInputView: View {
     }
 
     var body: some View {
-        Group {
+        ZStack {
             if isLoading {
                 ZStack {
                     Color.backgroundSecondary.ignoresSafeArea()
@@ -25,7 +25,8 @@ struct GroupNameInputView: View {
                 GenericInputSheetView(
                     item: .groupName,
                     title: "Enter group name",
-                    placeholder: "Friends") { groupName in
+                    placeholder: "Friends",
+                    error: .constant("")) { groupName in
                         onSubmit(groupName)
                     }
             }
