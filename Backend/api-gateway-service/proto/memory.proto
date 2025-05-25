@@ -1,0 +1,182 @@
+syntax = "proto3";
+
+package memory;
+
+option go_package = "Rewind-2.0/Backend/memory-service/proto";
+
+import "google/protobuf/timestamp.proto";
+
+// Сервис для работы с воспоминаниями
+service MemoryService {
+  rpc CreateMemory (CreateMemoryRequest) returns (CreateMemoryResponse);
+  rpc DeleteMemory (DeleteMemoryRequest) returns (DeleteMemoryResponse);
+  rpc DeleteMemoriesByGroup (DeleteMemoriesByGroupRequest) returns (DeleteMemoriesByGroupResponse);
+  rpc ListMemoriesByGroup (ListMemoriesByGroupRequest) returns (ListMemoriesByGroupResponse);
+  rpc ListMemoriesByGroupWithFilters (ListMemoriesByGroupWithFiltersRequest) returns (ListMemoriesByGroupWithFiltersResponse);
+
+  rpc CreateMemoryTag (CreateMemoryTagRequest) returns (CreateMemoryTagResponse);
+  rpc DeleteMemoryTag (DeleteMemoryTagRequest) returns (DeleteMemoryTagResponse);
+  rpc ListMemoryTagsByMemoryID (ListMemoryTagsByMemoryIDRequest) returns (ListMemoryTagsByMemoryIDResponse);
+
+  rpc CreateFavourite (CreateFavouriteRequest) returns (CreateFavouriteResponse);
+  rpc DeleteFavourite (DeleteFavouriteRequest) returns (DeleteFavouriteResponse);
+  rpc DeleteFavouritesByUserID (DeleteFavouritedByUserIDRequest) returns (DeleteFavouritedByUserIDResponse);
+}
+
+// Модель воспоминания
+message Memory {
+  uint64 id = 1;
+  uint64 group_id = 2;
+  uint64 user_id = 3;
+  string media_type = 4;
+  string media_url = 5;
+  double latitude = 6;
+  double longitude = 7;
+  string music_id = 8;
+  double offset = 9;
+  double duration = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
+}
+
+// Модель тега воспоминания
+message MemoryTag {
+  uint64 id = 1;
+  uint64 memory_id = 2;
+  string name = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+}
+
+// Модель избранного
+message Favourite {
+  uint64 memory_id = 1;
+  uint64 user_id = 2;
+  google.protobuf.Timestamp created_at = 3;
+}
+
+// Запрос на создание воспоминания
+message CreateMemoryRequest {
+  uint64 group_id = 1;
+  uint64 user_id = 2;
+  string media_type = 3;
+  bytes media_file = 4;
+  optional double latitude = 5;
+  optional double longitude = 6;
+  optional string music_id = 7;
+  optional double offset = 8;
+  optional double duration = 9;
+  repeated string tags = 10;
+}
+
+// Ответ на создание воспоминания
+message CreateMemoryResponse {
+  Memory memory = 1;
+}
+
+// Запрос на удаление воспоминаний по Group ID
+message DeleteMemoriesByGroupRequest {
+  uint64 group_id = 1;
+}
+
+// Ответ на удаление воспоминаний по Group ID
+message DeleteMemoriesByGroupResponse {}
+
+// Запрос на удаление воспоминания
+message DeleteMemoryRequest {
+  uint64 memory_id = 1;
+  uint64 user_id = 2;
+  bool is_admin = 3;
+}
+
+// Ответ на удаление воспоминания
+message DeleteMemoryResponse {}
+
+// Запрос на получение списка воспоминаний по Group ID
+message ListMemoriesByGroupRequest {
+  uint64 group_id = 1;
+  uint64 user_id = 2; // Для определения, добавлено ли в избранное
+}
+
+// Ответ на получение списка воспоминаний по Group ID (с детальной информацией)
+message ListMemoriesByGroupResponse {
+  repeated DetailedMemory memories = 1;
+}
+
+// Запрос на получение списка воспоминаний по Group ID с фильтрами
+message ListMemoriesByGroupWithFiltersRequest {
+  uint64 group_id = 1;
+  uint64 user_id = 2; // Для определения, добавлено ли в избранное
+  map<string, string> filters = 3; // Пример: {"created_at_gte": "2023-01-01", "user_id": "123"}
+  uint64 number_of_memories = 4;
+}
+
+// Ответ на получение списка воспоминаний по Group ID с фильтрами (с детальной информацией)
+message ListMemoriesByGroupWithFiltersResponse {
+  repeated DetailedMemory memories = 1;
+}
+
+// Детальная информация о воспоминании (включая теги и статус избранного)
+message DetailedMemory {
+  Memory memory = 1;
+  repeated string tags = 2;
+  bool is_favourite = 3;
+}
+
+// Запрос на создание тега воспоминания
+message CreateMemoryTagRequest {
+  uint64 memory_id = 1;
+  string name = 2;
+}
+
+// Ответ на создание тега воспоминания
+message CreateMemoryTagResponse {
+  MemoryTag tag = 1;
+}
+
+// Запрос на удаление тега воспоминания
+message DeleteMemoryTagRequest {
+  uint64 memory_id = 1;
+  string tag = 2;
+}
+
+// Ответ на удаление тега воспоминания
+message DeleteMemoryTagResponse {}
+
+// Запрос на получение списка тегов воспоминания по ID воспоминания
+message ListMemoryTagsByMemoryIDRequest {
+  uint64 memory_id = 1;
+}
+
+// Ответ на получение списка тегов воспоминания по ID воспоминания
+message ListMemoryTagsByMemoryIDResponse {
+  repeated MemoryTag tags = 1;
+}
+
+// Запрос на создание избранного
+message CreateFavouriteRequest {
+  uint64 memory_id = 1;
+  uint64 user_id = 2;
+}
+
+// Ответ на создание избранного
+message CreateFavouriteResponse {
+  Favourite favourite = 1;
+}
+
+// Запрос на удаление избранного
+message DeleteFavouriteRequest {
+  uint64 memory_id = 1;
+  uint64 user_id = 2;
+}
+
+// Ответ на удаление избранного
+message DeleteFavouriteResponse {}
+
+// Запрос на удаление избранного для пользователя
+message DeleteFavouritedByUserIDRequest {
+  uint64 user_id = 1;
+}
+
+// Ответ на удаление избранного для пользователя
+message DeleteFavouritedByUserIDResponse {}

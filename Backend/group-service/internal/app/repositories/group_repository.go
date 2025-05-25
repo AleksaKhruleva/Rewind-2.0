@@ -261,6 +261,23 @@ func (r *gormGroupMemberRepository) FindAnyOtherMemberByGroup(ctx context.Contex
 	return &member, nil
 }
 
+func (r *gormGroupMemberRepository) CheckUserInGroup(ctx context.Context, tx *gorm.DB, userID uint, groupID uint) (bool, bool, error) {
+	db := r.getDB(tx).WithContext(ctx)
+	var groupMember models.GroupMember
+	result := db.
+		Where("user_id = ? AND group_id = ?", userID, groupID).
+		First(&groupMember)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return false, false, nil // Пользователь не найден в группе
+		}
+		return false, false, result.Error
+	}
+
+	return true, groupMember.IsAdmin, nil
+}
+
 type gormGroupInvitationRepository struct {
 	db *gorm.DB
 }

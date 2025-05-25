@@ -728,6 +728,30 @@ func (s *GroupService) RemoveGroupMember(ctx context.Context, req *pb.RemoveGrou
 	}
 }
 
+// CheckUserInGroup реализует RPC метод для проверки, состоит ли пользователь в группе и является ли он админом.
+func (s *GroupService) CheckUserInGroup(ctx context.Context, req *pb.CheckUserInGroupRequest) (*pb.CheckUserInGroupResponse, error) {
+	// 1. Валидация входных данных
+	userID := req.GetUserId()
+	groupID := req.GetGroupId()
+	if userID <= 0 || groupID <= 0 {
+		log.Printf("CheckUserInGroup: Invalid argument: user_id (%d) or group_id (%d) is missing or invalid", userID, groupID)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid user or group ID")
+	}
+
+	// 2. Проверка членства пользователя в группе и роли (админ) через репозиторий
+	isInGroup, isAdmin, err := s.groupRepo.GroupMember().CheckUserInGroup(ctx, nil, uint(userID), uint(groupID))
+	if err != nil {
+		log.Printf("CheckUserInGroup: Failed to check user %d in group %d in DB: %v", userID, groupID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to check user group membership")
+	}
+
+	// 3. Формирование успешного ответа
+	return &pb.CheckUserInGroupResponse{
+		IsInGroup: isInGroup,
+		IsAdmin:   isAdmin,
+	}, nil
+}
+
 // CreateGroupInvitation реализует RPC метод создания приглашения в группу
 func (s *GroupService) CreateGroupInvitation(ctx context.Context, req *pb.CreateGroupInvitationRequest) (*pb.CreateGroupInvitationResponse, error) {
 	// 1. Валидация входных данных

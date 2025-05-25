@@ -63,8 +63,7 @@ func (s *GroupService) verifyUserExists(ctx context.Context, userID uint64) erro
 	req := &pb.GetUserByIDRequest{UserId: userID}
 	resp, err := s.authClient.GetUserByID(ctx, req)
 	if err != nil {
-		log.Printf("API GW GroupService: Failed to call AuthService.GetUserByID for user %d: %v", userID, err)
-		return status.Errorf(codes.Internal, "auth service error: %v", status.Convert(err).Message())
+		return err
 	}
 
 	if resp == nil {

@@ -1,0 +1,50 @@
+package responses
+
+import (
+	"time"
+)
+
+// MemoryResponse represents the HTTP response for a single memory.
+type MemoryResponse struct {
+	Id          uint64    `json:"id"`
+	GroupID     uint64    `json:"groupId"`
+	UserID      uint64    `json:"userId"`
+	MediaType   string    `json:"mediaType"`
+	MediaURL    string    `json:"mediaUrl"`
+	TextContent string    `json:"textContent"`
+	Latitude    float64   `json:"latitude"`
+	Longitude   float64   `json:"longitude"`
+	MusicID     string    `json:"musicId"`
+	Offset      float64   `json:"offset"`
+	Duration    float64   `json:"duration"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+}
+
+// DetailedMemoryResponse represents the HTTP response for a detailed memory.
+type DetailedMemoryResponse struct {
+	Memory      MemoryResponse `json:"memory"`
+	Tags        []string       `json:"tags"`
+	IsFavourite bool           `json:"isFavourite"`
+}
+
+// ListMemoriesResponse represents the HTTP response for a list of memories.
+type ListMemoriesResponse struct {
+	Memories []DetailedMemoryResponse `json:"memories"`
+}
+
+// MemoryTagResponse represents the HTTP response for a memory tag.
+type MemoryTagResponse struct {
+	Tag string `json:"tag"`
+}
+
+// ListMemoryTagsResponse represents the HTTP response for a list of memory tags.
+type ListMemoryTagsResponse struct {
+	Tags []MemoryTagResponse `json:"tags"`
+}
+
+// FavouriteResponse represents the HTTP response for a favourite.
+type FavouriteResponse struct {
+	MemoryID uint64 `json:"memoryId"`
+	UserID   uint64 `json:"userId"`
+}

@@ -77,6 +77,9 @@ type GroupMemberRepository interface {
 	// FindAnyOtherMemberByGroup находит любого другого активного участника в группе, исключая указанного.
 	// Возвращает ErrRecordNotFound если других участников нет.
 	FindAnyOtherMemberByGroup(ctx context.Context, tx *gorm.DB, groupID uint, excludeUserID uint) (*models.GroupMember, error)
+
+	// CheckUserInGroup проверяет есть ли пользователь в группе и является ли он админом
+	CheckUserInGroup(ctx context.Context, tx *gorm.DB, userID uint, groupID uint) (bool, bool, error)
 }
 
 // GroupInvitationRepository определяет методы для работы с приглашениями в группы в базе данных.

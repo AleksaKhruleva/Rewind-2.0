@@ -14,7 +14,7 @@ func GenerateAccessToken(userID uint, username string, secretKey string) (string
 	claims := token.Claims.(jwt.MapClaims)
 	claims["user_id"] = userID
 	claims["username"] = username
-	claims["exp"] = time.Now().Add(time.Hour * 24).Unix() // Время истечения токена (24 часа)
+	claims["exp"] = time.Now().Add(time.Minute * 30).Unix() // Время истечения токена
 
 	tokenString, err := token.SignedString([]byte(secretKey))
 	if err != nil {

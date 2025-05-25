@@ -89,6 +89,19 @@ func NewServer(dependencies *di.Dependencies) *Server {
 		r.Get("/api/users/groups", dependencies.GroupHandler.ListUserGroups) // Assuming GET method
 	})
 
+	// Memory routes (typically require authentication middleware)
+	mux.Group(func(r chi.Router) {
+		r.Post("/api/memories", dependencies.MemoryHandler.CreateMemory)
+		r.Delete("/api/memories/{memoryId}", dependencies.MemoryHandler.DeleteMemory)
+		r.Get("/api/groups/{groupId}/memories", dependencies.MemoryHandler.ListMemoriesByGroup)
+		r.Get("/api/groups/{groupId}/memories/filter", dependencies.MemoryHandler.ListMemoriesByGroupWithFilters)
+		r.Post("/api/memories/{memoryId}/tags", dependencies.MemoryHandler.CreateMemoryTag)
+		r.Delete("/api/memories/{memoryId}/tags/{tag}", dependencies.MemoryHandler.DeleteMemoryTag)
+		r.Get("/api/memories/{memoryId}/tags", dependencies.MemoryHandler.ListMemoryTagsByMemoryID)
+		r.Post("/api/memories/{memoryId}/favourite", dependencies.MemoryHandler.CreateFavourite)
+		r.Delete("/api/memories/{memoryId}/favourite", dependencies.MemoryHandler.DeleteFavourite)
+	})
+
 	mux.Handle("/swagger/*", httpSwagger.Handler(httpSwagger.URL("/swagger/doc.json")))
 
 	port := os.Getenv("API_GATEWAY_PORT")

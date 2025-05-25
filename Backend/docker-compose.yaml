@@ -37,6 +37,25 @@ services:
     volumes:
       - db_group_data:/var/lib/postgresql/data
 
+    # --- База данных Memory---
+  memory-db:
+    image: postgres:15-alpine
+    container_name: rewind-memory-db
+    environment:
+      POSTGRES_USER: rewind_user
+      POSTGRES_PASSWORD: rewind_password
+      POSTGRES_DB: rewind_db
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U rewind_user -d rewind_db" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - db_memory_data:/var/lib/postgresql/data
+
   # --- Сервисы Go ---
 
   api-gateway-service:
@@ -46,7 +65,7 @@ services:
       API_GATEWAY_PORT: "8080"
       AUTH_SERVICE_GRPC_ADDRESS: rewind-auth-service:50051
       GROUP_SERVICE_GRPC_ADDRESS: rewind-group-service:50052
-      # MEMORY_SERVICE_GRPC_ADDRESS: rewind-memory-service:50053
+      MEMORY_SERVICE_GRPC_ADDRESS: rewind-memory-service:50053
       # NOTIFICATION_SERVICE_GRPC_ADDRESS: rewind-notification-service:50054
     ports:
       - "8080:8080" # Или другой порт по вашему выбору для доступа к API Gateway
@@ -63,7 +82,7 @@ services:
 
 
   auth-service:
-    build: ./auth-service # Обновленный путь к Dockerfile
+    build: ./auth-service
     container_name: rewind-auth-service
     ports:
       - "50051:50051"
@@ -76,12 +95,23 @@ services:
         condition: service_started
 
   group-service:
-    build: ./group-service # Обновленный путь к Dockerfile
+    build: ./group-service
     container_name: rewind-group-service
     ports:
       - "50052:50052"
     depends_on:
       group-db:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+
+  memory-service:
+    build: ./memory-service
+    container_name: rewind-memory-service
+    ports:
+      - "50052:50052"
+    depends_on:
+      memory-db:
         condition: service_healthy
       auth-service:
         condition: service_started
@@ -223,6 +253,7 @@ services:
 volumes:
   db_data:
   db_group_data:
+  db_memory_data:
   rabbitmq_data:
   redis_data:
   certbot-etc:
