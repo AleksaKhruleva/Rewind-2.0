@@ -14,6 +14,7 @@ public struct AccountView: View {
     @State private var blurredAvatarShown = false
     @State private var signOutAlertShown = false
     @State private var deleteAccountAlertShown = false
+    @State private var helpAlertShown = false
 
     @State private var genericSheetItem: GenericInputSheetItem?
 
@@ -133,6 +134,7 @@ public struct AccountView: View {
                 Button(UIComponentsStrings.Buttons.cancel, role: .destructive) { }
             }
         }
+        .alert(UIComponentsStrings.Account.Help.Alert.title, isPresented: $helpAlertShown) { }
     }
 
     var header: some View {
@@ -186,8 +188,9 @@ public struct AccountView: View {
                 ("envelope.fill", UIComponentsStrings.Account.General.email, .account(.button(.editEmail)), {
                     genericSheetItem = .email
                 }),
-                ("gift.fill", UIComponentsStrings.Account.General.widget, nil, {}),
-                ("questionmark.circle.fill", UIComponentsStrings.Account.General.help, nil, {}),
+                ("questionmark.circle.fill", UIComponentsStrings.Account.General.help, nil, {
+                    helpAlertShown = true
+                }),
                 ("globe", UIComponentsStrings.Account.General.git, nil, {
                     UIApplication.shared.open(URL(string: "https://github.com/AleksaKhruleva/Rewind-2.0")!)
                 })

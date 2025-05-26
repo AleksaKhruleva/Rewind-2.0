@@ -86,6 +86,7 @@ final class GalleryViewModel {
     }
 
     // временно
+    // swiftlint:disable line_length
     private static func fetchTrack() -> Track? {
         let json = """
         {
@@ -119,4 +120,5 @@ final class GalleryViewModel {
         let track = try? JSONDecoder().decode(Track.self, from: data)
         return track
     }
+    // swiftlint:enable line_length
 }

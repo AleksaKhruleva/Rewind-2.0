@@ -44,7 +44,9 @@
 
 "account.sign_out.alert.title" = "Are you sure you want to log out?";
 
-"account.delete_account.alert.title" = "Are you sure you want to delete your account? You will not be able to undo this action.";
+"account.delete_account.alert.title" = "Are you sure you want to delete your account? You will not be able to undo this action";
+
+"account.help.alert.title" = "With any questions or ideas for improving Rewind, feel free to reach out to us at robot@rewindapp.ru";
 
 "account.edit.image.dialog.title" = "What to do with your profile image?";
 
