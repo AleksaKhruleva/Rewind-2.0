@@ -42,24 +42,22 @@ final class GalleryViewModel {
         showToast = { _ in }
 
         // временно
-        let items = [
+        mediaItems = [
             MediaItem(
-                type: .image,
-                image: UIComponentsAsset.media21.image,
+                userId: 1,
+                groupId: 1,
+                mediaType: .video,
+                mediaURL: URL(string: "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4"),
+                createdAt: "23.11.2024",
                 track: Self.fetchTrack()
             ),
             MediaItem(
-                type: .image,
-                image: UIComponentsAsset.media16.image
-            ),
-            MediaItem(
-                type: .video,
-                image: UIComponentsAsset.media1.image,
-                videoURL: URL(string: "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4")
+                userId: 2,
+                groupId: 2,
+                mediaType: .image,
+                createdAt: "01.01.2025"
             )
         ]
-
-        mediaItems = items
     }
 
     func dispatch(_ intent: Intent) async {

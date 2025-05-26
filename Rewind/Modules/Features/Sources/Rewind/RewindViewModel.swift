@@ -67,13 +67,19 @@ final class RewindViewModel {
         // временно
         let items = [
             MediaItem(
-                type: .image,
-                image: UIComponentsAsset.media21.image,
-                track: Self.fetchTrack()
+                userId: 1,
+                groupId: 1,
+                mediaType: .image,
+                createdAt: "23.11.2024",
+                track: Self.fetchTrack(),
+                image: UIComponentsAsset.media21.image
             ),
             MediaItem(
-                type: .image,
-                image: UIComponentsAsset.media16.image
+                userId: 2,
+                groupId: 2,
+                mediaType: .image,
+                createdAt: "01.01.2025",
+                image: UIComponentsAsset.media4.image
             )
         ]
 

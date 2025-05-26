@@ -1,28 +1,51 @@
 import UIKit
 
-public enum MediaType {
+public enum MediaType: Codable {
     case image
     case video
+    case quote
 }
 
-public struct MediaItem: Identifiable, Hashable {
+public struct MediaItem: Identifiable, Codable {
     public let id: UUID
-    public let type: MediaType
-    public let image: UIImage
+    public let userId: Int
+    public let groupId: Int
+    public let mediaType: MediaType
+    public let mediaURL: URL?
+    public let latitude: Double?
+    public let longitude: Double?
+    public let duration: Double?
+    public let offset: Double?
+    public let createdAt: String
+    
     public let track: Track?
-    public let videoURL: URL?
+//    public let image: UIImage
     
     public init(
         id: UUID = UUID(),
-        type: MediaType,
-        image: UIImage,
+        userId: Int,
+        groupId: Int,
+        mediaType: MediaType,
+        mediaURL: URL? = nil,
+        latitude: Double? = nil,
+        longitude: Double? = nil,
+        duration: Double? = nil,
+        offset: Double? = nil,
+        createdAt: String,
         track: Track? = nil,
-        videoURL: URL? = nil
+//        image: UIImage
     ) {
         self.id = id
-        self.type = type
-        self.image = image
+        self.userId = userId
+        self.groupId = groupId
+        self.mediaType = mediaType
+        self.mediaURL = mediaURL
+        self.latitude = latitude
+        self.longitude = longitude
+        self.duration = duration
+        self.offset = offset
+        self.createdAt = createdAt
         self.track = track
-        self.videoURL = videoURL
+//        self.image = image
     }
 }

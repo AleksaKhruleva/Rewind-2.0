@@ -38,7 +38,7 @@ public struct MediaContentView: View {
 
     public var body: some View {
         ZStack {
-            switch mediaItem.type {
+            switch mediaItem.mediaType {
             case .image:
                 imageContent
             case .video:
@@ -111,7 +111,7 @@ public struct MediaContentView: View {
     }
 
     private func setupPlayer() {
-        guard let url = mediaItem.videoURL else { return }
+        guard let url = mediaItem.mediaURL else { return }
 
         let item = AVPlayerItem(url: url)
         playerItem = item

@@ -33,6 +33,16 @@ public protocol NetworkServiceProtocol {
     func fetchFullGroupDetails(tokens: Tokens, id: Int) async throws -> GroupDetails
     func updateGroupName(tokens: Tokens, id: Int, name: String) async throws -> GroupResponse
     func createGroupInvitationCode(tokens: Tokens, id: Int) async throws -> GroupInvitationCodeResponse
+    
+    func getMedias(tokens: Tokens, groupId: Int) async throws -> MediasResponse
+    func getRandomMedias(tokens: Tokens, groupId: Int) async throws -> MediasResponse
+    // case addMedia
+    func deleteMedia(tokens: Tokens, groupId: Int, memoryId: Int) async throws -> SuccessResponse
+    func addTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> TagResponse
+    func deleteTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> TagResponse
+    func likeMedia(tokens: Tokens, memoryId: Int) async throws -> SuccessResponse
+    func unlikeMedia(tokens: Tokens, memoryId: Int) async throws -> SuccessResponse
+    func getMediaTags(tokens: Tokens, memoryId: Int) async throws -> TagsResponse
 }
 
 public final class NetworkService: NetworkServiceProtocol {
@@ -217,6 +227,107 @@ public final class NetworkService: NetworkServiceProtocol {
                     verificationCode: verificationCode
                 ),
                 type: SuccessResponse.self
+            )
+        }
+    }
+    
+    public func getMedias(tokens: Tokens, groupId: Int) async throws -> MediasResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+            try await self.provider.request(
+                .getMedias(
+                    accessToken: tokens.accessToken,
+                    groupId: groupId
+                ),
+                type: MediasResponse.self
+            )
+        }
+    }
+
+    public func getRandomMedias(tokens: Tokens, groupId: Int) async throws -> MediasResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+            try await self.provider.request(
+                .getRandomMedias(
+                    accessToken: tokens.accessToken,
+                    groupId: groupId
+                ),
+                type: MediasResponse.self
+            )
+        }
+    }
+
+    public func deleteMedia(tokens: Tokens, groupId: Int, memoryId: Int) async throws -> SuccessResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+            try await self.provider.request(
+                .deleteMedia(
+                    accessToken: tokens.accessToken,
+                    groupId: groupId,
+                    memoryId: memoryId
+                ),
+                type: SuccessResponse.self
+            )
+        }
+    }
+
+    public func addTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> TagResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+            try await self.provider.request(
+                .addTag(
+                    accessToken: tokens.accessToken,
+                    groupId: groupId,
+                    memoryId: memoryId,
+                    tag: tag
+                ),
+                type: TagResponse.self
+            )
+        }
+    }
+
+    public func deleteTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> TagResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+            try await self.provider.request(
+                .deleteTag(
+                    accessToken: tokens.accessToken,
+                    groupId: groupId,
+                    memoryId: memoryId,
+                    tag: tag
+                ),
+                type: TagResponse.self
+            )
+        }
+    }
+
+    public func likeMedia(tokens: Tokens, memoryId: Int) async throws -> SuccessResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+            try await self.provider.request(
+                .likeMedia(
+                    accessToken: tokens.accessToken,
+                    memoryId: memoryId
+                ),
+                type: SuccessResponse.self
+            )
+        }
+    }
+
+    public func unlikeMedia(tokens: Tokens, memoryId: Int) async throws -> SuccessResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+            try await self.provider.request(
+                .unlikeMedia(
+                    accessToken: tokens.accessToken,
+                    memoryId: memoryId
+                ),
+                type: SuccessResponse.self
+            )
+        }
+    }
+
+    public func getMediaTags(tokens: Tokens, memoryId: Int) async throws -> TagsResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+            try await self.provider.request(
+                .getMediaTags(
+                    accessToken: tokens.accessToken,
+                    memoryId: memoryId
+                ),
+                type: TagsResponse.self
             )
         }
     }
