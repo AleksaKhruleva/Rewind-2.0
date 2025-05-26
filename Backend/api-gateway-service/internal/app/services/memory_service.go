@@ -207,6 +207,7 @@ func (s *MemoryService) CreateMemoryTag(ctx context.Context, req *requests.Creat
 
 	pbReq := &pb.CreateMemoryTagRequest{
 		MemoryId: req.MemoryID,
+		GroupId:  req.GroupID,
 		Name:     req.Tag,
 	}
 
@@ -228,6 +229,7 @@ func (s *MemoryService) DeleteMemoryTag(ctx context.Context, req *requests.Delet
 
 	pbReq := &pb.DeleteMemoryTagRequest{
 		MemoryId: req.MemoryID,
+		GroupId:  req.GroupID,
 		Tag:      req.Tag,
 	}
 
@@ -249,6 +251,7 @@ func (s *MemoryService) ListMemoryTagsByMemoryID(ctx context.Context, req *reque
 
 	pbReq := &pb.ListMemoryTagsByMemoryIDRequest{
 		MemoryId: req.MemoryID,
+		GroupId:  req.GroupID,
 	}
 
 	return s.memoryClient.ListMemoryTagsByMemoryID(ctx, pbReq)

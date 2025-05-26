@@ -980,7 +980,8 @@ func (x *DetailedMemory) GetIsFavourite() bool {
 type CreateMemoryTagRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	MemoryId      uint64                 `protobuf:"varint,1,opt,name=memory_id,json=memoryId,proto3" json:"memory_id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	GroupId       uint64                 `protobuf:"varint,2,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1018,6 +1019,13 @@ func (*CreateMemoryTagRequest) Descriptor() ([]byte, []int) {
 func (x *CreateMemoryTagRequest) GetMemoryId() uint64 {
 	if x != nil {
 		return x.MemoryId
+	}
+	return 0
+}
+
+func (x *CreateMemoryTagRequest) GetGroupId() uint64 {
+	if x != nil {
+		return x.GroupId
 	}
 	return 0
 }
@@ -1078,7 +1086,8 @@ func (x *CreateMemoryTagResponse) GetTag() *MemoryTag {
 type DeleteMemoryTagRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	MemoryId      uint64                 `protobuf:"varint,1,opt,name=memory_id,json=memoryId,proto3" json:"memory_id,omitempty"`
-	Tag           string                 `protobuf:"bytes,2,opt,name=tag,proto3" json:"tag,omitempty"`
+	GroupId       uint64                 `protobuf:"varint,2,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`
+	Tag           string                 `protobuf:"bytes,3,opt,name=tag,proto3" json:"tag,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1116,6 +1125,13 @@ func (*DeleteMemoryTagRequest) Descriptor() ([]byte, []int) {
 func (x *DeleteMemoryTagRequest) GetMemoryId() uint64 {
 	if x != nil {
 		return x.MemoryId
+	}
+	return 0
+}
+
+func (x *DeleteMemoryTagRequest) GetGroupId() uint64 {
+	if x != nil {
+		return x.GroupId
 	}
 	return 0
 }
@@ -1176,6 +1192,7 @@ func (x *DeleteMemoryTagResponse) GetSuccess() bool {
 type ListMemoryTagsByMemoryIDRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	MemoryId      uint64                 `protobuf:"varint,1,opt,name=memory_id,json=memoryId,proto3" json:"memory_id,omitempty"`
+	GroupId       uint64                 `protobuf:"varint,2,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1213,6 +1230,13 @@ func (*ListMemoryTagsByMemoryIDRequest) Descriptor() ([]byte, []int) {
 func (x *ListMemoryTagsByMemoryIDRequest) GetMemoryId() uint64 {
 	if x != nil {
 		return x.MemoryId
+	}
+	return 0
+}
+
+func (x *ListMemoryTagsByMemoryIDRequest) GetGroupId() uint64 {
+	if x != nil {
+		return x.GroupId
 	}
 	return 0
 }
@@ -1633,19 +1657,22 @@ const file_proto_memory_proto_rawDesc = "" +
 	"\x0eDetailedMemory\x12&\n" +
 	"\x06memory\x18\x01 \x01(\v2\x0e.memory.MemoryR\x06memory\x12\x12\n" +
 	"\x04tags\x18\x02 \x03(\tR\x04tags\x12!\n" +
-	"\fis_favourite\x18\x03 \x01(\bR\visFavourite\"I\n" +
+	"\fis_favourite\x18\x03 \x01(\bR\visFavourite\"d\n" +
 	"\x16CreateMemoryTagRequest\x12\x1b\n" +
-	"\tmemory_id\x18\x01 \x01(\x04R\bmemoryId\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\">\n" +
+	"\tmemory_id\x18\x01 \x01(\x04R\bmemoryId\x12\x19\n" +
+	"\bgroup_id\x18\x02 \x01(\x04R\agroupId\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\">\n" +
 	"\x17CreateMemoryTagResponse\x12#\n" +
-	"\x03tag\x18\x01 \x01(\v2\x11.memory.MemoryTagR\x03tag\"G\n" +
+	"\x03tag\x18\x01 \x01(\v2\x11.memory.MemoryTagR\x03tag\"b\n" +
 	"\x16DeleteMemoryTagRequest\x12\x1b\n" +
-	"\tmemory_id\x18\x01 \x01(\x04R\bmemoryId\x12\x10\n" +
-	"\x03tag\x18\x02 \x01(\tR\x03tag\"3\n" +
+	"\tmemory_id\x18\x01 \x01(\x04R\bmemoryId\x12\x19\n" +
+	"\bgroup_id\x18\x02 \x01(\x04R\agroupId\x12\x10\n" +
+	"\x03tag\x18\x03 \x01(\tR\x03tag\"3\n" +
 	"\x17DeleteMemoryTagResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess\">\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"Y\n" +
 	"\x1fListMemoryTagsByMemoryIDRequest\x12\x1b\n" +
-	"\tmemory_id\x18\x01 \x01(\x04R\bmemoryId\"I\n" +
+	"\tmemory_id\x18\x01 \x01(\x04R\bmemoryId\x12\x19\n" +
+	"\bgroup_id\x18\x02 \x01(\x04R\agroupId\"I\n" +
 	" ListMemoryTagsByMemoryIDResponse\x12%\n" +
 	"\x04tags\x18\x01 \x03(\v2\x11.memory.MemoryTagR\x04tags\"N\n" +
 	"\x16CreateFavouriteRequest\x12\x1b\n" +

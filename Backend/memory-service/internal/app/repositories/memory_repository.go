@@ -21,6 +21,7 @@ type MemoryRepositoryInterface interface {
 	DeleteMemoriesByGroup(ctx context.Context, tx *gorm.DB, groupID uint) error
 	ListMemoriesByGroupDetailed(ctx context.Context, tx *gorm.DB, groupID uint, userID uint) ([]models.MemoryDetailed, error)
 	ListMemoriesByGroupWithFiltersDetailed(ctx context.Context, tx *gorm.DB, groupID uint, userID uint, filters map[string]string, numberOfMemories uint) ([]models.MemoryDetailed, error)
+	ExistsMemoryByIDAndGroupID(ctx context.Context, tx *gorm.DB, memoryID uint, groupID uint) (bool, error)
 
 	CreateMemoryTag(ctx context.Context, tx *gorm.DB, tag *models.MemoryTag) error
 	DeleteMemoryTag(ctx context.Context, tx *gorm.DB, memoryID uint, tag string) error
@@ -257,6 +258,23 @@ func (r *MemoryRepository) ListMemoriesByGroupWithFiltersDetailed(ctx context.Co
 	}
 
 	return memoriesDetailed, nil
+}
+
+// ExistsMemoryByIDAndGroupID проверяет, существует ли воспоминание с указанными memoryID и groupID.
+func (r *MemoryRepository) ExistsMemoryByIDAndGroupID(ctx context.Context, tx *gorm.DB, memoryID uint, groupID uint) (bool, error) {
+	db := r.getDB(tx).WithContext(ctx)
+	var count int64
+
+	err := db.Model(&models.Memory{}).
+		Where("id = ? AND group_id = ?", memoryID, groupID).
+		Count(&count).Error
+
+	if err != nil {
+		log.Printf("MemoryRepository: Failed to check existence of memory (id: %d, group_id: %d): %v", memoryID, groupID, err)
+		return false, fmt.Errorf("failed to check memory existence: %w", err)
+	}
+
+	return count > 0, nil
 }
 
 // Методы для работы с тегами

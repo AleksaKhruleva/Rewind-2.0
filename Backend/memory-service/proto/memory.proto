@@ -137,7 +137,8 @@ message DetailedMemory {
 // Запрос на создание тега воспоминания
 message CreateMemoryTagRequest {
   uint64 memory_id = 1;
-  string name = 2;
+  uint64 group_id = 2;
+  string name = 3;
 }
 
 // Ответ на создание тега воспоминания
@@ -148,7 +149,8 @@ message CreateMemoryTagResponse {
 // Запрос на удаление тега воспоминания
 message DeleteMemoryTagRequest {
   uint64 memory_id = 1;
-  string tag = 2;
+  uint64 group_id = 2;
+  string tag = 3;
 }
 
 // Ответ на удаление тега воспоминания
@@ -159,6 +161,7 @@ message DeleteMemoryTagResponse {
 // Запрос на получение списка тегов воспоминания по ID воспоминания
 message ListMemoryTagsByMemoryIDRequest {
   uint64 memory_id = 1;
+  uint64 group_id = 2;
 }
 
 // Ответ на получение списка тегов воспоминания по ID воспоминания

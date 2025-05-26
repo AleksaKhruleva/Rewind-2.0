@@ -290,6 +290,15 @@ func (s *MemoryService) CreateMemoryTag(ctx context.Context, req *pb.CreateMemor
 		return nil, status.Errorf(codes.InvalidArgument, "invalid request: %v", err)
 	}
 
+	exists, err := s.memoryRepo.ExistsMemoryByIDAndGroupID(ctx, nil, uint(req.MemoryId), uint(req.GroupId))
+	if err != nil {
+		log.Printf("MemoryService: Failed to check if memory %d exists in group %d: %v", req.MemoryId, req.GroupId, err)
+		return nil, status.Errorf(codes.Internal, "failed to check if memory exists: %v", err)
+	}
+	if !exists {
+		return nil, status.Errorf(codes.NotFound, "memory %d does not exist in group %d", req.MemoryId, req.GroupId)
+	}
+
 	tag := &models.MemoryTag{
 		MemoryID: uint(req.MemoryId),
 		Tag:      req.Name,
@@ -337,6 +346,14 @@ func (s *MemoryService) DeleteMemoryTag(ctx context.Context, req *pb.DeleteMemor
 		return nil, status.Errorf(codes.InvalidArgument, "invalid request: %v", err)
 	}
 
+	exists, err := s.memoryRepo.ExistsMemoryByIDAndGroupID(ctx, nil, uint(req.MemoryId), uint(req.GroupId))
+	if err != nil {
+		return &pb.DeleteMemoryTagResponse{Success: true}, nil
+	}
+	if !exists {
+		return &pb.DeleteMemoryTagResponse{Success: true}, nil
+	}
+
 	tx, err := s.memoryRepo.BeginTx(ctx)
 	if err != nil {
 		log.Printf("MemoryService: Failed to begin transaction: %v", err)
@@ -372,6 +389,15 @@ func (s *MemoryService) DeleteMemoryTag(ctx context.Context, req *pb.DeleteMemor
 func (s *MemoryService) ListMemoryTagsByMemoryID(ctx context.Context, req *pb.ListMemoryTagsByMemoryIDRequest) (*pb.ListMemoryTagsByMemoryIDResponse, error) {
 	if err := s.validator.Struct(req); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid request: %v", err)
+	}
+
+	exists, err := s.memoryRepo.ExistsMemoryByIDAndGroupID(ctx, nil, uint(req.MemoryId), uint(req.GroupId))
+	if err != nil {
+		log.Printf("MemoryService: Failed to check if memory %d exists in group %d: %v", req.MemoryId, req.GroupId, err)
+		return nil, status.Errorf(codes.Internal, "failed to check if memory exists: %v", err)
+	}
+	if !exists {
+		return nil, status.Errorf(codes.NotFound, "memory %d does not exist in group %d", req.MemoryId, req.GroupId)
 	}
 
 	tags, err := s.memoryRepo.ListMemoryTagsByMemoryID(ctx, nil, uint(req.MemoryId))
