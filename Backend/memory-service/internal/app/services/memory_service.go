@@ -374,7 +374,6 @@ func (s *MemoryService) ListMemoryTagsByMemoryID(ctx context.Context, req *pb.Li
 		return nil, status.Errorf(codes.InvalidArgument, "invalid request: %v", err)
 	}
 
-	// Pass nil for transaction as this is a read-only operation
 	tags, err := s.memoryRepo.ListMemoryTagsByMemoryID(ctx, nil, uint(req.MemoryId))
 	if err != nil {
 		log.Printf("MemoryService: Failed to list memory tags for memory %d: %v", req.MemoryId, err)

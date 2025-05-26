@@ -276,7 +276,7 @@ func (r *MemoryRepository) DeleteMemoryTag(ctx context.Context, tx *gorm.DB, mem
 	var memoryTag models.MemoryTag
 
 	// Находим первый тег с заданным значением для указанного memoryID
-	result := db.Where("memory_id = ? AND name = ?", memoryID, tag).First(&memoryTag)
+	result := db.Where("memory_id = ? AND tag = ?", memoryID, tag).First(&memoryTag)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			log.Printf("MemoryRepository: Memory tag with value '%s' not found for memory ID %d", tag, memoryID)

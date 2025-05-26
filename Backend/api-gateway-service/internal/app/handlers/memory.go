@@ -419,7 +419,7 @@ func (h *MemoryHandler) ListMemoriesByGroupWithFilters(w http.ResponseWriter, r 
 // @Produce json
 // @Param groupId path int true "Group ID"
 // @Param memoryId path int true "Memory ID"
-// @Param body body requests.CreateMemoryTagRequest true "Tag details"
+// @Param tag path string true "Tag to add"
 // @Success 200 {object} responses.MemoryTagResponse "Successfully created tag"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid input"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
@@ -563,7 +563,7 @@ func (h *MemoryHandler) ListMemoryTagsByMemoryID(w http.ResponseWriter, r *http.
 		handleServiceError(w, err, "ListMemoryTagsByMemoryID")
 		return
 	}
-	var tags []responses.MemoryTagResponse
+	tags := make([]responses.MemoryTagResponse, 0)
 	for _, tag := range resp.GetTags() {
 		tags = append(tags, responses.MemoryTagResponse{Tag: tag.Name})
 	}

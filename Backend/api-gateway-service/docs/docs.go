@@ -1143,13 +1143,11 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Tag details",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.CreateMemoryTagRequest"
-                        }
+                        "type": "string",
+                        "description": "Tag to add",
+                        "name": "tag",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -2566,20 +2564,6 @@ const docTemplate = `{
             "properties": {
                 "name": {
                     "description": "Group name is required",
-                    "type": "string"
-                }
-            }
-        },
-        "requests.CreateMemoryTagRequest": {
-            "type": "object",
-            "properties": {
-                "groupId": {
-                    "type": "integer"
-                },
-                "memoryId": {
-                    "type": "integer"
-                },
-                "tag": {
                     "type": "string"
                 }
             }

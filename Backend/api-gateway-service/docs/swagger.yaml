@@ -18,15 +18,6 @@ definitions:
     required:
     - name
     type: object
-  requests.CreateMemoryTagRequest:
-    properties:
-      groupId:
-        type: integer
-      memoryId:
-        type: integer
-      tag:
-        type: string
-    type: object
   requests.DeleteUserRequest:
     properties:
       email:
@@ -1197,12 +1188,11 @@ paths:
         name: memoryId
         required: true
         type: integer
-      - description: Tag details
-        in: body
-        name: body
+      - description: Tag to add
+        in: path
+        name: tag
         required: true
-        schema:
-          $ref: '#/definitions/requests.CreateMemoryTagRequest'
+        type: string
       produces:
       - application/json
       responses:
