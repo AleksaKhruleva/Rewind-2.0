@@ -44,13 +44,18 @@ final class GalleryViewModel {
         // временно
         let items = [
             MediaItem(
-                type: .imageWithMusic,
+                type: .image,
                 image: UIComponentsAsset.media21.image,
                 track: Self.fetchTrack()
             ),
             MediaItem(
                 type: .image,
                 image: UIComponentsAsset.media16.image
+            ),
+            MediaItem(
+                type: .video,
+                image: UIComponentsAsset.media1.image,
+                videoURL: URL(string: "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4")
             )
         ]
 

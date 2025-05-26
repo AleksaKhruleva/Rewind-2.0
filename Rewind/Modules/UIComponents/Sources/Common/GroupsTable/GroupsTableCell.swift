@@ -2,12 +2,12 @@ import SwiftUI
 import Domain
 
 struct GroupsTableCell: View {
-    private let group: RewindGroup
-    private let onTap: (RewindGroup) -> Void
+    private let group: Domain.Group
+    private let onTap: (Domain.Group) -> Void
 
     init(
-        group: RewindGroup,
-        onTap: @escaping (RewindGroup) -> Void
+        group: Domain.Group,
+        onTap: @escaping (Domain.Group) -> Void
     ) {
         self.group = group
         self.onTap = onTap
