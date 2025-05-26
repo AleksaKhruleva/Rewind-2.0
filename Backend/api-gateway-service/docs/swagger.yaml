@@ -23,10 +23,6 @@ definitions:
     type: object
   requests.CreateMemoryTagRequest:
     properties:
-      groupId:
-        type: integer
-      memoryId:
-        type: integer
       name:
         type: string
     type: object
@@ -417,7 +413,7 @@ definitions:
       success:
         type: boolean
     type: object
-host: localhost:8080
+host: rewindapp.ru
 info:
   contact: {}
   description: This is the API Gateway for the Rewind application.
@@ -840,6 +836,11 @@ paths:
         name: memoryId
         required: true
         type: integer
+      - description: Group ID
+        in: path
+        name: groupId
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
@@ -872,6 +873,109 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Delete a memory by ID
+      tags:
+      - memories
+  /api/groups/{groupId}/memories/{memoryId}/tags:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Group ID
+        in: path
+        name: groupId
+        required: true
+        type: integer
+      - description: Memory ID
+        in: path
+        name: memoryId
+        required: true
+        type: integer
+      - description: Tag details
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateMemoryTagRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully created tag
+          schema:
+            $ref: '#/definitions/responses.MemoryTagResponse'
+        "400":
+          description: Bad Request - Invalid input
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - Memory not found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new tag for a memory
+      tags:
+      - memories
+  /api/groups/{groupId}/memories/{memoryId}/tags/{tag}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Group ID
+        in: path
+        name: groupId
+        required: true
+        type: integer
+      - description: Memory ID
+        in: path
+        name: memoryId
+        required: true
+        type: integer
+      - description: Tag to delete
+        in: path
+        name: tag
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Successfully deleted tag
+        "400":
+          description: Bad Request - Invalid input
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - Memory or tag not found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a tag from a memory
       tags:
       - memories
   /api/groups/{groupId}/memories/filter:
@@ -1385,6 +1489,11 @@ paths:
       consumes:
       - application/json
       parameters:
+      - description: Group ID
+        in: path
+        name: groupId
+        required: true
+        type: integer
       - description: Memory ID
         in: path
         name: memoryId
@@ -1420,98 +1529,6 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: List tags for a memory
-      tags:
-      - memories
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: Memory ID
-        in: path
-        name: memoryId
-        required: true
-        type: integer
-      - description: Tag details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/requests.CreateMemoryTagRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successfully created tag
-          schema:
-            $ref: '#/definitions/responses.MemoryTagResponse'
-        "400":
-          description: Bad Request - Invalid input
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "401":
-          description: Unauthorized - User not authenticated
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "404":
-          description: Not Found - Memory not found
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "503":
-          description: Service Unavailable
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Create a new tag for a memory
-      tags:
-      - memories
-  /api/memories/{memoryId}/tags/{tag}:
-    delete:
-      consumes:
-      - application/json
-      parameters:
-      - description: Memory ID
-        in: path
-        name: memoryId
-        required: true
-        type: integer
-      - description: Tag to delete
-        in: path
-        name: tag
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: Successfully deleted tag
-        "400":
-          description: Bad Request - Invalid input
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "401":
-          description: Unauthorized - User not authenticated
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "404":
-          description: Not Found - Memory or tag not found
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "503":
-          description: Service Unavailable
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Delete a tag from a memory
       tags:
       - memories
   /api/users/{id}:
