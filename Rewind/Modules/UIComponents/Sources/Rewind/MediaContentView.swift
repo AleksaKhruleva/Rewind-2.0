@@ -71,7 +71,7 @@ public struct MediaContentView: View {
                         .clipShape(Circle())
                     }
                     .padding(12)
-                    .simultaneousGesture(
+                    .highPriorityGesture(
                         TapGesture().onEnded {
                             onToggleSound()
                             print("toggle sound")

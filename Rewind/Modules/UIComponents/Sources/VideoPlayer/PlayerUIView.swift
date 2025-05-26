@@ -112,7 +112,7 @@ public final class PlayerUIView: UIView {
             muteButton.widthAnchor.constraint(equalToConstant: buttonSize),
             muteButton.heightAnchor.constraint(equalToConstant: buttonSize),
             muteButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            muteButton.topAnchor.constraint(equalTo: topAnchor, constant: 16),
+            muteButton.topAnchor.constraint(equalTo: topAnchor, constant: 16)
         ])
     }
 
