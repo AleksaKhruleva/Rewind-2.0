@@ -58,7 +58,7 @@ final class QuoteCreationViewModel {
                 width: UIScreen.main.bounds.width,
                 height: UIScreen.main.bounds.width
             ))
-            
+
             saveImageWithToast(image: renderer.uiImage) { message in
                 print(message)
             }

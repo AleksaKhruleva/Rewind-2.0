@@ -138,6 +138,14 @@
 
 "media_upload.error" = "Can't load some of your medias 🫥";
 
+// MARK: - Groups strings
+
+"groups.title" = "Your groups";
+
+"groups.add_group" = "Add group";
+
+"groups.search.placeholder" = "Group's name";
+
 // MARK: - Group strings
 
 "group.activity" = "Activity";
@@ -205,6 +213,8 @@
 "media_details.title" = "Media details";
 
 "media_details.risky" = "Riksy zone";
+
+"media_details.delete" = "Delete media";
 
 "media.blurred.title" = "Media details";
 

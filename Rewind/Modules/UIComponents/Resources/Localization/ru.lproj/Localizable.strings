@@ -138,6 +138,14 @@
 
 "media_upload.error" = "Не смогли загрузить некоторые твои медиа 🫥";
 
+// MARK: - Groups strings
+
+"groups.title" = "Твои группы";
+
+"groups.add_group" = "Добавить группу";
+
+"groups.search.placeholder" = "Имя группы";
+
 // MARK: - Group strings
 
 "group.activity" = "Активность";
@@ -205,6 +213,8 @@
 "media_details.title" = "Детали медиа";
 
 "media_details.risky" = "Зона риска";
+
+"media_details.delete" = "Удалить медиа";
 
 "media.blurred.title" = "Детали медиа";
 

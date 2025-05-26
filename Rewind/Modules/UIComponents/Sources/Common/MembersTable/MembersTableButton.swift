@@ -19,14 +19,20 @@ public struct MembersTableButton: View {
     }
 
     public var body: some View {
-        Button(action: action) {
+        Button {
+            action()
+        } label: {
             HStack(spacing: 12) {
                 Image(systemName: systemImageName)
                     .modifier(RoundFontModifier(size: imageSize))
                     .frame(width: 34, height: 34)
 
                 Text(title)
-                    .modifier(RoundFontModifier(size: 16, foregroundColor: .textPrimary))
+                    .modifier(RoundFontModifier(
+                        size: 16,
+                        weight: .bold,
+                        foregroundColor: .textPrimary
+                    ))
 
                 Spacer()
 
@@ -38,9 +44,6 @@ public struct MembersTableButton: View {
             .padding(.horizontal, 14)
             .padding(.vertical, 5)
             .contentShape(Rectangle())
-            .onTapGesture {
-                action()
-            }
         }
     }
 }

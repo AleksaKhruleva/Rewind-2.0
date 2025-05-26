@@ -50,6 +50,7 @@ public struct RootView: View {
         case let .mediaDetails(mediaItem): MediaDetailsView(mediaItem: mediaItem, router: router)
 
         case .group: GroupView(router: GroupRouter(appRouter: router))
+        case .groupsList: GroupsListView(router: GroupsListRouter(appRouter: router))
         case .groupSettings: GroupSettingsView(router: GroupSettingsRouter(appRouter: router))
         case let .addMember(groupName): AddMemberView(groupName: groupName, router: router)
         case let .memberDetails(member): MemberDetailsView(member: member, router: router)

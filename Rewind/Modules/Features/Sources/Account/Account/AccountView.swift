@@ -165,7 +165,11 @@ public struct AccountView: View {
     }
 
     var groupsTable: some View {
-        InformationTable(title: UIComponentsStrings.Account.groups, data: AccountConstants.groups, isRisky: false)
+        InformationTable(title: UIComponentsStrings.Account.groups, data: [
+            ("person.2.fill", UIComponentsStrings.Account.Groups.count(8), nilAccessibility, {
+                viewModel.router.navigateToGroupsList()
+            })
+        ], isRisky: false)
     }
 
     var activityTable: some View {
