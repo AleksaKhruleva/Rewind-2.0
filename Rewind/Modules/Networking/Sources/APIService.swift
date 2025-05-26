@@ -2,6 +2,7 @@ import SwiftUI
 import Moya
 import Foundation
 import Base
+import Domain
 
 enum APIService {
     case register(email: String)
@@ -34,6 +35,16 @@ enum APIService {
     case updateGroupName(accessToken: String, id: Int, name: String)
     case createGroupInvitation(accessToken: String, id: Int)
     case deleteGroup(accessToken: String, id: Int)
+    
+    case getMedias(accessToken: String, groupId: Int)
+    case getRandomMedias(accessToken: String, groupId: Int)
+    // case addMedia
+    case deleteMedia(accessToken: String, groupId: Int, memoryId: Int)
+    case addTag(accessToken: String, groupId: Int, memoryId: Int, tag: String)
+    case deleteTag(accessToken: String, groupId: Int, memoryId: Int, tag: String)
+    case likeMedia(accessToken: String, memoryId: Int)
+    case unlikeMedia(accessToken: String, memoryId: Int)
+    case getMediaTags(accessToken: String, memoryId: Int)
 }
 
 extension APIService: TargetType {
@@ -93,6 +104,23 @@ extension APIService: TargetType {
             return "/groups/\(id)/invitations"
         case let .deleteGroup(_, id):
             return "/groups/\(id)"
+        case let .getMedias(_, groupId):
+            return "groups/\(groupId)/memories"
+        case let .getRandomMedias(_, groupId):
+            let groupId = 1
+            return "groups/\(groupId)/memories/filter"
+        case let .deleteMedia(_, groupId, memoryId):
+            return "groups/\(groupId)/memories/\(memoryId)"
+        case let .addTag(_, groupId, memoryId, tag):
+            return "groups/\(groupId)/memories/\(memoryId)/tags/\(tag)"
+        case let .deleteTag(_, groupId, memoryId, tag):
+            return "groups/\(groupId)/memories/\(memoryId)/tags/\(tag)"
+        case let .likeMedia(_, memoryId):
+            return "memories/\(memoryId)/favourite"
+        case let .unlikeMedia(_, memoryId):
+            return "memories/\(memoryId)/favourite"
+        case let .getMediaTags(_, memoryId):
+            return "memories/\(memoryId)/tags"
         }
     }
 
@@ -101,7 +129,10 @@ extension APIService: TargetType {
         case .user,
                 .fetchGroups,
                 .fetchGroup,
-                .fetchGroupMembers:
+                .fetchGroupMembers,
+                .getMedias,
+                .getRandomMedias,
+                .getMediaTags:
             return .get
         case .register,
                 .verifyEmail,
@@ -114,7 +145,9 @@ extension APIService: TargetType {
                 .checkPassword,
                 .emailStartChange,
                 .createGroup,
-                .createGroupInvitation:
+                .createGroupInvitation,
+                .addTag,
+                .likeMedia:
             return .post
         case .updateUserName,
                 .updateUserAvatar,
@@ -122,7 +155,10 @@ extension APIService: TargetType {
                 .emailVerifyChange:
             return .patch
         case .deleteUser,
-                .deleteGroup:
+                .deleteGroup,
+                .unlikeMedia,
+                .deleteTag,
+                .deleteMedia:
             return .delete
         case .updateGroupName:
             return .put
@@ -198,6 +234,22 @@ extension APIService: TargetType {
                 .fetchGroup,
                 .fetchGroupMembers,
                 .deleteGroup:
+                return .requestPlain
+        case .getMedias:
+            return .requestPlain
+        case .getRandomMedias:
+            return .requestPlain
+        case .deleteMedia:
+            return .requestPlain
+        case .addTag:
+            return .requestPlain
+        case .deleteTag:
+            return .requestPlain
+        case .likeMedia:
+            return .requestPlain
+        case .unlikeMedia:
+            return .requestPlain
+        case .getMediaTags:
             return .requestPlain
         }
     }
@@ -221,7 +273,15 @@ extension APIService: TargetType {
             let .fetchGroupMembers(accessToken, _),
             let .updateGroupName(accessToken, _, _),
             let .deleteGroup(accessToken, _),
-            let .createGroupInvitation(accessToken, _):
+            let .createGroupInvitation(accessToken, _),
+            let .getMedias(accessToken, _),
+            let .getRandomMedias(accessToken, _),
+            let .deleteMedia(accessToken, _, _),
+            let .addTag(accessToken, _, _, _),
+            let .deleteTag(accessToken, _, _, _),
+            let .likeMedia(accessToken, _),
+            let .unlikeMedia(accessToken, _),
+            let .getMediaTags(accessToken, _):
             return [
                 "Authorization": "Bearer \(accessToken)",
                 "Content-Type": "application/json"

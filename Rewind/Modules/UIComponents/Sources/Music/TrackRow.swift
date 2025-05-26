@@ -61,7 +61,7 @@ public struct TrackRow: View {
                         )
 
                     HStack {
-                        Text(track.artist)
+                        Text(track.artist.username)
                             .lineLimit(1)
                             .truncationMode(.tail)
 

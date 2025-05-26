@@ -41,25 +41,7 @@ final class GalleryViewModel {
         transformer = .init()
         showToast = { _ in }
 
-        // временно
-        let items = [
-            MediaItem(
-                type: .image,
-                image: UIComponentsAsset.media21.image,
-                track: Self.fetchTrack()
-            ),
-            MediaItem(
-                type: .image,
-                image: UIComponentsAsset.media16.image
-            ),
-            MediaItem(
-                type: .video,
-                image: UIComponentsAsset.media1.image,
-                videoURL: URL(string: "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4")
-            )
-        ]
-
-        mediaItems = items
+        mediaItems = MediaItem.stubs(track: Self.fetchTrack())
     }
 
     func dispatch(_ intent: Intent) async {

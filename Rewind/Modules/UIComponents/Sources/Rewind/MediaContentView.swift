@@ -1,6 +1,7 @@
 import SwiftUI
 import AVFoundation
 import Domain
+import Base
 
 public struct MediaContentView: View {
     private let mediaItem: MediaItem
@@ -38,11 +39,13 @@ public struct MediaContentView: View {
 
     public var body: some View {
         ZStack {
-            switch mediaItem.type {
+            switch mediaItem.mediaType {
             case .image:
                 imageContent
             case .video:
                 videoContent
+            case .quote:
+                EmptyView()
             }
         }
         .overlay {
@@ -54,8 +57,7 @@ public struct MediaContentView: View {
     }
 
     private var imageContent: some View {
-        Rectangle()
-            .toSquare(mediaItem.image, cornerRadius: cornerRadius)
+        SquareAsyncMedia(url: mediaItem.mediaURL, type: .image)
             .overlay(alignment: .topTrailing) {
                 if mediaItem.track != nil {
                     Button(action: {}) {
@@ -81,10 +83,7 @@ public struct MediaContentView: View {
 
     private var videoContent: some View {
         ZStack {
-            Rectangle()
-                .toSquare(mediaItem.image, cornerRadius: cornerRadius)
-                .opacity(isVideoReadyToPlay ? 0 : 1)
-                .animation(.easeInOut(duration: 0.5), value: isVideoReadyToPlay)
+            SquareAsyncMedia(url: mediaItem.mediaURL, type: .video)
 
             if let player = player {
                 CustomPlayerView(
@@ -111,7 +110,7 @@ public struct MediaContentView: View {
     }
 
     private func setupPlayer() {
-        guard let url = mediaItem.videoURL else { return }
+        guard let url = mediaItem.mediaURL else { return }
 
         let item = AVPlayerItem(url: url)
         playerItem = item

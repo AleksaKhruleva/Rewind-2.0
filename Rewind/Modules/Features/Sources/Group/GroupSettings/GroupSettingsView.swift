@@ -43,7 +43,10 @@ public struct GroupSettingsView: View {
                 viewModel.toastMessage = nil
             }
         }
-        .alert("Are you sure you want to delete your group? You will not be able to undo this action.", isPresented: $deleteGroupAlertShown) {
+        .alert(
+            "Are you sure you want to delete your group? You will not be able to undo this action.",
+            isPresented: $deleteGroupAlertShown
+        ) {
             VStack {
                 Button(UIComponentsStrings.Buttons.cancel, role: .cancel) { }
 
@@ -91,7 +94,9 @@ public struct GroupSettingsView: View {
 
     private var generalTable: some View {
         let generalData = [
-            ("photo.fill", UIComponentsStrings.Group.Settings.General.name, nilAccessibility, { viewModel.needNameInputView = true }),
+            ("photo.fill", UIComponentsStrings.Group.Settings.General.name, nilAccessibility, {
+                viewModel.needNameInputView = true
+            }),
             ("pencil", UIComponentsStrings.Group.Settings.General.image, nilAccessibility, {})
         ]
         return InformationTable(title: UIComponentsStrings.Group.Settings.general, data: generalData, isRisky: false)
@@ -102,14 +107,21 @@ public struct GroupSettingsView: View {
             if let tokens = Tokens(),
                let userID = JWTDecoder().getUserId(from: tokens.accessToken),
                let ownerID = viewModel.group.ownerID {
-
                 InformationTable(
                     title: UIComponentsStrings.Group.Settings.risky,
                     data: String(ownerID) == userID ? [
-                        ("rectangle.portrait.and.arrow.right.fill", UIComponentsStrings.Group.Settings.Risky.leave, nilAccessibility, {}),
-                        ("trash.fill", UIComponentsStrings.Group.Settings.Risky.delete, nilAccessibility, { deleteGroupAlertShown = true })
+                        (
+                            "rectangle.portrait.and.arrow.right.fill",
+                            UIComponentsStrings.Group.Settings.Risky.leave, nil, {}
+                        ),
+                        ("trash.fill", UIComponentsStrings.Group.Settings.Risky.delete, nil, {
+                            deleteGroupAlertShown = true
+                        })
                     ] : [
-                        ("rectangle.portrait.and.arrow.right.fill", UIComponentsStrings.Group.Settings.Risky.leave, nilAccessibility, {})
+                        (
+                            "rectangle.portrait.and.arrow.right.fill",
+                            UIComponentsStrings.Group.Settings.Risky.leave, nil, {}
+                        )
                     ],
                     isRisky: true
                 )
