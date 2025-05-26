@@ -64,24 +64,7 @@ final class RewindViewModel {
         jwtDecoder = JWTDecoder()
         audioManager = AudioPlayerManager.shared
 
-        // временно
-        let items = [
-            MediaItem(
-                userId: 1,
-                groupId: 1,
-                mediaType: .image,
-                createdAt: "23.11.2024",
-                track: Self.fetchTrack(),
-                image: UIComponentsAsset.media21.image
-            ),
-            MediaItem(
-                userId: 2,
-                groupId: 2,
-                mediaType: .image,
-                createdAt: "01.01.2025",
-                image: UIComponentsAsset.media4.image
-            )
-        ]
+        let items = MediaItem.stubs(track: Self.fetchTrack())
 
         mediaItems = items
         currentMediaItem = items[0]
@@ -92,7 +75,7 @@ final class RewindViewModel {
         case .fetchUser:
             do {
                 guard let tokens = Tokens() else {
-                    //                        router.navigateToWelcome() // TODO: return when routing is ready
+                    // router.navigateToWelcome() // TODO: return when routing is ready
                     return
                 }
                 let response = try await backend.user(tokens: tokens)

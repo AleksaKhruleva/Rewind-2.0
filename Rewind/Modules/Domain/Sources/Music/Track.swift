@@ -1,10 +1,10 @@
 import Foundation
 
-public struct Artist: Codable {
+public struct Artist: Codable, Hashable {
     public let username: String
 }
 
-public struct Track: Identifiable, Codable {
+public struct Track: Identifiable, Codable, Hashable {
     public let id: Int
     public let title: String
     public let artist: Artist

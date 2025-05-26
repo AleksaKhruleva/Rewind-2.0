@@ -41,23 +41,7 @@ final class GalleryViewModel {
         transformer = .init()
         showToast = { _ in }
 
-        // временно
-        mediaItems = [
-            MediaItem(
-                userId: 1,
-                groupId: 1,
-                mediaType: .video,
-                mediaURL: URL(string: "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4"),
-                createdAt: "23.11.2024",
-                track: Self.fetchTrack()
-            ),
-            MediaItem(
-                userId: 2,
-                groupId: 2,
-                mediaType: .image,
-                createdAt: "01.01.2025"
-            )
-        ]
+        mediaItems = MediaItem.stubs(track: Self.fetchTrack())
     }
 
     func dispatch(_ intent: Intent) async {

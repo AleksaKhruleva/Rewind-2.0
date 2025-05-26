@@ -90,8 +90,7 @@ public struct GalleryView: View {
                     count: 3
                 ), spacing: mediaSpacing) {
                     ForEach(viewModel.mediaItems) { mediaItem in
-                        Rectangle()
-                            .toSquare(mediaItem.image, cornerRadius: 10)
+                        SquareAsyncMedia(url: mediaItem.mediaURL, type: mediaItem.mediaType, cornerRadius: 10)
                             .onTapGesture {
                                 Task {
                                     await viewModel.dispatch(.viewBlurredMedia(mediaItem))

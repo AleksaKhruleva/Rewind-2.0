@@ -1,3 +1,3 @@
-public struct Media: Codable {
+public struct Media: Codable, Hashable {
     public let transcodings: [Transcoding]
 }

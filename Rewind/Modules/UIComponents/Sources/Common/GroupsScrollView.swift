@@ -83,7 +83,10 @@ public final class Coordinator: NSObject, UICollectionViewDelegate {
     func configureDataSource(for collectionView: UICollectionView) {
         dataSource = UICollectionViewDiffableDataSource<Int, Domain.Group>(collectionView: collectionView) {
             collectionView, indexPath, group in
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Cell.reuseIdentifier, for: indexPath) as! Cell
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: Cell.reuseIdentifier,
+                for: indexPath
+            ) as! Cell
             cell.configure(
                 with: group,
                 imageSize: self.imageSize,
@@ -92,6 +95,7 @@ public final class Coordinator: NSObject, UICollectionViewDelegate {
             return cell
         }
     }
+    // swiftlint:enable force_cast
 
     func update(groups: [Domain.Group], selectedGroupID: Int?) {
         var snapshot = NSDiffableDataSourceSnapshot<Int, Domain.Group>()

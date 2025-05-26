@@ -129,7 +129,7 @@ extension APIService: TargetType {
         case .user,
                 .fetchGroups,
                 .fetchGroup,
-                .fetchGroupMembers:
+                .fetchGroupMembers,
                 .getMedias,
                 .getRandomMedias,
                 .getMediaTags:
@@ -145,7 +145,7 @@ extension APIService: TargetType {
                 .checkPassword,
                 .emailStartChange,
                 .createGroup,
-                .createGroupInvitation:
+                .createGroupInvitation,
                 .addTag,
                 .likeMedia:
             return .post
@@ -273,7 +273,7 @@ extension APIService: TargetType {
             let .fetchGroupMembers(accessToken, _),
             let .updateGroupName(accessToken, _, _),
             let .deleteGroup(accessToken, _),
-            let .createGroupInvitation(accessToken, _):
+            let .createGroupInvitation(accessToken, _),
             let .getMedias(accessToken, _),
             let .getRandomMedias(accessToken, _),
             let .deleteMedia(accessToken, _, _),
