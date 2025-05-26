@@ -12,7 +12,6 @@ COPY go.mod go.sum ./
 # Скачиваем зависимости Go
 RUN go mod download
 
-# --- ДОБАВЬТЕ ЭТУ СТРОКУ ---
 # Явно копируем файл .env в рабочую директорию стадии builder
 COPY .env ./
 # --------------------------
@@ -23,10 +22,12 @@ COPY . .
 # Собираем Go приложение
 RUN go build -ldflags="-s -w" -o media-service ./cmd/main.go
 
-# Финальная стадия (остается без изменений)
-FROM scratch
+FROM alpine:3.20
 
-# Копируем собранный бинарник и .env из builder stage
+# Устанавливаем bash, curl и сертификаты
+RUN apk add --no-cache bash curl ca-certificates
+
+# Копируем собранный бинарник и .env
 COPY --from=builder /app/media-service /app/
 COPY --from=builder /app/.env /app/
 

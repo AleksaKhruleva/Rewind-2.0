@@ -110,7 +110,7 @@ func (s *MemoryService) CreateMemory(ctx context.Context, req *pb.CreateMemoryRe
 		GroupID:   uint(req.GroupId),
 		UserID:    uint(req.UserId),
 		MediaType: req.MediaType.String(),
-		MediaURL:  "",
+		MediaURL:  mediaURL,
 	}
 
 	if req.Latitude != nil && req.Longitude != nil {

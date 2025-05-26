@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/gabriel-vasile/mimetype" // For better MIME detection
@@ -38,9 +39,12 @@ func NewMediaService(
 	allowedExtensions map[pb.MediaType][]string,
 ) (*MediaService, error) {
 	cfg := &aws.Config{
-		Endpoint: aws.String(endpointURL),
-		Region:   aws.String("ru-central1"),
+		Endpoint:         aws.String(endpointURL),
+		Region:           aws.String("ru-central1"),
+		S3ForcePathStyle: aws.Bool(true), // важно для Yandex
+		Credentials:      credentials.NewEnvCredentials(),
 	}
+
 	sess, err := session.NewSession(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create S3 session: %w", err)
@@ -97,7 +101,7 @@ func (s *MediaService) UploadMedia(ctx context.Context, req *pb.UploadMediaReque
 	// Генерируем уникальное имя файла для S3
 	timestamp := time.Now().Format("20060102150405")
 	randomStr := generateRandomString(8)
-	objectKey := fmt.Sprintf("%s/%s_%s%s", mediaType.String(), timestamp, randomStr, fileExt)
+	objectKey := fmt.Sprintf("%s_%s%s", timestamp, randomStr, fileExt)
 
 	// Загрузка файла в Yandex Object Storage
 	_, err = s.s3Client.PutObjectWithContext(ctx, &s3.PutObjectInput{
