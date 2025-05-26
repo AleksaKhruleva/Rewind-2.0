@@ -559,9 +559,117 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "memories"
+                ],
+                "summary": "Create a new memory",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Group ID",
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Media Type (image/video/quote)",
+                        "name": "mediaType",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Media file to upload",
+                        "name": "mediaFile",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "number",
+                        "description": "Latitude (optional)",
+                        "name": "latitude",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Longitude (optional)",
+                        "name": "longitude",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Music ID (optional)",
+                        "name": "musicId",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Offset (optional)",
+                        "name": "offset",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "number",
+                        "description": "Duration (optional)",
+                        "name": "duration",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Comma-separated tags (optional)",
+                        "name": "tags",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully created memory",
+                        "schema": {
+                            "$ref": "#/definitions/responses.MemoryResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid request data",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - User not authenticated",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
             }
         },
-        "/api/groups/{groupId}/memories/filter": {
+        "/api/groups/{groupId}/memories/random": {
             "get": {
                 "security": [
                     {
@@ -588,7 +696,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Filter by media type (image, video, audio)",
+                        "description": "Filter by media type (image, video, quote)",
                         "name": "media_type",
                         "in": "query"
                     },
@@ -677,36 +785,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "memories"
-                ],
-                "summary": "Delete a memory by ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Memory ID",
-                        "name": "memoryId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Group ID",
-                        "name": "groupId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
                 "responses": {
-                    "204": {
-                        "description": "Successfully deleted memory"
-                    },
                     "400": {
                         "description": "Bad Request - Invalid memory ID",
                         "schema": {
@@ -746,7 +825,227 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/groups/{groupId}/memories/{memoryId}/favourite": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "memories"
+                ],
+                "summary": "Mark a memory as favourite",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Group ID",
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Memory ID",
+                        "name": "memoryId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully marked as favourite",
+                        "schema": {
+                            "$ref": "#/definitions/responses.FavouriteResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid memory ID",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - User not authenticated",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - Memory not found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict - Memory is already a favourite",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "memories"
+                ],
+                "summary": "Unmark a memory as favourite",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Group ID",
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Memory ID",
+                        "name": "memoryId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successfully unmarked as favourite"
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid memory ID",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - User not authenticated",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - Memory not found or not a favourite",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/groups/{groupId}/memories/{memoryId}/tags": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "memories"
+                ],
+                "summary": "List tags for a memory",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Group ID",
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Memory ID",
+                        "name": "memoryId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully listed tags",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ListMemoryTagsResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid memory ID",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - User not authenticated",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - Memory not found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/groups/{groupId}/memories/{memoryId}/tags/{tag}": {
             "post": {
                 "security": [
                     {
@@ -826,9 +1125,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/api/groups/{groupId}/memories/{memoryId}/tags/{tag}": {
+            },
             "delete": {
                 "security": [
                     {
@@ -1152,7 +1449,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": "Successfully deleted group (No Content)"
+                        "description": "Successfully deleted group",
+                        "schema": {
+                            "$ref": "#/definitions/responses.DeleteGroupResponse"
+                        }
                     },
                     "400": {
                         "description": "Bad Request - Invalid group ID format",
@@ -1393,322 +1693,6 @@ const docTemplate = `{
                     },
                     "409": {
                         "description": "Conflict - User is already a member of the group",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/memories": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "memories"
-                ],
-                "summary": "Create a new memory",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Group ID",
-                        "name": "groupId",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Media Type (image/video/quote)",
-                        "name": "mediaType",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "file",
-                        "description": "Media file to upload",
-                        "name": "mediaFile",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "number",
-                        "description": "Latitude (optional)",
-                        "name": "latitude",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "number",
-                        "description": "Longitude (optional)",
-                        "name": "longitude",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Music ID (optional)",
-                        "name": "musicId",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "number",
-                        "description": "Offset (optional)",
-                        "name": "offset",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "number",
-                        "description": "Duration (optional)",
-                        "name": "duration",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Comma-separated tags (optional)",
-                        "name": "tags",
-                        "in": "formData"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successfully created memory",
-                        "schema": {
-                            "$ref": "#/definitions/responses.MemoryResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request - Invalid request data",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized - User not authenticated",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/memories/{memoryId}/favourite": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "memories"
-                ],
-                "summary": "Mark a memory as favourite",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Memory ID",
-                        "name": "memoryId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successfully marked as favourite",
-                        "schema": {
-                            "$ref": "#/definitions/responses.FavouriteResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request - Invalid memory ID",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized - User not authenticated",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found - Memory not found",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "409": {
-                        "description": "Conflict - Memory is already a favourite",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "memories"
-                ],
-                "summary": "Unmark a memory as favourite",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Memory ID",
-                        "name": "memoryId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "Successfully unmarked as favourite"
-                    },
-                    "400": {
-                        "description": "Bad Request - Invalid memory ID",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized - User not authenticated",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found - Memory not found or not a favourite",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/memories/{memoryId}/tags": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "memories"
-                ],
-                "summary": "List tags for a memory",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Group ID",
-                        "name": "groupId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Memory ID",
-                        "name": "memoryId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successfully listed tags",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ListMemoryTagsResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request - Invalid memory ID",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized - User not authenticated",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found - Memory not found",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -2513,7 +2497,13 @@ const docTemplate = `{
         "requests.CreateMemoryTagRequest": {
             "type": "object",
             "properties": {
-                "name": {
+                "groupId": {
+                    "type": "integer"
+                },
+                "memoryId": {
+                    "type": "integer"
+                },
+                "tag": {
                     "type": "string"
                 }
             }
@@ -2680,6 +2670,14 @@ const docTemplate = `{
                 "invitation_code": {
                     "description": "The generated invitation code",
                     "type": "string"
+                }
+            }
+        },
+        "responses.DeleteGroupResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
                 }
             }
         },
@@ -2985,9 +2983,6 @@ const docTemplate = `{
                 },
                 "offset": {
                     "type": "number"
-                },
-                "textContent": {
-                    "type": "string"
                 },
                 "updatedAt": {
                     "type": "string"

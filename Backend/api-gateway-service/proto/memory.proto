@@ -87,7 +87,9 @@ message DeleteMemoriesByGroupRequest {
 }
 
 // Ответ на удаление воспоминаний по Group ID
-message DeleteMemoriesByGroupResponse {}
+message DeleteMemoriesByGroupResponse {
+  bool success = 1;
+}
 
 // Запрос на удаление воспоминания
 message DeleteMemoryRequest {
@@ -97,7 +99,9 @@ message DeleteMemoryRequest {
 }
 
 // Ответ на удаление воспоминания
-message DeleteMemoryResponse {}
+message DeleteMemoryResponse {
+  bool success = 1;
+}
 
 // Запрос на получение списка воспоминаний по Group ID
 message ListMemoriesByGroupRequest {
@@ -148,7 +152,9 @@ message DeleteMemoryTagRequest {
 }
 
 // Ответ на удаление тега воспоминания
-message DeleteMemoryTagResponse {}
+message DeleteMemoryTagResponse {
+  bool success = 1;
+}
 
 // Запрос на получение списка тегов воспоминания по ID воспоминания
 message ListMemoryTagsByMemoryIDRequest {
@@ -178,7 +184,9 @@ message DeleteFavouriteRequest {
 }
 
 // Ответ на удаление избранного
-message DeleteFavouriteResponse {}
+message DeleteFavouriteResponse {
+  bool success = 1;
+}
 
 // Запрос на удаление избранного для пользователя
 message DeleteFavouritedByUserIDRequest {
@@ -186,4 +194,6 @@ message DeleteFavouritedByUserIDRequest {
 }
 
 // Ответ на удаление избранного для пользователя
-message DeleteFavouritedByUserIDResponse {}
+message DeleteFavouritedByUserIDResponse {
+  bool success = 1;
+}

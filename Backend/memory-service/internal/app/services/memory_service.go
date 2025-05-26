@@ -194,7 +194,7 @@ func (s *MemoryService) DeleteMemory(ctx context.Context, req *pb.DeleteMemoryRe
 
 	if err = s.memoryRepo.DeleteMemory(ctx, tx, uint(req.MemoryId)); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return &pb.DeleteMemoryResponse{}, nil
+			return &pb.DeleteMemoryResponse{Success: true}, nil
 		}
 		log.Printf("MemoryService: Failed to delete memory %d: %v", req.MemoryId, err)
 		return nil, status.Errorf(codes.Internal, "failed to delete memory: %v", err)
@@ -205,7 +205,7 @@ func (s *MemoryService) DeleteMemory(ctx context.Context, req *pb.DeleteMemoryRe
 		return nil, status.Errorf(codes.Internal, "failed to commit transaction: %v", err)
 	}
 
-	return &pb.DeleteMemoryResponse{}, nil
+	return &pb.DeleteMemoryResponse{Success: true}, nil
 }
 
 // DeleteMemoriesByGroup implements pb.MemoryServiceServer.DeleteMemoriesByGroup
@@ -239,7 +239,7 @@ func (s *MemoryService) DeleteMemoriesByGroup(ctx context.Context, req *pb.Delet
 		return nil, status.Errorf(codes.Internal, "failed to commit transaction: %v", err)
 	}
 
-	return &pb.DeleteMemoriesByGroupResponse{}, nil
+	return &pb.DeleteMemoriesByGroupResponse{Success: true}, nil
 }
 
 // ListMemoriesByGroup implements pb.MemoryServiceServer.ListMemoriesByGroup
@@ -354,7 +354,7 @@ func (s *MemoryService) DeleteMemoryTag(ctx context.Context, req *pb.DeleteMemor
 
 	if err = s.memoryRepo.DeleteMemoryTag(ctx, tx, uint(req.MemoryId), req.Tag); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return &pb.DeleteMemoryTagResponse{}, nil
+			return &pb.DeleteMemoryTagResponse{Success: true}, nil
 		}
 		log.Printf("MemoryService: Failed to delete memory tag %d: %v", req.Tag, err)
 		return nil, status.Errorf(codes.Internal, "failed to delete memory tag: %v", err)
@@ -365,7 +365,7 @@ func (s *MemoryService) DeleteMemoryTag(ctx context.Context, req *pb.DeleteMemor
 		return nil, status.Errorf(codes.Internal, "failed to commit transaction: %v", err)
 	}
 
-	return &pb.DeleteMemoryTagResponse{}, nil
+	return &pb.DeleteMemoryTagResponse{Success: true}, nil
 }
 
 // ListMemoryTagsByMemoryID implements pb.MemoryServiceServer.ListMemoryTagsByMemoryID
@@ -463,7 +463,7 @@ func (s *MemoryService) DeleteFavourite(ctx context.Context, req *pb.DeleteFavou
 
 	if err = s.memoryRepo.DeleteFavourite(ctx, tx, uint(req.MemoryId), uint(req.UserId)); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return &pb.DeleteFavouriteResponse{}, nil
+			return &pb.DeleteFavouriteResponse{Success: true}, nil
 		}
 		log.Printf("MemoryService: Failed to delete favourite for memory %d by user %d: %v", req.MemoryId, req.UserId, err)
 		return nil, status.Errorf(codes.Internal, "failed to delete favourite: %v", err)
@@ -474,7 +474,7 @@ func (s *MemoryService) DeleteFavourite(ctx context.Context, req *pb.DeleteFavou
 		return nil, status.Errorf(codes.Internal, "failed to commit transaction: %v", err)
 	}
 
-	return &pb.DeleteFavouriteResponse{}, nil
+	return &pb.DeleteFavouriteResponse{Success: true}, nil
 }
 
 // DeleteFavouritesByUserID implements pb.MemoryServiceServer.DeleteFavouritesByUserID
@@ -500,7 +500,7 @@ func (s *MemoryService) DeleteFavouritesByUserID(ctx context.Context, req *pb.De
 
 	if err = s.memoryRepo.DeleteFavouritesByUserID(ctx, tx, uint(req.UserId)); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return &pb.DeleteFavouritedByUserIDResponse{}, nil
+			return &pb.DeleteFavouritedByUserIDResponse{Success: true}, nil
 		}
 		log.Printf("MemoryService: Failed to delete all favourites for user %d: %v", req.UserId, err)
 		return nil, status.Errorf(codes.Internal, "failed to delete favourites by user ID: %v", err)
@@ -511,5 +511,5 @@ func (s *MemoryService) DeleteFavouritesByUserID(ctx context.Context, req *pb.De
 		return nil, status.Errorf(codes.Internal, "failed to commit transaction: %v", err)
 	}
 
-	return &pb.DeleteFavouritedByUserIDResponse{}, nil
+	return &pb.DeleteFavouritedByUserIDResponse{Success: true}, nil
 }

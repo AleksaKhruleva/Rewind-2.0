@@ -212,7 +212,7 @@ func (h *GroupHandler) UpdateGroup(w http.ResponseWriter, r *http.Request) {
 // @Tags groups
 // @Produce json
 // @Param id path int true "Group ID"
-// @Success 204 "Successfully deleted group (No Content)"
+// @Success 204 {object} responses.DeleteGroupResponse "Successfully deleted group"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid group ID format"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - User is not an administrator of the group"
@@ -244,8 +244,11 @@ func (h *GroupHandler) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Respond with 204 No Content on successful deletion
-	w.WriteHeader(http.StatusNoContent)
+	responseBody := responses.DeleteGroupResponse{
+		Success: resp.GetSuccess(),
+	}
+
+	respondJSON(w, http.StatusNoContent, responseBody)
 }
 
 // ListGroupMembers обработчик для GET /api/groups/{id}/members
@@ -341,8 +344,11 @@ func (h *GroupHandler) RemoveGroupMember(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	// Respond with 204 No Content on successful removal
-	w.WriteHeader(http.StatusNoContent)
+	responseBody := responses.DeleteUserResponse{
+		Success: resp.GetSuccess(),
+	}
+
+	respondJSON(w, http.StatusNoContent, responseBody)
 }
 
 // CreateGroupInvitation обработчик для POST /api/groups/{id}/invitations

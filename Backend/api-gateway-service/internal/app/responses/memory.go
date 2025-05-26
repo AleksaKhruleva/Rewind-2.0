@@ -6,19 +6,18 @@ import (
 
 // MemoryResponse represents the HTTP response for a single memory.
 type MemoryResponse struct {
-	Id          uint64    `json:"id"`
-	GroupID     uint64    `json:"groupId"`
-	UserID      uint64    `json:"userId"`
-	MediaType   string    `json:"mediaType"`
-	MediaURL    string    `json:"mediaUrl"`
-	TextContent string    `json:"textContent"`
-	Latitude    float64   `json:"latitude"`
-	Longitude   float64   `json:"longitude"`
-	MusicID     string    `json:"musicId"`
-	Offset      float64   `json:"offset"`
-	Duration    float64   `json:"duration"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	Id        uint64    `json:"id"`
+	GroupID   uint64    `json:"groupId"`
+	UserID    uint64    `json:"userId"`
+	MediaType string    `json:"mediaType"`
+	MediaURL  string    `json:"mediaUrl"`
+	Latitude  float64   `json:"latitude"`
+	Longitude float64   `json:"longitude"`
+	MusicID   string    `json:"musicId"`
+	Offset    float64   `json:"offset"`
+	Duration  float64   `json:"duration"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 // DetailedMemoryResponse represents the HTTP response for a detailed memory.
@@ -47,4 +46,19 @@ type ListMemoryTagsResponse struct {
 type FavouriteResponse struct {
 	MemoryID uint64 `json:"memoryId"`
 	UserID   uint64 `json:"userId"`
+}
+
+// DeleteMemoryResponse represents the response for the DeleteMemory endpoint.
+type DeleteMemoryResponse struct {
+	Success bool `json:"success"`
+}
+
+// DeleteMemoryTagResponse represents the HTTP response for a delete memory tags.
+type DeleteMemoryTagResponse struct {
+	Success bool `json:"success"`
+}
+
+// DeleteFavouriteResponse represents the HTTP response for a delete memory favourite.
+type DeleteFavouriteResponse struct {
+	Success bool `json:"success"`
 }

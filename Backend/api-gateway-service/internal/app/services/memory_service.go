@@ -23,7 +23,7 @@ type MemoryServiceInterface interface {
 	DeleteMemory(ctx context.Context, req *requests.DeleteMemoryRequest) (*pb.DeleteMemoryResponse, error)
 	ListMemoriesByGroup(ctx context.Context, req *requests.ListMemoriesByGroupRequest) (*pb.ListMemoriesByGroupResponse, error)
 	ListMemoriesByGroupWithFilters(ctx context.Context, req *requests.ListMemoriesByGroupWithFiltersRequest) (*pb.ListMemoriesByGroupWithFiltersResponse, error)
-	CreateMemoryTag(ctx context.Context, req *requests.CreateMemoryTagRequest, groupID, memoryID uint64) (*pb.CreateMemoryTagResponse, error)
+	CreateMemoryTag(ctx context.Context, req *requests.CreateMemoryTagRequest) (*pb.CreateMemoryTagResponse, error)
 	DeleteMemoryTag(ctx context.Context, req *requests.DeleteMemoryTagRequest) (*pb.DeleteMemoryTagResponse, error)
 	ListMemoryTagsByMemoryID(ctx context.Context, req *requests.ListMemoryTagsByMemoryIDRequest) (*pb.ListMemoryTagsByMemoryIDResponse, error)
 	CreateFavourite(ctx context.Context, req *requests.CreateFavouriteRequest) (*pb.CreateFavouriteResponse, error)
@@ -193,21 +193,21 @@ func (s *MemoryService) ListMemoriesByGroupWithFilters(ctx context.Context, req 
 }
 
 // CreateMemoryTag calls the CreateMemoryTag RPC method in Memory-Service.
-func (s *MemoryService) CreateMemoryTag(ctx context.Context, req *requests.CreateMemoryTagRequest, groupID, memoryID uint64) (*pb.CreateMemoryTagResponse, error) {
+func (s *MemoryService) CreateMemoryTag(ctx context.Context, req *requests.CreateMemoryTagRequest) (*pb.CreateMemoryTagResponse, error) {
 	userID, err := GetRequestingUserIDFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("API GW MemoryService: Calling CreateMemoryTag RPC for user %d, memory %d, tag %s", userID, memoryID, req.Name)
+	log.Printf("API GW MemoryService: Calling CreateMemoryTag RPC for user %d, memory %d, tag %s", userID, req.MemoryID, req.Tag)
 
-	_, err = s.verifyUserExists(ctx, userID, &groupID)
+	_, err = s.verifyUserExists(ctx, userID, &req.GroupID)
 	if err != nil {
 		return nil, err
 	}
 
 	pbReq := &pb.CreateMemoryTagRequest{
-		MemoryId: memoryID,
-		Name:     req.Name,
+		MemoryId: req.MemoryID,
+		Name:     req.Tag,
 	}
 
 	return s.memoryClient.CreateMemoryTag(ctx, pbReq)
@@ -262,7 +262,7 @@ func (s *MemoryService) CreateFavourite(ctx context.Context, req *requests.Creat
 	}
 	log.Printf("API GW MemoryService: Calling CreateFavourite RPC for user %d, memory %d", userID, req.MemoryID)
 
-	_, err = s.verifyUserExists(ctx, userID, nil)
+	_, err = s.verifyUserExists(ctx, userID, &req.GroupID)
 	if err != nil {
 		return nil, err
 	}
@@ -283,7 +283,7 @@ func (s *MemoryService) DeleteFavourite(ctx context.Context, req *requests.Delet
 	}
 	log.Printf("API GW MemoryService: Calling DeleteFavourite RPC for user %d, memory %d", userID, req.MemoryID)
 
-	_, err = s.verifyUserExists(ctx, userID, nil)
+	_, err = s.verifyUserExists(ctx, userID, &req.GroupID)
 	if err != nil {
 		return nil, err
 	}

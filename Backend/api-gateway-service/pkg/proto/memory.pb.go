@@ -555,6 +555,7 @@ func (x *DeleteMemoriesByGroupRequest) GetGroupId() uint64 {
 // Ответ на удаление воспоминаний по Group ID
 type DeleteMemoriesByGroupResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -587,6 +588,13 @@ func (x *DeleteMemoriesByGroupResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use DeleteMemoriesByGroupResponse.ProtoReflect.Descriptor instead.
 func (*DeleteMemoriesByGroupResponse) Descriptor() ([]byte, []int) {
 	return file_proto_memory_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *DeleteMemoriesByGroupResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
 }
 
 // Запрос на удаление воспоминания
@@ -653,6 +661,7 @@ func (x *DeleteMemoryRequest) GetIsAdmin() bool {
 // Ответ на удаление воспоминания
 type DeleteMemoryResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -685,6 +694,13 @@ func (x *DeleteMemoryResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use DeleteMemoryResponse.ProtoReflect.Descriptor instead.
 func (*DeleteMemoryResponse) Descriptor() ([]byte, []int) {
 	return file_proto_memory_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *DeleteMemoryResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
 }
 
 // Запрос на получение списка воспоминаний по Group ID
@@ -1114,6 +1130,7 @@ func (x *DeleteMemoryTagRequest) GetTag() string {
 // Ответ на удаление тега воспоминания
 type DeleteMemoryTagResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1146,6 +1163,13 @@ func (x *DeleteMemoryTagResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use DeleteMemoryTagResponse.ProtoReflect.Descriptor instead.
 func (*DeleteMemoryTagResponse) Descriptor() ([]byte, []int) {
 	return file_proto_memory_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *DeleteMemoryTagResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
 }
 
 // Запрос на получение списка тегов воспоминания по ID воспоминания
@@ -1392,6 +1416,7 @@ func (x *DeleteFavouriteRequest) GetUserId() uint64 {
 // Ответ на удаление избранного
 type DeleteFavouriteResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1424,6 +1449,13 @@ func (x *DeleteFavouriteResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use DeleteFavouriteResponse.ProtoReflect.Descriptor instead.
 func (*DeleteFavouriteResponse) Descriptor() ([]byte, []int) {
 	return file_proto_memory_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *DeleteFavouriteResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
 }
 
 // Запрос на удаление избранного для пользователя
@@ -1474,6 +1506,7 @@ func (x *DeleteFavouritedByUserIDRequest) GetUserId() uint64 {
 // Ответ на удаление избранного для пользователя
 type DeleteFavouritedByUserIDResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1506,6 +1539,13 @@ func (x *DeleteFavouritedByUserIDResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use DeleteFavouritedByUserIDResponse.ProtoReflect.Descriptor instead.
 func (*DeleteFavouritedByUserIDResponse) Descriptor() ([]byte, []int) {
 	return file_proto_memory_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *DeleteFavouritedByUserIDResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
 }
 
 var File_proto_memory_proto protoreflect.FileDescriptor
@@ -1566,13 +1606,15 @@ const file_proto_memory_proto_rawDesc = "" +
 	"\x14CreateMemoryResponse\x12&\n" +
 	"\x06memory\x18\x01 \x01(\v2\x0e.memory.MemoryR\x06memory\"9\n" +
 	"\x1cDeleteMemoriesByGroupRequest\x12\x19\n" +
-	"\bgroup_id\x18\x01 \x01(\x04R\agroupId\"\x1f\n" +
-	"\x1dDeleteMemoriesByGroupResponse\"f\n" +
+	"\bgroup_id\x18\x01 \x01(\x04R\agroupId\"9\n" +
+	"\x1dDeleteMemoriesByGroupResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"f\n" +
 	"\x13DeleteMemoryRequest\x12\x1b\n" +
 	"\tmemory_id\x18\x01 \x01(\x04R\bmemoryId\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\x04R\x06userId\x12\x19\n" +
-	"\bis_admin\x18\x03 \x01(\bR\aisAdmin\"\x16\n" +
-	"\x14DeleteMemoryResponse\"P\n" +
+	"\bis_admin\x18\x03 \x01(\bR\aisAdmin\"0\n" +
+	"\x14DeleteMemoryResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"P\n" +
 	"\x1aListMemoriesByGroupRequest\x12\x19\n" +
 	"\bgroup_id\x18\x01 \x01(\x04R\agroupId\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\x04R\x06userId\"Q\n" +
@@ -1599,8 +1641,9 @@ const file_proto_memory_proto_rawDesc = "" +
 	"\x03tag\x18\x01 \x01(\v2\x11.memory.MemoryTagR\x03tag\"G\n" +
 	"\x16DeleteMemoryTagRequest\x12\x1b\n" +
 	"\tmemory_id\x18\x01 \x01(\x04R\bmemoryId\x12\x10\n" +
-	"\x03tag\x18\x02 \x01(\tR\x03tag\"\x19\n" +
-	"\x17DeleteMemoryTagResponse\">\n" +
+	"\x03tag\x18\x02 \x01(\tR\x03tag\"3\n" +
+	"\x17DeleteMemoryTagResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\">\n" +
 	"\x1fListMemoryTagsByMemoryIDRequest\x12\x1b\n" +
 	"\tmemory_id\x18\x01 \x01(\x04R\bmemoryId\"I\n" +
 	" ListMemoryTagsByMemoryIDResponse\x12%\n" +
@@ -1612,11 +1655,13 @@ const file_proto_memory_proto_rawDesc = "" +
 	"\tfavourite\x18\x01 \x01(\v2\x11.memory.FavouriteR\tfavourite\"N\n" +
 	"\x16DeleteFavouriteRequest\x12\x1b\n" +
 	"\tmemory_id\x18\x01 \x01(\x04R\bmemoryId\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\x04R\x06userId\"\x19\n" +
-	"\x17DeleteFavouriteResponse\":\n" +
+	"\auser_id\x18\x02 \x01(\x04R\x06userId\"3\n" +
+	"\x17DeleteFavouriteResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\":\n" +
 	"\x1fDeleteFavouritedByUserIDRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\x04R\x06userId\"\"\n" +
-	" DeleteFavouritedByUserIDResponse*=\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\"<\n" +
+	" DeleteFavouritedByUserIDResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess*=\n" +
 	"\tMediaType\x12\x0f\n" +
 	"\vUNSPECIFIED\x10\x00\x12\t\n" +
 	"\x05image\x10\x01\x12\t\n" +

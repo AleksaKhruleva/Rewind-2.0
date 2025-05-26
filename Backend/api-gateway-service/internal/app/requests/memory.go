@@ -32,7 +32,9 @@ type ListMemoriesByGroupWithFiltersRequest struct {
 
 // CreateMemoryTagRequest represents the HTTP request for creating a memory tag.
 type CreateMemoryTagRequest struct {
-	Name string `json:"name"`
+	GroupID  uint64 `json:"groupId"`
+	MemoryID uint64 `json:"memoryId"`
+	Tag      string `json:"tag"`
 }
 
 // DeleteMemoryTagRequest represents the HTTP request for deleting a memory tag.
@@ -50,10 +52,12 @@ type ListMemoryTagsByMemoryIDRequest struct {
 
 // CreateFavouriteRequest represents the HTTP request for creating a favourite.
 type CreateFavouriteRequest struct {
+	GroupID  uint64 `json:"groupId"`
 	MemoryID uint64 `json:"memoryId"`
 }
 
 // DeleteFavouriteRequest represents the HTTP request for deleting a favourite.
 type DeleteFavouriteRequest struct {
+	GroupID  uint64 `json:"groupId"`
 	MemoryID uint64 `json:"memoryId"`
 }

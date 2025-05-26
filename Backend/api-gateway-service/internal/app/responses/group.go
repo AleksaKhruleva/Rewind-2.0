@@ -81,3 +81,8 @@ type ListUserGroupsResponse struct {
 	// }
 	// UserGroups []UserGroupDetails `json:"user_groups"`
 }
+
+// DeleteGroupResponse represents the response for the DeleteGroup endpoint.
+type DeleteGroupResponse struct {
+	Success bool `json:"success"`
+}
