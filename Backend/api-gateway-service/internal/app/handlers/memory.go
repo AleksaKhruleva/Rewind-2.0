@@ -199,8 +199,7 @@ func (h *MemoryHandler) CreateMemory(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param memoryId path int true "Memory ID"
 // @Param groupId path int true "Group ID"
-// @Success 204 "Successfully deleted memory"
-
+// @Success 204 {object} responses.DeleteMemoryResponse "Successfully deleted memory"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid memory ID"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - Permission denied by service"
@@ -469,7 +468,7 @@ func (h *MemoryHandler) CreateMemoryTag(w http.ResponseWriter, r *http.Request) 
 // @Param groupId path int true "Group ID"
 // @Param memoryId path int true "Memory ID"
 // @Param tag path string true "Tag to delete"
-// @Success 204 "Successfully deleted tag"
+// @Success 204 {object} responses.DeleteMemoryTagResponse "Successfully deleted tag"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid input"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Memory or tag not found"
@@ -627,7 +626,7 @@ func (h *MemoryHandler) CreateFavourite(w http.ResponseWriter, r *http.Request) 
 // @Produce json
 // @Param groupId path int true "Group ID"
 // @Param memoryId path int true "Memory ID"
-// @Success 204 "Successfully unmarked as favourite"
+// @Success 204 {object} responses.DeleteFavouriteResponse "Successfully unmarked as favourite"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid memory ID"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Memory not found or not a favourite"

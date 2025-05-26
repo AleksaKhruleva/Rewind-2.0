@@ -785,7 +785,39 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "memories"
+                ],
+                "summary": "Delete a memory by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Memory ID",
+                        "name": "memoryId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Group ID",
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
+                    "204": {
+                        "description": "Successfully deleted memory",
+                        "schema": {
+                            "$ref": "#/definitions/responses.DeleteMemoryResponse"
+                        }
+                    },
                     "400": {
                         "description": "Bad Request - Invalid memory ID",
                         "schema": {
@@ -937,7 +969,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": "Successfully unmarked as favourite"
+                        "description": "Successfully unmarked as favourite",
+                        "schema": {
+                            "$ref": "#/definitions/responses.DeleteFavouriteResponse"
+                        }
                     },
                     "400": {
                         "description": "Bad Request - Invalid memory ID",
@@ -1167,7 +1202,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": "Successfully deleted tag"
+                        "description": "Successfully deleted tag",
+                        "schema": {
+                            "$ref": "#/definitions/responses.DeleteMemoryTagResponse"
+                        }
                     },
                     "400": {
                         "description": "Bad Request - Invalid input",
@@ -2673,7 +2711,31 @@ const docTemplate = `{
                 }
             }
         },
+        "responses.DeleteFavouriteResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
         "responses.DeleteGroupResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "responses.DeleteMemoryResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "responses.DeleteMemoryTagResponse": {
             "type": "object",
             "properties": {
                 "success": {

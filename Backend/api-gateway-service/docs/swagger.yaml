@@ -132,7 +132,22 @@ definitions:
         description: The generated invitation code
         type: string
     type: object
+  responses.DeleteFavouriteResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
   responses.DeleteGroupResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+  responses.DeleteMemoryResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+  responses.DeleteMemoryTagResponse:
     properties:
       success:
         type: boolean
@@ -906,7 +921,26 @@ paths:
       - memories
   /api/groups/{groupId}/memories/{memoryId}:
     delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Memory ID
+        in: path
+        name: memoryId
+        required: true
+        type: integer
+      - description: Group ID
+        in: path
+        name: groupId
+        required: true
+        type: integer
+      produces:
+      - application/json
       responses:
+        "204":
+          description: Successfully deleted memory
+          schema:
+            $ref: '#/definitions/responses.DeleteMemoryResponse'
         "400":
           description: Bad Request - Invalid memory ID
           schema:
@@ -933,6 +967,9 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
       security:
       - ApiKeyAuth: []
+      summary: Delete a memory by ID
+      tags:
+      - memories
   /api/groups/{groupId}/memories/{memoryId}/favourite:
     delete:
       consumes:
@@ -953,6 +990,8 @@ paths:
       responses:
         "204":
           description: Successfully unmarked as favourite
+          schema:
+            $ref: '#/definitions/responses.DeleteFavouriteResponse'
         "400":
           description: Bad Request - Invalid memory ID
           schema:
@@ -1100,6 +1139,8 @@ paths:
       responses:
         "204":
           description: Successfully deleted tag
+          schema:
+            $ref: '#/definitions/responses.DeleteMemoryTagResponse'
         "400":
           description: Bad Request - Invalid input
           schema:
