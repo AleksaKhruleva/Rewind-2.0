@@ -11,7 +11,7 @@ enum APIService {
     case login(email: String, password: String)
 
     case logout(accessToken: String, refreshToken: String)
-    case deleteUser(email: String)
+    case deleteUser(accessToken: String, email: String)
 
     case refresh(refreshToken: String)
     case user(accessToken: String)
@@ -50,7 +50,7 @@ extension APIService: TargetType {
         case .logout:
             return "/users/logout"
         case .deleteUser:
-            return "/auth/delete-user"
+            return "/users/delete-user"
         case .refresh:
             return "/auth/refresh"
         case let .user(accessToken):
@@ -84,7 +84,6 @@ extension APIService: TargetType {
                 .finishRegister,
                 .login,
                 .logout,
-                .deleteUser,
                 .refresh,
                 .passwordResetStart,
                 .passwordResetVerify,
@@ -96,6 +95,8 @@ extension APIService: TargetType {
                 .passwordResetSet,
                 .emailVerifyChange:
             return .patch
+        case .deleteUser:
+            return .delete
         }
     }
 
@@ -120,7 +121,7 @@ extension APIService: TargetType {
         case let .logout(_, refreshToken):
             let parameters = ["refresh_token": refreshToken]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
-        case let .deleteUser(email):
+        case let .deleteUser(_, email):
             let parameters = ["email": email]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
         case let .refresh(refreshToken):
@@ -166,6 +167,7 @@ extension APIService: TargetType {
     var headers: [String: String]? {
         switch self {
         case let .logout(accessToken, _),
+            let .deleteUser(accessToken, _),
             let .user(accessToken),
             let .updateUserName(accessToken, _),
             let .updateUserAvatar(accessToken, _),

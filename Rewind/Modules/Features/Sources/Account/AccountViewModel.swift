@@ -59,13 +59,13 @@ final class AccountViewModel {
             }
         case .deleteAccount:
             do {
-                let response = try await backend.deleteUser(email: user.email)
-                if response.success {
-                    KeychainService.shared.clearAll()
-                    router.navigateToWelcome()
-                    showToast(UIComponentsStrings.Toast.DeleteAccount.success)
-                } else {
-                    showErrorToast()
+                if let tokens = Tokens() {
+                    let response = try await backend.deleteUser(tokens: tokens, email: user.email)
+                    if response.success {
+                        KeychainService.shared.clearAll()
+                        router.navigateToWelcome()
+                        showToast(UIComponentsStrings.Toast.DeleteAccount.success)
+                    }
                 }
             } catch {
                 showErrorToast(for: error)
