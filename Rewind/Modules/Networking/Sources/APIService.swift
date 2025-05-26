@@ -121,8 +121,8 @@ extension APIService: TargetType {
                 .passwordResetSet,
                 .emailVerifyChange:
             return .patch
-        case .deleteUser:
-        case .deleteGroup:
+        case .deleteUser,
+                .deleteGroup:
             return .delete
         case .updateGroupName:
             return .put

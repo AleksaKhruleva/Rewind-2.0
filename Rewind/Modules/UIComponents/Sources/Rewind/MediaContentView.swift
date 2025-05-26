@@ -1,4 +1,5 @@
 import SwiftUI
+import AVFoundation
 import Domain
 
 public struct MediaContentView: View {
@@ -8,6 +9,16 @@ public struct MediaContentView: View {
     private let onLike: () -> Void
     private let onToggleSound: () -> Void
     @Binding var isTrackPlaying: Bool
+
+    // Video player state
+    @State private var player: AVPlayer?
+    @State private var playerItem: AVPlayerItem?
+    @State private var statusObserver: NSKeyValueObservation?
+
+    @State private var isVideoReadyToPlay = false
+    @State private var isVideoPlaying = false
+    @State private var isVideoMuted = true
+    @State private var shouldSeekToStartTime = false
 
     public init(
         mediaItem: MediaItem,
@@ -29,34 +40,9 @@ public struct MediaContentView: View {
         ZStack {
             switch mediaItem.type {
             case .image:
-                Rectangle()
-                    .toSquare(mediaItem.image, cornerRadius: cornerRadius)
-            case .imageWithMusic:
-                Rectangle()
-                    .toSquare(mediaItem.image, cornerRadius: cornerRadius)
-                    .overlay(alignment: .topTrailing) {
-                        if mediaItem.type == .imageWithMusic {
-                            Button(action: {}) {
-                                ZStack {
-                                    Image(systemName: "speaker.wave.2.fill").opacity(isTrackPlaying ? 1 : 0)
-                                    Image(systemName: "speaker.slash.fill").opacity(isTrackPlaying ? 0 : 1)
-                                }
-                                .modifier(RoundFontModifier(size: 14, weight: .regular, foregroundColor: .white))
-                                .padding(7.5)
-                                .background(Color.black.opacity(0.5))
-                                .clipShape(Circle())
-                            }
-                            .padding(12)
-                            .simultaneousGesture(
-                                TapGesture().onEnded {
-                                    onToggleSound()
-                                    print("toggle sound")
-                                }
-                            )
-                        }
-                    }
+                imageContent
             case .video:
-                Text("Not Implemented Yet")
+                videoContent
             }
         }
         .overlay {
@@ -65,5 +51,99 @@ public struct MediaContentView: View {
                 saveAction: onSave
             )
         }
+    }
+
+    private var imageContent: some View {
+        Rectangle()
+            .toSquare(mediaItem.image, cornerRadius: cornerRadius)
+            .overlay(alignment: .topTrailing) {
+                if mediaItem.track != nil {
+                    Button(action: {}) {
+                        ZStack {
+                            Image(systemName: "speaker.wave.2.fill").opacity(isTrackPlaying ? 1 : 0)
+                            Image(systemName: "speaker.slash.fill").opacity(isTrackPlaying ? 0 : 1)
+                        }
+                        .modifier(RoundFontModifier(size: 14, weight: .regular, foregroundColor: .white))
+                        .padding(7.5)
+                        .background(Color.black.opacity(0.5))
+                        .clipShape(Circle())
+                    }
+                    .padding(12)
+                    .simultaneousGesture(
+                        TapGesture().onEnded {
+                            onToggleSound()
+                            print("toggle sound")
+                        }
+                    )
+                }
+            }
+    }
+
+    private var videoContent: some View {
+        ZStack {
+            Rectangle()
+                .toSquare(mediaItem.image, cornerRadius: cornerRadius)
+                .opacity(isVideoReadyToPlay ? 0 : 1)
+                .animation(.easeInOut(duration: 0.5), value: isVideoReadyToPlay)
+
+            if let player = player {
+                CustomPlayerView(
+                    isPlaying: $isVideoPlaying,
+                    isMuted: $isVideoMuted,
+                    shouldSeekToStartTime: $shouldSeekToStartTime,
+                    player: player,
+                    startTime: .zero,
+                    onSeekComplete: {}
+                )
+                .opacity(isVideoReadyToPlay ? 1 : 0)
+                .animation(.easeInOut(duration: 0.25), value: isVideoReadyToPlay)
+                .aspectRatio(1, contentMode: .fit)
+                .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+                .contentShape(RoundedRectangle(cornerRadius: cornerRadius))
+            }
+        }
+        .onAppear {
+            setupPlayer()
+        }
+        .onDisappear {
+            resetPlayer()
+        }
+    }
+
+    private func setupPlayer() {
+        guard let url = mediaItem.videoURL else { return }
+
+        let item = AVPlayerItem(url: url)
+        playerItem = item
+        player = AVPlayer(playerItem: item)
+
+        statusObserver = item.observe(\.status, options: [.initial, .new]) { item, _ in
+            if item.status == .readyToPlay {
+                print("Ready to play")
+                isVideoReadyToPlay = true
+                isVideoPlaying = true
+            } else if item.status == .failed {
+                print("Video failed: \(item.error?.localizedDescription ?? "Unknown error")")
+            } else if item.status == .unknown {
+                print("Unknown status")
+            }
+        }
+
+        NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemDidPlayToEndTime,
+            object: item,
+            queue: .main
+        ) { [weak player] _ in
+            player?.seek(to: .zero)
+            isVideoPlaying = false
+        }
+    }
+
+    private func resetPlayer() {
+        player?.pause()
+        player = nil
+        playerItem = nil
+        statusObserver = nil
+        NotificationCenter.default.removeObserver(self)
     }
 }

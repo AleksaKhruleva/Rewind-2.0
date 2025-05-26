@@ -1,6 +1,6 @@
 import SwiftUI
 
-public struct Group: Hashable {
+public struct Group: Hashable, Identifiable {
     public let id: Int
     public var name: String
     public let ownerID: Int?

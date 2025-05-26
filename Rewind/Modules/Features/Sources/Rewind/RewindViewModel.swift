@@ -67,7 +67,7 @@ final class RewindViewModel {
         // временно
         let items = [
             MediaItem(
-                type: .imageWithMusic,
+                type: .image,
                 image: UIComponentsAsset.media21.image,
                 track: Self.fetchTrack()
             ),

@@ -1,6 +1,9 @@
 import UIKit
 import AVFoundation
 
+let buttonSize: CGFloat = 32
+let pointSize: CGFloat = 11
+
 public final class PlayerUIView: UIView {
     private let playerLayer = AVPlayerLayer()
     private let overlayButton = UIButton(type: .custom)
@@ -26,8 +29,12 @@ public final class PlayerUIView: UIView {
     private var isMuted = false {
         didSet {
             player?.isMuted = isMuted
+            let config = UIImage.SymbolConfiguration(pointSize: pointSize)
             let imageName = isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill"
-            let image = UIImage(systemName: imageName)
+            let image = UIImage(
+                systemName: imageName,
+                withConfiguration: config
+            )
             muteButton.setImage(image, for: .normal)
             onMuteToggle?()
         }
@@ -59,7 +66,12 @@ public final class PlayerUIView: UIView {
 
         playerLayer.frame = bounds
         overlayButton.frame = bounds
-        muteButton.frame = CGRect(x: bounds.maxX - 44 - 12, y: 12, width: 44, height: 44)
+        muteButton.frame = CGRect(
+            x: bounds.maxX - buttonSize - 12,
+            y: 12,
+            width: buttonSize,
+            height: buttonSize
+        )
     }
 
     private func setupOverlayButton() {
@@ -84,9 +96,24 @@ public final class PlayerUIView: UIView {
 
     private func setupMuteButton() {
         muteButton.tintColor = .white
-        muteButton.setImage(UIImage(systemName: "speaker.wave.2.fill"), for: .normal)
+        let config = UIImage.SymbolConfiguration(pointSize: pointSize)
+        let imageName = isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill"
+        let image = UIImage(systemName: imageName, withConfiguration: config)
+        muteButton.setImage(image, for: .normal)
         muteButton.addTarget(self, action: #selector(toggleMute), for: .touchUpInside)
+
+        muteButton.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        muteButton.layer.cornerRadius = buttonSize / 2
+        muteButton.clipsToBounds = true
+        muteButton.translatesAutoresizingMaskIntoConstraints = false
         addSubview(muteButton)
+
+        NSLayoutConstraint.activate([
+            muteButton.widthAnchor.constraint(equalToConstant: buttonSize),
+            muteButton.heightAnchor.constraint(equalToConstant: buttonSize),
+            muteButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            muteButton.topAnchor.constraint(equalTo: topAnchor, constant: 16),
+        ])
     }
 
     @objc private func togglePlay() {

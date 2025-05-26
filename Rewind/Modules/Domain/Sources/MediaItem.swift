@@ -2,7 +2,6 @@ import UIKit
 
 public enum MediaType {
     case image
-    case imageWithMusic
     case video
 }
 

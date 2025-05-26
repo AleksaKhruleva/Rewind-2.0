@@ -8,11 +8,11 @@ public struct GroupsListView: View {
     private let router: GroupsListRouter
 
     // ochevidno vremenno
-    private var filteredGroups: [RewindGroup] {
+    private var filteredGroups: [Domain.Group] {
         if searchText.isEmpty {
-            return groupsForTest
+            return []
         } else {
-            return groupsForTest.filter { group in
+            return [].filter { group in
                 group.name.lowercased().contains(searchText.lowercased())
             }
         }

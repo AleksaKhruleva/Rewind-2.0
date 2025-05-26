@@ -3,15 +3,15 @@ import Domain
 
 public struct GroupsTable: View {
     private let title: String
-    private let groups: [RewindGroup]
+    private let groups: [Domain.Group]
     private let onAddGroupTap: () -> Void
-    private let onGroupTap: (RewindGroup) -> Void
+    private let onGroupTap: (Domain.Group) -> Void
 
     public init(
         title: String = "Groups",
-        groups: [RewindGroup],
+        groups: [Domain.Group],
         onAddGroupTap: @escaping () -> Void,
-        onGroupTap: @escaping (RewindGroup) -> Void
+        onGroupTap: @escaping (Domain.Group) -> Void
     ) {
         self.title = title
         self.groups = groups
