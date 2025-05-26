@@ -199,7 +199,7 @@ func (h *MemoryHandler) CreateMemory(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param memoryId path int true "Memory ID"
 // @Param groupId path int true "Group ID"
-// @Success 204 {object} responses.DeleteMemoryResponse "Successfully deleted memory"
+// @Success 200 {object} responses.DeleteMemoryResponse "Successfully deleted memory"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid memory ID"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - Permission denied by service"
@@ -243,7 +243,7 @@ func (h *MemoryHandler) DeleteMemory(w http.ResponseWriter, r *http.Request) {
 		Success: resp.GetSuccess(),
 	}
 
-	respondJSON(w, http.StatusNoContent, responseBody)
+	respondJSON(w, http.StatusOK, responseBody)
 }
 
 // ListMemoriesByGroup handles GET /api/groups/{groupId}/memories
@@ -255,6 +255,7 @@ func (h *MemoryHandler) DeleteMemory(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} responses.ListMemoriesResponse "Successfully listed memories"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid group ID"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
+// @Failure 403 {object} responses.ErrorResponse "Forbidden - Permission denied by service"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
@@ -319,6 +320,7 @@ func (h *MemoryHandler) ListMemoriesByGroup(w http.ResponseWriter, r *http.Reque
 // @Success 200 {object} responses.ListMemoriesResponse "Successfully listed memories"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid input"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
+// @Failure 403 {object} responses.ErrorResponse "Forbidden - Permission denied by service"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
@@ -422,6 +424,7 @@ func (h *MemoryHandler) ListMemoriesByGroupWithFilters(w http.ResponseWriter, r 
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid input"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Memory not found"
+// @Failure 403 {object} responses.ErrorResponse "Forbidden - Permission denied by service"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
@@ -468,10 +471,11 @@ func (h *MemoryHandler) CreateMemoryTag(w http.ResponseWriter, r *http.Request) 
 // @Param groupId path int true "Group ID"
 // @Param memoryId path int true "Memory ID"
 // @Param tag path string true "Tag to delete"
-// @Success 204 {object} responses.DeleteMemoryTagResponse "Successfully deleted tag"
+// @Success 200 {object} responses.DeleteMemoryTagResponse "Successfully deleted tag"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid input"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Memory or tag not found"
+// @Failure 403 {object} responses.ErrorResponse "Forbidden - Permission denied by service"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
@@ -515,7 +519,7 @@ func (h *MemoryHandler) DeleteMemoryTag(w http.ResponseWriter, r *http.Request) 
 		Success: resp.GetSuccess(),
 	}
 
-	respondJSON(w, http.StatusNoContent, responseBody)
+	respondJSON(w, http.StatusOK, responseBody)
 }
 
 // ListMemoryTagsByMemoryID handles GET /api/groups/{groupId}/memories/{memoryId}/tags
@@ -528,6 +532,7 @@ func (h *MemoryHandler) DeleteMemoryTag(w http.ResponseWriter, r *http.Request) 
 // @Success 200 {object} responses.ListMemoryTagsResponse "Successfully listed tags"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid memory ID"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
+// @Failure 403 {object} responses.ErrorResponse "Forbidden - Permission denied by service"
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Memory not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
@@ -579,6 +584,7 @@ func (h *MemoryHandler) ListMemoryTagsByMemoryID(w http.ResponseWriter, r *http.
 // @Success 200 {object} responses.FavouriteResponse "Successfully marked as favourite"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid memory ID"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
+// @Failure 403 {object} responses.ErrorResponse "Forbidden - Permission denied by service"
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Memory not found"
 // @Failure 409 {object} responses.ErrorResponse "Conflict - Memory is already a favourite"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
@@ -626,9 +632,10 @@ func (h *MemoryHandler) CreateFavourite(w http.ResponseWriter, r *http.Request) 
 // @Produce json
 // @Param groupId path int true "Group ID"
 // @Param memoryId path int true "Memory ID"
-// @Success 204 {object} responses.DeleteFavouriteResponse "Successfully unmarked as favourite"
+// @Success 200 {object} responses.DeleteFavouriteResponse "Successfully unmarked as favourite"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid memory ID"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
+// @Failure 403 {object} responses.ErrorResponse "Forbidden - Permission denied by service"
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Memory not found or not a favourite"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
@@ -670,5 +677,5 @@ func (h *MemoryHandler) DeleteFavourite(w http.ResponseWriter, r *http.Request) 
 		Success: resp.GetSuccess(),
 	}
 
-	respondJSON(w, http.StatusNoContent, responseBody)
+	respondJSON(w, http.StatusOK, responseBody)
 }

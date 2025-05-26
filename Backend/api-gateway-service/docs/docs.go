@@ -546,6 +546,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden - Permission denied by service",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -763,6 +769,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden - Permission denied by service",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -812,7 +824,7 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "204": {
+                    "200": {
                         "description": "Successfully deleted memory",
                         "schema": {
                             "$ref": "#/definitions/responses.DeleteMemoryResponse"
@@ -909,6 +921,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden - Permission denied by service",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Not Found - Memory not found",
                         "schema": {
@@ -968,7 +986,7 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "204": {
+                    "200": {
                         "description": "Successfully unmarked as favourite",
                         "schema": {
                             "$ref": "#/definitions/responses.DeleteFavouriteResponse"
@@ -982,6 +1000,12 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized - User not authenticated",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Permission denied by service",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1055,6 +1079,12 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized - User not authenticated",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Permission denied by service",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1141,6 +1171,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden - Permission denied by service",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Not Found - Memory not found",
                         "schema": {
@@ -1201,7 +1237,7 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "204": {
+                    "200": {
                         "description": "Successfully deleted tag",
                         "schema": {
                             "$ref": "#/definitions/responses.DeleteMemoryTagResponse"
@@ -1215,6 +1251,12 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized - User not authenticated",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Permission denied by service",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1271,7 +1313,7 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "204": {
+                    "200": {
                         "description": "Successfully removed member (No Content)"
                     },
                     "400": {
@@ -1486,7 +1528,7 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "204": {
+                    "200": {
                         "description": "Successfully deleted group",
                         "schema": {
                             "$ref": "#/definitions/responses.DeleteGroupResponse"
@@ -2522,10 +2564,6 @@ const docTemplate = `{
                 "name"
             ],
             "properties": {
-                "image": {
-                    "description": "Image URL is optional",
-                    "type": "string"
-                },
                 "name": {
                     "description": "Group name is required",
                     "type": "string"

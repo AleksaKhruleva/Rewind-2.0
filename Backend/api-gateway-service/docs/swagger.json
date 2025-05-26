@@ -539,6 +539,12 @@
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden - Permission denied by service",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -756,6 +762,12 @@
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden - Permission denied by service",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -805,7 +817,7 @@
                     }
                 ],
                 "responses": {
-                    "204": {
+                    "200": {
                         "description": "Successfully deleted memory",
                         "schema": {
                             "$ref": "#/definitions/responses.DeleteMemoryResponse"
@@ -902,6 +914,12 @@
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden - Permission denied by service",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Not Found - Memory not found",
                         "schema": {
@@ -961,7 +979,7 @@
                     }
                 ],
                 "responses": {
-                    "204": {
+                    "200": {
                         "description": "Successfully unmarked as favourite",
                         "schema": {
                             "$ref": "#/definitions/responses.DeleteFavouriteResponse"
@@ -975,6 +993,12 @@
                     },
                     "401": {
                         "description": "Unauthorized - User not authenticated",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Permission denied by service",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1048,6 +1072,12 @@
                     },
                     "401": {
                         "description": "Unauthorized - User not authenticated",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Permission denied by service",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1134,6 +1164,12 @@
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
+                    "403": {
+                        "description": "Forbidden - Permission denied by service",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
                     "404": {
                         "description": "Not Found - Memory not found",
                         "schema": {
@@ -1194,7 +1230,7 @@
                     }
                 ],
                 "responses": {
-                    "204": {
+                    "200": {
                         "description": "Successfully deleted tag",
                         "schema": {
                             "$ref": "#/definitions/responses.DeleteMemoryTagResponse"
@@ -1208,6 +1244,12 @@
                     },
                     "401": {
                         "description": "Unauthorized - User not authenticated",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Permission denied by service",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1264,7 +1306,7 @@
                     }
                 ],
                 "responses": {
-                    "204": {
+                    "200": {
                         "description": "Successfully removed member (No Content)"
                     },
                     "400": {
@@ -1479,7 +1521,7 @@
                     }
                 ],
                 "responses": {
-                    "204": {
+                    "200": {
                         "description": "Successfully deleted group",
                         "schema": {
                             "$ref": "#/definitions/responses.DeleteGroupResponse"
@@ -2515,10 +2557,6 @@
                 "name"
             ],
             "properties": {
-                "image": {
-                    "description": "Image URL is optional",
-                    "type": "string"
-                },
                 "name": {
                     "description": "Group name is required",
                     "type": "string"

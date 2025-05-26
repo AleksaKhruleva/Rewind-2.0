@@ -66,7 +66,6 @@ message CreateGroupRequest {
   // ID пользователя, который создает группу (будет администратором) - приходит от API Gateway
   uint64 requesting_user_id = 1;
   string name = 2;
-  string image = 3; // URL изображения аватара (необязательно)
 }
 
 // Ответ на создание группы

@@ -332,7 +332,7 @@ func (h *AuthHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		Success: resp.GetSuccess(),
 	}
 
-	respondJSON(w, http.StatusNoContent, responseBody)
+	respondJSON(w, http.StatusOK, responseBody)
 }
 
 // GetUserByID обработчик для GET /api/users/{id}.

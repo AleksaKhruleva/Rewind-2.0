@@ -50,7 +50,7 @@ func (h *GroupHandler) CreateGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// User ID is extracted by the service layer from the context
-	resp, err := h.groupService.CreateGroup(r.Context(), reqBody.Name, reqBody.Image)
+	resp, err := h.groupService.CreateGroup(r.Context(), reqBody.Name)
 	if err != nil {
 		handleServiceError(w, err, "CreateGroup")
 		return
@@ -212,7 +212,7 @@ func (h *GroupHandler) UpdateGroup(w http.ResponseWriter, r *http.Request) {
 // @Tags groups
 // @Produce json
 // @Param id path int true "Group ID"
-// @Success 204 {object} responses.DeleteGroupResponse "Successfully deleted group"
+// @Success 200 {object} responses.DeleteGroupResponse "Successfully deleted group"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid group ID format"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - User is not an administrator of the group"
@@ -248,7 +248,7 @@ func (h *GroupHandler) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 		Success: resp.GetSuccess(),
 	}
 
-	respondJSON(w, http.StatusNoContent, responseBody)
+	respondJSON(w, http.StatusOK, responseBody)
 }
 
 // ListGroupMembers обработчик для GET /api/groups/{id}/members
@@ -305,7 +305,7 @@ func (h *GroupHandler) ListGroupMembers(w http.ResponseWriter, r *http.Request) 
 // @Produce json
 // @Param group_id path int true "Group ID"
 // @Param user_id path int true "User ID to remove"
-// @Success 204 "Successfully removed member (No Content)"
+// @Success 200 "Successfully removed member (No Content)"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid group ID or user ID format"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - User does not have permission (not admin or not removing self)"
@@ -348,7 +348,7 @@ func (h *GroupHandler) RemoveGroupMember(w http.ResponseWriter, r *http.Request)
 		Success: resp.GetSuccess(),
 	}
 
-	respondJSON(w, http.StatusNoContent, responseBody)
+	respondJSON(w, http.StatusOK, responseBody)
 }
 
 // CreateGroupInvitation обработчик для POST /api/groups/{id}/invitations

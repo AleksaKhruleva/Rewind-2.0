@@ -300,7 +300,6 @@ type CreateGroupRequest struct {
 	// ID пользователя, который создает группу (будет администратором) - приходит от API Gateway
 	RequestingUserId uint64 `protobuf:"varint,1,opt,name=requesting_user_id,json=requestingUserId,proto3" json:"requesting_user_id,omitempty"`
 	Name             string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Image            string `protobuf:"bytes,3,opt,name=image,proto3" json:"image,omitempty"` // URL изображения аватара (необязательно)
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -345,13 +344,6 @@ func (x *CreateGroupRequest) GetRequestingUserId() uint64 {
 func (x *CreateGroupRequest) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *CreateGroupRequest) GetImage() string {
-	if x != nil {
-		return x.Image
 	}
 	return ""
 }
@@ -1461,11 +1453,10 @@ const file_proto_group_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"expires_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\"l\n" +
+	"expires_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\"V\n" +
 	"\x12CreateGroupRequest\x12,\n" +
 	"\x12requesting_user_id\x18\x01 \x01(\x04R\x10requestingUserId\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x14\n" +
-	"\x05image\x18\x03 \x01(\tR\x05image\"9\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\"9\n" +
 	"\x13CreateGroupResponse\x12\"\n" +
 	"\x05group\x18\x01 \x01(\v2\f.group.GroupR\x05group\"Z\n" +
 	"\x0fGetGroupRequest\x12,\n" +

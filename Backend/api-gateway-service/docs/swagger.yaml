@@ -12,9 +12,6 @@ definitions:
     type: object
   requests.CreateGroupRequest:
     properties:
-      image:
-        description: Image URL is optional
-        type: string
       name:
         description: Group name is required
         type: string
@@ -778,7 +775,7 @@ paths:
       produces:
       - application/json
       responses:
-        "204":
+        "200":
           description: Successfully removed member (No Content)
         "400":
           description: Bad Request - Invalid group ID or user ID format
@@ -833,6 +830,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "401":
           description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - Permission denied by service
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
@@ -937,7 +938,7 @@ paths:
       produces:
       - application/json
       responses:
-        "204":
+        "200":
           description: Successfully deleted memory
           schema:
             $ref: '#/definitions/responses.DeleteMemoryResponse'
@@ -988,7 +989,7 @@ paths:
       produces:
       - application/json
       responses:
-        "204":
+        "200":
           description: Successfully unmarked as favourite
           schema:
             $ref: '#/definitions/responses.DeleteFavouriteResponse'
@@ -998,6 +999,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "401":
           description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - Permission denied by service
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
@@ -1044,6 +1049,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "401":
           description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - Permission denied by service
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
@@ -1097,6 +1106,10 @@ paths:
           description: Unauthorized - User not authenticated
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - Permission denied by service
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
         "404":
           description: Not Found - Memory not found
           schema:
@@ -1137,7 +1150,7 @@ paths:
       produces:
       - application/json
       responses:
-        "204":
+        "200":
           description: Successfully deleted tag
           schema:
             $ref: '#/definitions/responses.DeleteMemoryTagResponse'
@@ -1147,6 +1160,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "401":
           description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - Permission denied by service
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
@@ -1199,6 +1216,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "401":
           description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - Permission denied by service
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
@@ -1276,6 +1297,10 @@ paths:
           description: Unauthorized - User not authenticated
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - Permission denied by service
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -1300,7 +1325,7 @@ paths:
       produces:
       - application/json
       responses:
-        "204":
+        "200":
           description: Successfully deleted group
           schema:
             $ref: '#/definitions/responses.DeleteGroupResponse'

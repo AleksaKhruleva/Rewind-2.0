@@ -2,8 +2,7 @@ package requests
 
 // CreateGroupRequest represents the HTTP request body for creating a new group.
 type CreateGroupRequest struct {
-	Name  string `json:"name" validate:"required"` // Group name is required
-	Image string `json:"image"`                    // Image URL is optional
+	Name string `json:"name" validate:"required"` // Group name is required
 }
 
 // UpdateGroupRequest represents the HTTP request body for updating group details.

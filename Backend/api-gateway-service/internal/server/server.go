@@ -93,7 +93,7 @@ func NewServer(dependencies *di.Dependencies) *Server {
 		r.Post("/api/groups/{groupId}/memories", dependencies.MemoryHandler.CreateMemory)
 		r.Delete("/api/groups/{groupId}/memories/{memoryId}", dependencies.MemoryHandler.DeleteMemory)
 		r.Get("/api/groups/{groupId}/memories", dependencies.MemoryHandler.ListMemoriesByGroup)
-		r.Get("/api/groups/{groupId}/memories/filter", dependencies.MemoryHandler.ListMemoriesByGroupWithFilters)
+		r.Get("/api/groups/{groupId}/memories/random", dependencies.MemoryHandler.ListMemoriesByGroupWithFilters)
 		r.Post("/api/groups/{groupId}/memories/{memoryId}/tags/{tag}", dependencies.MemoryHandler.CreateMemoryTag)
 		r.Delete("/api/groups/{groupId}/memories/{memoryId}/tags/{tag}", dependencies.MemoryHandler.DeleteMemoryTag)
 		r.Get("/api/groups/{groupId}/memories/{memoryId}/tags", dependencies.MemoryHandler.ListMemoryTagsByMemoryID)

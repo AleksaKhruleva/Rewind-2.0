@@ -83,7 +83,6 @@ func (s *GroupService) CreateGroup(ctx context.Context, req *pb.CreateGroupReque
 
 	groupModel := &models.Group{
 		Name:        req.GetName(),
-		Image:       req.GetImage(),
 		AdminUserID: uint(requestingUserID),
 	}
 
