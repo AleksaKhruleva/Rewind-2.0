@@ -10,6 +10,10 @@ public final class AccountRouter {
         appRouter?.navigate(to: .welcome)
     }
 
+    func navigateToGroupsList() {
+        appRouter?.navigate(to: .groupsList)
+    }
+
     func dismiss() {
         appRouter?.pop()
     }

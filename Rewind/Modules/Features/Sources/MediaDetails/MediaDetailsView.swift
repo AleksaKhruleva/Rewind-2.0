@@ -69,6 +69,8 @@ public struct MediaDetailsView: View {
     }
 
     private var riskyTable: some View {
-        InformationTable(title: UIComponentsStrings.MediaDetails.risky, data: AccountConstants.risky, isRisky: true)
+        InformationTable(title: UIComponentsStrings.MediaDetails.risky, data: [
+            ("rectangle.portrait.and.arrow.right.fill", UIComponentsStrings.MediaDetails.delete, nil, nil)
+        ], isRisky: true)
     }
 }

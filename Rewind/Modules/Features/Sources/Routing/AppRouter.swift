@@ -31,6 +31,7 @@ public final class AppRouter {
         case mediaDetails(MediaItem)
 
         case group
+        case groupsList
         case groupSettings
         case addMember(String)
         case memberDetails(Member)
