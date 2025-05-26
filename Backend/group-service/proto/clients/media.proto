@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package media;
+
+option go_package = "Rewind-2.0/Backend/media-service/proto";
+
+// Сервис для работы с медиа файлами
+
+service MediaService {
+  rpc UploadMedia (UploadMediaRequest) returns (UploadMediaResponse);
+}
+
+enum MediaType {
+  UNSPECIFIED = 0;
+  image = 1;
+  video = 2;
+  quote = 3;
+  avatar = 4;
+}
+
+message UploadMediaRequest {
+  bytes file_data = 1;  // The binary data of the file
+  MediaType media_type = 2; // The type of media (e.g., "image", "video")
+}
+
+message UploadMediaResponse {
+  string file_url = 1;  // The URL of the uploaded file in S3
+  string file_key = 2;  // The key used to store the file in S3
+}

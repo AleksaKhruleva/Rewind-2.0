@@ -115,28 +115,12 @@ services:
         condition: service_healthy
       auth-service:
         condition: service_started
-#
-#  memory-service:
-#    build: ./memory-service # Обновленный путь к Dockerfile
-#    container_name: rewind-memory-service
-#    environment:
-#      DATABASE_URL: postgres://rewind_user:rewind_password@db:5432/rewind_db?sslmode=disable
-#      GRPC_PORT: 50054
-#      AUTH_SERVICE_GRPC_ADDRESS: auth-service:50051
-#      GROUP_SERVICE_GRPC_ADDRESS: group-service:50052
-#      NOTIFICATION_SERVICE_GRPC_ADDRESS: notification-service:50053
-#      STORAGE_BUCKET_NAME: your-s3-bucket-name
-#      STORAGE_REGION: your-s3-region
-#      STORAGE_ACCESS_KEY_ID: your-s3-access-key-id
-#      STORAGE_SECRET_ACCESS_KEY: your-s3-secret-access-key
-#      STORAGE_ENDPOINT: your-s3-endpoint
-#    ports:
-#      - "50054:50054"
-#    depends_on:
-#      - db
-#      - auth-service
-#      - group-service
-#      - notification-service
+
+  media-service:
+    build: ./media-service
+    container_name: rewind-media-service
+    ports:
+      - "50055:50055"
 
   notification-service:
     build: ./notification-service # Обновленный путь к Dockerfile

@@ -21,17 +21,17 @@ COPY .env ./
 COPY . .
 
 # Собираем Go приложение
-RUN go build -ldflags="-s -w" -o memory-service ./cmd/main.go
+RUN go build -ldflags="-s -w" -o media-service ./cmd/main.go
 
 # Финальная стадия (остается без изменений)
 FROM scratch
 
 # Копируем собранный бинарник и .env из builder stage
-COPY --from=builder /app/memory-service /app/
+COPY --from=builder /app/media-service /app/
 COPY --from=builder /app/.env /app/
 
 WORKDIR /app
 
-EXPOSE 50054
+EXPOSE 50055
 
-ENTRYPOINT ["/app/memory-service"]
+ENTRYPOINT ["/app/media-service"]
