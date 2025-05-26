@@ -24,7 +24,7 @@ func NewGRPCServer() *grpc.Server {
 func RunGRPCServer(grpcServer *grpc.Server, memoryService pb.MemoryServiceServer) error {
 	listenAddr := os.Getenv("GRPC_PORT")
 	if listenAddr == "" {
-		listenAddr = ":50052" // Значение по умолчанию
+		listenAddr = ":50054" // Значение по умолчанию
 		log.Println("Warning: Server.GRPCAddress not set in .env, using default:", listenAddr)
 	}
 

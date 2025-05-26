@@ -28,7 +28,7 @@ message Memory {
   uint64 id = 1;
   uint64 group_id = 2;
   uint64 user_id = 3;
-  string media_type = 4;
+  MediaType media_type = 4;
   string media_url = 5;
   double latitude = 6;
   double longitude = 7;
@@ -37,6 +37,13 @@ message Memory {
   double duration = 10;
   google.protobuf.Timestamp created_at = 11;
   google.protobuf.Timestamp updated_at = 12;
+}
+
+enum MediaType {
+  UNSPECIFIED = 0; // Always include UNSPECIFIED as the first value
+  image = 1;
+  video = 2;
+  quote = 3;
 }
 
 // Модель тега воспоминания
@@ -59,7 +66,7 @@ message Favourite {
 message CreateMemoryRequest {
   uint64 group_id = 1;
   uint64 user_id = 2;
-  string media_type = 3;
+  MediaType media_type = 3;
   bytes media_file = 4;
   optional double latitude = 5;
   optional double longitude = 6;

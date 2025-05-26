@@ -261,7 +261,10 @@ func (s *GroupService) UpdateGroup(ctx context.Context, req *pb.UpdateGroupReque
 		groupModel.Name = req.GetName()
 	}
 	if req.Image != nil {
-		groupModel.Image = req.GetImage()
+
+		// TODO send to media-service req.GetImage()
+
+		groupModel.Image = "default"
 	}
 	// GORM при Save с gorm.Model автоматически обновит UpdatedAt
 

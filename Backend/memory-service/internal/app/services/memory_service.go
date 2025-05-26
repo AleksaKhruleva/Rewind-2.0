@@ -1,18 +1,20 @@
 package services
 
 import (
-	"Rewind-memory-service/clients/auth"
-	"Rewind-memory-service/internal/app/models"
-	"Rewind-memory-service/internal/app/repositories"
-	pb "Rewind-memory-service/pkg/proto"
 	"context"
 	"errors"
+	"log"
+
 	"github.com/go-playground/validator/v10"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
-	"log"
+
+	"Rewind-memory-service/clients/auth"
+	"Rewind-memory-service/internal/app/models"
+	"Rewind-memory-service/internal/app/repositories"
+	pb "Rewind-memory-service/pkg/proto"
 )
 
 // MemoryService implements the memory.MemoryServiceServer interface
@@ -41,7 +43,7 @@ func convertMemoryToProto(m *models.Memory) *pb.Memory {
 		Id:        uint64(m.ID),
 		GroupId:   uint64(m.GroupID),
 		UserId:    uint64(m.UserID),
-		MediaType: m.MediaType,
+		MediaType: pb.MediaType(pb.MediaType_value[m.MediaType]),
 		MediaUrl:  m.MediaURL,
 		Latitude:  m.Latitude,
 		Longitude: m.Longitude,
@@ -76,30 +78,30 @@ func (s *MemoryService) CreateMemory(ctx context.Context, req *pb.CreateMemoryRe
 		return nil, status.Errorf(codes.InvalidArgument, "media_file is required")
 	}
 
-	//// Отправка файла в медиа-сервис
-	//uploadReq := &media_pb.UploadMediaRequest{
+	// // Отправка файла в медиа-сервис
+	// uploadReq := &media_pb.UploadMediaRequest{
 	//	MediaType: req.MediaType,
 	//	File:      req.MediaFile,
 	//	UserId:    req.UserId, // Передайте ID пользователя для связи с медиафайлом
 	//	// FileName:  "", // Имя файла генерируется в media-service
-	//}
+	// }
 	//
-	//uploadResp, err := s.mediaClient.UploadMedia(ctx, uploadReq)
-	//if err != nil {
+	// uploadResp, err := s.mediaClient.UploadMedia(ctx, uploadReq)
+	// if err != nil {
 	//	log.Printf("MemoryService: Failed to upload media to media service: %v", err)
 	//	return nil, status.Errorf(codes.Internal, "failed to upload media")
-	//}
+	// }
 	//
-	//mediaURL := uploadResp.GetMediaUrl()
-	//if mediaURL == "" {
+	// mediaURL := uploadResp.GetMediaUrl()
+	// if mediaURL == "" {
 	//	log.Println("MemoryService: Received empty media URL from media service")
 	//	return nil, status.Errorf(codes.Internal, "media upload failed to return URL")
-	//}
+	// }
 
 	memory := &models.Memory{
 		GroupID:   uint(req.GroupId),
 		UserID:    uint(req.UserId),
-		MediaType: req.MediaType,
+		MediaType: req.MediaType.String(),
 		MediaURL:  "",
 	}
 

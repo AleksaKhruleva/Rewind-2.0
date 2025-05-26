@@ -25,6 +25,6 @@ type Memory struct {
 type MemoryDetailed struct {
 	Memory
 	Tags        string   `gorm:"column:tags"` // Строка тегов из базы данных
-	TagsArray   []string // Слайс тегов для использования в Go
+	TagsArray   []string `gorm:"-"`
 	IsFavourite bool     `gorm:"column:is_favourite"`
 }

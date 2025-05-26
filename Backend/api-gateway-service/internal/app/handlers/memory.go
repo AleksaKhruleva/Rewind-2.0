@@ -1,15 +1,16 @@
 package handlers
 
 import (
-	"Rewind-api-gateway-service/internal/app/requests"
-	"Rewind-api-gateway-service/internal/app/responses"
-	"Rewind-api-gateway-service/internal/app/services"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"Rewind-api-gateway-service/internal/app/requests"
+	"Rewind-api-gateway-service/internal/app/responses"
+	"Rewind-api-gateway-service/internal/app/services"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -32,7 +33,7 @@ func NewMemoryHandler(memoryService services.MemoryServiceInterface) *MemoryHand
 // @Accept multipart/form-data
 // @Produce json
 // @Param groupId formData int true "Group ID"
-// @Param mediaType formData string true "Media Type (e.g., image, video)"
+// @Param mediaType formData string true "Media Type (image/video/quote)"
 // @Param mediaFile formData file true "Media file to upload"
 // @Param latitude formData number false "Latitude (optional)"
 // @Param longitude formData number false "Longitude (optional)"
@@ -177,7 +178,7 @@ func (h *MemoryHandler) CreateMemory(w http.ResponseWriter, r *http.Request) {
 		Id:        memory.GetId(),
 		GroupID:   memory.GetGroupId(),
 		UserID:    memory.GetUserId(),
-		MediaType: memory.GetMediaType(),
+		MediaType: memory.MediaType.String(),
 		MediaURL:  memory.GetMediaUrl(),
 		Latitude:  memory.GetLatitude(),
 		Longitude: memory.GetLongitude(),
@@ -191,12 +192,13 @@ func (h *MemoryHandler) CreateMemory(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, responseBody)
 }
 
-// DeleteMemory handles DELETE /api/groups/{groupId}memories/{memoryId}
+// DeleteMemory handles DELETE /api/groups/{groupId}/memories/{memoryId}
 // @Summary Delete a memory by ID
 // @Tags memories
 // @Accept json
 // @Produce json
 // @Param memoryId path int true "Memory ID"
+// @Param groupId path int true "Group ID"
 // @Success 204 "Successfully deleted memory"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid memory ID"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
@@ -205,7 +207,7 @@ func (h *MemoryHandler) CreateMemory(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
-// @Router /api/groups/{groupId}memories/{memoryId} [delete]
+// @Router /api/groups/{groupId}/memories/{memoryId} [delete]
 func (h *MemoryHandler) DeleteMemory(w http.ResponseWriter, r *http.Request) {
 	groupIDStr := chi.URLParam(r, "groupId")
 	groupID, err := strconv.ParseUint(groupIDStr, 10, 64)
@@ -236,7 +238,7 @@ func (h *MemoryHandler) DeleteMemory(w http.ResponseWriter, r *http.Request) {
 
 // ListMemoriesByGroup handles GET /api/groups/{groupId}/memories
 // @Summary List memories by group
-// @Tags memories, groups
+// @Tags memories
 // @Accept json
 // @Produce json
 // @Param groupId path int true "Group ID"
@@ -272,7 +274,7 @@ func (h *MemoryHandler) ListMemoriesByGroup(w http.ResponseWriter, r *http.Reque
 				Id:        mem.GetMemory().GetId(),
 				GroupID:   mem.GetMemory().GetGroupId(),
 				UserID:    mem.GetMemory().GetUserId(),
-				MediaType: mem.GetMemory().GetMediaType(),
+				MediaType: mem.GetMemory().MediaType.String(),
 				MediaURL:  mem.GetMemory().GetMediaUrl(),
 				Latitude:  mem.GetMemory().GetLatitude(),
 				Longitude: mem.GetMemory().GetLongitude(),
@@ -292,11 +294,17 @@ func (h *MemoryHandler) ListMemoriesByGroup(w http.ResponseWriter, r *http.Reque
 
 // ListMemoriesByGroupWithFilters handles GET /api/groups/{groupId}/memories/filter
 // @Summary List memories by group with filters
-// @Tags memories, groups
+// @Tags memories
 // @Accept json
 // @Produce json
 // @Param groupId path int true "Group ID"
-// @Param filters query object false "Filters (media_type, is_favourite, start_time, end_time, has_geo, has_music, tags)"
+// @Param media_type query string false "Filter by media type (image, video, audio)"
+// @Param is_favourite query string false "Filter by favourite status (true, false)"
+// @Param start_time query string false "Filter by start time (ISO 8601 format)"
+// @Param end_time query string false "Filter by end time (ISO 8601 format)"
+// @Param has_geo query string false "Filter by geolocation data (true)"
+// @Param has_music query string false "Filter by music data (true)"
+// @Param tags query string false "Filter by tags (comma-separated)"
 // @Param numberOfMemories query int false "Number of memories to return (for random selection)" default(10)
 // @Success 200 {object} responses.ListMemoriesResponse "Successfully listed memories"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid input"
@@ -313,27 +321,52 @@ func (h *MemoryHandler) ListMemoriesByGroupWithFilters(w http.ResponseWriter, r 
 		return
 	}
 
-	filters := make(map[string]string)
-	for key, values := range r.URL.Query() {
-		if key != "numberOfMemories" { // Exclude numberOfMemories from filters map
-			filters[key] = values[0] // Take the first value if multiple are provided
-		}
-	}
+	// Get filter values from query parameters
+	mediaType := r.URL.Query().Get("media_type")
+	isFavourite := r.URL.Query().Get("is_favourite")
+	startTime := r.URL.Query().Get("start_time")
+	endTime := r.URL.Query().Get("end_time")
+	hasGeo := r.URL.Query().Get("has_geo")
+	hasMusic := r.URL.Query().Get("has_music")
+	tags := r.URL.Query().Get("tags")
 
 	numberOfMemoriesStr := r.URL.Query().Get("numberOfMemories")
-	var numberOfMemories uint64 = 10
+	numberOfMemories := uint64(10) // Default value
 	if numberOfMemoriesStr != "" {
-		numberOfMemories, err = strconv.ParseUint(numberOfMemoriesStr, 10, 64)
+		parsedNumberOfMemories, err := strconv.ParseUint(numberOfMemoriesStr, 10, 64)
 		if err != nil {
 			respondError(w, http.StatusBadRequest, "Invalid numberOfMemories")
 			return
 		}
+		numberOfMemories = parsedNumberOfMemories
 	}
 
 	req := requests.ListMemoriesByGroupWithFiltersRequest{
 		GroupID:          groupID,
-		Filters:          filters,
+		Filters:          make(map[string]string), // Initialize the map
 		NumberOfMemories: numberOfMemories,
+	}
+
+	if mediaType != "" {
+		req.Filters["media_type"] = mediaType
+	}
+	if isFavourite != "" {
+		req.Filters["is_favourite"] = isFavourite
+	}
+	if startTime != "" {
+		req.Filters["start_time"] = startTime
+	}
+	if endTime != "" {
+		req.Filters["end_time"] = endTime
+	}
+	if hasGeo != "" {
+		req.Filters["has_geo"] = hasGeo
+	}
+	if hasMusic != "" {
+		req.Filters["has_music"] = hasMusic
+	}
+	if tags != "" {
+		req.Filters["tags"] = tags
 	}
 
 	resp, err := h.memoryService.ListMemoriesByGroupWithFilters(r.Context(), &req)
@@ -349,7 +382,7 @@ func (h *MemoryHandler) ListMemoriesByGroupWithFilters(w http.ResponseWriter, r 
 				Id:        mem.GetMemory().GetId(),
 				GroupID:   mem.GetMemory().GetGroupId(),
 				UserID:    mem.GetMemory().GetUserId(),
-				MediaType: mem.GetMemory().GetMediaType(),
+				MediaType: mem.GetMemory().MediaType.String(),
 				MediaURL:  mem.GetMemory().GetMediaUrl(),
 				Latitude:  mem.GetMemory().GetLatitude(),
 				Longitude: mem.GetMemory().GetLongitude(),
@@ -367,11 +400,12 @@ func (h *MemoryHandler) ListMemoriesByGroupWithFilters(w http.ResponseWriter, r 
 	respondJSON(w, http.StatusOK, responses.ListMemoriesResponse{Memories: respMemories})
 }
 
-// CreateMemoryTag handles POST /api/memories/{memoryId}/tags
+// CreateMemoryTag handles POST /api/groups/{groupId}/memories/{memoryId}/tags
 // @Summary Create a new tag for a memory
-// @Tags memories, tags
+// @Tags memories
 // @Accept json
 // @Produce json
+// @Param groupId path int true "Group ID"
 // @Param memoryId path int true "Memory ID"
 // @Param body body requests.CreateMemoryTagRequest true "Tag details"
 // @Success 200 {object} responses.MemoryTagResponse "Successfully created tag"
@@ -381,12 +415,18 @@ func (h *MemoryHandler) ListMemoriesByGroupWithFilters(w http.ResponseWriter, r 
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
-// @Router /api/memories/{memoryId}/tags [post]
+// @Router /api/groups/{groupId}/memories/{memoryId}/tags [post]
 func (h *MemoryHandler) CreateMemoryTag(w http.ResponseWriter, r *http.Request) {
 	memoryIDStr := chi.URLParam(r, "memoryId")
 	memoryID, err := strconv.ParseUint(memoryIDStr, 10, 64)
 	if err != nil {
 		respondError(w, http.StatusBadRequest, "Invalid memory ID")
+		return
+	}
+	groupIDStr := chi.URLParam(r, "groupId")
+	groupID, err := strconv.ParseUint(groupIDStr, 10, 64)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid group ID")
 		return
 	}
 
@@ -396,12 +436,7 @@ func (h *MemoryHandler) CreateMemoryTag(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if req.MemoryID != memoryID {
-		respondError(w, http.StatusBadRequest, "Memory ID in path does not match body")
-		return
-	}
-
-	resp, err := h.memoryService.CreateMemoryTag(r.Context(), &req)
+	resp, err := h.memoryService.CreateMemoryTag(r.Context(), &req, groupID, memoryID)
 	if err != nil {
 		handleServiceError(w, err, "CreateMemoryTag")
 		return
@@ -414,11 +449,12 @@ func (h *MemoryHandler) CreateMemoryTag(w http.ResponseWriter, r *http.Request) 
 	respondJSON(w, http.StatusOK, responseBody)
 }
 
-// DeleteMemoryTag handles DELETE /api/memories/{memoryId}/tags/{tag}
+// DeleteMemoryTag handles DELETE /api/groups/{groupId}/memories/{memoryId}/tags/{tag}
 // @Summary Delete a tag from a memory
-// @Tags memories, tags
+// @Tags memories
 // @Accept json
 // @Produce json
+// @Param groupId path int true "Group ID"
 // @Param memoryId path int true "Memory ID"
 // @Param tag path string true "Tag to delete"
 // @Success 204 "Successfully deleted tag"
@@ -428,7 +464,7 @@ func (h *MemoryHandler) CreateMemoryTag(w http.ResponseWriter, r *http.Request) 
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
-// @Router /api/memories/{memoryId}/tags/{tag} [delete]
+// @Router /api/groups/{groupId}/memories/{memoryId}/tags/{tag} [delete]
 func (h *MemoryHandler) DeleteMemoryTag(w http.ResponseWriter, r *http.Request) {
 	memoryIDStr := chi.URLParam(r, "memoryId")
 	tag := chi.URLParam(r, "tag")
@@ -455,9 +491,10 @@ func (h *MemoryHandler) DeleteMemoryTag(w http.ResponseWriter, r *http.Request) 
 
 // ListMemoryTagsByMemoryID handles GET /api/memories/{memoryId}/tags
 // @Summary List tags for a memory
-// @Tags memories, tags
+// @Tags memories
 // @Accept json
 // @Produce json
+// @Param groupId path int true "Group ID"
 // @Param memoryId path int true "Memory ID"
 // @Success 200 {object} responses.ListMemoryTagsResponse "Successfully listed tags"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid memory ID"
@@ -497,7 +534,7 @@ func (h *MemoryHandler) ListMemoryTagsByMemoryID(w http.ResponseWriter, r *http.
 
 // CreateFavourite handles POST /api/memories/{memoryId}/favourite
 // @Summary Mark a memory as favourite
-// @Tags memories, favourites
+// @Tags memories
 // @Accept json
 // @Produce json
 // @Param memoryId path int true "Memory ID"
@@ -538,7 +575,7 @@ func (h *MemoryHandler) CreateFavourite(w http.ResponseWriter, r *http.Request) 
 
 // DeleteFavourite handles DELETE /api/memories/{memoryId}/favourite
 // @Summary Unmark a memory as favourite
-// @Tags memories, favourites
+// @Tags memories
 // @Accept json
 // @Produce json
 // @Param memoryId path int true "Memory ID"

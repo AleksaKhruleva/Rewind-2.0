@@ -515,8 +515,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "memories",
-                    "groups"
+                    "memories"
                 ],
                 "summary": "List memories by group",
                 "parameters": [
@@ -576,8 +575,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "memories",
-                    "groups"
+                    "memories"
                 ],
                 "summary": "List memories by group with filters",
                 "parameters": [
@@ -589,14 +587,50 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "object",
-                        "description": "Filters (e.g., media_type, is_favourite, start_time, end_time, has_geo, has_music, tags)",
-                        "name": "filters",
+                        "type": "string",
+                        "description": "Filter by media type (image, video, audio)",
+                        "name": "media_type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by favourite status (true, false)",
+                        "name": "is_favourite",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by start time (ISO 8601 format)",
+                        "name": "start_time",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by end time (ISO 8601 format)",
+                        "name": "end_time",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by geolocation data (true)",
+                        "name": "has_geo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by music data (true)",
+                        "name": "has_music",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by tags (comma-separated)",
+                        "name": "tags",
                         "in": "query"
                     },
                     {
                         "type": "integer",
-                        "default": 0,
+                        "default": 10,
                         "description": "Number of memories to return (for random selection)",
                         "name": "numberOfMemories",
                         "in": "query"
@@ -636,7 +670,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/groups/{groupId}memories/{memoryId}": {
+        "/api/groups/{groupId}/memories/{memoryId}": {
             "delete": {
                 "security": [
                     {
@@ -853,7 +887,7 @@ const docTemplate = `{
                     }
                 ],
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -871,13 +905,16 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Updated group details",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.UpdateGroupRequest"
-                        }
+                        "type": "string",
+                        "description": "Updated group name (optional)",
+                        "name": "name",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Updated group image file (optional)",
+                        "name": "image",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -888,7 +925,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request - Invalid request body, data, or group ID format",
+                        "description": "Bad Request - Invalid request, data, or group ID format",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1236,7 +1273,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Media Type (e.g., image, video)",
+                        "description": "Media Type (image/video/quote)",
                         "name": "mediaType",
                         "in": "formData",
                         "required": true
@@ -1333,8 +1370,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "memories",
-                    "favourites"
+                    "memories"
                 ],
                 "summary": "Mark a memory as favourite",
                 "parameters": [
@@ -1404,8 +1440,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "memories",
-                    "favourites"
+                    "memories"
                 ],
                 "summary": "Unmark a memory as favourite",
                 "parameters": [
@@ -1468,8 +1503,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "memories",
-                    "tags"
+                    "memories"
                 ],
                 "summary": "List tags for a memory",
                 "parameters": [
@@ -1533,8 +1567,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "memories",
-                    "tags"
+                    "memories"
                 ],
                 "summary": "Create a new tag for a memory",
                 "parameters": [
@@ -1609,8 +1642,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "memories",
-                    "tags"
+                    "memories"
                 ],
                 "summary": "Delete a tag from a memory",
                 "parameters": [
@@ -1797,7 +1829,7 @@ const docTemplate = `{
             }
         },
         "/api/users/delete-user": {
-            "post": {
+            "delete": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -2550,19 +2582,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "new_email": {
-                    "type": "string"
-                }
-            }
-        },
-        "requests.UpdateGroupRequest": {
-            "type": "object",
-            "properties": {
-                "image": {
-                    "description": "Optional image URL",
-                    "type": "string"
-                },
-                "name": {
-                    "description": "Optional group name",
                     "type": "string"
                 }
             }

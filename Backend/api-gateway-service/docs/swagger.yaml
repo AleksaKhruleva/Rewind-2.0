@@ -88,15 +88,6 @@ definitions:
       new_email:
         type: string
     type: object
-  requests.UpdateGroupRequest:
-    properties:
-      image:
-        description: Optional image URL
-        type: string
-      name:
-        description: Optional group name
-        type: string
-    type: object
   requests.UpdateUsernameRequest:
     properties:
       new_username:
@@ -839,57 +830,7 @@ paths:
       summary: List memories by group
       tags:
       - memories
-      - groups
-  /api/groups/{groupId}/memories/filter:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: Group ID
-        in: path
-        name: groupId
-        required: true
-        type: integer
-      - description: Filters (e.g., media_type, is_favourite, start_time, end_time,
-          has_geo, has_music, tags)
-        in: query
-        name: filters
-        type: object
-      - default: 0
-        description: Number of memories to return (for random selection)
-        in: query
-        name: numberOfMemories
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successfully listed memories
-          schema:
-            $ref: '#/definitions/responses.ListMemoriesResponse'
-        "400":
-          description: Bad Request - Invalid input
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "401":
-          description: Unauthorized - User not authenticated
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-        "503":
-          description: Service Unavailable
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: List memories by group with filters
-      tags:
-      - memories
-      - groups
-  /api/groups/{groupId}memories/{memoryId}:
+  /api/groups/{groupId}/memories/{memoryId}:
     delete:
       consumes:
       - application/json
@@ -931,6 +872,77 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Delete a memory by ID
+      tags:
+      - memories
+  /api/groups/{groupId}/memories/filter:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Group ID
+        in: path
+        name: groupId
+        required: true
+        type: integer
+      - description: Filter by media type (image, video, audio)
+        in: query
+        name: media_type
+        type: string
+      - description: Filter by favourite status (true, false)
+        in: query
+        name: is_favourite
+        type: string
+      - description: Filter by start time (ISO 8601 format)
+        in: query
+        name: start_time
+        type: string
+      - description: Filter by end time (ISO 8601 format)
+        in: query
+        name: end_time
+        type: string
+      - description: Filter by geolocation data (true)
+        in: query
+        name: has_geo
+        type: string
+      - description: Filter by music data (true)
+        in: query
+        name: has_music
+        type: string
+      - description: Filter by tags (comma-separated)
+        in: query
+        name: tags
+        type: string
+      - default: 10
+        description: Number of memories to return (for random selection)
+        in: query
+        name: numberOfMemories
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully listed memories
+          schema:
+            $ref: '#/definitions/responses.ListMemoriesResponse'
+        "400":
+          description: Bad Request - Invalid input
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: List memories by group with filters
       tags:
       - memories
   /api/groups/{id}:
@@ -1020,19 +1032,21 @@ paths:
       - groups
     put:
       consumes:
-      - application/json
+      - multipart/form-data
       parameters:
       - description: Group ID
         in: path
         name: id
         required: true
         type: integer
-      - description: Updated group details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/requests.UpdateGroupRequest'
+      - description: Updated group name (optional)
+        in: formData
+        name: name
+        type: string
+      - description: Updated group image file (optional)
+        in: formData
+        name: image
+        type: file
       produces:
       - application/json
       responses:
@@ -1041,7 +1055,7 @@ paths:
           schema:
             $ref: '#/definitions/responses.GroupResponse'
         "400":
-          description: Bad Request - Invalid request body, data, or group ID format
+          description: Bad Request - Invalid request, data, or group ID format
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "401":
@@ -1219,7 +1233,7 @@ paths:
         name: groupId
         required: true
         type: integer
-      - description: Media Type (e.g., image, video)
+      - description: Media Type (image/video/quote)
         in: formData
         name: mediaType
         required: true
@@ -1321,7 +1335,6 @@ paths:
       summary: Unmark a memory as favourite
       tags:
       - memories
-      - favourites
     post:
       consumes:
       - application/json
@@ -1367,7 +1380,6 @@ paths:
       summary: Mark a memory as favourite
       tags:
       - memories
-      - favourites
   /api/memories/{memoryId}/tags:
     get:
       consumes:
@@ -1410,7 +1422,6 @@ paths:
       summary: List tags for a memory
       tags:
       - memories
-      - tags
     post:
       consumes:
       - application/json
@@ -1458,7 +1469,6 @@ paths:
       summary: Create a new tag for a memory
       tags:
       - memories
-      - tags
   /api/memories/{memoryId}/tags/{tag}:
     delete:
       consumes:
@@ -1504,7 +1514,6 @@ paths:
       summary: Delete a tag from a memory
       tags:
       - memories
-      - tags
   /api/users/{id}:
     get:
       description: Retrieves details for a specific user by their ID.
@@ -1626,7 +1635,7 @@ paths:
       tags:
       - users
   /api/users/delete-user:
-    post:
+    delete:
       consumes:
       - application/json
       description: Deletes a user account by email.

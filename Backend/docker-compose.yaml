@@ -65,7 +65,7 @@ services:
       API_GATEWAY_PORT: "8080"
       AUTH_SERVICE_GRPC_ADDRESS: rewind-auth-service:50051
       GROUP_SERVICE_GRPC_ADDRESS: rewind-group-service:50052
-      MEMORY_SERVICE_GRPC_ADDRESS: rewind-memory-service:50053
+      MEMORY_SERVICE_GRPC_ADDRESS: rewind-memory-service:50054
       # NOTIFICATION_SERVICE_GRPC_ADDRESS: rewind-notification-service:50054
     ports:
       - "8080:8080" # Или другой порт по вашему выбору для доступа к API Gateway
@@ -109,7 +109,7 @@ services:
     build: ./memory-service
     container_name: rewind-memory-service
     ports:
-      - "50052:50052"
+      - "50054:50054"
     depends_on:
       memory-db:
         condition: service_healthy

@@ -93,7 +93,7 @@ message UpdateGroupRequest {
   uint64 group_id = 2;
   // Используем обертку для необязательных полей, чтобы различать отсутствие значения и пустое значение
   optional string name = 3;
-  optional string image = 4;
+  optional bytes image = 4;
 }
 
 // Ответ на обновление группы

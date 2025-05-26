@@ -114,7 +114,7 @@ func (r *MemoryRepository) ListMemoriesByGroupDetailed(ctx context.Context, tx *
 	query := `
         SELECT
             m.*,
-            COALESCE(string_agg(DISTINCT mt.name, ','), '') as tags,
+            COALESCE(string_agg(DISTINCT mt.tag, ','), '') as tags,
             CASE
                 WHEN EXISTS (SELECT 1 FROM favourites f WHERE f.memory_id = m.id AND f.user_id = ?) THEN TRUE
                 ELSE FALSE
@@ -153,7 +153,7 @@ func (r *MemoryRepository) ListMemoriesByGroupWithFiltersDetailed(ctx context.Co
 	query := `
         SELECT
             m.*,
-            COALESCE(string_agg(DISTINCT mt.name, ','), '') as tags,
+            COALESCE(string_agg(DISTINCT mt.tag, ','), '') as tags,
             CASE
                 WHEN EXISTS (SELECT 1 FROM favourites f WHERE f.memory_id = m.id AND f.user_id = ?) THEN TRUE
                 ELSE FALSE
@@ -166,54 +166,79 @@ func (r *MemoryRepository) ListMemoriesByGroupWithFiltersDetailed(ctx context.Co
 
 	var args []interface{}
 	args = append(args, userID, userID, groupID)
-	whereClauses := ""
+	whereClauses := []string{}
+	havingClauses := []string{}
+
 	for key, value := range filters {
 		switch key {
 		case "media_type":
 			if value != "" {
-				whereClauses += " AND m.media_type = ?"
+				whereClauses = append(whereClauses, "m.media_type = ?")
 				args = append(args, value)
 			}
 		case "is_favourite":
 			if value == "true" {
-				whereClauses += " AND is_favourite = TRUE"
+				havingClauses = append(havingClauses,
+					"EXISTS (SELECT 1 FROM favourites f2 WHERE f2.memory_id = m.id AND f2.user_id = ?)")
+				args = append(args, userID)
 			} else if value == "false" {
-				whereClauses += " AND is_favourite = FALSE"
+				havingClauses = append(havingClauses,
+					"NOT EXISTS (SELECT 1 FROM favourites f2 WHERE f2.memory_id = m.id AND f2.user_id = ?)")
+				args = append(args, userID)
 			}
 		case "start_time":
 			if parsedTime, err := time.Parse(time.RFC3339, value); err == nil && value != "" {
-				whereClauses += " AND m.created_at >= ?"
+				whereClauses = append(whereClauses, "m.created_at >= ?")
 				args = append(args, parsedTime)
 			} else if value != "" {
 				log.Printf("MemoryRepository: Failed to parse start_time: %v", err)
 			}
 		case "end_time":
 			if parsedTime, err := time.Parse(time.RFC3339, value); err == nil && value != "" {
-				whereClauses += " AND m.created_at <= ?"
+				whereClauses = append(whereClauses, "m.created_at <= ?")
 				args = append(args, parsedTime)
 			} else if value != "" {
 				log.Printf("MemoryRepository: Failed to parse end_time: %v", err)
 			}
 		case "has_geo":
 			if value == "true" {
-				whereClauses += " AND m.latitude IS NOT NULL AND m.longitude IS NOT NULL AND m.latitude != '0' AND m.longitude != '0'"
+				whereClauses = append(whereClauses, "m.latitude IS NOT NULL AND m.longitude IS NOT NULL AND m.latitude != '0' AND m.longitude != '0'")
 			}
 		case "has_music":
 			if value == "true" {
-				whereClauses += " AND m.music_id IS NOT NULL AND m.music_id != '' AND m.offset IS NOT NULL AND m.offset != '0' AND m.duration IS NOT NULL AND m.duration != '0'"
+				whereClauses = append(whereClauses, "m.music_id IS NOT NULL AND m.music_id != '' AND m.offset IS NOT NULL AND m.duration IS NOT NULL AND m.duration != '0'")
 			}
 		case "tags":
 			if value != "" {
 				tags := strings.Split(value, ",")
-				whereClauses += " AND mt.name IN (?)"
-				args = append(args, tags)
+				if len(tags) > 0 {
+					placeholders := strings.Repeat("?,", len(tags)-1) + "?"
+					whereClauses = append(whereClauses,
+						`EXISTS (
+							SELECT 1 FROM memory_tags filter_mt
+							WHERE filter_mt.memory_id = m.id AND filter_mt.tag IN (`+placeholders+`)
+						)`)
+					for _, tag := range tags {
+						args = append(args, tag)
+					}
+				}
 			}
 		default:
 			log.Printf("MemoryRepository: Unknown filter key: %s", key)
 		}
 	}
 
-	query += whereClauses + " GROUP BY m.id ORDER BY RANDOM() LIMIT ?"
+	if len(whereClauses) > 0 {
+		query += " AND " + strings.Join(whereClauses, " AND ")
+	}
+
+	query += " GROUP BY m.id"
+
+	if len(havingClauses) > 0 {
+		query += " HAVING " + strings.Join(havingClauses, " AND ")
+	}
+
+	query += " ORDER BY RANDOM() LIMIT ?"
 	args = append(args, numberOfMemories)
 
 	result := db.Raw(query, args...).Scan(&memoriesDetailed)
@@ -296,7 +321,7 @@ func (r *MemoryRepository) CreateFavourite(ctx context.Context, tx *gorm.DB, fav
 
 func (r *MemoryRepository) DeleteFavourite(ctx context.Context, tx *gorm.DB, favouriteMemoryID uint, favouriteUserID uint) error {
 	db := r.getDB(tx).WithContext(ctx)
-	result := db.Where("memory_id = ? AND user_id = ?", favouriteMemoryID, favouriteUserID).Delete(&models.Favourite{})
+	result := db.Unscoped().Where("memory_id = ? AND user_id = ?", favouriteMemoryID, favouriteUserID).Delete(&models.Favourite{})
 	if result.Error != nil {
 		log.Printf("MemoryRepository: Failed to delete favourite: %v", result.Error)
 		return fmt.Errorf("failed to delete favourite: %w", result.Error)
