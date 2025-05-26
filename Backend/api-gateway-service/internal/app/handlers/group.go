@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"strconv" // Needed for parsing uint64 from URL params
@@ -49,7 +50,7 @@ func (h *GroupHandler) CreateGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// User ID is extracted by the service layer from the context
-	resp, err := h.groupService.CreateGroup(r.Context(), reqBody.Name, reqBody.Image)
+	resp, err := h.groupService.CreateGroup(r.Context(), reqBody.Name)
 	if err != nil {
 		handleServiceError(w, err, "CreateGroup")
 		return
@@ -129,12 +130,13 @@ func (h *GroupHandler) GetGroup(w http.ResponseWriter, r *http.Request) {
 // UpdateGroup обработчик для PUT /api/groups/{id}
 // @Summary Update group details by ID
 // @Tags groups
-// @Accept json
+// @Accept multipart/form-data
 // @Produce json
 // @Param id path int true "Group ID"
-// @Param body body requests.UpdateGroupRequest true "Updated group details"
+// @Param name formData string false "Updated group name (optional)"
+// @Param image formData file false "Updated group image file (optional)"
 // @Success 200 {object} responses.GroupResponse "Successfully updated group"
-// @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid request body, data, or group ID format"
+// @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid request, data, or group ID format"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - User is not an administrator of the group"
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group not found"
@@ -151,23 +153,35 @@ func (h *GroupHandler) UpdateGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var reqBody requests.UpdateGroupRequest
-	if err := decodeJSONBody(r, &reqBody); err != nil {
-		respondError(w, http.StatusBadRequest, fmt.Sprintf("Invalid request body: %v", err))
+	// Parse the multipart form with a maximum size (e.g., 25MB)
+	if err := r.ParseMultipartForm(25 << 20); err != nil {
+		respondError(w, http.StatusBadRequest, fmt.Sprintf("Invalid request: %v", err))
 		return
 	}
 
-	// Pass pointers for optional fields
+	// Extract the name from the form
+	name := r.FormValue("name")
 	var namePtr *string
-	if reqBody.Name != nil {
-		namePtr = reqBody.Name
-	}
-	var imagePtr *string
-	if reqBody.Image != nil {
-		imagePtr = reqBody.Image
+	if name != "" {
+		namePtr = &name
 	}
 
-	resp, err := h.groupService.UpdateGroup(r.Context(), groupID, namePtr, imagePtr)
+	// Extract the image file from the form
+	file, _, err := r.FormFile("image")
+	var imageData []byte
+	if err == nil && file != nil {
+		defer file.Close()
+		imageData, err = io.ReadAll(file)
+		if err != nil {
+			respondError(w, http.StatusInternalServerError, fmt.Sprintf("Failed to read image file: %v", err))
+			return
+		}
+	} else if err != http.ErrMissingFile {
+		respondError(w, http.StatusBadRequest, fmt.Sprintf("Invalid image file: %v", err))
+		return
+	}
+
+	resp, err := h.groupService.UpdateGroup(r.Context(), groupID, namePtr, imageData)
 	if err != nil {
 		handleServiceError(w, err, "UpdateGroup")
 		return
@@ -198,7 +212,7 @@ func (h *GroupHandler) UpdateGroup(w http.ResponseWriter, r *http.Request) {
 // @Tags groups
 // @Produce json
 // @Param id path int true "Group ID"
-// @Success 204 "Successfully deleted group (No Content)"
+// @Success 200 {object} responses.DeleteGroupResponse "Successfully deleted group"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid group ID format"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - User is not an administrator of the group"
@@ -230,8 +244,11 @@ func (h *GroupHandler) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Respond with 204 No Content on successful deletion
-	w.WriteHeader(http.StatusNoContent)
+	responseBody := responses.DeleteGroupResponse{
+		Success: resp.GetSuccess(),
+	}
+
+	respondJSON(w, http.StatusOK, responseBody)
 }
 
 // ListGroupMembers обработчик для GET /api/groups/{id}/members
@@ -288,7 +305,7 @@ func (h *GroupHandler) ListGroupMembers(w http.ResponseWriter, r *http.Request) 
 // @Produce json
 // @Param group_id path int true "Group ID"
 // @Param user_id path int true "User ID to remove"
-// @Success 204 "Successfully removed member (No Content)"
+// @Success 200 "Successfully removed member (No Content)"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid group ID or user ID format"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - User does not have permission (not admin or not removing self)"
@@ -327,8 +344,11 @@ func (h *GroupHandler) RemoveGroupMember(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	// Respond with 204 No Content on successful removal
-	w.WriteHeader(http.StatusNoContent)
+	responseBody := responses.DeleteUserResponse{
+		Success: resp.GetSuccess(),
+	}
+
+	respondJSON(w, http.StatusOK, responseBody)
 }
 
 // CreateGroupInvitation обработчик для POST /api/groups/{id}/invitations

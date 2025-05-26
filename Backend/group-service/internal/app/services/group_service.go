@@ -83,7 +83,6 @@ func (s *GroupService) CreateGroup(ctx context.Context, req *pb.CreateGroupReque
 
 	groupModel := &models.Group{
 		Name:        req.GetName(),
-		Image:       req.GetImage(),
 		AdminUserID: uint(requestingUserID),
 	}
 
@@ -261,7 +260,10 @@ func (s *GroupService) UpdateGroup(ctx context.Context, req *pb.UpdateGroupReque
 		groupModel.Name = req.GetName()
 	}
 	if req.Image != nil {
-		groupModel.Image = req.GetImage()
+
+		// TODO send to media-service req.GetImage()
+
+		groupModel.Image = "default"
 	}
 	// GORM при Save с gorm.Model автоматически обновит UpdatedAt
 
@@ -726,6 +728,30 @@ func (s *GroupService) RemoveGroupMember(ctx context.Context, req *pb.RemoveGrou
 		// 5. Формирование успешного ответа
 		return &pb.RemoveGroupMemberResponse{Success: true}, nil
 	}
+}
+
+// CheckUserInGroup реализует RPC метод для проверки, состоит ли пользователь в группе и является ли он админом.
+func (s *GroupService) CheckUserInGroup(ctx context.Context, req *pb.CheckUserInGroupRequest) (*pb.CheckUserInGroupResponse, error) {
+	// 1. Валидация входных данных
+	userID := req.GetUserId()
+	groupID := req.GetGroupId()
+	if userID <= 0 || groupID <= 0 {
+		log.Printf("CheckUserInGroup: Invalid argument: user_id (%d) or group_id (%d) is missing or invalid", userID, groupID)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid user or group ID")
+	}
+
+	// 2. Проверка членства пользователя в группе и роли (админ) через репозиторий
+	isInGroup, isAdmin, err := s.groupRepo.GroupMember().CheckUserInGroup(ctx, nil, uint(userID), uint(groupID))
+	if err != nil {
+		log.Printf("CheckUserInGroup: Failed to check user %d in group %d in DB: %v", userID, groupID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to check user group membership")
+	}
+
+	// 3. Формирование успешного ответа
+	return &pb.CheckUserInGroupResponse{
+		IsInGroup: isInGroup,
+		IsAdmin:   isAdmin,
+	}, nil
 }
 
 // CreateGroupInvitation реализует RPC метод создания приглашения в группу

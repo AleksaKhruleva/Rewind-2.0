@@ -12,9 +12,6 @@ definitions:
     type: object
   requests.CreateGroupRequest:
     properties:
-      image:
-        description: Image URL is optional
-        type: string
       name:
         description: Group name is required
         type: string
@@ -79,15 +76,6 @@ definitions:
       new_email:
         type: string
     type: object
-  requests.UpdateGroupRequest:
-    properties:
-      image:
-        description: Optional image URL
-        type: string
-      name:
-        description: Optional group name
-        type: string
-    type: object
   requests.UpdateUsernameRequest:
     properties:
       new_username:
@@ -132,15 +120,53 @@ definitions:
         description: The generated invitation code
         type: string
     type: object
+  responses.DeleteFavouriteResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+  responses.DeleteGroupResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+  responses.DeleteMemoryResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+  responses.DeleteMemoryTagResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
   responses.DeleteUserResponse:
     properties:
       success:
         type: boolean
     type: object
+  responses.DetailedMemoryResponse:
+    properties:
+      isFavourite:
+        type: boolean
+      memory:
+        $ref: '#/definitions/responses.MemoryResponse'
+      tags:
+        items:
+          type: string
+        type: array
+    type: object
   responses.ErrorResponse:
     properties:
       error:
         type: string
+    type: object
+  responses.FavouriteResponse:
+    properties:
+      memoryId:
+        type: integer
+      userId:
+        type: integer
     type: object
   responses.ForgotPasswordResponse:
     properties:
@@ -242,6 +268,20 @@ definitions:
           $ref: '#/definitions/responses.MemberDetails'
         type: array
     type: object
+  responses.ListMemoriesResponse:
+    properties:
+      memories:
+        items:
+          $ref: '#/definitions/responses.DetailedMemoryResponse'
+        type: array
+    type: object
+  responses.ListMemoryTagsResponse:
+    properties:
+      tags:
+        items:
+          $ref: '#/definitions/responses.MemoryTagResponse'
+        type: array
+    type: object
   responses.ListUserGroupsResponse:
     properties:
       groups:
@@ -284,6 +324,42 @@ definitions:
         type: string
       username:
         description: Username from Auth-Service
+        type: string
+    type: object
+  responses.MemoryResponse:
+    properties:
+      createdAt:
+        type: string
+      duration:
+        type: number
+      groupId:
+        type: integer
+      id:
+        type: integer
+      latitude:
+        type: number
+      longitude:
+        type: number
+      mediaType:
+        type: string
+      mediaUrl:
+        type: string
+      musicId:
+        type: string
+      offset:
+        type: number
+      updatedAt:
+        type: string
+      userId:
+        type: integer
+      userImage:
+        type: string
+      username:
+        type: string
+    type: object
+  responses.MemoryTagResponse:
+    properties:
+      tag:
         type: string
     type: object
   responses.RefreshTokenResponse:
@@ -694,7 +770,7 @@ paths:
       produces:
       - application/json
       responses:
-        "204":
+        "200":
           description: Successfully removed member (No Content)
         "400":
           description: Bad Request - Invalid group ID or user ID format
@@ -726,6 +802,512 @@ paths:
       summary: Remove a member from a group
       tags:
       - groups
+  /api/groups/{groupId}/memories:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Group ID
+        in: path
+        name: groupId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully listed memories
+          schema:
+            $ref: '#/definitions/responses.ListMemoriesResponse'
+        "400":
+          description: Bad Request - Invalid group ID
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - Permission denied by service
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: List memories by group
+      tags:
+      - memories
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Group ID
+        in: path
+        name: groupId
+        required: true
+        type: integer
+      - description: Media Type (image/video/quote)
+        in: formData
+        name: mediaType
+        required: true
+        type: string
+      - description: Media file to upload
+        in: formData
+        name: mediaFile
+        required: true
+        type: file
+      - description: Latitude (optional)
+        in: formData
+        name: latitude
+        type: number
+      - description: Longitude (optional)
+        in: formData
+        name: longitude
+        type: number
+      - description: Music ID (optional)
+        in: formData
+        name: musicId
+        type: string
+      - description: Offset (optional)
+        in: formData
+        name: offset
+        type: number
+      - description: Duration (optional)
+        in: formData
+        name: duration
+        type: number
+      - description: Comma-separated tags (optional)
+        in: formData
+        name: tags
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully created memory
+          schema:
+            $ref: '#/definitions/responses.MemoryResponse'
+        "400":
+          description: Bad Request - Invalid request data
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new memory
+      tags:
+      - memories
+  /api/groups/{groupId}/memories/{memoryId}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Memory ID
+        in: path
+        name: memoryId
+        required: true
+        type: integer
+      - description: Group ID
+        in: path
+        name: groupId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted memory
+          schema:
+            $ref: '#/definitions/responses.DeleteMemoryResponse'
+        "400":
+          description: Bad Request - Invalid memory ID
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - Permission denied by service
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - Memory not found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a memory by ID
+      tags:
+      - memories
+  /api/groups/{groupId}/memories/{memoryId}/favourite:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Group ID
+        in: path
+        name: groupId
+        required: true
+        type: integer
+      - description: Memory ID
+        in: path
+        name: memoryId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully unmarked as favourite
+          schema:
+            $ref: '#/definitions/responses.DeleteFavouriteResponse'
+        "400":
+          description: Bad Request - Invalid memory ID
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - Permission denied by service
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - Memory not found or not a favourite
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Unmark a memory as favourite
+      tags:
+      - memories
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Group ID
+        in: path
+        name: groupId
+        required: true
+        type: integer
+      - description: Memory ID
+        in: path
+        name: memoryId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully marked as favourite
+          schema:
+            $ref: '#/definitions/responses.FavouriteResponse'
+        "400":
+          description: Bad Request - Invalid memory ID
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - Permission denied by service
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - Memory not found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "409":
+          description: Conflict - Memory is already a favourite
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Mark a memory as favourite
+      tags:
+      - memories
+  /api/groups/{groupId}/memories/{memoryId}/tags:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Group ID
+        in: path
+        name: groupId
+        required: true
+        type: integer
+      - description: Memory ID
+        in: path
+        name: memoryId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully listed tags
+          schema:
+            $ref: '#/definitions/responses.ListMemoryTagsResponse'
+        "400":
+          description: Bad Request - Invalid memory ID
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - Permission denied by service
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - Memory not found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: List tags for a memory
+      tags:
+      - memories
+  /api/groups/{groupId}/memories/{memoryId}/tags/{tag}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Group ID
+        in: path
+        name: groupId
+        required: true
+        type: integer
+      - description: Memory ID
+        in: path
+        name: memoryId
+        required: true
+        type: integer
+      - description: Tag to delete
+        in: path
+        name: tag
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted tag
+          schema:
+            $ref: '#/definitions/responses.DeleteMemoryTagResponse'
+        "400":
+          description: Bad Request - Invalid input
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - Permission denied by service
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - Memory or tag not found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a tag from a memory
+      tags:
+      - memories
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Group ID
+        in: path
+        name: groupId
+        required: true
+        type: integer
+      - description: Memory ID
+        in: path
+        name: memoryId
+        required: true
+        type: integer
+      - description: Tag to add
+        in: path
+        name: tag
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully created tag
+          schema:
+            $ref: '#/definitions/responses.MemoryTagResponse'
+        "400":
+          description: Bad Request - Invalid input
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - Permission denied by service
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - Memory not found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new tag for a memory
+      tags:
+      - memories
+  /api/groups/{groupId}/memories/random:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Group ID
+        in: path
+        name: groupId
+        required: true
+        type: integer
+      - description: Filter by media type (image, video, quote)
+        in: query
+        name: media_type
+        type: string
+      - description: Filter by favourite status (true, false)
+        in: query
+        name: is_favourite
+        type: string
+      - description: Filter by start time (ISO 8601 format)
+        in: query
+        name: start_time
+        type: string
+      - description: Filter by end time (ISO 8601 format)
+        in: query
+        name: end_time
+        type: string
+      - description: Filter by geolocation data (true)
+        in: query
+        name: has_geo
+        type: string
+      - description: Filter by music data (true)
+        in: query
+        name: has_music
+        type: string
+      - description: Filter by tags (comma-separated)
+        in: query
+        name: tags
+        type: string
+      - default: 10
+        description: Number of memories to return (for random selection)
+        in: query
+        name: numberOfMemories
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully listed memories
+          schema:
+            $ref: '#/definitions/responses.ListMemoriesResponse'
+        "400":
+          description: Bad Request - Invalid input
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - Permission denied by service
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: List memories by group with filters
+      tags:
+      - memories
   /api/groups/{id}:
     delete:
       parameters:
@@ -737,8 +1319,10 @@ paths:
       produces:
       - application/json
       responses:
-        "204":
-          description: Successfully deleted group (No Content)
+        "200":
+          description: Successfully deleted group
+          schema:
+            $ref: '#/definitions/responses.DeleteGroupResponse'
         "400":
           description: Bad Request - Invalid group ID format
           schema:
@@ -813,19 +1397,21 @@ paths:
       - groups
     put:
       consumes:
-      - application/json
+      - multipart/form-data
       parameters:
       - description: Group ID
         in: path
         name: id
         required: true
         type: integer
-      - description: Updated group details
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/requests.UpdateGroupRequest'
+      - description: Updated group name (optional)
+        in: formData
+        name: name
+        type: string
+      - description: Updated group image file (optional)
+        in: formData
+        name: image
+        type: file
       produces:
       - application/json
       responses:
@@ -834,7 +1420,7 @@ paths:
           schema:
             $ref: '#/definitions/responses.GroupResponse'
         "400":
-          description: Bad Request - Invalid request body, data, or group ID format
+          description: Bad Request - Invalid request, data, or group ID format
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "401":
@@ -1123,7 +1709,7 @@ paths:
       tags:
       - users
   /api/users/delete-user:
-    post:
+    delete:
       consumes:
       - application/json
       description: Deletes a user account by email.

@@ -76,17 +76,29 @@ func NewServer(dependencies *di.Dependencies) *Server {
 		// Add middleware specific to this group, e.g., requiring authentication
 		// r.Use(auth.RequireAuthentication) // Assuming you have a middleware to check for authenticated user ID in context
 
-		// Use chi's specific HTTP method handlers (Post, Get, Put, Delete)
 		r.Post("/api/groups", dependencies.GroupHandler.CreateGroup)
 		r.Get("/api/groups/{id}", dependencies.GroupHandler.GetGroup)
 		r.Put("/api/groups/{id}", dependencies.GroupHandler.UpdateGroup)
-		r.Delete("/api/groups/{id}", dependencies.GroupHandler.DeleteGroup) // Assuming DELETE method
+		r.Delete("/api/groups/{id}", dependencies.GroupHandler.DeleteGroup)
 		r.Get("/api/groups/{id}/members", dependencies.GroupHandler.ListGroupMembers)
-		r.Delete("/api/groups/{group_id}/members/{user_id}", dependencies.GroupHandler.RemoveGroupMember) // Assuming DELETE method
-		r.Post("/api/groups/{id}/invitations", dependencies.GroupHandler.CreateGroupInvitation)           // Assuming POST method
-		r.Post("/api/invitations/{code}/accept", dependencies.GroupHandler.AcceptGroupInvitation)         // Assuming POST method
+		r.Delete("/api/groups/{group_id}/members/{user_id}", dependencies.GroupHandler.RemoveGroupMember)
+		r.Post("/api/groups/{id}/invitations", dependencies.GroupHandler.CreateGroupInvitation)
+		r.Post("/api/invitations/{code}/accept", dependencies.GroupHandler.AcceptGroupInvitation)
 		// Note: ListUserGroups path might be better under /api/users/{user_id}/groups
 		r.Get("/api/users/groups", dependencies.GroupHandler.ListUserGroups) // Assuming GET method
+	})
+
+	// Memory routes (typically require authentication middleware)
+	mux.Group(func(r chi.Router) {
+		r.Post("/api/groups/{groupId}/memories", dependencies.MemoryHandler.CreateMemory)
+		r.Delete("/api/groups/{groupId}/memories/{memoryId}", dependencies.MemoryHandler.DeleteMemory)
+		r.Get("/api/groups/{groupId}/memories", dependencies.MemoryHandler.ListMemoriesByGroup)
+		r.Get("/api/groups/{groupId}/memories/random", dependencies.MemoryHandler.ListMemoriesByGroupWithFilters)
+		r.Post("/api/groups/{groupId}/memories/{memoryId}/tags/{tag}", dependencies.MemoryHandler.CreateMemoryTag)
+		r.Delete("/api/groups/{groupId}/memories/{memoryId}/tags/{tag}", dependencies.MemoryHandler.DeleteMemoryTag)
+		r.Get("/api/groups/{groupId}/memories/{memoryId}/tags", dependencies.MemoryHandler.ListMemoryTagsByMemoryID)
+		r.Post("/api/groups/{groupId}/memories/{memoryId}/favourite", dependencies.MemoryHandler.CreateFavourite)
+		r.Delete("/api/groups/{groupId}/memories/{memoryId}/favourite", dependencies.MemoryHandler.DeleteFavourite)
 	})
 
 	mux.Handle("/swagger/*", httpSwagger.Handler(httpSwagger.URL("/swagger/doc.json")))

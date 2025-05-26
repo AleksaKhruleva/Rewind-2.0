@@ -81,6 +81,14 @@ proto-group:
 	cp ./auth-service/proto/auth.proto ./group-service/proto/clients
 	cd ./group-service && protoc --go_out=./pkg --go-grpc_out=./pkg --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative proto/clients/auth.proto
 
+# Генерация протофайлов для memory-service из Backend
+.PHONY: proto-memory
+proto-memory:
+	cd ./memory-service && mkdir -p pkg
+	cd ./memory-service && protoc --go_out=./pkg --go-grpc_out=./pkg --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative proto/memory.proto
+	cp ./auth-service/proto/auth.proto ./memory-service/proto/clients
+	cd ./memory-service && protoc --go_out=./pkg --go-grpc_out=./pkg --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative proto/clients/auth.proto
+
 # Генерация протофайлов для api-gateway-service из Backend
 .PHONY: proto-api-gateway
 proto-api-gateway:
@@ -89,9 +97,12 @@ proto-api-gateway:
 	cd ./api-gateway-service && protoc --go_out=./pkg --go-grpc_out=./pkg --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative proto/auth.proto
 	cp ./group-service/proto/group.proto ./api-gateway-service/proto
 	cd ./api-gateway-service && protoc --go_out=./pkg --go-grpc_out=./pkg --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative proto/group.proto
+	cp ./memory-service/proto/memory.proto ./api-gateway-service/proto
+	cd ./api-gateway-service && protoc --go_out=./pkg --go-grpc_out=./pkg --go_opt=paths=source_relative --go-grpc_opt=paths=source_relative proto/memory.proto
 
 .PHONY: proto
 proto:
 	make proto-auth
 	make proto-group
+	make proto-memory
 	make proto-api-gateway

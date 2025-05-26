@@ -16,6 +16,7 @@ service GroupService {
 
   rpc ListGroupMembers (ListGroupMembersRequest) returns (ListGroupMembersResponse);
   rpc RemoveGroupMember (RemoveGroupMemberRequest) returns (RemoveGroupMemberResponse);
+  rpc CheckUserInGroup (CheckUserInGroupRequest) returns (CheckUserInGroupResponse);
 
   rpc CreateGroupInvitation (CreateGroupInvitationRequest) returns (CreateGroupInvitationResponse);
   rpc AcceptGroupInvitation (AcceptGroupInvitationRequest) returns (AcceptGroupInvitationResponse);
@@ -65,7 +66,6 @@ message CreateGroupRequest {
   // ID пользователя, который создает группу (будет администратором) - приходит от API Gateway
   uint64 requesting_user_id = 1;
   string name = 2;
-  string image = 3; // URL изображения аватара (необязательно)
 }
 
 // Ответ на создание группы
@@ -92,7 +92,7 @@ message UpdateGroupRequest {
   uint64 group_id = 2;
   // Используем обертку для необязательных полей, чтобы различать отсутствие значения и пустое значение
   optional string name = 3;
-  optional string image = 4;
+  optional bytes image = 4;
 }
 
 // Ответ на обновление группы
@@ -144,6 +144,16 @@ message RemoveGroupMemberRequest {
 // Ответ на удаление участника
 message RemoveGroupMemberResponse {
   bool success = 1;
+}
+
+message CheckUserInGroupRequest {
+  uint64 user_id = 1;
+  uint64 group_id = 2;
+}
+
+message CheckUserInGroupResponse {
+  bool is_in_group = 1;
+  bool is_admin = 2;
 }
 
 // Запрос на создание приглашения в группу

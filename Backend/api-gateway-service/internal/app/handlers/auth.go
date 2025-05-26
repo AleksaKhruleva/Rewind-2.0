@@ -300,7 +300,7 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, responseBody)
 }
 
-// DeleteUser обработчик для POST /api/users/delete-user.
+// DeleteUser обработчик для DELETE /api/users/delete-user.
 // @Summary Delete user account.
 // @Description Deletes a user account by email.
 // @Tags users
@@ -313,7 +313,7 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
 // @Security ApiKeyAuth
-// @Router /api/users/delete-user [post].
+// @Router /api/users/delete-user [delete].
 func (h *AuthHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	var req requests.DeleteUserRequest
 	if err := decodeJSONBody(r, &req); err != nil {

@@ -20,7 +20,7 @@ type GroupServiceClient struct {
 func NewGroupServiceClient() (*GroupServiceClient, error) {
 	groupServiceAddress := os.Getenv("GROUP_SERVICE_GRPC_ADDRESS")
 	if groupServiceAddress == "" {
-		groupServiceAddress = "localhost:50051" // Значение по умолчанию
+		groupServiceAddress = "localhost:50052" // Значение по умолчанию
 		log.Println("Warning: GROUP_SERVICE_GRPC_ADDRESS environment variable not set, using default.")
 	}
 
@@ -88,4 +88,9 @@ func (c *GroupServiceClient) AcceptGroupInvitation(ctx context.Context, in *pb.A
 // ListUserGroups вызывает RPC метод ListUserGroups в Group-Service.
 func (c *GroupServiceClient) ListUserGroups(ctx context.Context, in *pb.ListUserGroupsRequest, opts ...grpc.CallOption) (*pb.ListUserGroupsResponse, error) {
 	return c.client.ListUserGroups(ctx, in, opts...)
+}
+
+// CheckUserInGroup вызывает RPC метод CheckUserInGroup в Group-Service
+func (c *GroupServiceClient) CheckUserInGroup(ctx context.Context, in *pb.CheckUserInGroupRequest, opts ...grpc.CallOption) (*pb.CheckUserInGroupResponse, error) {
+	return c.client.CheckUserInGroup(ctx, in, opts...)
 }

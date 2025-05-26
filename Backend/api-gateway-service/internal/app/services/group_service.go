@@ -20,9 +20,9 @@ import (
 // Методы принимают простые типы данных и возвращают protobuf сообщения от микросервиса.
 // ID запрашивающего пользователя извлекается из контекста.
 type GroupServiceInterface interface {
-	CreateGroup(ctx context.Context, name string, imageURL string) (*pb.CreateGroupResponse, error)
+	CreateGroup(ctx context.Context, name string) (*pb.CreateGroupResponse, error)
 	GetGroup(ctx context.Context, groupID uint64) (*pb.GetGroupResponse, error)
-	UpdateGroup(ctx context.Context, groupID uint64, name *string, image *string) (*pb.UpdateGroupResponse, error)
+	UpdateGroup(ctx context.Context, groupID uint64, name *string, imageData []byte) (*pb.UpdateGroupResponse, error)
 	DeleteGroup(ctx context.Context, groupID uint64) (*pb.DeleteGroupResponse, error)
 	ListGroupMembers(ctx context.Context, groupID uint64) (*pb.ListGroupMembersResponse, error)
 	RemoveGroupMember(ctx context.Context, groupID uint64, userToRemoveID uint64) (*pb.RemoveGroupMemberResponse, error)
@@ -63,8 +63,7 @@ func (s *GroupService) verifyUserExists(ctx context.Context, userID uint64) erro
 	req := &pb.GetUserByIDRequest{UserId: userID}
 	resp, err := s.authClient.GetUserByID(ctx, req)
 	if err != nil {
-		log.Printf("API GW GroupService: Failed to call AuthService.GetUserByID for user %d: %v", userID, err)
-		return status.Errorf(codes.Internal, "auth service error: %v", status.Convert(err).Message())
+		return err
 	}
 
 	if resp == nil {
@@ -76,7 +75,7 @@ func (s *GroupService) verifyUserExists(ctx context.Context, userID uint64) erro
 }
 
 // CreateGroup вызывает RPC метод CreateGroup в Group-Service.
-func (s *GroupService) CreateGroup(ctx context.Context, name string, imageURL string) (*pb.CreateGroupResponse, error) {
+func (s *GroupService) CreateGroup(ctx context.Context, name string) (*pb.CreateGroupResponse, error) {
 	requestingUserID, err := GetRequestingUserIDFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -90,7 +89,6 @@ func (s *GroupService) CreateGroup(ctx context.Context, name string, imageURL st
 	req := &pb.CreateGroupRequest{
 		RequestingUserId: requestingUserID,
 		Name:             name,
-		Image:            imageURL,
 	}
 
 	return s.groupClient.CreateGroup(ctx, req)
@@ -117,7 +115,7 @@ func (s *GroupService) GetGroup(ctx context.Context, groupID uint64) (*pb.GetGro
 }
 
 // UpdateGroup вызывает RPC метод UpdateGroup в Group-Service.
-func (s *GroupService) UpdateGroup(ctx context.Context, groupID uint64, name *string, image *string) (*pb.UpdateGroupResponse, error) {
+func (s *GroupService) UpdateGroup(ctx context.Context, groupID uint64, name *string, imageData []byte) (*pb.UpdateGroupResponse, error) {
 	requestingUserID, err := GetRequestingUserIDFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -134,10 +132,10 @@ func (s *GroupService) UpdateGroup(ctx context.Context, groupID uint64, name *st
 	}
 
 	if name != nil {
-		req.Name = name
+		req.Name = name // Dereference the pointer to get the string value
 	}
-	if image != nil {
-		req.Image = image
+	if imageData != nil {
+		req.Image = imageData
 	}
 
 	return s.groupClient.UpdateGroup(ctx, req)
