@@ -3,7 +3,6 @@ FROM golang:1.23.1-alpine AS builder
 
 WORKDIR /app
 
-# Установка Go плагинов для protoc
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:$PATH
 
@@ -18,7 +17,7 @@ RUN go mod download
 COPY .env ./
 # --------------------------
 
-# Копируем остальной исходный код проекта, включая директорию 'proto'
+# Копируем остальной исходный код проекта
 COPY . .
 
 # Собираем Go приложение
