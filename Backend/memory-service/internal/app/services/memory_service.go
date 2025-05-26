@@ -16,7 +16,7 @@ import (
 	"Rewind-memory-service/internal/app/models"
 	"Rewind-memory-service/internal/app/repositories"
 	pb "Rewind-memory-service/pkg/proto"
-	pb_clients "Rewind-memory-service/pkg/proto/clients"
+	clients "Rewind-memory-service/pkg/proto/clients"
 )
 
 // MemoryService implements the memory.MemoryServiceServer interface
@@ -86,10 +86,10 @@ func (s *MemoryService) CreateMemory(ctx context.Context, req *pb.CreateMemoryRe
 	if !ok || mediaTypeValue == int32(pb.MediaType_UNSPECIFIED) {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid mediaType: %s", req.MediaType)
 	}
-	pbMediaType := pb_clients.MediaType(mediaTypeValue)
+	pbMediaType := clients.MediaType(mediaTypeValue)
 
 	// Отправка файла в медиа-сервис
-	uploadReq := &pb_clients.UploadMediaRequest{
+	uploadReq := &clients.UploadMediaRequest{
 		MediaType: pbMediaType,
 		FileData:  req.MediaFile,
 	}
@@ -97,7 +97,7 @@ func (s *MemoryService) CreateMemory(ctx context.Context, req *pb.CreateMemoryRe
 	uploadResp, err := s.mediaClient.UploadMedia(ctx, uploadReq)
 	if err != nil {
 		log.Printf("MemoryService: Failed to upload media to media service: %v", err)
-		return nil, status.Errorf(codes.Internal, "failed to upload media")
+		return nil, err
 	}
 
 	mediaURL := uploadResp.GetFileUrl()

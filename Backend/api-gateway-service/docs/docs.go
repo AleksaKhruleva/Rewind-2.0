@@ -480,6 +480,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
+                    "404": {
+                        "description": "Not Found - User not found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
                     "409": {
                         "description": "Conflict - Group with this name already exists",
                         "schema": {
@@ -548,6 +554,12 @@ const docTemplate = `{
                     },
                     "403": {
                         "description": "Forbidden - Permission denied by service",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - Group or User not found",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -656,6 +668,12 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized - User not authenticated",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - Group or User not found",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -771,6 +789,12 @@ const docTemplate = `{
                     },
                     "403": {
                         "description": "Forbidden - Permission denied by service",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - Group or User not found",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -928,7 +952,7 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not Found - Memory not found",
+                        "description": "Not Found - Memory or User not found",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1011,7 +1035,7 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not Found - Memory not found or not a favourite",
+                        "description": "Not Found - Memory or User not found",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1090,7 +1114,7 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not Found - Memory not found",
+                        "description": "Not Found - Group or User or Memory not found",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1176,7 +1200,7 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not Found - Memory not found",
+                        "description": "Not Found - Group or User or Memory not found",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1260,7 +1284,7 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not Found - Memory or tag not found",
+                        "description": "Not Found - Group or User not found",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1333,7 +1357,7 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not Found - Group or user not found",
+                        "description": "Not Found - Group or User not found",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1402,7 +1426,7 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not Found - Group not found",
+                        "description": "Not Found - Group or User not found",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1484,7 +1508,7 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not Found - Group not found",
+                        "description": "Not Found - Group or User not found",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1551,7 +1575,7 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not Found - Group not found",
+                        "description": "Not Found - Group or User not found",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1632,7 +1656,7 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not Found - Group not found",
+                        "description": "Not Found - Group or User not found",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1701,7 +1725,7 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not Found - Group not found",
+                        "description": "Not Found - Group or User not found",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1764,7 +1788,7 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not Found - Invitation not found or expired",
+                        "description": "Not Found - Group or User not found",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1928,9 +1952,6 @@ const docTemplate = `{
                     }
                 ],
                 "description": "Deletes a user account by email.",
-                "consumes": [
-                    "application/json"
-                ],
                 "produces": [
                     "application/json"
                 ],
@@ -1938,17 +1959,6 @@ const docTemplate = `{
                     "users"
                 ],
                 "summary": "Delete user account.",
-                "parameters": [
-                    {
-                        "description": "User email to delete",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/requests.DeleteUserRequest"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "User account successfully deleted\".",
@@ -2161,7 +2171,7 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not Found - User not found",
+                        "description": "Not Found - Group or User not found",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -2564,14 +2574,6 @@ const docTemplate = `{
             "properties": {
                 "name": {
                     "description": "Group name is required",
-                    "type": "string"
-                }
-            }
-        },
-        "requests.DeleteUserRequest": {
-            "type": "object",
-            "properties": {
-                "email": {
                     "type": "string"
                 }
             }

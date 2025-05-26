@@ -95,7 +95,7 @@ func (s *MediaService) UploadMedia(ctx context.Context, req *pb.UploadMediaReque
 	// Валидация расширения
 	if !isExtensionAllowed(fileExt, mediaType, s.allowedExtensions) {
 		log.Printf("MediaService.UploadMedia: disallowed file extension: %s for media type: %v", fileExt, mediaType)
-		return nil, status.Errorf(codes.InvalidArgument, "disallowed file extension: %s", fileExt)
+		return nil, status.Errorf(codes.InvalidArgument, "disallowed file extension")
 	}
 
 	// Генерируем уникальное имя файла для S3

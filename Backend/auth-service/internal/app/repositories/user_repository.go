@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"fmt"
+
 	"golang.org/x/crypto/bcrypt"
 
 	"gorm.io/gorm"
@@ -18,6 +19,7 @@ type UserRepositoryInterface interface {
 	Save(tx *gorm.DB, user *models.User) error
 	GetRefreshToken(tx *gorm.DB, refreshToken string) (*models.RefreshToken, error)
 	DeleteRefreshToken(tx *gorm.DB, id uint) error
+	DeleteUserRefreshTokens(tx *gorm.DB, userID uint) error
 	GetDeletedUserByEmail(tx *gorm.DB, email string) (*models.User, error)
 	SaveDeleted(tx *gorm.DB, user *models.User) error
 	DeleteUser(tx *gorm.DB, email string) error
@@ -108,6 +110,13 @@ func (r *UserRepository) DeleteRefreshToken(tx *gorm.DB, id uint) error {
 	return tx.Unscoped().Delete(&models.RefreshToken{}, "id = ?", id).Error
 }
 
+func (r *UserRepository) DeleteUserRefreshTokens(tx *gorm.DB, userID uint) error {
+	if tx == nil {
+		tx = r.db
+	}
+	return tx.Unscoped().Delete(&models.RefreshToken{}, "user_id = ?", userID).Error
+}
+
 func (r *UserRepository) GetDeletedUserByEmail(tx *gorm.DB, email string) (*models.User, error) {
 	if tx == nil {
 		tx = r.db
@@ -136,7 +145,7 @@ func (r *UserRepository) ListUsersByIDs(tx *gorm.DB, userIDs []uint) ([]*models.
 		tx = r.db
 	}
 	var users []*models.User
-	result := tx.Where("id IN (?)", userIDs).Find(&users)
+	result := tx.Unscoped().Where("id IN (?)", userIDs).Find(&users)
 	return users, result.Error
 }
 

@@ -18,11 +18,6 @@ definitions:
     required:
     - name
     type: object
-  requests.DeleteUserRequest:
-    properties:
-      email:
-        type: string
-    type: object
   requests.ForgotPasswordRequest:
     properties:
       email:
@@ -737,6 +732,10 @@ paths:
           description: Forbidden - Permission denied by service
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - User not found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
         "409":
           description: Conflict - Group with this name already exists
           schema:
@@ -786,7 +785,7 @@ paths:
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
-          description: Not Found - Group or user not found
+          description: Not Found - Group or User not found
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
@@ -829,6 +828,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "403":
           description: Forbidden - Permission denied by service
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - Group or User not found
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
@@ -900,6 +903,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "401":
           description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - Group or User not found
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
@@ -1001,7 +1008,7 @@ paths:
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
-          description: Not Found - Memory not found or not a favourite
+          description: Not Found - Memory or User not found
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
@@ -1051,7 +1058,7 @@ paths:
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
-          description: Not Found - Memory not found
+          description: Not Found - Memory or User not found
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "409":
@@ -1106,7 +1113,7 @@ paths:
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
-          description: Not Found - Memory not found
+          description: Not Found - Group or User or Memory not found
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
@@ -1162,7 +1169,7 @@ paths:
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
-          description: Not Found - Memory or tag not found
+          description: Not Found - Group or User not found
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
@@ -1217,7 +1224,7 @@ paths:
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
-          description: Not Found - Memory not found
+          description: Not Found - Group or User or Memory not found
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
@@ -1295,6 +1302,10 @@ paths:
           description: Forbidden - Permission denied by service
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - Group or User not found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -1336,7 +1347,7 @@ paths:
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
-          description: Not Found - Group not found
+          description: Not Found - Group or User not found
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
@@ -1379,7 +1390,7 @@ paths:
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
-          description: Not Found - Group not found
+          description: Not Found - Group or User not found
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
@@ -1432,7 +1443,7 @@ paths:
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
-          description: Not Found - Group not found
+          description: Not Found - Group or User not found
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
@@ -1484,7 +1495,7 @@ paths:
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
-          description: Not Found - Group not found
+          description: Not Found - Group or User not found
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
@@ -1528,7 +1539,7 @@ paths:
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
-          description: Not Found - Group not found
+          description: Not Found - Group or User not found
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
@@ -1568,7 +1579,7 @@ paths:
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
-          description: Not Found - Invitation not found or expired
+          description: Not Found - Group or User not found
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "409":
@@ -1710,16 +1721,7 @@ paths:
       - users
   /api/users/delete-user:
     delete:
-      consumes:
-      - application/json
       description: Deletes a user account by email.
-      parameters:
-      - description: User email to delete
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/requests.DeleteUserRequest'
       produces:
       - application/json
       responses:
@@ -1860,7 +1862,7 @@ paths:
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "404":
-          description: Not Found - User not found
+          description: Not Found - Group or User not found
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":

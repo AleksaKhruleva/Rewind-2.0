@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"os"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -14,6 +15,7 @@ import (
 	"gorm.io/gorm"
 
 	"Rewind-group-service/clients/auth"
+	"Rewind-group-service/clients/media"
 	"Rewind-group-service/internal/app/models"
 	"Rewind-group-service/internal/app/repositories"
 	pb "Rewind-group-service/pkg/proto"
@@ -23,18 +25,19 @@ import (
 // GroupService implements the group.GroupServiceServer interface
 type GroupService struct {
 	pb.UnimplementedGroupServiceServer
-	groupRepo  repositories.Repository
-	validator  *validator.Validate
-	authClient *auth.AuthServiceClient
-	// memoryClient       memory.MemoryServiceClient // TODO: Зависимость от клиента Memory Service
+	groupRepo   repositories.Repository
+	validator   *validator.Validate
+	authClient  *auth.AuthServiceClient
+	mediaClient *media.MediaServiceClient
 }
 
 // NewGroupService создает новый экземпляр GroupService
-func NewGroupService(repo repositories.Repository, validate *validator.Validate, authClient *auth.AuthServiceClient) *GroupService {
+func NewGroupService(repo repositories.Repository, validate *validator.Validate, authClient *auth.AuthServiceClient, mediaClient *media.MediaServiceClient) *GroupService {
 	return &GroupService{
-		groupRepo:  repo,
-		validator:  validate,
-		authClient: authClient,
+		groupRepo:   repo,
+		validator:   validate,
+		authClient:  authClient,
+		mediaClient: mediaClient,
 	}
 }
 
@@ -45,8 +48,6 @@ func (s *GroupService) CreateGroup(ctx context.Context, req *pb.CreateGroupReque
 		log.Printf("CreateGroup: Invalid argument (Name): %v", err)
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid group name: %v", err)
 	}
-	// Валидация Image, если нужно
-	// if req.GetImage() != "" { ... }
 
 	requestingUserID := req.GetRequestingUserId()
 	// Мы предполагаем, что API Gateway уже проверил существование этого пользователя.
@@ -83,6 +84,7 @@ func (s *GroupService) CreateGroup(ctx context.Context, req *pb.CreateGroupReque
 
 	groupModel := &models.Group{
 		Name:        req.GetName(),
+		Image:       os.Getenv("DEFAULT_GROUP_AVATAR"),
 		AdminUserID: uint(requestingUserID),
 	}
 
@@ -261,9 +263,25 @@ func (s *GroupService) UpdateGroup(ctx context.Context, req *pb.UpdateGroupReque
 	}
 	if req.Image != nil {
 
-		// TODO send to media-service req.GetImage()
+		// Отправка файла в медиа-сервис
+		uploadReq := &clients.UploadMediaRequest{
+			MediaType: clients.MediaType_avatar,
+			FileData:  req.GetImage(),
+		}
 
-		groupModel.Image = "default"
+		uploadResp, err := s.mediaClient.UploadMedia(ctx, uploadReq)
+		if err != nil {
+			log.Printf("MemoryService: Failed to upload media to media service: %v", err)
+			return nil, err
+		}
+
+		mediaURL := uploadResp.GetFileUrl()
+		if mediaURL == "" {
+			log.Println("MemoryService: Received empty media URL from media service")
+			return nil, status.Errorf(codes.Internal, "media upload failed to return URL")
+		}
+
+		groupModel.Image = mediaURL
 	}
 	// GORM при Save с gorm.Model автоматически обновит UpdatedAt
 

@@ -304,9 +304,7 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 // @Summary Delete user account.
 // @Description Deletes a user account by email.
 // @Tags users
-// @Accept json
 // @Produce json
-// @Param body body requests.DeleteUserRequest true "User email to delete".
 // @Success 200 {object} responses.DeleteUserResponse "User account successfully deleted".
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid email format or request body".
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found".
@@ -315,13 +313,7 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 // @Security ApiKeyAuth
 // @Router /api/users/delete-user [delete].
 func (h *AuthHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
-	var req requests.DeleteUserRequest
-	if err := decodeJSONBody(r, &req); err != nil {
-		respondError(w, http.StatusBadRequest, fmt.Sprintf("Invalid request body: %v", err))
-		return
-	}
-
-	resp, err := h.authService.DeleteUser(r.Context(), req.Email)
+	resp, err := h.authService.DeleteUser(r.Context())
 	if err != nil {
 		handleServiceError(w, err, "DeleteUser")
 		return

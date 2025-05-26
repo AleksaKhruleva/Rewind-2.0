@@ -44,6 +44,7 @@ func NewMemoryHandler(memoryService services.MemoryServiceInterface) *MemoryHand
 // @Success 200 {object} responses.MemoryResponse "Successfully created memory"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid request data"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
@@ -256,6 +257,7 @@ func (h *MemoryHandler) DeleteMemory(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid group ID"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - Permission denied by service"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
@@ -299,6 +301,7 @@ func (h *MemoryHandler) ListMemoriesByGroup(w http.ResponseWriter, r *http.Reque
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid input"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - Permission denied by service"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
@@ -381,6 +384,7 @@ func (h *MemoryHandler) ListMemoriesByGroupWithFilters(w http.ResponseWriter, r 
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Memory not found"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - Permission denied by service"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User or Memory not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
@@ -432,6 +436,7 @@ func (h *MemoryHandler) CreateMemoryTag(w http.ResponseWriter, r *http.Request) 
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Memory or tag not found"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - Permission denied by service"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
@@ -489,7 +494,7 @@ func (h *MemoryHandler) DeleteMemoryTag(w http.ResponseWriter, r *http.Request) 
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid memory ID"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - Permission denied by service"
-// @Failure 404 {object} responses.ErrorResponse "Not Found - Memory not found"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User or Memory not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
@@ -541,7 +546,7 @@ func (h *MemoryHandler) ListMemoryTagsByMemoryID(w http.ResponseWriter, r *http.
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid memory ID"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - Permission denied by service"
-// @Failure 404 {object} responses.ErrorResponse "Not Found - Memory not found"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - Memory or User not found"
 // @Failure 409 {object} responses.ErrorResponse "Conflict - Memory is already a favourite"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
@@ -592,7 +597,7 @@ func (h *MemoryHandler) CreateFavourite(w http.ResponseWriter, r *http.Request) 
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid memory ID"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - Permission denied by service"
-// @Failure 404 {object} responses.ErrorResponse "Not Found - Memory not found or not a favourite"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - Memory or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth

@@ -106,7 +106,7 @@ message LogoutResponse {
 }
 
 message DeleteUserRequest {
-  string email = 1;
+  uint64 user_id = 1;
 }
 
 message DeleteUserResponse {
