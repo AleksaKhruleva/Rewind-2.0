@@ -15,6 +15,7 @@ final class RewindViewModel {
         case showNextMediaItem
         case fetchGroups
         case openGroup
+        case selectedNewGroup(Domain.Group)
     }
 
     enum UserGroupsState {
@@ -25,10 +26,6 @@ final class RewindViewModel {
     enum CurrentGroupState {
         case ready
         case notReady
-    }
-
-    var currentGroupID: Int? {
-        GroupStorage.currentGroup?.id
     }
 
     var showToast: (String) -> Void
@@ -122,6 +119,14 @@ final class RewindViewModel {
                 guard let tokens = Tokens() else { return }
                 let responses = try await backend.fetchGroups(tokens: tokens)
                 groups = sortedGroups(from: responses)
+                if let currentGroupId = GroupStorage.currentGroup?.id {
+                    if let updatedGroup = groups.first(where: { $0.id == currentGroupId }) {
+                        GroupStorage.set(newGroup: updatedGroup)
+                    } else {
+                        GroupStorage.currentGroup = nil
+                        print("Current group is no longer available")
+                    }
+                }
                 userGroupsState = .ready
             } catch {
                 groups = []
@@ -131,7 +136,7 @@ final class RewindViewModel {
         case .openGroup:
             currentGroupState = .notReady
             do {
-                guard let currentGroupID,
+                guard let currentGroupID = GroupStorage.currentGroup?.id,
                       let tokens = Tokens(),
                       let userID = jwtDecoder.getUserId(from: tokens.accessToken)
                 else {
@@ -163,6 +168,12 @@ final class RewindViewModel {
                 print(error)
                 // TODO: handle error
             }
+        case let .selectedNewGroup(newGroup):
+            groups = sortedGroups(
+                groups,
+                currentGroupID: GroupStorage.currentGroup?.id
+            )
+            print(newGroup.name)
         }
     }
 
@@ -177,7 +188,7 @@ final class RewindViewModel {
             }
             .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
 
-        if let currentGroupID {
+        if let currentGroupID = GroupStorage.currentGroup?.id {
             if let currentGroup = groups.first(where: { $0.id == currentGroupID }) {
                 groups.removeAll { $0.id == currentGroupID }
                 groups.insert(currentGroup, at: 0)
@@ -185,6 +196,18 @@ final class RewindViewModel {
         }
 
         return groups
+    }
+
+    private func sortedGroups(_ groups: [Domain.Group], currentGroupID: Int?) -> [Domain.Group] {
+        var sorted = groups.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+
+        if let currentGroupID,
+           let currentGroup = sorted.first(where: { $0.id == currentGroupID }) {
+            sorted.removeAll { $0.id == currentGroupID }
+            sorted.insert(currentGroup, at: 0)
+        }
+
+        return sorted
     }
 
     private func sortedMembers(from responses: [GroupMemberResponse], currentUserID: String) -> [Member] {

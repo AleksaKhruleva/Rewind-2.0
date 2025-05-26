@@ -18,7 +18,6 @@ public protocol NetworkServiceProtocol {
     func user(tokens: Tokens) async throws -> UserResponse
 
     func updateUserName(tokens: Tokens, name: String) async throws -> SuccessResponse
-
     func updateUserAvatar(tokens: Tokens, avatar: UIImage) async throws -> SuccessResponse
 
     func passwordResetSet(tokens: Tokens, password: String) async throws -> SuccessResponse
@@ -32,6 +31,8 @@ public protocol NetworkServiceProtocol {
     func createGroup(tokens: Tokens, name: String) async throws -> GroupResponse
     func fetchGroups(tokens: Tokens) async throws -> [GroupResponse]
     func fetchFullGroupDetails(tokens: Tokens, id: Int) async throws -> GroupDetails
+    func updateGroupName(tokens: Tokens, id: Int, name: String) async throws -> GroupResponse
+    func createGroupInvitationCode(tokens: Tokens, id: Int) async throws -> GroupInvitationCodeResponse
 }
 
 public final class NetworkService: NetworkServiceProtocol {
@@ -243,6 +244,33 @@ public final class NetworkService: NetworkServiceProtocol {
         async let group = fetchGroup(tokens: tokens, id: id)
         async let members = fetchGroupMembers(tokens: tokens, id: id)
         return GroupDetails(group: try await group, members: try await members)
+    }
+
+    public func updateGroupName(tokens: Tokens, id: Int, name: String) async throws -> GroupResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+            try await provider
+                .request(
+                    .updateGroupName(
+                        accessToken: tokens.accessToken,
+                        id: id,
+                        name: name
+                    ),
+                    type: GroupResponse.self
+                )
+        }
+    }
+
+    public func createGroupInvitationCode(tokens: Tokens, id: Int) async throws -> GroupInvitationCodeResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+            try await provider
+                .request(
+                    .createGroupInvitation(
+                        accessToken: tokens.accessToken,
+                        id: id
+                    ),
+                    type: GroupInvitationCodeResponse.self
+                )
+        }
     }
 }
 

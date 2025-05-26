@@ -1,22 +1,15 @@
 import SwiftUI
 import UIComponents
-
-// vremenno
-let generalData = [
-    ("photo.fill", UIComponentsStrings.Group.Settings.General.name, nilAccessibility, {}),
-    ("pencil", UIComponentsStrings.Group.Settings.General.image, nilAccessibility, {})
-]
-
-let riskyData = [
-    ("rectangle.portrait.and.arrow.right.fill", UIComponentsStrings.Group.Settings.Risky.leave, nilAccessibility, {}),
-    ("trash.fill", UIComponentsStrings.Group.Settings.Risky.delete, nilAccessibility, {})
-]
+import Domain
+import Base
 
 public struct GroupSettingsView: View {
-    private let router: GroupSettingsRouter
+    @State private var viewModel: GroupSettingsViewModel
+    @State private var deleteGroupAlertShown = false
+    @Environment(\.showToast) private var showToast
 
-    public init(router: GroupSettingsRouter) {
-        self.router = router
+    public init(group: Domain.Group, router: GroupSettingsRouter) {
+        viewModel = GroupSettingsViewModel(group: group, router: router)
     }
 
     public var body: some View {
@@ -35,6 +28,43 @@ public struct GroupSettingsView: View {
             }
         }
         .background(Color.background)
+        .sheet(isPresented: $viewModel.needNameInputView) {
+            GroupNameInputView(
+                isPresented: $viewModel.needNameInputView,
+                isLoading: $viewModel.isLoading) { newName in
+                    Task {
+                        await viewModel.dispatch(.updateName(newName))
+                    }
+                }
+        }
+        .onChange(of: viewModel.toastMessage) { _, newValue in
+            if let newValue {
+                showToast(newValue)
+                viewModel.toastMessage = nil
+            }
+        }
+        .alert("Are you sure you want to delete your group? You will not be able to undo this action.", isPresented: $deleteGroupAlertShown) {
+            VStack {
+                Button(UIComponentsStrings.Buttons.cancel, role: .cancel) { }
+
+                Button(
+                    UIComponentsStrings.Buttons.continue,
+                    role: .destructive
+                ) {
+                    Task { await viewModel.dispatch(.deleteGroup) }
+                }
+            }
+        }
+        .overlay {
+            if viewModel.isLoading {
+                ZStack {
+                    Color.background.ignoresSafeArea()
+
+                    ProgressView(viewModel.progressMessage)
+                        .modifier(RoundFontModifier(size: 15))
+                }
+            }
+        }
     }
 
     private var header: some View {
@@ -42,25 +72,50 @@ public struct GroupSettingsView: View {
             RewindButton(type: .rightChevron).hidden()
         } centerView: {
             HeaderBadgeView(
-                image: UIComponentsAsset.groupAvatar.image,
-                text: "Friends"
+                image: viewModel.group.image,
+                text: viewModel.group.name
             )
         } rightView: {
             RewindButton(type: .rightChevron) {
-                router.dismiss()
+                viewModel.router.dismiss()
             }
         }
     }
 
     private var avatar: some View {
-        AvatarView(image: UIComponentsAsset.groupAvatar.image, text: "Friends")
+        AvatarView(
+            image: viewModel.group.image,
+            text: viewModel.group.name
+        )
     }
 
     private var generalTable: some View {
-        InformationTable(title: UIComponentsStrings.Group.Settings.general, data: generalData, isRisky: false)
+        let generalData = [
+            ("photo.fill", UIComponentsStrings.Group.Settings.General.name, nilAccessibility, { viewModel.needNameInputView = true }),
+            ("pencil", UIComponentsStrings.Group.Settings.General.image, nilAccessibility, {})
+        ]
+        return InformationTable(title: UIComponentsStrings.Group.Settings.general, data: generalData, isRisky: false)
     }
 
     private var riskyTable: some View {
-        InformationTable(title: UIComponentsStrings.Group.Settings.risky, data: riskyData, isRisky: true)
+        Group {
+            if let tokens = Tokens(),
+               let userID = JWTDecoder().getUserId(from: tokens.accessToken),
+               let ownerID = viewModel.group.ownerID {
+
+                InformationTable(
+                    title: UIComponentsStrings.Group.Settings.risky,
+                    data: String(ownerID) == userID ? [
+                        ("rectangle.portrait.and.arrow.right.fill", UIComponentsStrings.Group.Settings.Risky.leave, nilAccessibility, {}),
+                        ("trash.fill", UIComponentsStrings.Group.Settings.Risky.delete, nilAccessibility, { deleteGroupAlertShown = true })
+                    ] : [
+                        ("rectangle.portrait.and.arrow.right.fill", UIComponentsStrings.Group.Settings.Risky.leave, nilAccessibility, {})
+                    ],
+                    isRisky: true
+                )
+            } else {
+                EmptyView()
+            }
+        }
     }
 }

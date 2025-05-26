@@ -52,10 +52,10 @@ public struct RootView: View {
 
         case .groupsList: GroupsListView(router: GroupsListRouter(appRouter: router))
         case let .group(group): GroupView(group: group, router: GroupRouter(appRouter: router))
-        case .groupSettings: GroupSettingsView(router: GroupSettingsRouter(appRouter: router))
-        case let .addMember(groupName): AddMemberView(groupName: groupName, router: router)
+        case let .groupSettings(group): GroupSettingsView(group: group, router: GroupSettingsRouter(appRouter: router))
+        case let .addMember(groupName, link): AddMemberView(groupName: groupName, link: link, router: router)
         case let .memberDetails(member): MemberDetailsView(member: member, router: router)
-        case let .membersList(members): MembersListView(members: members, router: MembersListRouter(appRouter: router))
+        case let .membersList(group): MembersListView(group: group, router: MembersListRouter(appRouter: router))
 
         case .rewindsStand: StandView(title: "You added 207 Rewinds", counterType: .rewinds, router: router)
         case .rollsStand: StandView(title: "You rolled 207 Rewinds", counterType: .rolls, router: router)

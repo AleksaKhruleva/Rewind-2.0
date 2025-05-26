@@ -18,9 +18,13 @@ final class AddMemberViewModel {
 
     var toastMessage: String?
     var showShareSheet = false
-    let link = "https://rewindapp.ru/swagger/index.html"
+    let link: String
 
     private(set) var qrCodeImageState: QRCodeImageState = .requested
+
+    init(link: String) {
+        self.link = link
+    }
 
     func dispatch(_ intent: Intent) {
         switch intent {

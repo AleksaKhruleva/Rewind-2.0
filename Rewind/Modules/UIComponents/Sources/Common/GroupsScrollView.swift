@@ -14,18 +14,21 @@ private enum Constants {
 // MARK: - GroupsScrollView
 
 public struct GroupsScrollView: UIViewRepresentable {
-    @Binding var selectedGroupID: Int?
+    private let selectedGroupID: Int?
     private let groups: [Domain.Group]
     private let imageSize: CGFloat
+    private let onGroupSelected: ((Domain.Group) -> Void)?
 
     public init(
-        selectedGroupID: Binding<Int?>,
+        selectedGroupID: Int?,
         groups: [Domain.Group],
-        imageSize: CGFloat
+        imageSize: CGFloat,
+        onGroupSelected: ((Domain.Group) -> Void)?
     ) {
-        self._selectedGroupID = selectedGroupID
+        self.selectedGroupID = selectedGroupID
         self.groups = groups
         self.imageSize = imageSize
+        self.onGroupSelected = onGroupSelected
     }
 
     public func makeUIView(context: Context) -> UICollectionView {
@@ -54,7 +57,11 @@ public struct GroupsScrollView: UIViewRepresentable {
     }
 
     public func makeCoordinator() -> Coordinator {
-        Coordinator(imageSize: imageSize)
+        Coordinator(
+            imageSize: imageSize,
+            selectedGroupID: selectedGroupID,
+            onGroupSelected: onGroupSelected
+        )
     }
 }
 
@@ -64,22 +71,29 @@ public final class Coordinator: NSObject, UICollectionViewDelegate {
     private var dataSource: UICollectionViewDiffableDataSource<Int, Domain.Group>?
     private let imageSize: CGFloat
     private var selectedGroupID: Int?
+    private let onGroupSelected: ((Domain.Group) -> Void)?
 
-    init(imageSize: CGFloat) {
+    init(imageSize: CGFloat, selectedGroupID: Int?, onGroupSelected: ((Domain.Group) -> Void)?) {
         self.imageSize = imageSize
+        self.selectedGroupID = selectedGroupID
+        self.onGroupSelected = onGroupSelected
     }
 
     // swiftlint:disable force_cast
     func configureDataSource(for collectionView: UICollectionView) {
-        dataSource = UICollectionViewDiffableDataSource<Int, Domain.Group>(collectionView: collectionView) { collectionView, indexPath, group in
+        dataSource = UICollectionViewDiffableDataSource<Int, Domain.Group>(collectionView: collectionView) {
+            collectionView, indexPath, group in
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Cell.reuseIdentifier, for: indexPath) as! Cell
-            cell.configure(with: group, imageSize: self.imageSize, isSelected: group.id == self.selectedGroupID)
+            cell.configure(
+                with: group,
+                imageSize: self.imageSize,
+                isSelected: group.id == self.selectedGroupID
+            )
             return cell
         }
     }
 
     func update(groups: [Domain.Group], selectedGroupID: Int?) {
-        self.selectedGroupID = selectedGroupID
         var snapshot = NSDiffableDataSourceSnapshot<Int, Domain.Group>()
         snapshot.appendSections([0])
         snapshot.appendItems(groups, toSection: 0)
@@ -93,6 +107,20 @@ public final class Coordinator: NSObject, UICollectionViewDelegate {
 
         if selectedGroupID != group.id {
             selectedGroupID = group.id
+
+            onGroupSelected?(group)
+
+            collectionView.visibleCells.forEach { cell in
+                if let cell = cell as? Cell, let indexPath = collectionView.indexPath(for: cell) {
+                    if let group = dataSource?.itemIdentifier(for: indexPath) {
+                        cell.configure(
+                            with: group,
+                            imageSize: imageSize,
+                            isSelected: group.id == selectedGroupID
+                        )
+                    }
+                }
+            }
         }
     }
 }

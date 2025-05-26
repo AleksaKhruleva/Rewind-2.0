@@ -14,10 +14,10 @@ public struct AddMemberView: View {
 
     private weak var router: AppRouter?
 
-    public init(groupName: String, router: AppRouter) {
+    public init(groupName: String, link: String, router: AppRouter) {
         self.groupName = groupName
         self.router = router
-        viewModel = AddMemberViewModel()
+        viewModel = AddMemberViewModel(link: link)
     }
 
     public var body: some View {

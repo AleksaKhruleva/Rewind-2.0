@@ -32,10 +32,10 @@ public final class AppRouter {
 
         case groupsList
         case group(Domain.Group)
-        case groupSettings
-        case addMember(String)
+        case groupSettings(Domain.Group)
+        case addMember(String, String)
         case memberDetails(Member)
-        case membersList([Member])
+        case membersList(Domain.Group)
 
         case rewindsStand
         case rollsStand

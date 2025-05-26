@@ -11,11 +11,12 @@ final class GroupSelectionViewModel {
 
     var isLoading = false
     var isGroupCreationViewPresented = false
-    var currentGroupID: Int? {
-        get { GroupStorage.currentGroup?.id }
+
+    var currentGroup: Domain.CurrentGroupInfo? {
+        get { GroupStorage.currentGroup }
         set {
             if let newValue {
-                GroupStorage.set(groupID: newValue, imageData: nil)
+                GroupStorage.set(newGroup: newValue)
             }
         }
     }
@@ -69,7 +70,7 @@ final class GroupSelectionViewModel {
                     createdAt: DateParser.parseISODate(response.createdAt)
                 )
 
-                GroupStorage.set(groupID: group.id, imageData: group.imageData)
+                GroupStorage.set(newGroup: group)
 
                 isGroupCreationViewPresented = false
 

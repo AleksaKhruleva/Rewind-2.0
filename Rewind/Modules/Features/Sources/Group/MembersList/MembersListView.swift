@@ -6,24 +6,31 @@ public struct MembersListView: View {
     @State private var searchText = ""
 
     private let router: MembersListRouter
-    private let members: [Member]
+    private let group: Domain.Group
+
+    private var groupMembers: [Member] {
+        group.members ?? []
+    }
 
     private var filteredMembers: [Member] {
         if searchText.isEmpty {
-            return members
+            return groupMembers
         } else {
             let searchQuery = searchText
                 .trimmingCharacters(in: .whitespacesAndNewlines)
                 .localizedLowercase
 
-            return members.filter { member in
+            return groupMembers.filter { member in
                 member.name.localizedCaseInsensitiveContains(searchQuery)
             }
         }
     }
 
-    public init(members: [Member], router: MembersListRouter) {
-        self.members = members
+    public init(
+        group: Domain.Group,
+        router: MembersListRouter
+    ) {
+        self.group = group
         self.router = router
     }
 
@@ -47,8 +54,8 @@ public struct MembersListView: View {
     private var header: some View {
         RewindHeader(centerView: {
             HeaderBadgeView(
-                image: UIComponentsAsset.groupAvatar.image,
-                text: "Friends"
+                image: group.image,
+                text: group.name
             )
         }, rightView: {
             RewindButton(type: .rightChevron) {
@@ -70,7 +77,7 @@ public struct MembersListView: View {
             members: filteredMembers,
             isShortened: false,
             onAddMemberTap: {
-                router.navigateToAddMember(groupName: "Friends")
+                router.navigateToAddMember(groupName: group.name, link: "") // TODO: request link later
             },
             onMemberTap: { member in
                 router.navigateToMemberDetails(member)

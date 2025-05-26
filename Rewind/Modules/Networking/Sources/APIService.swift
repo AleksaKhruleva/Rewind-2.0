@@ -31,6 +31,9 @@ enum APIService {
     case fetchGroups(accessToken: String)
     case fetchGroup(accessToken: String, id: Int)
     case fetchGroupMembers(accessToken: String, id: Int)
+    case updateGroupName(accessToken: String, id: Int, name: String)
+    case createGroupInvitation(accessToken: String, id: Int)
+    case deleteGroup(accessToken: String, id: Int)
 }
 
 extension APIService: TargetType {
@@ -84,6 +87,12 @@ extension APIService: TargetType {
             return "/groups/\(id)"
         case let .fetchGroupMembers(_, id):
             return "/groups/\(id)/members"
+        case let .updateGroupName(_, id, _):
+            return "/groups/\(id)"
+        case let .createGroupInvitation(_, id):
+            return "/groups/\(id)/invitations"
+        case let .deleteGroup(_, id):
+            return "/groups/\(id)"
         }
     }
 
@@ -104,7 +113,8 @@ extension APIService: TargetType {
                 .passwordResetVerify,
                 .checkPassword,
                 .emailStartChange,
-                .createGroup:
+                .createGroup,
+                .createGroupInvitation:
             return .post
         case .updateUserName,
                 .updateUserAvatar,
@@ -112,7 +122,10 @@ extension APIService: TargetType {
                 .emailVerifyChange:
             return .patch
         case .deleteUser:
+        case .deleteGroup:
             return .delete
+        case .updateGroupName:
+            return .put
         }
     }
 
@@ -177,9 +190,14 @@ extension APIService: TargetType {
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
         case let .createGroup(_, name):
             return jsonRequest(["image": "aboba", "name": name])
+        case let .updateGroupName(_, _, name):
+            return jsonRequest(["name": name])
+        case .createGroupInvitation:
+            return jsonRequest([:])
         case .fetchGroups,
                 .fetchGroup,
-                .fetchGroupMembers:
+                .fetchGroupMembers,
+                .deleteGroup:
             return .requestPlain
         }
     }
@@ -200,7 +218,10 @@ extension APIService: TargetType {
             let .createGroup(accessToken, _),
             let .fetchGroups(accessToken),
             let .fetchGroup(accessToken, _),
-            let .fetchGroupMembers(accessToken, _):
+            let .fetchGroupMembers(accessToken, _),
+            let .updateGroupName(accessToken, _, _),
+            let .deleteGroup(accessToken, _),
+            let .createGroupInvitation(accessToken, _):
             return [
                 "Authorization": "Bearer \(accessToken)",
                 "Content-Type": "application/json"

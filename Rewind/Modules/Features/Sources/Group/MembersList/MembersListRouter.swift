@@ -9,8 +9,8 @@ public final class MembersListRouter {
         self.appRouter = appRouter
     }
 
-    func navigateToAddMember(groupName: String) {
-        appRouter?.navigate(to: .addMember(groupName), with: .pushFromLeft)
+    func navigateToAddMember(groupName: String, link: String) {
+        appRouter?.navigate(to: .addMember(groupName, link), with: .pushFromLeft)
     }
 
     func navigateToMemberDetails(_ member: Member) {

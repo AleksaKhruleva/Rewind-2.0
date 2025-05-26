@@ -72,11 +72,17 @@ public struct RewindView: View {
             GroupSelectionView(
                 user: viewModel.user,
                 groups: viewModel.groups,
-                router: viewModel.router
+                router: viewModel.router,
+                onGroupSelected: { newGroup in
+                    print("New group selected, need to update rewind")
+                    Task {
+                        await viewModel.dispatch(.selectedNewGroup(newGroup))
+                    }
+                }
             )
-                .presentationCornerRadius(30)
-                .presentationDragIndicator(.visible)
-                .presentationDetents([.height(450)])
+            .presentationCornerRadius(30)
+            .presentationDragIndicator(.visible)
+            .presentationDetents([.height(450)])
         }
         .sheet(isPresented: $filterSettingsShown) {
             FilterView(title: UIComponentsStrings.Rewind.Filters.title) { settings in
@@ -115,6 +121,9 @@ public struct RewindView: View {
                             await viewModel.dispatch(.openGroup)
                         }
                     }
+                    .blur(radius: viewModel.userGroupsState == .notReady ? 3 : 0)
+                    .animation(.easeInOut(duration: 0.2), value: viewModel.userGroupsState)
+                    .disabledWithOpacity(viewModel.userGroupsState == .notReady)
             }
         } centerView: {
             HStack {
@@ -131,8 +140,7 @@ public struct RewindView: View {
                     if !viewModel.user.isEmpty {
                         viewModel.router.navigateToAccount(user: viewModel.user)
                     }
-                }
-            }.rewindAccessibilityIdentifier(.rewind(.button(.account)))
+                }.rewindAccessibilityIdentifier(.rewind(.button(.account)))
         }
     }
 

@@ -31,5 +31,6 @@ struct GroupNameInputView: View {
                     }
             }
         }
+        .interactiveDismissDisabled(isLoading)
     }
 }

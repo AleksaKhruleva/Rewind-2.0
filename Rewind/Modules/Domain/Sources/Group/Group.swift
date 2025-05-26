@@ -2,7 +2,7 @@ import SwiftUI
 
 public struct Group: Hashable {
     public let id: Int
-    public let name: String
+    public var name: String
     public let ownerID: Int?
     public private(set) var imageData: Data?
     public let members: [Member]?

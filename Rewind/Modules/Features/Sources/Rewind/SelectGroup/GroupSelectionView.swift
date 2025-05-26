@@ -9,6 +9,8 @@ struct GroupSelectionView: View {
     @State private var searchText = ""
     @Environment(\.dismiss) private var dismiss
 
+    private let onGroupSelected: ((Domain.Group) -> Void)?
+
     private var filteredGroups: [Domain.Group] {
         if searchText.isEmpty {
             return viewModel.groups
@@ -19,7 +21,8 @@ struct GroupSelectionView: View {
         }
     }
 
-    init(user: User, groups: [Domain.Group], router: RewindRouter) {
+    init(user: User, groups: [Domain.Group], router: RewindRouter, onGroupSelected: ((Domain.Group) -> Void)?) {
+        self.onGroupSelected = onGroupSelected
         viewModel = GroupSelectionViewModel(user: user, groups: groups, router: router)
     }
 
@@ -75,9 +78,18 @@ struct GroupSelectionView: View {
                     .fill(Color.background)
 
                 GroupsScrollView(
-                    selectedGroupID: $viewModel.currentGroupID,
+                    selectedGroupID: viewModel.currentGroup?.id,
                     groups: filteredGroups,
-                    imageSize: imageSize
+                    imageSize: imageSize,
+                    onGroupSelected: { newGroup in
+                        viewModel.currentGroup = CurrentGroupInfo(
+                            id: newGroup.id,
+                            name: newGroup.name,
+                            imageData: newGroup.imageData
+                        )
+                        onGroupSelected?(newGroup)
+                        dismiss()
+                    }
                 )
                 .frame(height: imageSize + 20)
                 .clipShape(RoundedRectangle(cornerRadius: 40, style: .continuous))
