@@ -3073,6 +3073,12 @@ const docTemplate = `{
                 },
                 "userId": {
                     "type": "integer"
+                },
+                "userImage": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },

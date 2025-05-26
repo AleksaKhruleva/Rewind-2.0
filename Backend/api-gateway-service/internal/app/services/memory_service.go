@@ -11,6 +11,7 @@ import (
 	groupClient "Rewind-api-gateway-service/clients/group"
 	memoryClient "Rewind-api-gateway-service/clients/memory"
 	"Rewind-api-gateway-service/internal/app/requests"
+	"Rewind-api-gateway-service/internal/app/responses"
 	pb "Rewind-api-gateway-service/pkg/proto"
 )
 
@@ -21,8 +22,8 @@ import (
 type MemoryServiceInterface interface {
 	CreateMemory(ctx context.Context, req *requests.CreateMemoryRequest, mediaFileBytes []byte) (*pb.CreateMemoryResponse, error)
 	DeleteMemory(ctx context.Context, req *requests.DeleteMemoryRequest) (*pb.DeleteMemoryResponse, error)
-	ListMemoriesByGroup(ctx context.Context, req *requests.ListMemoriesByGroupRequest) (*pb.ListMemoriesByGroupResponse, error)
-	ListMemoriesByGroupWithFilters(ctx context.Context, req *requests.ListMemoriesByGroupWithFiltersRequest) (*pb.ListMemoriesByGroupWithFiltersResponse, error)
+	ListMemoriesByGroup(ctx context.Context, req *requests.ListMemoriesByGroupRequest) ([]responses.DetailedMemoryResponse, error)
+	ListMemoriesByGroupWithFilters(ctx context.Context, req *requests.ListMemoriesByGroupWithFiltersRequest) ([]responses.DetailedMemoryResponse, error)
 	CreateMemoryTag(ctx context.Context, req *requests.CreateMemoryTagRequest) (*pb.CreateMemoryTagResponse, error)
 	DeleteMemoryTag(ctx context.Context, req *requests.DeleteMemoryTagRequest) (*pb.DeleteMemoryTagResponse, error)
 	ListMemoryTagsByMemoryID(ctx context.Context, req *requests.ListMemoryTagsByMemoryIDRequest) (*pb.ListMemoryTagsByMemoryIDResponse, error)
@@ -138,7 +139,7 @@ func (s *MemoryService) DeleteMemory(ctx context.Context, req *requests.DeleteMe
 }
 
 // ListMemoriesByGroup calls the ListMemoriesByGroup RPC method in Memory-Service.
-func (s *MemoryService) ListMemoriesByGroup(ctx context.Context, req *requests.ListMemoriesByGroupRequest) (*pb.ListMemoriesByGroupResponse, error) {
+func (s *MemoryService) ListMemoriesByGroup(ctx context.Context, req *requests.ListMemoriesByGroupRequest) ([]responses.DetailedMemoryResponse, error) {
 	userID, err := GetRequestingUserIDFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -155,11 +156,66 @@ func (s *MemoryService) ListMemoriesByGroup(ctx context.Context, req *requests.L
 		GroupId: req.GroupID,
 	}
 
-	return s.memoryClient.ListMemoriesByGroup(ctx, pbReq)
+	resp, err := s.memoryClient.ListMemoriesByGroup(ctx, pbReq)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.AddUserInfoToMemories(ctx, resp.GetMemories())
+}
+
+func (s *MemoryService) AddUserInfoToMemories(ctx context.Context, detailedMemories []*pb.DetailedMemory) ([]responses.DetailedMemoryResponse, error) {
+	userIDs := make([]uint64, len(detailedMemories))
+	for i, m := range detailedMemories {
+		userIDs[i] = m.GetMemory().GetUserId()
+	}
+	users, err := s.authClient.GetUsersByIDs(ctx, &pb.GetUsersByIDsRequest{UserIds: userIDs})
+	if err != nil {
+		return nil, err
+	}
+	usersMap := make(map[uint64]*pb.User)
+	for _, user := range users.GetUsers() {
+		usersMap[user.GetId()] = user
+	}
+	var (
+		respMemories        []responses.DetailedMemoryResponse
+		username, userImage string
+	)
+	for _, mem := range detailedMemories {
+		user, found := usersMap[mem.GetMemory().GetUserId()]
+		if !found {
+			username = "unknown"
+			userImage = "unknown"
+		} else {
+			username = user.GetUsername()
+			userImage = user.GetImage()
+		}
+		respMemories = append(respMemories, responses.DetailedMemoryResponse{
+			Memory: responses.MemoryResponse{
+				Id:        mem.GetMemory().GetId(),
+				GroupID:   mem.GetMemory().GetGroupId(),
+				UserID:    mem.GetMemory().GetUserId(),
+				Username:  username,
+				UserImage: userImage,
+				MediaType: mem.GetMemory().MediaType.String(),
+				MediaURL:  mem.GetMemory().GetMediaUrl(),
+				Latitude:  mem.GetMemory().GetLatitude(),
+				Longitude: mem.GetMemory().GetLongitude(),
+				MusicID:   mem.GetMemory().GetMusicId(),
+				Offset:    mem.GetMemory().GetOffset(),
+				Duration:  mem.GetMemory().GetDuration(),
+				CreatedAt: mem.GetMemory().GetCreatedAt().AsTime(),
+				UpdatedAt: mem.GetMemory().GetUpdatedAt().AsTime(),
+			},
+			Tags:        mem.GetTags(),
+			IsFavourite: mem.GetIsFavourite(),
+		})
+	}
+	return respMemories, nil
 }
 
 // ListMemoriesByGroupWithFilters calls the ListMemoriesByGroupWithFilters RPC method in Memory-Service.
-func (s *MemoryService) ListMemoriesByGroupWithFilters(ctx context.Context, req *requests.ListMemoriesByGroupWithFiltersRequest) (*pb.ListMemoriesByGroupWithFiltersResponse, error) {
+func (s *MemoryService) ListMemoriesByGroupWithFilters(ctx context.Context, req *requests.ListMemoriesByGroupWithFiltersRequest) ([]responses.DetailedMemoryResponse, error) {
 	userID, err := GetRequestingUserIDFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -189,7 +245,11 @@ func (s *MemoryService) ListMemoriesByGroupWithFilters(ctx context.Context, req 
 		pbReq.Filters = req.Filters
 	}
 
-	return s.memoryClient.ListMemoriesByGroupWithFilters(ctx, pbReq)
+	resp, err := s.memoryClient.ListMemoriesByGroupWithFilters(ctx, pbReq)
+	if err != nil {
+		return nil, err
+	}
+	return s.AddUserInfoToMemories(ctx, resp.GetMemories())
 }
 
 // CreateMemoryTag calls the CreateMemoryTag RPC method in Memory-Service.

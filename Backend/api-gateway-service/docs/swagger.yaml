@@ -352,6 +352,10 @@ definitions:
         type: string
       userId:
         type: integer
+      userImage:
+        type: string
+      username:
+        type: string
     type: object
   responses.MemoryTagResponse:
     properties:

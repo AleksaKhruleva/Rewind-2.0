@@ -272,32 +272,10 @@ func (h *MemoryHandler) ListMemoriesByGroup(w http.ResponseWriter, r *http.Reque
 		GroupID: groupID,
 	}
 
-	resp, err := h.memoryService.ListMemoriesByGroup(r.Context(), &req)
+	respMemories, err := h.memoryService.ListMemoriesByGroup(r.Context(), &req)
 	if err != nil {
 		handleServiceError(w, err, "ListMemoriesByGroup")
 		return
-	}
-
-	var respMemories []responses.DetailedMemoryResponse
-	for _, mem := range resp.GetMemories() {
-		respMemories = append(respMemories, responses.DetailedMemoryResponse{
-			Memory: responses.MemoryResponse{
-				Id:        mem.GetMemory().GetId(),
-				GroupID:   mem.GetMemory().GetGroupId(),
-				UserID:    mem.GetMemory().GetUserId(),
-				MediaType: mem.GetMemory().MediaType.String(),
-				MediaURL:  mem.GetMemory().GetMediaUrl(),
-				Latitude:  mem.GetMemory().GetLatitude(),
-				Longitude: mem.GetMemory().GetLongitude(),
-				MusicID:   mem.GetMemory().GetMusicId(),
-				Offset:    mem.GetMemory().GetOffset(),
-				Duration:  mem.GetMemory().GetDuration(),
-				CreatedAt: mem.GetMemory().GetCreatedAt().AsTime(),
-				UpdatedAt: mem.GetMemory().GetUpdatedAt().AsTime(),
-			},
-			Tags:        mem.GetTags(),
-			IsFavourite: mem.GetIsFavourite(),
-		})
 	}
 
 	respondJSON(w, http.StatusOK, responses.ListMemoriesResponse{Memories: respMemories})
@@ -381,32 +359,10 @@ func (h *MemoryHandler) ListMemoriesByGroupWithFilters(w http.ResponseWriter, r 
 		req.Filters["tags"] = tags
 	}
 
-	resp, err := h.memoryService.ListMemoriesByGroupWithFilters(r.Context(), &req)
+	respMemories, err := h.memoryService.ListMemoriesByGroupWithFilters(r.Context(), &req)
 	if err != nil {
 		handleServiceError(w, err, "ListMemoriesByGroupWithFilters")
 		return
-	}
-
-	var respMemories []responses.DetailedMemoryResponse
-	for _, mem := range resp.GetMemories() {
-		respMemories = append(respMemories, responses.DetailedMemoryResponse{
-			Memory: responses.MemoryResponse{
-				Id:        mem.GetMemory().GetId(),
-				GroupID:   mem.GetMemory().GetGroupId(),
-				UserID:    mem.GetMemory().GetUserId(),
-				MediaType: mem.GetMemory().MediaType.String(),
-				MediaURL:  mem.GetMemory().GetMediaUrl(),
-				Latitude:  mem.GetMemory().GetLatitude(),
-				Longitude: mem.GetMemory().GetLongitude(),
-				MusicID:   mem.GetMemory().GetMusicId(),
-				Offset:    mem.GetMemory().GetOffset(),
-				Duration:  mem.GetMemory().GetDuration(),
-				CreatedAt: mem.GetMemory().GetCreatedAt().AsTime(),
-				UpdatedAt: mem.GetMemory().GetUpdatedAt().AsTime(),
-			},
-			Tags:        mem.GetTags(),
-			IsFavourite: mem.GetIsFavourite(),
-		})
 	}
 
 	respondJSON(w, http.StatusOK, responses.ListMemoriesResponse{Memories: respMemories})

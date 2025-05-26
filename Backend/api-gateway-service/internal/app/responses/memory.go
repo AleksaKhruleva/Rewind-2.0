@@ -9,6 +9,8 @@ type MemoryResponse struct {
 	Id        uint64    `json:"id"`
 	GroupID   uint64    `json:"groupId"`
 	UserID    uint64    `json:"userId"`
+	Username  string    `json:"username"`
+	UserImage string    `json:"userImage"`
 	MediaType string    `json:"mediaType"`
 	MediaURL  string    `json:"mediaUrl"`
 	Latitude  float64   `json:"latitude"`
