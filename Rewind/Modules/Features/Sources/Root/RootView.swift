@@ -12,11 +12,12 @@ public struct RootView: View {
         ZStack {
             ForEach(Array(router.stack.enumerated()), id: \.element.id) { index, wrapper in
                 let isBelowTop = index == router.stack.count - 2
+                let isTop = index == router.stack.count - 1
 
                 screen(for: wrapper.route)
                     .transition(transition(for: wrapper.transition))
                     .zIndex(Double(index))
-
+                    .environment(\.isTopScreen, isTop)
                     .overlay {
                         if isBelowTop {
                             Color.black.opacity(0.2)
@@ -49,12 +50,12 @@ public struct RootView: View {
         case .mediasUploading: MediasUploadingView(router: router)
         case let .mediaDetails(mediaItem): MediaDetailsView(mediaItem: mediaItem, router: router)
 
-        case .group: GroupView(router: GroupRouter(appRouter: router))
         case .groupsList: GroupsListView(router: GroupsListRouter(appRouter: router))
-        case .groupSettings: GroupSettingsView(router: GroupSettingsRouter(appRouter: router))
-        case let .addMember(groupName): AddMemberView(groupName: groupName, router: router)
+        case let .group(group): GroupView(group: group, router: GroupRouter(appRouter: router))
+        case let .groupSettings(group): GroupSettingsView(group: group, router: GroupSettingsRouter(appRouter: router))
+        case let .addMember(groupName, link): AddMemberView(groupName: groupName, link: link, router: router)
         case let .memberDetails(member): MemberDetailsView(member: member, router: router)
-        case .membersList: MembersListView(router: MembersListRouter(appRouter: router))
+        case let .membersList(group): MembersListView(group: group, router: MembersListRouter(appRouter: router))
 
         case .rewindsStand: StandView(title: "You added 207 Rewinds", counterType: .rewinds, router: router)
         case .rollsStand: StandView(title: "You rolled 207 Rewinds", counterType: .rolls, router: router)

@@ -1,25 +1,13 @@
 import SwiftUI
 import UIComponents
-
-let images = [
-    UIComponentsAsset.media1.image,
-    UIComponentsAsset.media2.image,
-    UIComponentsAsset.media3.image,
-    UIComponentsAsset.media4.image,
-    UIComponentsAsset.media6.image,
-    UIComponentsAsset.media7.image,
-    UIComponentsAsset.media8.image,
-    UIComponentsAsset.media9.image,
-    UIComponentsAsset.media10.image
-]
+import Domain
 
 public struct GroupView: View {
+    @State private var viewModel: GroupViewModel
     @State private var isBlurredAvatarPresented = false
 
-    private let router: GroupRouter
-
-    public init(router: GroupRouter) {
-        self.router = router
+    public init(group: Domain.Group, router: GroupRouter) {
+        viewModel = GroupViewModel(group: group, router: router)
     }
 
     public var body: some View {
@@ -51,7 +39,7 @@ public struct GroupView: View {
             if isBlurredAvatarPresented {
                 BlurredAvatarView(
                     isPresented: $isBlurredAvatarPresented,
-                    image: .constant(UIComponentsAsset.groupAvatar.image)
+                    image: .constant(viewModel.group.image)
                 )
             }
         }
@@ -60,36 +48,38 @@ public struct GroupView: View {
     private var header: some View {
         RewindHeader {
             RewindButton(type: .gearshape) {
-                router.navigateToGroupSettings()
+                viewModel.router.navigateToGroupSettings(viewModel.group)
             }
         } centerView: {
             HeaderBadgeView(
-                image: UIComponentsAsset.groupAvatar.image,
-                text: "Friends"
+                image: viewModel.group.image,
+                text: viewModel.group.name
             )
         } rightView: {
             RewindButton(type: .rightChevron) {
-                router.dismiss()
+                viewModel.router.dismiss()
             }
         }
     }
 
     private var avatar: some View {
-        AvatarView(image: UIComponentsAsset.groupAvatar.image, text: "Friends")
+        AvatarView(image: viewModel.group.image, text: viewModel.group.name)
     }
 
     private var membersTable: some View {
         MembersTable(
-            members: Array(membersForTest.prefix(4)),
+            members: viewModel.group.members ?? [],
             isShortened: true,
             onAddMemberTap: {
-                router.navigateToAddMember(groupName: "Friends")
+                Task {
+                    await viewModel.dispatch(.createInvitation)
+                }
             },
             onMemberTap: { member in
-                router.navigateToMemberDetails(member)
+                viewModel.router.navigateToMemberDetails(member)
             },
             onShowAllMembersTap: {
-                router.navigateToMembersList()
+                viewModel.router.navigateToMembersList(viewModel.group)
             }
         )
     }
@@ -106,14 +96,14 @@ public struct GroupView: View {
                     systemImageName: "photo.on.rectangle",
                     title: UIComponentsStrings.Group.Stand.rewinds,
                     imageSize: 20) {
-                        router.navigateToRewindsStand()
+                        viewModel.router.navigateToRewindsStand()
                     }
 
                 MembersTableButton(
                     systemImageName: "forward.fill",
                     title: UIComponentsStrings.Group.Stand.rolls,
                     imageSize: 15) {
-                        router.navigateToRollsStand()
+                        viewModel.router.navigateToRollsStand()
                     }
             }
             .padding(.vertical, 5)
@@ -122,14 +112,20 @@ public struct GroupView: View {
         }
     }
 
+    @ViewBuilder
     private var galleryPreview: some View {
-        GalleryScrollPreview(images: images, onChevronTap: {
-            router.navigateToGallery()
-        })
+        if let gallery = viewModel.group.gallery {
+            GalleryScrollPreview(images: gallery, onChevronTap: {
+                viewModel.router.navigateToGallery()
+            })
+        }
     }
 
+    @ViewBuilder
     private var groupExistenceNote: some View {
-        RewindNoteTextView(text: UIComponentsStrings.Group.note(100))
-            .padding(.vertical, 4)
+        if let days = viewModel.group.daysSinceCreation {
+            RewindNoteTextView(text: UIComponentsStrings.Group.note(days))
+                .padding(.vertical, 4)
+        }
     }
 }

@@ -1,17 +1,6 @@
 import SwiftUI
 import UIKit
-
-// временно тут
-public struct RewindGroup: Identifiable, Hashable {
-    public let id: UUID = UUID()
-    public let image: UIImage
-    public let name: String
-
-    public init(image: UIImage, name: String) {
-        self.image = image
-        self.name = name
-    }
-}
+import Domain
 
 // MARK: - Constants
 
@@ -25,12 +14,21 @@ private enum Constants {
 // MARK: - GroupsScrollView
 
 public struct GroupsScrollView: UIViewRepresentable {
-    private let groups: [RewindGroup]
+    private let selectedGroupID: Int?
+    private let groups: [Domain.Group]
     private let imageSize: CGFloat
+    private let onGroupSelected: ((Domain.Group) -> Void)?
 
-    public init(groups: [RewindGroup], imageSize: CGFloat) {
+    public init(
+        selectedGroupID: Int?,
+        groups: [Domain.Group],
+        imageSize: CGFloat,
+        onGroupSelected: ((Domain.Group) -> Void)?
+    ) {
+        self.selectedGroupID = selectedGroupID
         self.groups = groups
         self.imageSize = imageSize
+        self.onGroupSelected = onGroupSelected
     }
 
     public func makeUIView(context: Context) -> UICollectionView {
@@ -47,6 +45,7 @@ public struct GroupsScrollView: UIViewRepresentable {
         collectionView.backgroundColor = .clear
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.alwaysBounceHorizontal = true
+        collectionView.delegate = context.coordinator
 
         context.coordinator.configureDataSource(for: collectionView)
 
@@ -54,43 +53,75 @@ public struct GroupsScrollView: UIViewRepresentable {
     }
 
     public func updateUIView(_ uiView: UICollectionView, context: Context) {
-        context.coordinator.update(groups: groups)
+        context.coordinator.update(groups: groups, selectedGroupID: selectedGroupID)
     }
 
     public func makeCoordinator() -> Coordinator {
-        Coordinator(imageSize: imageSize)
+        Coordinator(
+            imageSize: imageSize,
+            selectedGroupID: selectedGroupID,
+            onGroupSelected: onGroupSelected
+        )
     }
 }
 
 // MARK: - Coordinator
 
-public final class Coordinator {
-    private var dataSource: UICollectionViewDiffableDataSource<Int, RewindGroup>?
+public final class Coordinator: NSObject, UICollectionViewDelegate {
+    private var dataSource: UICollectionViewDiffableDataSource<Int, Domain.Group>?
     private let imageSize: CGFloat
+    private var selectedGroupID: Int?
+    private let onGroupSelected: ((Domain.Group) -> Void)?
 
-    init(imageSize: CGFloat) {
+    init(imageSize: CGFloat, selectedGroupID: Int?, onGroupSelected: ((Domain.Group) -> Void)?) {
         self.imageSize = imageSize
+        self.selectedGroupID = selectedGroupID
+        self.onGroupSelected = onGroupSelected
     }
 
     // swiftlint:disable force_cast
     func configureDataSource(for collectionView: UICollectionView) {
-        dataSource = UICollectionViewDiffableDataSource<Int, RewindGroup>(
-            collectionView: collectionView
-        ) { collectionView, indexPath, group in
-            let cell = collectionView.dequeueReusableCell(
-                withReuseIdentifier: Cell.reuseIdentifier, for: indexPath
-            ) as! Cell
-            cell.configure(with: group, imageSize: self.imageSize)
+        dataSource = UICollectionViewDiffableDataSource<Int, Domain.Group>(collectionView: collectionView) {
+            collectionView, indexPath, group in
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Cell.reuseIdentifier, for: indexPath) as! Cell
+            cell.configure(
+                with: group,
+                imageSize: self.imageSize,
+                isSelected: group.id == self.selectedGroupID
+            )
             return cell
         }
     }
-    // swiftlint:enable force_cast
 
-    func update(groups: [RewindGroup]) {
-        var snapshot = NSDiffableDataSourceSnapshot<Int, RewindGroup>()
+    func update(groups: [Domain.Group], selectedGroupID: Int?) {
+        var snapshot = NSDiffableDataSourceSnapshot<Int, Domain.Group>()
         snapshot.appendSections([0])
         snapshot.appendItems(groups, toSection: 0)
         dataSource?.apply(snapshot, animatingDifferences: true)
+    }
+
+    // MARK: - UICollectionViewDelegate
+
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let group = dataSource?.itemIdentifier(for: indexPath) else { return }
+
+        if selectedGroupID != group.id {
+            selectedGroupID = group.id
+
+            onGroupSelected?(group)
+
+            collectionView.visibleCells.forEach { cell in
+                if let cell = cell as? Cell, let indexPath = collectionView.indexPath(for: cell) {
+                    if let group = dataSource?.itemIdentifier(for: indexPath) {
+                        cell.configure(
+                            with: group,
+                            imageSize: imageSize,
+                            isSelected: group.id == selectedGroupID
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -113,11 +144,19 @@ public final class Cell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(with group: RewindGroup, imageSize: CGFloat) {
+    func configure(with group: Domain.Group, imageSize: CGFloat, isSelected: Bool) {
         imageView.image = group.image
         titleLabel.text = group.name
-
         widthConstraint?.constant = imageSize
+
+        if isSelected {
+            imageView.layer.borderColor = UIComponentsAsset.pinkPrimary.color.cgColor
+            imageView.layer.borderWidth = 3
+            titleLabel.textColor = UIComponentsAsset.pinkPrimary.color
+        } else {
+            imageView.layer.borderWidth = 0
+            titleLabel.textColor = UIComponentsAsset.textPrimary.color
+        }
     }
 
     private func setupViews() {

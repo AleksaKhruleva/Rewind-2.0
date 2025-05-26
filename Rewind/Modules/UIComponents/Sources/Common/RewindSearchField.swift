@@ -26,6 +26,8 @@ public struct RewindSearchField: View {
                 .disableAutocorrection(true)
                 .modifier(RoundFontModifier(size: 17))
                 .padding(.trailing, text.isEmpty ? 0 : 8)
+                .tint(.pinkPrimary)
+                .submitLabel(.search)
 
             if !text.isEmpty {
                 Button {

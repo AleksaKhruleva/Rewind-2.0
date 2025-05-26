@@ -17,7 +17,7 @@ public struct GenericInputSheetView: View {
 
     private var keyboardType: UIKeyboardType {
         switch item {
-        case .name, .password, .tag, .code: .default
+        case .name, .password, .tag, .code, .groupName: .default
         case .email: .emailAddress
         }
     }
@@ -47,7 +47,7 @@ public struct GenericInputSheetView: View {
                     .modifier(RoundFontModifier(size: AuthConstants.titleFontSize))
 
                 switch item {
-                case .name, .password, .email, .tag:
+                case .name, .password, .email, .tag, .groupName:
                     StyledTextField(
                         text: $text,
                         placeholder: placeholder ?? "",

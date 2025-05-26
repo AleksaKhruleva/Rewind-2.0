@@ -28,6 +28,12 @@ public struct MediaTopButtons: View {
                     .background(Color.backgroundSecondary)
                     .clipShape(Capsule())
             }
+
+            // для центрирования
+            Circle()
+                .foregroundStyle(.clear)
+                .frame(width: 36, height: 36)
+                .allowsHitTesting(false)
         }
         .foregroundStyle(Color.textPrimary)
     }

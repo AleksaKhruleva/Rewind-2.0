@@ -31,28 +31,28 @@ public struct StandView: View {
                         .modifier(RoundFontModifier(size: 16, foregroundColor: .white))
                 }
 
-                HStack(alignment: .bottom) {
-                    ForEach(podiumMembers, id: \.index) { podiumMember in
-                        PodiumBadgeView(
-                            rank: podiumMember.rank,
-                            member: membersForTest[podiumMember.index],
-                            imageSize: podiumMember.imageSize,
-                            count: podiumMember.count,
-                            counterType: counterType,
-                            badgeSize: podiumMember.badgeSize,
-                            badgeColor: podiumMember.badgeColor
-                        )
-                    }
-                }
-
-                ForEach(membersForTest.indices.dropFirst(3), id: \.self) { index in
-                    LeaderboardRowView(
-                        rank: index + 1,
-                        member: membersForTest[index],
-                        count: [123, 70, 7][index - 3],
-                        counterType: counterType
-                    )
-                }
+//                HStack(alignment: .bottom) {
+//                    ForEach(podiumMembers, id: \.index) { podiumMember in
+//                        PodiumBadgeView(
+//                            rank: podiumMember.rank,
+//                            member: membersForTest[podiumMember.index],
+//                            imageSize: podiumMember.imageSize,
+//                            count: podiumMember.count,
+//                            counterType: counterType,
+//                            badgeSize: podiumMember.badgeSize,
+//                            badgeColor: podiumMember.badgeColor
+//                        )
+//                    }
+//                }
+//
+//                ForEach(membersForTest.indices.dropFirst(3), id: \.self) { index in
+//                    LeaderboardRowView(
+//                        rank: index + 1,
+//                        member: membersForTest[index],
+//                        count: [123, 70, 7][index - 3],
+//                        counterType: counterType
+//                    )
+//                }
             }
         }
     }

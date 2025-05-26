@@ -17,7 +17,6 @@ enum APIService {
     case user(accessToken: String)
 
     case updateUserName(accessToken: String, name: String)
-
     case updateUserAvatar(accessToken: String, avatar: UIImage)
 
     case passwordResetSet(accessToken: String, password: String)
@@ -27,6 +26,14 @@ enum APIService {
     case checkPassword(accessToken: String, password: String)
     case emailStartChange(accessToken: String, email: String)
     case emailVerifyChange(accessToken: String, verificationCode: String)
+
+    case createGroup(accessToken: String, name: String)
+    case fetchGroups(accessToken: String)
+    case fetchGroup(accessToken: String, id: Int)
+    case fetchGroupMembers(accessToken: String, id: Int)
+    case updateGroupName(accessToken: String, id: Int, name: String)
+    case createGroupInvitation(accessToken: String, id: Int)
+    case deleteGroup(accessToken: String, id: Int)
 }
 
 extension APIService: TargetType {
@@ -54,7 +61,7 @@ extension APIService: TargetType {
         case .refresh:
             return "/auth/refresh"
         case let .user(accessToken):
-            let id = JWTDecoderService().getUserId(from: accessToken) ?? "undefined"
+            let id = JWTDecoder().getUserId(from: accessToken) ?? "undefined"
             return "users/\(id)"
         case .updateUserName:
             return "users/username"
@@ -72,12 +79,29 @@ extension APIService: TargetType {
             return "users/email/start-change"
         case .emailVerifyChange:
             return "users/email/verify-change"
+        case .createGroup:
+            return "/groups"
+        case .fetchGroups:
+            return "/users/groups"
+        case let .fetchGroup(_, id):
+            return "/groups/\(id)"
+        case let .fetchGroupMembers(_, id):
+            return "/groups/\(id)/members"
+        case let .updateGroupName(_, id, _):
+            return "/groups/\(id)"
+        case let .createGroupInvitation(_, id):
+            return "/groups/\(id)/invitations"
+        case let .deleteGroup(_, id):
+            return "/groups/\(id)"
         }
     }
 
     var method: Moya.Method {
         switch self {
-        case .user:
+        case .user,
+                .fetchGroups,
+                .fetchGroup,
+                .fetchGroupMembers:
             return .get
         case .register,
                 .verifyEmail,
@@ -88,7 +112,9 @@ extension APIService: TargetType {
                 .passwordResetStart,
                 .passwordResetVerify,
                 .checkPassword,
-                .emailStartChange:
+                .emailStartChange,
+                .createGroup,
+                .createGroupInvitation:
             return .post
         case .updateUserName,
                 .updateUserAvatar,
@@ -96,25 +122,26 @@ extension APIService: TargetType {
                 .emailVerifyChange:
             return .patch
         case .deleteUser:
+        case .deleteGroup:
             return .delete
+        case .updateGroupName:
+            return .put
         }
     }
 
     var task: Moya.Task {
         switch self {
         case let .register(email):
-            let parameters = ["email": email]
-            return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+            return jsonRequest(["email": email])
         case let .verifyEmail(registrationID, verificationCode):
-            let parameters = ["registration_id": registrationID, "verification_code": verificationCode]
-            return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+            return jsonRequest(["registration_id": registrationID, "verification_code": verificationCode])
         case let .finishRegister(password, registrationID, username):
             let parameters = [
                 "password": password,
                 "registration_id": registrationID,
                 "username": username
             ]
-            return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+            return jsonRequest(parameters)
         case let .login(email, password):
             let parameters = ["email": email, "password": password]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
@@ -161,6 +188,17 @@ extension APIService: TargetType {
         case let .emailVerifyChange(_, verificationCode):
             let parameters = ["verification_code": verificationCode]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+        case let .createGroup(_, name):
+            return jsonRequest(["image": "aboba", "name": name])
+        case let .updateGroupName(_, _, name):
+            return jsonRequest(["name": name])
+        case .createGroupInvitation:
+            return jsonRequest([:])
+        case .fetchGroups,
+                .fetchGroup,
+                .fetchGroupMembers,
+                .deleteGroup:
+            return .requestPlain
         }
     }
 
@@ -176,7 +214,14 @@ extension APIService: TargetType {
             let .passwordResetVerify(accessToken, _),
             let .checkPassword(accessToken, _),
             let .emailStartChange(accessToken, _),
-            let .emailVerifyChange(accessToken, _):
+            let .emailVerifyChange(accessToken, _),
+            let .createGroup(accessToken, _),
+            let .fetchGroups(accessToken),
+            let .fetchGroup(accessToken, _),
+            let .fetchGroupMembers(accessToken, _),
+            let .updateGroupName(accessToken, _, _),
+            let .deleteGroup(accessToken, _),
+            let .createGroupInvitation(accessToken, _):
             return [
                 "Authorization": "Bearer \(accessToken)",
                 "Content-Type": "application/json"
@@ -184,5 +229,9 @@ extension APIService: TargetType {
         default:
             return ["Content-Type": "application/json"]
         }
+    }
+
+    private func jsonRequest(_ parameters: [String: Any]) -> Moya.Task {
+        .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
     }
 }

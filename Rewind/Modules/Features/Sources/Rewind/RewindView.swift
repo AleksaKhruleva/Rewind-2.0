@@ -9,14 +9,11 @@ public struct RewindView: View {
     @State private var filterSettingsShown = false
     @State private var isSelectGroupPresented = false
 
-    private let router: RewindRouter
-
-    @Environment(\.showToast)
-    private var showToast
+    @Environment(\.showToast) private var showToast
+    @Environment(\.isTopScreen) private var isTopScreen
 
     public init(router: RewindRouter) {
-        self.router = router
-        viewModel = RewindViewModel()
+        viewModel = RewindViewModel(router: router)
     }
 
     public var body: some View {
@@ -25,7 +22,7 @@ public struct RewindView: View {
 
             VStack(spacing: 10) {
                 MediaTopButtons {
-                    router.navigateToMediaDetails(viewModel.currentMediaItem)
+                    viewModel.router.navigateToMediaDetails(viewModel.currentMediaItem)
                 } onSettingsTap: {
                     filterSettingsShown = true
                 }
@@ -59,52 +56,132 @@ public struct RewindView: View {
                     ]
                 )
                 .onTapGesture {
-                    router.navigateToGallery()
+                    viewModel.router.navigateToGallery()
                 }
             }
             .safeAreaPadding(20)
         }
         .onAppear {
             viewModel.set(showToast: showToast)
-            viewModel.dispatch(.fetchUser)
+            Task {
+                await viewModel.dispatch(.fetchUser)
+            }
         }
         .ignoresSafeArea(.keyboard)
         .sheet(isPresented: $isSelectGroupPresented) {
-            SelectGroupView()
-                .presentationCornerRadius(30)
-                .presentationDragIndicator(.visible)
-                .presentationDetents([.height(450)])
+            GroupSelectionView(
+                user: viewModel.user,
+                groups: viewModel.groups,
+                router: viewModel.router,
+                onGroupSelected: { newGroup in
+                    print("New group selected, need to update rewind")
+                    Task {
+                        await viewModel.dispatch(.selectedNewGroup(newGroup))
+                    }
+                }
+            )
+            .presentationCornerRadius(30)
+            .presentationDragIndicator(.visible)
+            .presentationDetents([.height(450)])
         }
         .sheet(isPresented: $filterSettingsShown) {
             FilterView(title: UIComponentsStrings.Rewind.Filters.title) { settings in
                 print(settings)
             }
         }
+        .onTopAppear {
+            Task {
+                await viewModel.dispatch(.fetchGroups)
+            }
+        }
     }
 
+    private var groupImage: UIImage? {
+        guard let currentGroup = GroupStorage.currentGroup else { return nil }
+
+        guard let data = currentGroup.imageData, let image = UIImage(data: data) else {
+            return DomainAsset.groupPlaceholder.image
+        }
+
+        return image
+    }
+
+    @ViewBuilder
     private var header: some View {
         RewindHeader {
-            RoundImageView(image: UIComponentsAsset.media5.image, size: 44)
-                .contentShape(Circle())
-                .onTapGesture {
-                    router.navigateToGroup()
-                }
+            if viewModel.currentGroupState == .notReady {
+                ProgressView()
+                    .frame(width: 42, height: 42)
+                    .clipShape(Circle())
+            } else if let image = groupImage {
+                RoundImageView(image: image)
+                    .contentShape(Circle())
+                    .onTapGesture {
+                        Task {
+                            await viewModel.dispatch(.openGroup)
+                        }
+                    }
+                    .blur(radius: viewModel.userGroupsState == .notReady ? 3 : 0)
+                    .animation(.easeInOut(duration: 0.2), value: viewModel.userGroupsState)
+                    .disabledWithOpacity(viewModel.userGroupsState == .notReady)
+            }
         } centerView: {
-            GroupsAndLocationHeader(groupCount: 8) {
-                isSelectGroupPresented = true
-            } onGlobeTap: {
-                router.navigateToMap()
+            HStack {
+                groupsButton
+
+                Spacer()
+
+                mapButton
             }
         } rightView: {
-            Button {
-                if !viewModel.user.isEmpty {
-                    router.navigateToAccount(user: viewModel.user)
-                }
-            } label: {
-                RoundImageView(image: viewModel.user.image, size: 44)
-                    .contentShape(Circle())
-            }.rewindAccessibilityIdentifier(.rewind(.button(.account)))
+            RoundImageView(image: viewModel.user.image, size: 44)
+                .contentShape(Circle())
+                .onTapGesture {
+                    if !viewModel.user.isEmpty {
+                        viewModel.router.navigateToAccount(user: viewModel.user)
+                    }
+                }.rewindAccessibilityIdentifier(.rewind(.button(.account)))
         }
+    }
+
+    private var groupsButton: some View {
+        Button {
+            isSelectGroupPresented = true
+        } label: {
+            HStack {
+                Image(systemName: "person.2.fill")
+                    .font(.system(size: 17))
+
+                Text(UIComponentsStrings.Rewind.Groups.count(viewModel.groups.count))
+                    .modifier(RoundFontModifier(size: 15))
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 15, weight: .black))
+                    .padding(.trailing, 4)
+            }
+            .padding(.horizontal, 10)
+            .frame(height: 44)
+            .background(Color.backgroundSecondary)
+            .clipShape(Capsule())
+        }
+        .padding(.horizontal, groupImage == nil ? -8 : 0)
+        .foregroundStyle(Color.textPrimary)
+        .blur(radius: viewModel.userGroupsState == .notReady ? 3 : 0)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.userGroupsState)
+        .disabledWithOpacity(viewModel.userGroupsState == .notReady)
+    }
+
+    private var mapButton: some View {
+        Button {
+            viewModel.router.navigateToMap()
+        } label: {
+            Image(systemName: "globe.asia.australia.fill")
+                .font(.system(size: 26))
+                .frame(width: 44, height: 44)
+                .background(Color.backgroundSecondary)
+                .clipShape(Circle())
+        }
+        .foregroundStyle(Color.textPrimary)
     }
 
     private var mediaView: some View {
@@ -113,12 +190,16 @@ public struct RewindView: View {
             onSave: {},
             onLike: {},
             onToggleSound: {
-                viewModel.dispatch(.toggleTrackPlaying)
+                Task {
+                    await viewModel.dispatch(.toggleTrackPlaying)
+                }
             },
             isTrackPlaying: $viewModel.isTrackPlaying
         )
         .onTapGesture {
-            viewModel.dispatch(.showNextMediaItem)
+            Task {
+                await viewModel.dispatch(.showNextMediaItem)
+            }
         }
     }
 

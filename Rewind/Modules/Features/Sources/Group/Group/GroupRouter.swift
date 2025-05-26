@@ -9,20 +9,20 @@ public final class GroupRouter {
         self.appRouter = appRouter
     }
 
-    func navigateToGroupSettings() {
-        appRouter?.navigate(to: .groupSettings, with: .pushFromLeft)
+    func navigateToGroupSettings(_ group: Domain.Group) {
+        appRouter?.navigate(to: .groupSettings(group), with: .pushFromLeft)
     }
 
-    func navigateToAddMember(groupName: String) {
-        appRouter?.navigate(to: .addMember(groupName), with: .pushFromLeft)
+    func navigateToAddMember(groupName: String, link: String) {
+        appRouter?.navigate(to: .addMember(groupName, link), with: .pushFromLeft)
     }
 
     func navigateToMemberDetails(_ member: Member) {
         appRouter?.navigate(to: .memberDetails(member), with: .pushFromLeft)
     }
 
-    func navigateToMembersList() {
-        appRouter?.navigate(to: .membersList, with: .pushFromLeft)
+    func navigateToMembersList(_ group: Domain.Group) {
+        appRouter?.navigate(to: .membersList(group), with: .pushFromLeft)
     }
 
     func navigateToRewindsStand() {

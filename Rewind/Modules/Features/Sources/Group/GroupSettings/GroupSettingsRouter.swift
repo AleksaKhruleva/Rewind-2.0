@@ -8,6 +8,10 @@ public final class GroupSettingsRouter {
         self.appRouter = appRouter
     }
 
+    func navigateToRewind() {
+        appRouter?.navigate(to: .rewind)
+    }
+
     func dismiss() {
         appRouter?.pop()
     }

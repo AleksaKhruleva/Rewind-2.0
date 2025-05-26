@@ -30,12 +30,12 @@ public final class AppRouter {
         case mediasUploading
         case mediaDetails(MediaItem)
 
-        case group
         case groupsList
-        case groupSettings
-        case addMember(String)
+        case group(Domain.Group)
+        case groupSettings(Domain.Group)
+        case addMember(String, String)
         case memberDetails(Member)
-        case membersList
+        case membersList(Domain.Group)
 
         case rewindsStand
         case rollsStand

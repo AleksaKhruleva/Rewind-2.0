@@ -263,7 +263,7 @@
 
 // MARK: - Rewind screen strings
 
-"rewind.groups.count" = "%@ Groups";
+"rewind.groups.count" = "%@ groups";
 
 "rewind.details" = "View details";
 

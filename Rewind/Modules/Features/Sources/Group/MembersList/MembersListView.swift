@@ -6,19 +6,31 @@ public struct MembersListView: View {
     @State private var searchText = ""
 
     private let router: MembersListRouter
+    private let group: Domain.Group
 
-    // ochevidno vremenno
+    private var groupMembers: [Member] {
+        group.members ?? []
+    }
+
     private var filteredMembers: [Member] {
         if searchText.isEmpty {
-            return membersForTest
+            return groupMembers
         } else {
-            return membersForTest.filter { member in
-                member.name.lowercased().contains(searchText.lowercased())
+            let searchQuery = searchText
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+                .localizedLowercase
+
+            return groupMembers.filter { member in
+                member.name.localizedCaseInsensitiveContains(searchQuery)
             }
         }
     }
 
-    public init(router: MembersListRouter) {
+    public init(
+        group: Domain.Group,
+        router: MembersListRouter
+    ) {
+        self.group = group
         self.router = router
     }
 
@@ -42,12 +54,15 @@ public struct MembersListView: View {
     private var header: some View {
         RewindHeader(centerView: {
             HeaderBadgeView(
-                image: UIComponentsAsset.groupAvatar.image,
-                text: "Friends"
+                image: group.image,
+                text: group.name
             )
         }, rightView: {
             RewindButton(type: .rightChevron) {
-                router.dismiss()
+                hideKeyboard()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    router.dismiss()
+                }
             }
         })
     }
@@ -62,7 +77,7 @@ public struct MembersListView: View {
             members: filteredMembers,
             isShortened: false,
             onAddMemberTap: {
-                router.navigateToAddMember(groupName: "Friends")
+                router.navigateToAddMember(groupName: group.name, link: "") // TODO: request link later
             },
             onMemberTap: { member in
                 router.navigateToMemberDetails(member)
