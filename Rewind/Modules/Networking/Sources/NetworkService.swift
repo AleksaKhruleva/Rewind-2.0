@@ -33,7 +33,7 @@ public protocol NetworkServiceProtocol {
     func fetchFullGroupDetails(tokens: Tokens, id: Int) async throws -> GroupDetails
     func updateGroupName(tokens: Tokens, id: Int, name: String) async throws -> GroupResponse
     func createGroupInvitationCode(tokens: Tokens, id: Int) async throws -> GroupInvitationCodeResponse
-    
+
     func getMedias(tokens: Tokens, groupId: Int) async throws -> MediasResponse
     func getRandomMedias(tokens: Tokens, groupId: Int) async throws -> MediasResponse
     // case addMedia
@@ -230,7 +230,7 @@ public final class NetworkService: NetworkServiceProtocol {
             )
         }
     }
-    
+
     public func getMedias(tokens: Tokens, groupId: Int) async throws -> MediasResponse {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
             try await self.provider.request(

@@ -196,11 +196,17 @@ public struct RewindView: View {
             },
             isTrackPlaying: $viewModel.isTrackPlaying
         )
-        .onTapGesture {
-            Task {
-                await viewModel.dispatch(.showNextMediaItem)
+        .gesture(
+            ExclusiveGesture(
+                TapGesture(),
+                LongPressGesture(minimumDuration: 0.4)
+            )
+            .onEnded { _ in
+                Task {
+                    await viewModel.dispatch(.showNextMediaItem)
+                }
             }
-        }
+        )
     }
 
     private var author: some View {

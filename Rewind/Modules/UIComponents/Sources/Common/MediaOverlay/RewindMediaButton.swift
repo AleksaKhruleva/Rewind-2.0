@@ -41,7 +41,7 @@ public struct RewindMediaButton: View {
             .background(Color.white.opacity(0.5))
             .foregroundColor(foregroundColor)
             .clipShape(Circle())
-            .simultaneousGesture(
+            .highPriorityGesture(
                 TapGesture().onEnded {
                     action()
                     toggle()

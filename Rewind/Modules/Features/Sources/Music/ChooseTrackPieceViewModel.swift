@@ -14,7 +14,6 @@ final class ChooseTrackPieceViewModel {
     private(set) var selectedTrack: Track
     private(set) var isTrackPlaying: Bool = false
 
-    private var currentlyLoadedURL: URL?
     private let backend: SoundCloudServiceProtocol
     private let playerManager: AudioPlayerManager
 
@@ -47,11 +46,8 @@ final class ChooseTrackPieceViewModel {
                         streamURL = fetchedURL
                     }
 
-                    if currentlyLoadedURL != streamURL {
-                        playerManager.stop()
-                        playerManager.load(url: streamURL)
-                        currentlyLoadedURL = streamURL
-                    }
+                    playerManager.stop()
+                    playerManager.load(url: streamURL)
 
                     playerManager.play(from: startTime) { [weak self] success in
                         self?.isTrackPlaying = success
@@ -65,12 +61,10 @@ final class ChooseTrackPieceViewModel {
         case .stopPlaying:
             isTrackPlaying = false
             playerManager.stop()
-            currentlyLoadedURL = nil
 
         case .destroyPlayer:
             isTrackPlaying = false
             playerManager.cleanup()
-            currentlyLoadedURL = nil
         }
     }
 }

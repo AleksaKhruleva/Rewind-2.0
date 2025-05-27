@@ -35,7 +35,7 @@ enum APIService {
     case updateGroupName(accessToken: String, id: Int, name: String)
     case createGroupInvitation(accessToken: String, id: Int)
     case deleteGroup(accessToken: String, id: Int)
-    
+
     case getMedias(accessToken: String, groupId: Int)
     case getRandomMedias(accessToken: String, groupId: Int)
     // case addMedia
