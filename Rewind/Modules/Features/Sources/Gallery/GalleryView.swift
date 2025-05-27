@@ -88,8 +88,8 @@ public struct GalleryView: View {
 
     private var headerView: some View {
         GalleryHeader(
-            image: UIComponentsAsset.media5.image,
-            groupName: "Group name",
+            image: viewModel.group.image,
+            groupName: viewModel.group.name,
             onDismiss: {
                 DispatchQueue.main.async {
                     router.dismiss()

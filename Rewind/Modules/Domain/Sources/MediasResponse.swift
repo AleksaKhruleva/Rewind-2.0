@@ -65,5 +65,5 @@ public struct MediasResponseItem: Codable {
 }
 
 public struct MediasResponse: Codable {
-    public let memories: [MediasResponseItem]
+    public let memories: [MediasResponseItem]?
 }
