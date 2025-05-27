@@ -46,6 +46,7 @@ struct GroupSelectionView: View {
             GroupNameInputView(
                 isPresented: $viewModel.isGroupCreationViewPresented,
                 isLoading: $viewModel.isLoading,
+                error: $viewModel.groupNameError,
                 message: "Creating new group..."
             ) { name in
                 Task {

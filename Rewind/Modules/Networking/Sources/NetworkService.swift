@@ -269,7 +269,7 @@ public final class NetworkService: NetworkServiceProtocol {
             )
         }
     }
-    
+
     public func addMedia(
         tokens: Tokens,
         groupId: Int,

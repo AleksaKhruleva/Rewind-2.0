@@ -12,29 +12,29 @@ public enum GroupUtils {
                 )
             }
             .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-        
+
         if let currentGroupID = GroupStorage.currentGroup?.id {
             if let currentGroup = groups.first(where: { $0.id == currentGroupID }) {
                 groups.removeAll { $0.id == currentGroupID }
                 groups.insert(currentGroup, at: 0)
             }
         }
-        
+
         return groups
     }
-    
+
     public static func sortedGroups(_ groups: [Domain.Group]) -> [Domain.Group] {
         var sorted = groups.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-        
+
         if let currentGroupID = GroupStorage.currentGroup?.id,
            let currentGroup = sorted.first(where: { $0.id == currentGroupID }) {
             sorted.removeAll { $0.id == currentGroupID }
             sorted.insert(currentGroup, at: 0)
         }
-        
+
         return sorted
     }
-    
+
     public static func sortedMembers(
         from responses: [GroupMemberResponse],
         groupOwnerID: Int,

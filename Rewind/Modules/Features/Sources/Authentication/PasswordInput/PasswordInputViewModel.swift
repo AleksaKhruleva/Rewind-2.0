@@ -27,7 +27,7 @@ final class PasswordInputViewModel {
             case .invalid:
                 return "Your data in invalid"
             case .responseError:
-                return "Something went worng,\nplease try again"
+                return "Something went wrong,\nplease try again"
             }
         }
     }

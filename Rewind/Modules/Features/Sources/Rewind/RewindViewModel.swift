@@ -118,7 +118,7 @@ final class RewindViewModel {
                         GroupStorage.set(newGroup: updatedGroup)
                     } else {
                         GroupStorage.currentGroup = nil
-                        print("Current group is no longer available")
+                        showToast("You no longer have access to the currently selected group!")
                     }
                 }
             } catch {
@@ -131,25 +131,25 @@ final class RewindViewModel {
                 currentGroupState = .ready
             }
             do {
-                guard var currentGroupID = GroupStorage.currentGroup?.id,
+                guard let currentGroupID = GroupStorage.currentGroup?.id,
                       let tokens = Tokens(),
                       let userID = jwtDecoder.getUserId(from: tokens.accessToken)
                 else {
                     // TODO: throw error
                     return
                 }
-                
+
                 let response = try await backend.fetchFullGroupDetails(
                     tokens: tokens,
                     id: currentGroupID
                 )
-                
+
                 let members = GroupUtils.sortedMembers(
                     from: response.members,
                     groupOwnerID: response.group.ownerID,
                     currentUserID: userID
                 )
-                
+
                 let currentGroup = Domain.Group(
                     id: currentGroupID,
                     name: response.group.name,
@@ -165,7 +165,7 @@ final class RewindViewModel {
                 GroupStorage.currentGroup = nil
                 showToast("Error: \(error)")
             }
-        case let .selectedNewGroup(newGroup):
+        case .selectedNewGroup(_):
             groups = GroupUtils.sortedGroups(groups)
             userGroupsState = .ready
         }

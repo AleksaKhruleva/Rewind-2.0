@@ -33,6 +33,7 @@ public struct GroupSettingsView: View {
             GroupNameInputView(
                 isPresented: $viewModel.needNameInputView,
                 isLoading: $viewModel.isLoading,
+                error: $viewModel.groupNameError,
                 message: viewModel.progressMessage
             ) { newName in
                     Task {
@@ -62,7 +63,7 @@ public struct GroupSettingsView: View {
             }
         }
         .alert(
-            "Are you sure you want to log out?",
+            "Are you sure you want to leave the group?",
             isPresented: $leaveGroupAlertShown,
             actions: {
                 VStack {

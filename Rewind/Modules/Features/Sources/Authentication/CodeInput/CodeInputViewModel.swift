@@ -22,7 +22,7 @@ final class CodeInputViewModel {
         var errorDescription: String {
             switch self {
             case .responseError:
-                return "Something went worng,\nplease try again"
+                return "Something went wrong,\nplease try again"
             case .incorrect:
                 return "Your code is incorrect"
             }

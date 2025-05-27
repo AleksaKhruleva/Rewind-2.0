@@ -30,7 +30,6 @@ struct RewindApp: App {
                     toastController.present(with: $0)
                 })
                 .onOpenURL { url in
-                    print("here")
                     if hasTokens && !testingAuth {
                         pendingLink = IdentifiableURL(url)
                     } else {

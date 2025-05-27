@@ -17,6 +17,10 @@ public final class MembersListRouter {
         appRouter?.navigate(to: .memberDetails(member), with: .pushFromLeft)
     }
 
+    func navigateToRewind() {
+        appRouter?.navigate(to: .rewind)
+    }
+
     func dismiss() {
         appRouter?.pop()
     }

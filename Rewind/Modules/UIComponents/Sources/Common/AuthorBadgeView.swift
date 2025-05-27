@@ -10,7 +10,7 @@ public struct AuthorBadgeView: View {
     @State private var showTrack = true
     private let timer = Timer.publish(every: 3.5, on: .main, in: .common).autoconnect()
 
-    public init(image: UIImage, name: String, date: String, track: Track? = nil) {
+    public init(image: UIImage, name: String, date: String, track: Track?) {
         self.image = image
         self.name = name
         self.date = date
@@ -37,7 +37,7 @@ public struct AuthorBadgeView: View {
                     if let track, showTrack {
                         HStack(spacing: 4) {
                             Image(systemName: "music.note")
-                            Text("\(track.artist) — \(track.title)")
+                            Text("\(track.artist.username) — \(track.title)")
                                 .lineLimit(1)
                         }
                     } else {
@@ -67,6 +67,7 @@ public struct AuthorBadgeView: View {
     AuthorBadgeView(
         image: UIComponentsAsset.media15.image,
         name: "flowykk",
-        date: "23.11.2024"
+        date: "23.11.2024",
+        track: nil
     )
 }

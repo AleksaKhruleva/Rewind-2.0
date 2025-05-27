@@ -48,11 +48,11 @@ public struct GroupView: View {
             }
         }
         .overlay {
-            if viewModel.isRefreshing {
+            if viewModel.isLoading {
                 ZStack {
                     Color.background.ignoresSafeArea()
 
-                    ProgressView(viewModel.refreshMessage)
+                    ProgressView(viewModel.progressMessage)
                         .modifier(RoundFontModifier(size: 15))
                 }
             }
