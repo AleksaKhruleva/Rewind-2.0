@@ -254,8 +254,13 @@ public final class NetworkService: NetworkServiceProtocol {
             )
         }
     }
-    
-    public func addMedia(tokens: Tokens, groupId: Int, mediaType: String, mediaFile: UIImage) async throws -> MediaItem {
+
+    public func addMedia(
+        tokens: Tokens,
+        groupId: Int,
+        mediaType: String,
+        mediaFile: UIImage
+    ) async throws -> MediaItem {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
             try await self.provider.request(
                 .addMedia(

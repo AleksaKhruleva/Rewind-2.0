@@ -3,6 +3,7 @@ import PhotosUI
 import Base
 import Domain
 import UIComponents
+import Networking
 
 @MainActor @Observable
 final class GalleryViewModel {
@@ -12,6 +13,8 @@ final class GalleryViewModel {
         case selectOneMedia(PhotosPickerItem)
         case viewBlurredMedia(MediaItem)
         case openFilters
+        
+        case addMedia(LoadedMedia)
     }
 
     var mediaPickerPresented: Bool = false
@@ -36,12 +39,15 @@ final class GalleryViewModel {
         }
         return blurredMediaSelection
     }
+    
+    let backend: NetworkServiceProtocol
 
     init() {
         transformer = .init()
         showToast = { _ in }
 
         mediaItems = MediaItem.stubs(track: Self.fetchTrack())
+        backend = NetworkService()
     }
 
     func dispatch(_ intent: Intent) async {
@@ -65,6 +71,24 @@ final class GalleryViewModel {
             }
         case .openFilters:
             filterSettingsShown = true
+        case let .addMedia(loadedMedia):
+            do {
+                if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                    switch loadedMedia.content {
+                    case let .image(image):
+                        let _ = try await backend.addMedia(
+                            tokens: tokens,
+                            groupId: groupId,
+                            mediaType: "image",
+                            mediaFile: image,
+                        )
+                    case .video:
+                        print("good")
+                    }
+                }
+            } catch {
+                showToast(UIComponentsStrings.Toast.error)
+            }
         }
     }
 
