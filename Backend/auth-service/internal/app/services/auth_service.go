@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/url"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -15,6 +16,7 @@ import (
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 
+	"Rewind-auth-service/clients/media"
 	"Rewind-auth-service/internal/app/models"
 	"Rewind-auth-service/internal/app/repositories"
 	"Rewind-auth-service/internal/utils"
@@ -24,6 +26,7 @@ import (
 	"github.com/google/uuid"
 
 	pb "Rewind-auth-service/pkg/proto"
+	clients "Rewind-auth-service/pkg/proto/clients"
 )
 
 const (
@@ -34,15 +37,17 @@ const (
 type AuthService struct {
 	userRepo repositories.UserRepositoryInterface
 	pb.UnimplementedAuthServiceServer
-	validator *validator.Validate
-	redisRepo repositories.RedisRepositoryInterface
+	validator   *validator.Validate
+	redisRepo   repositories.RedisRepositoryInterface
+	mediaClient *media.MediaServiceClient
 }
 
-func NewAuthService(repo repositories.UserRepositoryInterface, validator *validator.Validate, redisClient repositories.RedisRepositoryInterface) *AuthService {
+func NewAuthService(repo repositories.UserRepositoryInterface, validator *validator.Validate, redisClient repositories.RedisRepositoryInterface, mediaClient *media.MediaServiceClient) *AuthService {
 	return &AuthService{
-		userRepo:  repo,
-		validator: validator,
-		redisRepo: redisClient,
+		userRepo:    repo,
+		validator:   validator,
+		redisRepo:   redisClient,
+		mediaClient: mediaClient,
 	}
 }
 
@@ -150,8 +155,9 @@ func (s *AuthService) SetPasswordAndUsername(ctx context.Context, req *pb.SetPas
 	username := req.GetUsername()
 
 	// Валидация пароля
-	if err := s.validator.Var(password, "required,min=6"); err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid password: %v", err)
+	if err := s.validator.Var(password, "required,securepwd"); err != nil {
+		log.Printf("Error validating password: %v", err)
+		return nil, status.Errorf(codes.InvalidArgument, "password must be at least 6 characters long and contain at least one uppercase letter and one digit")
 	}
 	// Валидация имени пользователя
 	if err := s.validator.Var(username, "required,min=3,max=50"); err != nil {
@@ -181,6 +187,7 @@ func (s *AuthService) SetPasswordAndUsername(ctx context.Context, req *pb.SetPas
 		Email:    email,
 		Password: string(hashedPassword),
 		Username: username,
+		Image:    os.Getenv("DEFAULT_AVATAR"),
 	}
 
 	// Поиск удаленного пользователя по email для "восстановления"
@@ -499,30 +506,36 @@ func (s *AuthService) Logout(ctx context.Context, req *pb.LogoutRequest) (*pb.Lo
 }
 
 func (s *AuthService) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*pb.DeleteUserResponse, error) {
-	email := req.GetEmail()
+	userID := req.GetUserId()
 
-	// Валидация email
-	err := s.validator.Var(email, "required,email")
-	if err != nil {
-		// Клиентская ошибка - неверный ввод
-		return nil, status.Errorf(codes.InvalidArgument, "invalid email format")
-	}
-
-	// 1. Получение пользователя по email
-	user, err := s.userRepo.GetUserByEmail(nil, email)
+	// 1. Получение пользователя по userID
+	user, err := s.userRepo.GetUserByID(nil, uint(userID))
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, status.Errorf(codes.NotFound, "user not found")
+			return &pb.DeleteUserResponse{Success: true}, nil
 		}
-		log.Printf("Failed to query user by email %s: %v", email, err)
+		log.Printf("Failed to query user by userID %d: %v", userID, err)
 		return nil, status.Errorf(codes.Internal, "Failed to retrieve user data")
 	}
 
 	// 2. Удаление пользователя из базы данных
+	user.Email = user.Email + strconv.FormatInt(time.Now().Unix(), 10)
+	user.Image = os.Getenv("DELETED_AVATAR")
+	user.Username = "unknown"
+	err = s.userRepo.SaveDeleted(nil, user)
+	if err != nil {
+		log.Printf("Failed to delete user with ID %d: %v", user.ID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to delete user")
+	}
 	err = s.userRepo.DeleteUser(nil, user.Email)
 	if err != nil {
 		log.Printf("Failed to delete user with email %s: %v", user.Email, err)
 		return nil, status.Errorf(codes.Internal, "Failed to delete user")
+	}
+	err = s.userRepo.DeleteUserRefreshTokens(nil, user.ID)
+	if err != nil {
+		log.Printf("Failed to delete user refresh tokens: %v", err)
+		return nil, status.Errorf(codes.Internal, "Failed to delete user refresh tokens")
 	}
 
 	// Успешное удаление
@@ -869,8 +882,9 @@ func (s *AuthService) SetNewPassword(ctx context.Context, req *pb.SetNewPassword
 	userID := req.GetUserId()
 	newPassword := req.GetNewPassword()
 
-	if err := s.validator.Var(newPassword, "required,min=8"); err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid new password format")
+	if err := s.validator.Var(newPassword, "required,securepwd"); err != nil {
+		log.Printf("Failed to validate new password: %v", err)
+		return nil, status.Errorf(codes.InvalidArgument, "password must be at least 6 characters long and contain at least one uppercase letter and one digit")
 	}
 
 	redisKey := fmt.Sprintf("password_change:%d", userID)
@@ -918,13 +932,25 @@ func (s *AuthService) UpdateAvatar(ctx context.Context, req *pb.UpdateAvatarRequ
 		return nil, status.Errorf(codes.InvalidArgument, "Image data is required")
 	}
 
-	// TODO:  Call image service to upload the image and get the URL
-	// imageUrl, err := s.mediaService.uploadImage(ctx, image)
-	// if err != nil {
-	//  return nil, err
-	// }
+	// Отправка файла в медиа-сервис
+	uploadReq := &clients.UploadMediaRequest{
+		MediaType: clients.MediaType_avatar,
+		FileData:  req.GetImage(),
+	}
 
-	err := s.userRepo.UpdateAvatar(nil, uint(userID), "default")
+	uploadResp, err := s.mediaClient.UploadMedia(ctx, uploadReq)
+	if err != nil {
+		log.Printf("MemoryService: Failed to upload media to media service: %v", err)
+		return nil, err
+	}
+
+	mediaURL := uploadResp.GetFileUrl()
+	if mediaURL == "" {
+		log.Println("MemoryService: Received empty media URL from media service")
+		return nil, status.Errorf(codes.Internal, "media upload failed to return URL")
+	}
+
+	err = s.userRepo.UpdateAvatar(nil, uint(userID), mediaURL)
 	if err != nil {
 		log.Printf("Failed to update avatar for user %d: %v", userID, err)
 		return nil, status.Errorf(codes.Internal, "Failed to update avatar")

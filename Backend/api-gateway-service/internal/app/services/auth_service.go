@@ -17,7 +17,7 @@ type AuthServiceInterface interface {
 	ForgotPassword(ctx context.Context, email string) (*pb.ForgotPasswordResponse, error)
 	ResetPassword(ctx context.Context, token, newPassword string) (*pb.ResetPasswordResponse, error)
 	Logout(ctx context.Context, refreshToken string) (*pb.LogoutResponse, error)
-	DeleteUser(ctx context.Context, email string) (*pb.DeleteUserResponse, error)
+	DeleteUser(ctx context.Context) (*pb.DeleteUserResponse, error)
 	GetUserByID(ctx context.Context, userID uint64) (*pb.GetUserByIDResponse, error)
 	UpdateUsername(ctx context.Context, newUsername string) (*pb.UpdateUsernameResponse, error)
 	CheckPassword(ctx context.Context, password string) (*pb.CheckPasswordResponse, error)
@@ -79,8 +79,12 @@ func (s *AuthService) Logout(ctx context.Context, refreshToken string) (*pb.Logo
 	return s.authClient.Logout(ctx, &pb.LogoutRequest{RefreshToken: refreshToken})
 }
 
-func (s *AuthService) DeleteUser(ctx context.Context, email string) (*pb.DeleteUserResponse, error) {
-	return s.authClient.DeleteUser(ctx, &pb.DeleteUserRequest{Email: email})
+func (s *AuthService) DeleteUser(ctx context.Context) (*pb.DeleteUserResponse, error) {
+	userID, err := GetRequestingUserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return s.authClient.DeleteUser(ctx, &pb.DeleteUserRequest{UserId: userID})
 }
 
 func (s *AuthService) GetUserByID(ctx context.Context, userID uint64) (*pb.GetUserByIDResponse, error) {

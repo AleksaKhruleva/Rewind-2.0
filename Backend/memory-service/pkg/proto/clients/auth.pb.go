@@ -859,7 +859,7 @@ func (x *LogoutResponse) GetSuccess() bool {
 
 type DeleteUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -894,11 +894,11 @@ func (*DeleteUserRequest) Descriptor() ([]byte, []int) {
 	return file_proto_clients_auth_proto_rawDescGZIP(), []int{17}
 }
 
-func (x *DeleteUserRequest) GetEmail() string {
+func (x *DeleteUserRequest) GetUserId() uint64 {
 	if x != nil {
-		return x.Email
+		return x.UserId
 	}
-	return ""
+	return 0
 }
 
 type DeleteUserResponse struct {
@@ -1930,9 +1930,9 @@ const file_proto_clients_auth_proto_rawDesc = "" +
 	"\rLogoutRequest\x12#\n" +
 	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"*\n" +
 	"\x0eLogoutResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess\")\n" +
-	"\x11DeleteUserRequest\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05email\".\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\",\n" +
+	"\x11DeleteUserRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\".\n" +
 	"\x12DeleteUserResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\"1\n" +
 	"\x14GetUsersByIDsRequest\x12\x19\n" +

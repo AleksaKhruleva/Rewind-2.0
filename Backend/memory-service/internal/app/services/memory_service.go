@@ -12,25 +12,29 @@ import (
 	"gorm.io/gorm"
 
 	"Rewind-memory-service/clients/auth"
+	"Rewind-memory-service/clients/media"
 	"Rewind-memory-service/internal/app/models"
 	"Rewind-memory-service/internal/app/repositories"
 	pb "Rewind-memory-service/pkg/proto"
+	clients "Rewind-memory-service/pkg/proto/clients"
 )
 
 // MemoryService implements the memory.MemoryServiceServer interface
 type MemoryService struct {
 	pb.UnimplementedMemoryServiceServer
-	memoryRepo repositories.MemoryRepositoryInterface // Corrected type here
-	validator  *validator.Validate
-	authClient *auth.AuthServiceClient
+	memoryRepo  repositories.MemoryRepositoryInterface // Corrected type here
+	validator   *validator.Validate
+	authClient  *auth.AuthServiceClient
+	mediaClient *media.MediaServiceClient
 }
 
 // NewMemoryService создает новый экземпляр MemoryService
-func NewMemoryService(repo repositories.MemoryRepositoryInterface, validate *validator.Validate, authClient *auth.AuthServiceClient) *MemoryService {
+func NewMemoryService(repo repositories.MemoryRepositoryInterface, validate *validator.Validate, authClient *auth.AuthServiceClient, mediaClient *media.MediaServiceClient) *MemoryService {
 	return &MemoryService{
-		memoryRepo: repo,
-		validator:  validate,
-		authClient: authClient,
+		memoryRepo:  repo,
+		validator:   validate,
+		authClient:  authClient,
+		mediaClient: mediaClient,
 	}
 }
 
@@ -78,31 +82,35 @@ func (s *MemoryService) CreateMemory(ctx context.Context, req *pb.CreateMemoryRe
 		return nil, status.Errorf(codes.InvalidArgument, "media_file is required")
 	}
 
-	// // Отправка файла в медиа-сервис
-	// uploadReq := &media_pb.UploadMediaRequest{
-	//	MediaType: req.MediaType,
-	//	File:      req.MediaFile,
-	//	UserId:    req.UserId, // Передайте ID пользователя для связи с медиафайлом
-	//	// FileName:  "", // Имя файла генерируется в media-service
-	// }
-	//
-	// uploadResp, err := s.mediaClient.UploadMedia(ctx, uploadReq)
-	// if err != nil {
-	//	log.Printf("MemoryService: Failed to upload media to media service: %v", err)
-	//	return nil, status.Errorf(codes.Internal, "failed to upload media")
-	// }
-	//
-	// mediaURL := uploadResp.GetMediaUrl()
-	// if mediaURL == "" {
-	//	log.Println("MemoryService: Received empty media URL from media service")
-	//	return nil, status.Errorf(codes.Internal, "media upload failed to return URL")
-	// }
+	mediaTypeValue, ok := pb.MediaType_value[req.MediaType.String()]
+	if !ok || mediaTypeValue == int32(pb.MediaType_UNSPECIFIED) {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid mediaType: %s", req.MediaType)
+	}
+	pbMediaType := clients.MediaType(mediaTypeValue)
+
+	// Отправка файла в медиа-сервис
+	uploadReq := &clients.UploadMediaRequest{
+		MediaType: pbMediaType,
+		FileData:  req.MediaFile,
+	}
+
+	uploadResp, err := s.mediaClient.UploadMedia(ctx, uploadReq)
+	if err != nil {
+		log.Printf("MemoryService: Failed to upload media to media service: %v", err)
+		return nil, err
+	}
+
+	mediaURL := uploadResp.GetFileUrl()
+	if mediaURL == "" {
+		log.Println("MemoryService: Received empty media URL from media service")
+		return nil, status.Errorf(codes.Internal, "media upload failed to return URL")
+	}
 
 	memory := &models.Memory{
 		GroupID:   uint(req.GroupId),
 		UserID:    uint(req.UserId),
 		MediaType: req.MediaType.String(),
-		MediaURL:  "",
+		MediaURL:  mediaURL,
 	}
 
 	if req.Latitude != nil && req.Longitude != nil {

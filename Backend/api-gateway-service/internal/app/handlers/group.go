@@ -37,6 +37,7 @@ func NewGroupHandler(groupService services.GroupServiceInterface) *GroupHandler 
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid request body or data"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - Permission denied by service"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - User not found"
 // @Failure 409 {object} responses.ErrorResponse "Conflict - Group with this name already exists"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
@@ -85,7 +86,7 @@ func (h *GroupHandler) CreateGroup(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid group ID format"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - User is not a member of the group"
-// @Failure 404 {object} responses.ErrorResponse "Not Found - Group not found"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
@@ -139,7 +140,7 @@ func (h *GroupHandler) GetGroup(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid request, data, or group ID format"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - User is not an administrator of the group"
-// @Failure 404 {object} responses.ErrorResponse "Not Found - Group not found"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
@@ -216,7 +217,7 @@ func (h *GroupHandler) UpdateGroup(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid group ID format"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - User is not an administrator of the group"
-// @Failure 404 {object} responses.ErrorResponse "Not Found - Group not found"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
@@ -260,7 +261,7 @@ func (h *GroupHandler) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid group ID format"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - User is not a member of the group"
-// @Failure 404 {object} responses.ErrorResponse "Not Found - Group not found"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
@@ -309,7 +310,7 @@ func (h *GroupHandler) ListGroupMembers(w http.ResponseWriter, r *http.Request) 
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid group ID or user ID format"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - User does not have permission (not admin or not removing self)"
-// @Failure 404 {object} responses.ErrorResponse "Not Found - Group or user not found"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
@@ -362,7 +363,7 @@ func (h *GroupHandler) RemoveGroupMember(w http.ResponseWriter, r *http.Request)
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid group ID format or request body"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - User is not an administrator of the group"
-// @Failure 404 {object} responses.ErrorResponse "Not Found - Group not found"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
@@ -419,7 +420,7 @@ func (h *GroupHandler) CreateGroupInvitation(w http.ResponseWriter, r *http.Requ
 // @Success 200 {object} responses.AcceptGroupInvitationResponse "Successfully accepted invitation"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid invitation code format"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
-// @Failure 404 {object} responses.ErrorResponse "Not Found - Invitation not found or expired"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 409 {object} responses.ErrorResponse "Conflict - User is already a member of the group"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
@@ -482,7 +483,7 @@ func (h *GroupHandler) AcceptGroupInvitation(w http.ResponseWriter, r *http.Requ
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid user ID format"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - User does not have permission to list groups for this user"
-// @Failure 404 {object} responses.ErrorResponse "Not Found - User not found"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth

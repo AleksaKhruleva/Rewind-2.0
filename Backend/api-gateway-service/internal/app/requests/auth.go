@@ -37,10 +37,6 @@ type LogoutRequest struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
-type DeleteUserRequest struct {
-	Email string `json:"email"`
-}
-
 type UpdateUsernameRequest struct {
 	NewUsername string `json:"new_username"`
 }
