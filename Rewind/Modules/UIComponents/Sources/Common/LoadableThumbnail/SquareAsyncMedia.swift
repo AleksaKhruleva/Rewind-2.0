@@ -39,7 +39,7 @@ public struct SquareAsyncMedia: View {
     private func contentBuilder(_ state: LoadableMediaState) -> some View {
         switch state {
         case .empty:
-            imageView(for: DomainAsset.defaultPlaceholder.swiftUIImage)
+            imageView(for: DomainAsset.defaultPlaceholder.image)
         case .ready(let image):
             imageView(for: image)
         case .failure:
@@ -51,8 +51,8 @@ public struct SquareAsyncMedia: View {
         }
     }
 
-    private func imageView(for image: Image) -> some View {
-        image
+    private func imageView(for image: UIImage) -> some View {
+        Image(uiImage: image)
             .resizable()
             .scaledToFill()
             .frame(maxWidth: .infinity, maxHeight: .infinity)

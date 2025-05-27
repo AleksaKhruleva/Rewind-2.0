@@ -38,7 +38,7 @@ enum APIService {
 
     case getMedias(accessToken: String, groupId: Int)
     case getRandomMedias(accessToken: String, groupId: Int)
-    // case addMedia
+    case addMedia(accessToken: String, groupId: String, mediaType: String, mediaFile: UIImage)
     case deleteMedia(accessToken: String, groupId: Int, memoryId: Int)
     case addTag(accessToken: String, groupId: Int, memoryId: Int, tag: String)
     case deleteTag(accessToken: String, groupId: Int, memoryId: Int, tag: String)
@@ -109,6 +109,8 @@ extension APIService: TargetType {
         case let .getRandomMedias(_, groupId):
             let groupId = 1
             return "groups/\(groupId)/memories/filter"
+        case let .addMedia(_, groupId, _, _):
+            return "groups/\(groupId)/memories"
         case let .deleteMedia(_, groupId, memoryId):
             return "groups/\(groupId)/memories/\(memoryId)"
         case let .addTag(_, groupId, memoryId, tag):
@@ -147,7 +149,8 @@ extension APIService: TargetType {
                 .createGroup,
                 .createGroupInvitation,
                 .addTag,
-                .likeMedia:
+                .likeMedia,
+                .addMedia:
             return .post
         case .updateUserName,
                 .updateUserAvatar,
@@ -239,6 +242,29 @@ extension APIService: TargetType {
             return .requestPlain
         case .getRandomMedias:
             return .requestPlain
+        case let .addMedia(_, groupId, mediaType, mediaFile):
+            guard let imageData = mediaFile.jpegData(compressionQuality: 1),
+                  let groupIdData = groupId.data(using: .utf8),
+                  let mediaTypeData = mediaType.data(using: .utf8) else {
+                return .requestPlain
+            }
+
+            return .uploadMultipart([
+                MultipartFormData(
+                    provider: .data(imageData),
+                    name: "mediaFile",
+                    fileName: "mediaFile.jpg",
+                    mimeType: "mediaFile/jpeg"
+                ),
+                MultipartFormData(
+                    provider: .data(groupIdData),
+                    name: "groupId"
+                ),
+                MultipartFormData(
+                    provider: .data(mediaTypeData),
+                    name: "mediaType"
+                )
+            ])
         case .deleteMedia:
             return .requestPlain
         case .addTag:
@@ -276,6 +302,7 @@ extension APIService: TargetType {
             let .createGroupInvitation(accessToken, _),
             let .getMedias(accessToken, _),
             let .getRandomMedias(accessToken, _),
+            let .addMedia(accessToken, _, _, _),
             let .deleteMedia(accessToken, _, _),
             let .addTag(accessToken, _, _, _),
             let .deleteTag(accessToken, _, _, _),
