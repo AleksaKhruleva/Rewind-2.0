@@ -12,6 +12,8 @@ public struct GalleryView: View {
 
     @Environment(\.showToast)
     private var showToast
+    @Environment(\.isTopScreen)
+    private var isTopScreen
 
     public init(router: GalleryRouter) {
         viewModel = .init()
@@ -35,13 +37,28 @@ public struct GalleryView: View {
                 if let selectedMedia = viewModel.viewingBlurredMedia {
                     BlurredMediaView(
                         isPresented: $viewModel.blurredMediaShown,
-                        mediaItem: selectedMedia,
-                        showMediaDetails: router.navigateToMediaDetails
+                        galleryItem: selectedMedia, onDelete: { galleryItem in
+                            Task {
+                                await viewModel.dispatch(.deleteMedia(galleryItem))
+                                withAnimation {
+                                    viewModel.blurredMediaShown = false
+                                }
+                            }
+                        },
+                        showMediaDetails: {
+                            withAnimation {
+                                viewModel.blurredMediaShown = false
+                            }
+                            router.navigateToMediaDetails($0)
+                        }
                     )
                 }
             }
             .onAppear {
                 viewModel.set(showToast: showToast)
+            }
+            .onTopAppear {
+                Task { await viewModel.dispatch(.fetchGallery) }
             }
             .onChange(of: viewModel.mediaSelection) { _, newValue in
                 if let newValue {
@@ -63,21 +80,7 @@ public struct GalleryView: View {
             .photosPicker(isPresented: $viewModel.mediaPickerPresented, selection: $viewModel.mediaSelection)
             .navigationDestination(item: $viewModel.uploadingMedia) { media in
                 uploadingMediaDestination(for: media) { loadedMedia in
-                    Task {
-                        if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
-                            switch loadedMedia.content {
-                            case let .image(image):
-                                try await NetworkService().addMedia(
-                                    tokens: tokens,
-                                    groupId: groupId,
-                                    mediaType: "image",
-                                    mediaFile: image,
-                                )
-                            case .video:
-                                print("good")
-                            }
-                        }
-                    }
+                    Task { await viewModel.dispatch(.addMedia(loadedMedia)) }
                 }.toolbar(.hidden)
             }
         }
@@ -105,13 +108,17 @@ public struct GalleryView: View {
                     repeating: GridItem(.flexible(), spacing: mediaSpacing),
                     count: 3
                 ), spacing: mediaSpacing) {
-                    ForEach(viewModel.mediaItems) { mediaItem in
-                        SquareAsyncMedia(url: mediaItem.mediaURL, type: mediaItem.mediaType, cornerRadius: 10)
-                            .onTapGesture {
-                                Task {
-                                    await viewModel.dispatch(.viewBlurredMedia(mediaItem))
-                                }
+                    ForEach(viewModel.galleryItems) { galleryItem in
+                        SquareAsyncMedia(
+                            url: galleryItem.memory.mediaURL,
+                            type: galleryItem.memory.mediaType,
+                            cornerRadius: 10
+                        )
+                        .onTapGesture {
+                            Task {
+                                await viewModel.dispatch(.viewBlurredMedia(galleryItem))
                             }
+                        }
                     }
                 }
 
@@ -122,18 +129,6 @@ public struct GalleryView: View {
         .scrollIndicators(.hidden)
         .safeAreaInset(edge: .bottom) {
             footer
-        }
-    }
-
-    private var blurredMediaOverlay: some View {
-        Group {
-            if let selectedMedia = viewModel.viewingBlurredMedia {
-                BlurredMediaView(
-                    isPresented: $viewModel.blurredMediaShown,
-                    mediaItem: selectedMedia,
-                    showMediaDetails: router.navigateToMediaDetails
-                )
-            }
         }
     }
 

@@ -38,7 +38,18 @@ enum APIService {
 
     case getMedias(accessToken: String, groupId: Int)
     case getRandomMedias(accessToken: String, groupId: Int)
-    case addMedia(accessToken: String, groupId: String, mediaType: String, mediaFile: UIImage)
+    case addMedia(
+        accessToken: String,
+        groupId: String,
+        mediaType: String,
+        mediaFile: UIImage,
+        latitude: Double? = nil,
+        longitude: Double? = nil,
+        musicId: String? = nil,
+        offset: Double? = nil,
+        duration: Double? = nil,
+        tags: [String] = []
+    )
     case deleteMedia(accessToken: String, groupId: Int, memoryId: Int)
     case addTag(accessToken: String, groupId: Int, memoryId: Int, tag: String)
     case deleteTag(accessToken: String, groupId: Int, memoryId: Int, tag: String)
@@ -107,9 +118,8 @@ extension APIService: TargetType {
         case let .getMedias(_, groupId):
             return "groups/\(groupId)/memories"
         case let .getRandomMedias(_, groupId):
-            let groupId = 1
             return "groups/\(groupId)/memories/filter"
-        case let .addMedia(_, groupId, _, _):
+        case let .addMedia(_, groupId, _, _, _, _, _, _, _, _):
             return "groups/\(groupId)/memories"
         case let .deleteMedia(_, groupId, memoryId):
             return "groups/\(groupId)/memories/\(memoryId)"
@@ -242,29 +252,56 @@ extension APIService: TargetType {
             return .requestPlain
         case .getRandomMedias:
             return .requestPlain
-        case let .addMedia(_, groupId, mediaType, mediaFile):
+        case let .addMedia(
+            _,
+            groupId,
+            mediaType,
+            mediaFile,
+            latitude,
+            longitude,
+            musicId,
+            offset,
+            duration,
+            tags
+        ):
+            let tagsString = tags.joined(separator: ",")
             guard let imageData = mediaFile.jpegData(compressionQuality: 1),
-                  let groupIdData = groupId.data(using: .utf8),
-                  let mediaTypeData = mediaType.data(using: .utf8) else {
+                  let groupIdData = groupId.defaultUTF8Data(),
+                  let mediaTypeData = mediaType.defaultUTF8Data() else {
                 return .requestPlain
             }
 
-            return .uploadMultipart([
+            var multipartFormData = [
                 MultipartFormData(
                     provider: .data(imageData),
                     name: "mediaFile",
                     fileName: "mediaFile.jpg",
                     mimeType: "mediaFile/jpeg"
                 ),
-                MultipartFormData(
-                    provider: .data(groupIdData),
-                    name: "groupId"
-                ),
-                MultipartFormData(
-                    provider: .data(mediaTypeData),
-                    name: "mediaType"
-                )
-            ])
+                MultipartFormData(provider: .data(groupIdData), name: "groupId"),
+                MultipartFormData(provider: .data(mediaTypeData), name: "mediaType")
+            ]
+
+            if let latitude, let latitudeData = String(latitude).defaultUTF8Data() {
+                multipartFormData.append(.init(provider: .data(latitudeData), name: "latitude"))
+            }
+            if let longitude, let longitudeData = String(longitude).defaultUTF8Data() {
+                multipartFormData.append(.init(provider: .data(longitudeData), name: "longitude"))
+            }
+            if let musicId, let musicIdData = musicId.defaultUTF8Data() {
+                multipartFormData.append(.init(provider: .data(musicIdData), name: "musicId"))
+            }
+            if let offset, let offsetData = String(offset).defaultUTF8Data() {
+                multipartFormData.append(.init(provider: .data(offsetData), name: "offset"))
+            }
+            if let duration, let durationData = String(duration).defaultUTF8Data() {
+                multipartFormData.append(.init(provider: .data(durationData), name: "duration"))
+            }
+            if !tags.isEmpty, let tagsData = tagsString.defaultUTF8Data() {
+                multipartFormData.append(.init(provider: .data(tagsData), name: "tags"))
+            }
+
+            return .uploadMultipart(multipartFormData)
         case .deleteMedia:
             return .requestPlain
         case .addTag:
@@ -302,7 +339,7 @@ extension APIService: TargetType {
             let .createGroupInvitation(accessToken, _),
             let .getMedias(accessToken, _),
             let .getRandomMedias(accessToken, _),
-            let .addMedia(accessToken, _, _, _),
+            let .addMedia(accessToken, _, _, _, _, _, _, _, _, _),
             let .deleteMedia(accessToken, _, _),
             let .addTag(accessToken, _, _, _),
             let .deleteTag(accessToken, _, _, _),
@@ -320,5 +357,11 @@ extension APIService: TargetType {
 
     private func jsonRequest(_ parameters: [String: Any]) -> Moya.Task {
         .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+    }
+}
+
+extension String {
+    func defaultUTF8Data() -> Data? {
+        self.data(using: .utf8)
     }
 }

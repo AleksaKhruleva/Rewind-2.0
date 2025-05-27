@@ -3,6 +3,7 @@ import Base
 import PhotosUI
 import UIComponents
 import Domain
+import Networking
 
 @MainActor @Observable
 final class MediasUploadingViewModel {
@@ -10,6 +11,8 @@ final class MediasUploadingViewModel {
         case importMedias([PhotosPickerItem])
         case removeMedia(LoadedMedia)
         case showMediaSettings(LoadedMedia)
+
+        case createMedias
     }
 
     var similarSettigns: Bool
@@ -23,6 +26,8 @@ final class MediasUploadingViewModel {
 
     private let transformer: PhotosPickerItemTransformer
 
+    private let backend: NetworkService
+
     init() {
         similarSettigns = false
         toggleDisabled = false
@@ -31,6 +36,7 @@ final class MediasUploadingViewModel {
         selection = []
         showToast = { _ in }
         transformer = PhotosPickerItemTransformer()
+        backend = NetworkService()
     }
 
     func dispatch(_ intent: Intent) async {
@@ -65,6 +71,32 @@ final class MediasUploadingViewModel {
             }
         case let .showMediaSettings(media):
             viewingMedia = media
+        case .createMedias:
+            for loadedMedia in loadedMedias {
+                do {
+                    if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                        switch loadedMedia.content {
+                        case let .image(image):
+                            let response = try await backend.addMedia(
+                                tokens: tokens,
+                                groupId: groupId,
+                                mediaType: "image",
+                                mediaFile: image,
+                                latitude: 23.1,
+                                longitude: 22.2,
+                                musicId: "id",
+                                offset: 321,
+                                duration: 123,
+                                tags: loadedMedia.tags ?? []
+                            )
+                        case .video:
+                            print()
+                        }
+                    }
+                } catch {
+                    showToast("Can't load one of your images. You can try again later 😢")
+                }
+            }
         }
     }
 

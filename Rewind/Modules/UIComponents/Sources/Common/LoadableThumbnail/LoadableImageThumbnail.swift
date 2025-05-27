@@ -6,7 +6,7 @@ public struct LoadableImageThumbnail<Content: View>: View {
     @State private var url: URL?
     @ViewBuilder let content: (LoadableMediaState) -> Content
     @State private var state: LoadableMediaState = .empty
-    
+
     public init(
         url: URL? = nil,
         content: @escaping (LoadableMediaState) -> Content
@@ -20,7 +20,7 @@ public struct LoadableImageThumbnail<Content: View>: View {
             .task {
                 await loadImage(url)
             }
-            .onChange(of: url) { newValue in
+            .onChange(of: url) { _ in
                 print("URL CHANGED")
             }
     }

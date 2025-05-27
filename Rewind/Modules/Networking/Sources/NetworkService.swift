@@ -1,3 +1,4 @@
+// swiftlint:disable function_parameter_count file_length
 import SwiftUI
 import Moya
 import Foundation
@@ -36,7 +37,18 @@ public protocol NetworkServiceProtocol {
 
     func getMedias(tokens: Tokens, groupId: Int) async throws -> MediasResponse
     func getRandomMedias(tokens: Tokens, groupId: Int) async throws -> MediasResponse
-    func addMedia(tokens: Tokens, groupId: Int, mediaType: String, mediaFile: UIImage) async throws -> MediaItem
+    func addMedia(
+        tokens: Tokens,
+        groupId: Int,
+        mediaType: String,
+        mediaFile: UIImage,
+        latitude: Double?,
+        longitude: Double?,
+        musicId: String?,
+        offset: Double?,
+        duration: Double?,
+        tags: [String]
+    ) async throws -> MediaResponse
     func deleteMedia(tokens: Tokens, groupId: Int, memoryId: Int) async throws -> SuccessResponse
     func addTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> TagResponse
     func deleteTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> TagResponse
@@ -259,17 +271,29 @@ public final class NetworkService: NetworkServiceProtocol {
         tokens: Tokens,
         groupId: Int,
         mediaType: String,
-        mediaFile: UIImage
-    ) async throws -> MediaItem {
+        mediaFile: UIImage,
+        latitude: Double? = nil,
+        longitude: Double? = nil,
+        musicId: String? = nil,
+        offset: Double? = nil,
+        duration: Double? = nil,
+        tags: [String] = []
+    ) async throws -> MediaResponse {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
             try await self.provider.request(
                 .addMedia(
                     accessToken: tokens.accessToken,
                     groupId: String(groupId),
                     mediaType: mediaType,
-                    mediaFile: mediaFile
+                    mediaFile: mediaFile,
+                    latitude: latitude,
+                    longitude: longitude,
+                    musicId: musicId,
+                    offset: offset,
+                    duration: duration,
+                    tags: tags
                 ),
-                type: MediaItem.self
+                type: MediaResponse.self
             )
         }
     }
@@ -438,3 +462,4 @@ extension NetworkService {
         }
     }
 }
+// swiftlint:enable function_parameter_count file_length

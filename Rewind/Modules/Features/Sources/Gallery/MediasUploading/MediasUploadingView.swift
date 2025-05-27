@@ -6,12 +6,12 @@ import Domain
 public struct MediasUploadingView: View {
     @State private var viewModel: MediasUploadingViewModel
 
-    private let router: AppRouter
+    private let router: MediasUploadingRouter
 
     @Environment(\.showToast)
     private var showToast
 
-    public init(router: AppRouter) {
+    public init(router: MediasUploadingRouter) {
         viewModel = .init()
         self.router = router
     }
@@ -70,12 +70,15 @@ public struct MediasUploadingView: View {
                     await viewModel.dispatch(.importMedias(newItems))
                 }
             }
+            .safeAreaInset(edge: .bottom) {
+                continueButton
+            }
         }
     }
 
     private var header: some View {
         RewindHeader(leftView: {
-            RewindButton(type: .leftChevron) { router.pop() }
+            RewindButton(type: .leftChevron) { router.dismiss() }
         })
     }
 
@@ -170,6 +173,15 @@ public struct MediasUploadingView: View {
                         .font(.system(size: 15, weight: .black))
                 }
         }
+    }
+
+    private var continueButton: some View {
+        GradientButton(title: "Save memories", width: .given(200)) {
+            Task {
+                await viewModel.dispatch(.createMedias)
+                router.dismiss()
+            }
+        }.disabledWithOpacity(viewModel.loadedMedias.isEmpty)
     }
 }
 

@@ -186,7 +186,7 @@ public struct RewindView: View {
 
     private var mediaView: some View {
         MediaContentView(
-            mediaItem: viewModel.currentMediaItem,
+            mediaItem: viewModel.currentMediaItem.memory,
             onSave: {},
             onLike: {},
             onToggleSound: {
@@ -215,7 +215,7 @@ public struct RewindView: View {
                 image: UIComponentsAsset.sasha.image,
                 name: "sasha",
                 date: "22.04.2025",
-                track: viewModel.currentMediaItem.track
+                track: viewModel.currentMediaItem.memory.track
             )
         }
     }

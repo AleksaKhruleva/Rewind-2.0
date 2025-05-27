@@ -11,10 +11,12 @@ final class GalleryViewModel {
         case viewGallery
         case showMediasDialog
         case selectOneMedia(PhotosPickerItem)
-        case viewBlurredMedia(MediaItem)
+        case viewBlurredMedia(GalleryItem)
         case openFilters
-        
+
+        case fetchGallery
         case addMedia(LoadedMedia)
+        case deleteMedia(GalleryItem)
     }
 
     var mediaPickerPresented: Bool = false
@@ -25,28 +27,28 @@ final class GalleryViewModel {
 
     var filterSettingsShown = false
     var blurredMediaShown = false
-    var blurredMediaSelection: MediaItem?
+    var blurredMediaSelection: GalleryItem?
 
     var showToast: (String) -> Void
 
-    private(set) var mediaItems = [MediaItem]()
+    private(set) var galleryItems = [GalleryItem]()
 
     private let transformer: PhotosPickerItemTransformer
 
-    var viewingBlurredMedia: MediaItem? {
+    var viewingBlurredMedia: GalleryItem? {
         guard let blurredMediaSelection, blurredMediaShown else {
             return nil
         }
         return blurredMediaSelection
     }
-    
-    let backend: NetworkServiceProtocol
+
+    let backend: NetworkService
 
     init() {
         transformer = .init()
         showToast = { _ in }
 
-        mediaItems = MediaItem.stubs(track: Self.fetchTrack())
+        galleryItems = []
         backend = NetworkService()
     }
 
@@ -76,14 +78,57 @@ final class GalleryViewModel {
                 if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
                     switch loadedMedia.content {
                     case let .image(image):
-                        let _ = try await backend.addMedia(
+                        let response = try await backend.addMedia(
                             tokens: tokens,
                             groupId: groupId,
                             mediaType: "image",
                             mediaFile: image,
+                            latitude: 23.1,
+                            longitude: 22.2,
+                            musicId: "id",
+                            offset: 321,
+                            duration: 123,
+                            tags: loadedMedia.tags ?? []
                         )
+                        withAnimation {
+                            galleryItems = [
+                                GalleryItem(
+                                    isFavourite: false,
+                                    tags: loadedMedia.tags ?? [],
+                                    memory: response.toMediaItem()
+                                )
+                            ] + galleryItems
+                        }
                     case .video:
-                        print("good")
+                        print()
+                    }
+                }
+            } catch {
+                showToast(UIComponentsStrings.Toast.error)
+            }
+        case .fetchGallery:
+            do {
+                if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                    let response = try await backend.getMedias(tokens: tokens, groupId: groupId)
+                    galleryItems = response.memories.map {
+                        $0.toGalleryItem()
+                    }
+                }
+            } catch {
+                showToast(UIComponentsStrings.Toast.error)
+            }
+        case let .deleteMedia(galleryItem):
+            do {
+                if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                    let response = try await backend.deleteMedia(
+                        tokens: tokens,
+                        groupId: groupId,
+                        memoryId: galleryItem.id
+                    )
+                    if response.success {
+                        withAnimation {
+                            galleryItems.removeAll { $0.id == galleryItem.id }
+                        }
                     }
                 }
             } catch {
