@@ -306,7 +306,7 @@ func (h *GroupHandler) ListGroupMembers(w http.ResponseWriter, r *http.Request) 
 // @Produce json
 // @Param group_id path int true "Group ID"
 // @Param user_id path int true "User ID to remove"
-// @Success 200 "Successfully removed member (No Content)"
+// @Success 200 {object} responses.DeleteUserResponse "Successfully removed member"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid group ID or user ID format"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - User does not have permission (not admin or not removing self)"

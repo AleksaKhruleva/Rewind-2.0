@@ -228,13 +228,7 @@ func (s *GroupService) UpdateGroup(ctx context.Context, req *pb.UpdateGroupReque
 		return nil, status.Errorf(codes.Internal, "Failed to retrieve group information")
 	}
 
-	// 3. Проверка прав доступа: является ли запрашивающий пользователь администратором группы?
-	if groupModel.AdminUserID != uint(requestingUserID) {
-		log.Printf("UpdateGroup: Permission denied - user %d is not admin of group %d", requestingUserID, groupID)
-		return nil, status.Errorf(codes.PermissionDenied, "Only group administrator can update group information")
-	}
-
-	// 4. Обновление полей группы (используем транзакцию для операции записи)
+	// 3. Обновление полей группы (используем транзакцию для операции записи)
 	tx, err := s.groupRepo.BeginTx(ctx)
 	if err != nil {
 		log.Printf("UpdateGroup: Failed to start transaction: %v", err)

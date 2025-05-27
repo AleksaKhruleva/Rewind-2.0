@@ -1336,7 +1336,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Successfully removed member (No Content)"
+                        "description": "Successfully removed member",
+                        "schema": {
+                            "$ref": "#/definitions/responses.DeleteUserResponse"
+                        }
                     },
                     "400": {
                         "description": "Bad Request - Invalid group ID or user ID format",

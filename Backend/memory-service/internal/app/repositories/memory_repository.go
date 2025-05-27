@@ -25,6 +25,8 @@ type MemoryRepositoryInterface interface {
 
 	CreateMemoryTag(ctx context.Context, tx *gorm.DB, tag *models.MemoryTag) error
 	DeleteMemoryTag(ctx context.Context, tx *gorm.DB, memoryID uint, tag string) error
+	DeleteMemoryTagsByMemoryID(ctx context.Context, tx *gorm.DB, memoryID uint) error
+	DeleteMemoryTagsByGroupID(ctx context.Context, tx *gorm.DB, memoryID uint) error
 	ListMemoryTagsByMemoryID(ctx context.Context, tx *gorm.DB, memoryID uint) ([]models.MemoryTag, error)
 
 	CreateFavourite(ctx context.Context, tx *gorm.DB, favourite *models.Favourite) error
@@ -305,10 +307,41 @@ func (r *MemoryRepository) DeleteMemoryTag(ctx context.Context, tx *gorm.DB, mem
 	}
 
 	// Удаляем найденный тег
-	deleteResult := db.Delete(&memoryTag)
+	deleteResult := db.Unscoped().Delete(&memoryTag)
 	if deleteResult.Error != nil {
 		log.Printf("MemoryRepository: Failed to delete memory tag with value '%s': %v", tag, deleteResult.Error)
 		return fmt.Errorf("failed to delete memory tag: %w", deleteResult.Error)
+	}
+
+	return nil
+}
+
+func (r *MemoryRepository) DeleteMemoryTagsByMemoryID(ctx context.Context, tx *gorm.DB, memoryID uint) error {
+	db := r.getDB(tx).WithContext(ctx)
+	deleteResult := db.Unscoped().Where("memory_id = ?", memoryID).Delete(&models.MemoryTag{})
+	if deleteResult.Error != nil {
+		log.Printf("MemoryRepository: Failed to delete memory tags: %v", deleteResult.Error)
+		return fmt.Errorf("failed to delete memory tags: %w", deleteResult.Error)
+	}
+	return nil
+}
+
+func (r *MemoryRepository) DeleteMemoryTagsByGroupID(ctx context.Context, tx *gorm.DB, groupID uint) error {
+	db := r.getDB(tx).WithContext(ctx)
+
+	var memoryIDs []uint
+	result := db.Model(&models.Memory{}).
+		Where("group_id = ?", groupID).
+		Pluck("id", &memoryIDs)
+	if result.Error != nil {
+		return fmt.Errorf("failed to find memory IDs for group %d: %w", groupID, result.Error)
+	}
+
+	if len(memoryIDs) > 0 {
+		deleteResult := db.Where("memory_id IN (?)", memoryIDs).Delete(&models.MemoryTag{})
+		if deleteResult.Error != nil {
+			return fmt.Errorf("failed to delete memory tags for group %d: %w", groupID, deleteResult.Error)
+		}
 	}
 
 	return nil
