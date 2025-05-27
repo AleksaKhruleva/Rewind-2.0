@@ -67,8 +67,7 @@ type GroupMemberResponse struct {
 
 // AcceptGroupInvitationResponse represents the HTTP response body for accepting an invitation.
 type AcceptGroupInvitationResponse struct {
-	Group       GroupResponse       `json:"group"`        // Details of the group joined
-	GroupMember GroupMemberResponse `json:"group_member"` // Details of the user's membership
+	Group GroupResponse `json:"group"` // Details of the group joined
 }
 
 // ListUserGroupsResponse represents the HTTP response body for listing groups for a user.

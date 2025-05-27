@@ -16,7 +16,10 @@ import (
 
 // NewGRPCServer создает новый gRPC сервер
 func NewGRPCServer() *grpc.Server {
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.MaxSendMsgSize(25*1024*1024), // 25 MB
+		grpc.MaxRecvMsgSize(25*1024*1024), // 25 MB
+	)
 	return grpcServer
 }
 

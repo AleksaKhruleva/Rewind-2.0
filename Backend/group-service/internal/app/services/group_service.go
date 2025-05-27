@@ -692,15 +692,28 @@ func (s *GroupService) RemoveGroupMember(ctx context.Context, req *pb.RemoveGrou
 				return nil, err
 			}
 
-			// Мягкое удаление записи участника (текущего админа)
-			softDeleteMemberErr := s.groupRepo.GroupMember().DeleteMember(ctx, tx, memberToRemove.ID)
-			if softDeleteMemberErr != nil {
-				if errors.Is(softDeleteMemberErr, gorm.ErrRecordNotFound) {
-					log.Printf("RemoveGroupMember: Member record %d not found during soft deletion after fetch", memberToRemove.ID)
+			updateNewAdminErr := s.groupRepo.GroupMember().UpdateMemberIsAdmin(ctx, tx, newAdminMember.ID, true)
+			if updateNewAdminErr != nil {
+				log.Printf("RemoveGroupMember: Failed to update member %d as admin: %v", newAdminUserID, updateNewAdminErr)
+				err = status.Errorf(codes.Internal, "Failed to update member as administrator")
+				return nil, err
+			}
+
+			// Удаление записи участника (текущего админа)
+			deleteInvitationsErr := s.groupRepo.GroupInvitation().HardDeleteInvitationsByUserID(ctx, tx, memberToRemove.ID)
+			if deleteInvitationsErr != nil {
+				if errors.Is(deleteInvitationsErr, gorm.ErrRecordNotFound) {
+					log.Printf("RemoveGroupMember: Invitation record %d not found during deletion after fetch", memberToRemove.ID)
+				}
+			}
+			deleteMemberErr := s.groupRepo.GroupMember().DeleteMember(ctx, tx, memberToRemove.ID)
+			if deleteMemberErr != nil {
+				if errors.Is(deleteMemberErr, gorm.ErrRecordNotFound) {
+					log.Printf("RemoveGroupMember: Member record %d not found during deletion after fetch", memberToRemove.ID)
 					err = status.Errorf(codes.Internal, "Internal error deleting member")
 					return nil, err
 				}
-				log.Printf("RemoveGroupMember: Failed to soft delete member %d from DB: %v", memberToRemove.ID, softDeleteMemberErr)
+				log.Printf("RemoveGroupMember: Failed to delete member %d from DB: %v", memberToRemove.ID, deleteMemberErr)
 				err = status.Errorf(codes.Internal, "Failed to remove group member")
 				return nil, err
 			}
@@ -719,9 +732,15 @@ func (s *GroupService) RemoveGroupMember(ctx context.Context, req *pb.RemoveGrou
 		}
 	} else {
 		// Сценарий: Не-администратор удаляет себя ИЛИ Администратор удаляет другого участника.
-		// В этом случае просто мягко удаляем запись участника.
+		// В этом случае просто удаляем запись участника.
 
-		// Мягкое удаление записи GroupMember
+		// Удаление записи GroupMember
+		deleteInvitationsErr := s.groupRepo.GroupInvitation().HardDeleteInvitationsByUserID(ctx, tx, memberToRemove.ID)
+		if deleteInvitationsErr != nil {
+			if errors.Is(deleteInvitationsErr, gorm.ErrRecordNotFound) {
+				log.Printf("RemoveGroupMember: Invitation record %d not found during deletion after fetch", memberToRemove.ID)
+			}
+		}
 		err = s.groupRepo.GroupMember().DeleteMember(ctx, tx, memberToRemove.ID)
 		if err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {

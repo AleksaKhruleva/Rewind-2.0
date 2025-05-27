@@ -460,16 +460,6 @@ func (h *GroupHandler) AcceptGroupInvitation(w http.ResponseWriter, r *http.Requ
 			CreatedAt:   groupPB.GetCreatedAt().AsTime(),
 			UpdatedAt:   groupPB.GetUpdatedAt().AsTime(),
 		},
-		GroupMember: responses.GroupMemberResponse{
-			Id:                  memberPB.GetId(),
-			GroupId:             memberPB.GetGroupId(),
-			UserId:              memberPB.GetUserId(),
-			IsAdmin:             memberPB.GetIsAdmin(),
-			MemoriesAddedCount:  memberPB.GetMemoriesAddedCount(),
-			MemoriesViewedCount: memberPB.GetMemoriesViewedCount(),
-			CreatedAt:           memberPB.GetCreatedAt().AsTime(),
-			UpdatedAt:           memberPB.GetUpdatedAt().AsTime(),
-		},
 	}
 
 	respondJSON(w, http.StatusOK, responseBody)

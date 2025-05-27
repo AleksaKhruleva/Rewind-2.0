@@ -2707,14 +2707,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/responses.GroupResponse"
                         }
                     ]
-                },
-                "group_member": {
-                    "description": "Details of the user's membership",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/responses.GroupMemberResponse"
-                        }
-                    ]
                 }
             }
         },
@@ -2870,43 +2862,6 @@ const docTemplate = `{
                 "username": {
                     "description": "Username",
                     "type": "string"
-                }
-            }
-        },
-        "responses.GroupMemberResponse": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "description": "Creation timestamp",
-                    "type": "string"
-                },
-                "group_id": {
-                    "description": "Associated Group ID",
-                    "type": "integer"
-                },
-                "id": {
-                    "description": "Group Member entry ID",
-                    "type": "integer"
-                },
-                "is_admin": {
-                    "description": "Is this member an admin?",
-                    "type": "boolean"
-                },
-                "memories_added_count": {
-                    "description": "Memories added count",
-                    "type": "integer"
-                },
-                "memories_viewed_count": {
-                    "description": "Memories viewed count",
-                    "type": "integer"
-                },
-                "updated_at": {
-                    "description": "Last update timestamp",
-                    "type": "string"
-                },
-                "user_id": {
-                    "description": "Associated User ID",
-                    "type": "integer"
                 }
             }
         },

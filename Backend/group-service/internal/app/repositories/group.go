@@ -1,9 +1,11 @@
 package repositories
 
 import (
-	"Rewind-group-service/internal/app/models"
 	"context"
+
 	"gorm.io/gorm"
+
+	"Rewind-group-service/internal/app/models"
 )
 
 // GroupRepository определяет методы для работы с группами в базе данных.
@@ -49,7 +51,7 @@ type GroupMemberRepository interface {
 	// TODO: Добавить параметры для пагинации и сортировки.
 	ListMembersByGroup(ctx context.Context, tx *gorm.DB, groupID uint) ([]models.GroupMember, error)
 
-	// DeleteMember мягко удаляет запись об участии пользователя в группе по её уникальному идентификатору.
+	// DeleteMember удаляет запись об участии пользователя в группе по её уникальному идентификатору.
 	// Возвращает ErrRecordNotFound если запись не найдена.
 	DeleteMember(ctx context.Context, tx *gorm.DB, memberID uint) error
 
@@ -109,6 +111,7 @@ type GroupInvitationRepository interface {
 	CheckInvitationExistsByCode(ctx context.Context, tx *gorm.DB, invitationCode string) (bool, error)
 
 	HardDeleteInvitationsByGroup(ctx context.Context, tx *gorm.DB, groupID uint) error
+	HardDeleteInvitationsByUserID(ctx context.Context, tx *gorm.DB, userID uint) error
 }
 
 // Repository объединяет все репозитории для Group Service и предоставляет методы управления транзакциями.
