@@ -17,7 +17,7 @@ final class MediasUploadingViewModel {
 
     var similarSettigns: Bool
     var toggleDisabled: Bool
-    var tags: [String]
+    var tags: [MediaTag]
     var loadedMedias: [LoadedMedia]
     var selection: [PhotosPickerItem]
     var showToast: (String) -> Void
@@ -39,7 +39,7 @@ final class MediasUploadingViewModel {
         backend = NetworkService()
     }
 
-    func dispatch(_ intent: Intent) async {
+    func dispatch(_ intent: Intent, onSuccess: @escaping () -> Void = {}) async {
         switch intent {
         case let .importMedias(items):
             do {
@@ -72,12 +72,12 @@ final class MediasUploadingViewModel {
         case let .showMediaSettings(media):
             viewingMedia = media
         case .createMedias:
-            for loadedMedia in loadedMedias {
-                do {
+            do {
+                for loadedMedia in loadedMedias {
                     if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
                         switch loadedMedia.content {
                         case let .image(image):
-                            let response = try await backend.addMedia(
+                            let _ = try await backend.addMedia(
                                 tokens: tokens,
                                 groupId: groupId,
                                 mediaType: "image",
@@ -93,9 +93,10 @@ final class MediasUploadingViewModel {
                             print()
                         }
                     }
-                } catch {
-                    showToast("Can't load one of your images. You can try again later 😢")
+                    onSuccess()
                 }
+            } catch {
+                showToast("Can't load one of your images. You can try again later 😢")
             }
         }
     }

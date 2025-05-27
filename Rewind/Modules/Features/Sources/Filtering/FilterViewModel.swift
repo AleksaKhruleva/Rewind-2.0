@@ -1,5 +1,6 @@
 import SwiftUI
 import Foundation
+import Domain
 
 @MainActor @Observable
 final class FilterViewModel {
@@ -12,7 +13,7 @@ final class FilterViewModel {
     var startDate: Date?
     var endDate: Date?
 
-    var tags: [String] = []
+    var tags: [MediaTag] = []
 
     var invalidDates: Bool {
         let comparingStartDate = startDate ?? Date()
@@ -29,7 +30,7 @@ final class FilterViewModel {
             favourites: favourites,
             startDate: startDate?.description,
             endDate: endDate?.description,
-            tags: tags.isEmpty ? nil : tags
+            tags: tags.isEmpty ? nil : tags.map { $0.tag }
         )
     }
 }

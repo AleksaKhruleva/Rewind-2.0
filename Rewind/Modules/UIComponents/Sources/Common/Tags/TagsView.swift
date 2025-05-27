@@ -1,21 +1,28 @@
 import SwiftUI
+import Domain
 
 struct TagsView: View {
-    @Binding var tags: [String]
+    @Binding var tags: [MediaTag]
     @State private var totalHeight: CGFloat
     @State private var tagInputPresented: Bool
     var useInvertedColors: Bool
+    var onTagAdd: ((MediaTag) -> Void)?
+    var onTagDelete: ((MediaTag) -> Void)?
 
     init(
-        tags: Binding<[String]>,
+        tags: Binding<[MediaTag]>,
         totalHeight: Double = CGFloat.zero,
         tagInputPresented: Bool = false,
-        useInvertedColors: Bool
+        useInvertedColors: Bool,
+        onTagAdd: ((MediaTag) -> Void)?,
+        onTagDelete: ((MediaTag) -> Void)?
     ) {
         self._tags = tags
         self.totalHeight = totalHeight
         self.tagInputPresented = tagInputPresented
         self.useInvertedColors = useInvertedColors
+        self.onTagAdd = onTagAdd
+        self.onTagDelete = onTagDelete
     }
 
     var body: some View {
@@ -32,7 +39,7 @@ struct TagsView: View {
                 placeholder: UIComponentsStrings.GenericInput.NewTag.placeholder,
                 error: .constant(nil) // TODO: Use real data
             ) { tag in
-                tags.append(tag)
+                onTagAdd?(MediaTag(tag: tag))
                 tagInputPresented = false
             }
         }
@@ -47,8 +54,8 @@ struct TagsView: View {
         var lastHeight: CGFloat = 0
 
         return ZStack(alignment: .topLeading) {
-            ForEach(self.tags, id: \.self) { tag in
-                self.item(for: tag)
+            ForEach(self.tags) { tag in
+                self.item(for: tag.tag)
                     .padding([.vertical, .trailing], 4)
                     .alignmentGuide(.leading) { dimension in
                         if abs(width - dimension.width) > geometry.size.width {
@@ -119,7 +126,7 @@ struct TagsView: View {
                 .clipShape(Circle())
                 .onTapGesture {
                     withAnimation {
-                        tags.removeAll { $0 == text }
+                        onTagDelete?(MediaTag(tag: text))
                     }
                 }
         }
@@ -127,14 +134,4 @@ struct TagsView: View {
         .background(useInvertedColors ? Color.background : Color.backgroundSecondary)
         .cornerRadius(20)
     }
-}
-
-#Preview {
-    TagsView(tags: Binding.constant([
-        "Ninetendo",
-        "XBox",
-        "PlayStatio",
-        "PlayStation 2",
-        "PlayStation 4ddd"
-    ]), useInvertedColors: false)
 }

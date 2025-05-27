@@ -29,7 +29,7 @@ final class VideoUploadingViewModel {
     var loadedMedia: LoadedMedia?
     var toastMessage: String? // TODO: implement later
 
-    var tags: [String] {
+    var tags: [MediaTag] {
         get { loadedMedia?.tags ?? [] }
         set { loadedMedia?.tags = newValue }
     }
