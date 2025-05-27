@@ -3,13 +3,18 @@ import UIComponents
 import Domain
 
 public struct MediaDetailsView: View {
+    @State private var viewModel: MediaDetailsViewModel
     @State private var tags: [String] = []
     @State private var isTrackPlaying: Bool = false
-    private let mediaItem: MediaItem
+    private let galleryItem: GalleryItem
     private let router: AppRouter
 
-    public init(mediaItem: MediaItem, router: AppRouter) {
-        self.mediaItem = mediaItem
+    @Environment(\.showToast)
+    private var showToast
+
+    public init(galleryItem: GalleryItem, router: AppRouter) {
+        viewModel = MediaDetailsViewModel()
+        self.galleryItem = galleryItem
         self.router = router
     }
 
@@ -35,6 +40,9 @@ public struct MediaDetailsView: View {
             .padding(.horizontal, 8)
         }
         .background(Color.background)
+        .onAppear {
+            viewModel.set(showToast: showToast)
+        }
     }
 
     private var header: some View {
@@ -51,7 +59,7 @@ public struct MediaDetailsView: View {
 
     private var rewind: some View {
         MediaContentView(
-            mediaItem: mediaItem,
+            mediaItem: galleryItem.memory,
             onSave: {},
             onLike: {},
             onToggleSound: {},
@@ -64,13 +72,18 @@ public struct MediaDetailsView: View {
             image: UIComponentsAsset.media15.image,
             name: "flowykk",
             date: "23.11.2024",
-            track: mediaItem.track
+            track: galleryItem.memory.track
         )
     }
 
     private var riskyTable: some View {
         InformationTable(title: UIComponentsStrings.MediaDetails.risky, data: [
-            ("rectangle.portrait.and.arrow.right.fill", UIComponentsStrings.MediaDetails.delete, nil, nil)
+            ("rectangle.portrait.and.arrow.right.fill", UIComponentsStrings.MediaDetails.delete, nil, {
+                Task {
+                    await viewModel.dispatch(.deleteMedia(galleryItem))
+                    router.pop()
+                }
+            })
         ], isRisky: true)
     }
 }

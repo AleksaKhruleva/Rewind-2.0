@@ -7,7 +7,7 @@ public enum MediaType: Codable {
 }
 
 public struct MediaItem: Identifiable, Codable, Hashable {
-    public let id: UUID
+    public let id: Int
     public let userId: Int
     public let groupId: Int
     public let mediaType: MediaType
@@ -21,7 +21,7 @@ public struct MediaItem: Identifiable, Codable, Hashable {
     public let track: Track?
     
     public init(
-        id: UUID = UUID(),
+        id: Int = -1,
         userId: Int,
         groupId: Int,
         mediaType: MediaType,
@@ -99,5 +99,16 @@ extension MediaItem {
                 track: track
             )
         ]
+    }
+}
+
+extension String {
+    public func toMediaType() -> MediaType {
+        switch self {
+        case "image": .image
+        case "video": .video
+        case "quote": .quote
+        default: .image
+        }
     }
 }

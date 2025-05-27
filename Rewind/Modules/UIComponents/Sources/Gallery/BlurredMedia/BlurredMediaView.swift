@@ -3,20 +3,23 @@ import Domain
 
 public struct BlurredMediaView: View {
     @Binding var isPresented: Bool
-    @State private var mediaItem: MediaItem
+    @State private var galleryItem: GalleryItem
     @State private var isTrackPlaying: Bool = false
-    private var showMediaDetails: (MediaItem) -> Void
+    private var onDelete: (GalleryItem) -> Void
+    private var showMediaDetails: (GalleryItem) -> Void
 
     @Environment(\.showToast)
     private var showToast
 
     public init(
         isPresented: Binding<Bool>,
-        mediaItem: MediaItem,
-        showMediaDetails: @escaping (MediaItem) -> Void
+        galleryItem: GalleryItem,
+        onDelete: @escaping (GalleryItem) -> Void,
+        showMediaDetails: @escaping (GalleryItem) -> Void
     ) {
         self._isPresented = isPresented
-        self.mediaItem = mediaItem
+        self.galleryItem = galleryItem
+        self.onDelete = onDelete
         self.showMediaDetails = showMediaDetails
     }
 
@@ -60,7 +63,7 @@ public struct BlurredMediaView: View {
                 image: UIComponentsAsset.avatar.image,
                 name: "flowykk",
                 date: "23.11.2024",
-                track: mediaItem.track
+                track: galleryItem.memory.track
             )
             .padding(.leading, 6)
             Spacer()
@@ -72,7 +75,7 @@ public struct BlurredMediaView: View {
 
     private var mediaView: some View {
         MediaContentView(
-            mediaItem: mediaItem,
+            mediaItem: galleryItem.memory,
             onSave: {},
             onLike: {},
             onToggleSound: {},
@@ -86,7 +89,7 @@ public struct BlurredMediaView: View {
                 icon: "gearshape.fill",
                 title: UIComponentsStrings.Media.Blurred.title,
                 needChevron: true,
-                action: { showMediaDetails(mediaItem) }
+                action: { showMediaDetails(galleryItem) }
             )
         }
         .background(Color.background)
@@ -100,7 +103,7 @@ public struct BlurredMediaView: View {
             needChevron: true,
             isRisky: true,
             action: {
-                // TODO: smth
+                onDelete(galleryItem)
             }
         )
         .background(Color.riskyBackground)

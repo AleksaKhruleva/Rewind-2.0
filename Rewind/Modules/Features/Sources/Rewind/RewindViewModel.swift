@@ -34,7 +34,7 @@ final class RewindViewModel {
     private(set) var groups = [Domain.Group]()
     private(set) var userGroupsState = UserGroupsState.notReady
     private(set) var currentGroupState = CurrentGroupState.ready
-    private(set) var currentMediaItem: MediaItem
+    private(set) var currentMediaItem: GalleryItem
     let router: RewindRouter
 
     var fetchedUser: User?
@@ -54,7 +54,7 @@ final class RewindViewModel {
     private let backend: NetworkServiceProtocol
     private let jwtDecoder: JWTDecoder
     private let audioManager: AudioPlayerManager
-    private var mediaItems = [MediaItem]()
+    private var mediaItems = [GalleryItem]()
     private var currentIndex = 0
 
     init(router: RewindRouter) {
@@ -64,7 +64,9 @@ final class RewindViewModel {
         jwtDecoder = JWTDecoder()
         audioManager = AudioPlayerManager.shared
 
-        let items = MediaItem.stubs(track: Self.fetchTrack())
+        let items = MediaItem.stubs(track: Self.fetchTrack()).map {
+            GalleryItem(isFavourite: false, tags: [], memory: $0)
+        }
 
         mediaItems = items
         currentMediaItem = items[0]
@@ -85,7 +87,7 @@ final class RewindViewModel {
             }
         case .toggleTrackPlaying:
             if !isTrackPlaying {
-                guard let streamURL = currentMediaItem.track?.streamURL else {
+                guard let streamURL = currentMediaItem.memory.track?.streamURL else {
                     return
                 }
                 audioManager.load(url: streamURL)

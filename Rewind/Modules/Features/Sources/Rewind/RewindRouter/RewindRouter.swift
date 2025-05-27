@@ -17,8 +17,8 @@ public final class RewindRouter {
         appRouter?.navigate(to: .account(user))
     }
 
-    func navigateToMediaDetails(_ mediaItem: MediaItem) {
-        appRouter?.navigate(to: .mediaDetails(mediaItem))
+    func navigateToMediaDetails(_ galleryItem: GalleryItem) {
+        appRouter?.navigate(to: .mediaDetails(galleryItem))
     }
 
     func navigateToMap() {
