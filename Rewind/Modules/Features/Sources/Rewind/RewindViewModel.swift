@@ -165,7 +165,7 @@ final class RewindViewModel {
                 GroupStorage.currentGroup = nil
                 showToast("Error: \(error)")
             }
-        case .selectedNewGroup(_):
+        case .selectedNewGroup:
             groups = GroupUtils.sortedGroups(groups)
             userGroupsState = .ready
         }
