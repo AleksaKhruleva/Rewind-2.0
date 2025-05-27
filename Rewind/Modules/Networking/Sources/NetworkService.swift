@@ -36,7 +36,7 @@ public protocol NetworkServiceProtocol {
 
     func getMedias(tokens: Tokens, groupId: Int) async throws -> MediasResponse
     func getRandomMedias(tokens: Tokens, groupId: Int) async throws -> MediasResponse
-    // case addMedia
+    func addMedia(tokens: Tokens, groupId: Int, mediaType: String, mediaFile: UIImage) async throws -> MediaItem
     func deleteMedia(tokens: Tokens, groupId: Int, memoryId: Int) async throws -> SuccessResponse
     func addTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> TagResponse
     func deleteTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> TagResponse
@@ -251,6 +251,20 @@ public final class NetworkService: NetworkServiceProtocol {
                     groupId: groupId
                 ),
                 type: MediasResponse.self
+            )
+        }
+    }
+    
+    public func addMedia(tokens: Tokens, groupId: Int, mediaType: String, mediaFile: UIImage) async throws -> MediaItem {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+            try await self.provider.request(
+                .addMedia(
+                    accessToken: tokens.accessToken,
+                    groupId: String(groupId),
+                    mediaType: mediaType,
+                    mediaFile: mediaFile
+                ),
+                type: MediaItem.self
             )
         }
     }

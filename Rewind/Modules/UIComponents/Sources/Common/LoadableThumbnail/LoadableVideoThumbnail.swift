@@ -22,11 +22,11 @@ public struct LoadableVideoThumbnail<Content: View>: View {
             return
         }
         do {
-            let fileURL = url.deletingPathExtension().lastPathComponent
-            if let uiImage = FileManagerImageStorage.shared.getImage(url: fileURL) {
-                animateState(to: .ready(Image(uiImage: uiImage)))
-                return
-            }
+//            let fileURL = url.deletingPathExtension().lastPathComponent
+//            if let uiImage = FileManagerImageStorage.shared.getImage(url: fileURL) {
+//                animateState(to: .ready(Image(uiImage: uiImage)))
+//                return
+//            }
             let asset = AVURLAsset(url: url)
             let imageGenerator = AVAssetImageGenerator(asset: asset)
             imageGenerator.appliesPreferredTrackTransform = true
@@ -45,8 +45,8 @@ public struct LoadableVideoThumbnail<Content: View>: View {
                 }
             }
             let uiImage = UIImage(cgImage: cgImage)
-            FileManagerImageStorage.shared.saveImage(image: uiImage, url: fileURL)
-            animateState(to: .ready(Image(uiImage: uiImage)))
+//            FileManagerImageStorage.shared.saveImage(image: uiImage, url: fileURL)
+            animateState(to: .ready(uiImage))
         } catch {
             animateState(to: .failure)
         }

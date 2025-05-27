@@ -3,14 +3,25 @@ import SwiftUI
 import Base
 
 public struct LoadableImageThumbnail<Content: View>: View {
-    let url: URL?
+    @State private var url: URL?
     @ViewBuilder let content: (LoadableMediaState) -> Content
     @State private var state: LoadableMediaState = .empty
+    
+    public init(
+        url: URL? = nil,
+        content: @escaping (LoadableMediaState) -> Content
+    ) {
+        self.url = url
+        self.content = content
+    }
 
     public var body: some View {
         content(state)
-            .task(id: url) {
+            .task {
                 await loadImage(url)
+            }
+            .onChange(of: url) { newValue in
+                print("URL CHANGED")
             }
     }
 
@@ -21,15 +32,16 @@ public struct LoadableImageThumbnail<Content: View>: View {
             return
         }
         do {
-            let fileURL = url.deletingPathExtension().lastPathComponent
-            if let uiImage = FileManagerImageStorage.shared.getImage(url: fileURL) {
-                animateState(to: .ready(Image(uiImage: uiImage)))
-                return
-            }
-            let (data, _) = try await URLSession.shared.data(from: url)
-            if let uiImage = UIImage(data: data) {
-                FileManagerImageStorage.shared.saveImage(image: uiImage, url: fileURL)
-                animateState(to: .ready(Image(uiImage: uiImage)))
+//            let fileURL = url.deletingPathExtension().lastPathComponent
+//            async let uiImage = await FileManagerImageStorage.shared.getImage(url: fileURL)
+//            if let uiImage = await uiImage {
+//                animateState(to: .ready(uiImage))
+//                return
+//            }
+            async let (data, _) = try await URLSession.shared.data(from: url)
+            if let uiImage = try await UIImage(data: data) {
+//                await FileManagerImageStorage.shared.saveImage(image: uiImage, url: fileURL)
+                animateState(to: .ready(uiImage))
             } else {
                 animateState(to: .failure)
             }

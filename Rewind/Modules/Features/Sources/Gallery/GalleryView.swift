@@ -2,6 +2,8 @@ import SwiftUI
 import UIComponents
 import PhotosUI
 import Domain
+import Base
+import Networking
 
 public struct GalleryView: View {
     @State private var viewModel: GalleryViewModel
@@ -60,8 +62,22 @@ public struct GalleryView: View {
             }
             .photosPicker(isPresented: $viewModel.mediaPickerPresented, selection: $viewModel.mediaSelection)
             .navigationDestination(item: $viewModel.uploadingMedia) { media in
-                uploadingMediaDestination(for: media) { _ in
-                    print("Saving")
+                uploadingMediaDestination(for: media) { loadedMedia in
+                    Task {
+                        if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                            switch loadedMedia.content {
+                            case let .image(image):
+                                try await NetworkService().addMedia(
+                                    tokens: tokens,
+                                    groupId: groupId,
+                                    mediaType: "image",
+                                    mediaFile: image,
+                                )
+                            case .video:
+                                print("good")
+                            }
+                        }
+                    }
                 }.toolbar(.hidden)
             }
         }
