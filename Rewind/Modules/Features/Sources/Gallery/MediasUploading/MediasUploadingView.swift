@@ -178,8 +178,9 @@ public struct MediasUploadingView: View {
     private var continueButton: some View {
         GradientButton(title: "Save memories", width: .given(200)) {
             Task {
-                await viewModel.dispatch(.createMedias)
-                router.dismiss()
+                await viewModel.dispatch(.createMedias) {
+                    router.dismiss()
+                }
             }
         }.disabledWithOpacity(viewModel.loadedMedias.isEmpty)
     }

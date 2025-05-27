@@ -52,7 +52,7 @@ final class GalleryViewModel {
         backend = NetworkService()
     }
 
-    func dispatch(_ intent: Intent) async {
+    func dispatch(_ intent: Intent, onSuccess: @escaping () -> Void = {}) async {
         switch intent {
         case .viewGallery:
             if mediaSelection != nil { mediaSelection = nil }
@@ -91,10 +91,11 @@ final class GalleryViewModel {
                             tags: loadedMedia.tags ?? []
                         )
                         withAnimation {
+                            onSuccess()
                             galleryItems = [
                                 GalleryItem(
                                     isFavourite: false,
-                                    tags: loadedMedia.tags ?? [],
+                                    tags: loadedMedia.tags?.map { $0.tag } ?? [],
                                     memory: response.toMediaItem()
                                 )
                             ] + galleryItems
@@ -111,7 +112,7 @@ final class GalleryViewModel {
                 if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
                     let response = try await backend.getMedias(tokens: tokens, groupId: groupId)
                     galleryItems = response.memories.map {
-                        $0.toGalleryItem()
+                        return $0.toGalleryItem()
                     }
                 }
             } catch {
@@ -127,6 +128,7 @@ final class GalleryViewModel {
                     )
                     if response.success {
                         withAnimation {
+                            onSuccess()
                             galleryItems.removeAll { $0.id == galleryItem.id }
                         }
                     }

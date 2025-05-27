@@ -204,7 +204,11 @@ final class RewindViewModel {
         return sorted
     }
 
-    private func sortedMembers(from responses: [GroupMemberResponse], groupOwnerID: Int, currentUserID: String) -> [Member] {
+    private func sortedMembers(
+        from responses: [GroupMemberResponse],
+        groupOwnerID: Int,
+        currentUserID: String
+    ) -> [Member] {
         let members = responses.map { response in
             Member(
                 id: String(response.id),

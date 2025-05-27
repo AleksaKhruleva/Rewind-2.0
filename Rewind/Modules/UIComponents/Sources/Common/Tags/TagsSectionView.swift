@@ -1,14 +1,24 @@
 import SwiftUI
+import Domain
 
 let maxTags = 5
 
 public struct TagsSectionView: View {
-    @Binding var tags: [String]
+    @Binding var tags: [MediaTag]
     var useInvertedColors: Bool
+    var onTagAdd: ((MediaTag) -> Void)?
+    var onTagDelete: ((MediaTag) -> Void)?
 
-    public init(tags: Binding<[String]>, useInvertedColors: Bool = false) {
+    public init(
+        tags: Binding<[MediaTag]>,
+        useInvertedColors: Bool = false,
+        onTagAdd: ((MediaTag) -> Void)? = nil,
+        onTagDelete: ((MediaTag) -> Void)? = nil
+    ) {
         self._tags = tags
         self.useInvertedColors = useInvertedColors
+        self.onTagAdd = onTagAdd
+        self.onTagDelete = onTagDelete
     }
 
     public var body: some View {
@@ -36,7 +46,14 @@ public struct TagsSectionView: View {
                 .disabledWithOpacity(tags.isEmpty)
             }
 
-            TagsView(tags: $tags, useInvertedColors: useInvertedColors)
+            TagsView(
+                tags: $tags,
+                useInvertedColors: useInvertedColors,
+                onTagAdd: onTagAdd ?? { tags.append($0) },
+                onTagDelete: onTagDelete ?? { tagToDelete in
+                    tags.removeAll { $0.tag == tagToDelete.tag }
+                }
+            )
         }
     }
 }

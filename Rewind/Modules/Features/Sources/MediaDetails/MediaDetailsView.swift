@@ -4,7 +4,7 @@ import Domain
 
 public struct MediaDetailsView: View {
     @State private var viewModel: MediaDetailsViewModel
-    @State private var tags: [String] = []
+    @State private var tags: [MediaTag]
     @State private var isTrackPlaying: Bool = false
     private let galleryItem: GalleryItem
     private let router: AppRouter
@@ -16,6 +16,7 @@ public struct MediaDetailsView: View {
         viewModel = MediaDetailsViewModel()
         self.galleryItem = galleryItem
         self.router = router
+        self.tags = galleryItem.tags.map { MediaTag(tag: $0) }
     }
 
     public var body: some View {
@@ -29,7 +30,21 @@ public struct MediaDetailsView: View {
                     author
                         .padding(.leading)
 
-                    TagsSectionView(tags: $tags)
+                    TagsSectionView(tags: $tags) { tag in
+                        Task {
+                            await viewModel.dispatch(.addTag(galleryItem, tag.tag)) {
+                                tags.append(tag)
+                            }
+                        }
+                    } onTagDelete: { tag in
+                        Task {
+                            await viewModel.dispatch(.deleteTag(galleryItem, tag.tag)) {
+                                withAnimation {
+                                    tags.removeAll { $0.tag == tag.tag }
+                                }
+                            }
+                        }
+                    }
 
                     riskyTable
                 }
@@ -80,8 +95,9 @@ public struct MediaDetailsView: View {
         InformationTable(title: UIComponentsStrings.MediaDetails.risky, data: [
             ("rectangle.portrait.and.arrow.right.fill", UIComponentsStrings.MediaDetails.delete, nil, {
                 Task {
-                    await viewModel.dispatch(.deleteMedia(galleryItem))
-                    router.pop()
+                    await viewModel.dispatch(.deleteMedia(galleryItem)) {
+                        router.pop()
+                    }
                 }
             })
         ], isRisky: true)

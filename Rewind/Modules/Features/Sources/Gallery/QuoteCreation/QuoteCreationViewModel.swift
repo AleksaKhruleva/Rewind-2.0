@@ -29,7 +29,7 @@ final class QuoteCreationViewModel {
 
     var quote: String = ""
     var author: String = ""
-    var tags: [String] = []
+    var tags: [MediaTag] = []
 
     var selectedTrack: Track?
     var selectedStartTime: Double = 0
