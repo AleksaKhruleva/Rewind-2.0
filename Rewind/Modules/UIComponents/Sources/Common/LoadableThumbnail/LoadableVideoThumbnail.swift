@@ -1,6 +1,7 @@
 import Foundation
 import AVFoundation
 import SwiftUI
+import Base
 
 public struct LoadableVideoThumbnail<Content: View>: View {
     let url: URL?
@@ -14,20 +15,26 @@ public struct LoadableVideoThumbnail<Content: View>: View {
             }
     }
 
-    @MainActor
-    private func loadThumbnail(_ currentUrl: URL?) async {
+    private func loadThumbnail(_ currentURL: URL?) async {
         animateState(to: .empty)
-        guard let url = currentUrl else {
+        guard let url = currentURL else {
             animateState(to: .failure)
             return
         }
         do {
+            let fileURL = url.deletingPathExtension().lastPathComponent
+            if let uiImage = FileManagerImageStorage.shared.getImage(url: fileURL) {
+                animateState(to: .ready(Image(uiImage: uiImage)))
+                return
+            }
             let asset = AVURLAsset(url: url)
             let imageGenerator = AVAssetImageGenerator(asset: asset)
             imageGenerator.appliesPreferredTrackTransform = true
             let time = CMTime(seconds: 0.0, preferredTimescale: 600)
             let cgImage = try await withCheckedThrowingContinuation { cont in
-                imageGenerator.generateCGImagesAsynchronously(forTimes: [NSValue(time: time)]) { _, cgImage, _, result, error in
+                imageGenerator.generateCGImagesAsynchronously(
+                    forTimes: [NSValue(time: time)]
+                ) { _, cgImage, _, result, error in
                     if let cgImage, result == .succeeded {
                         cont.resume(returning: cgImage)
                     } else if let error {
@@ -37,8 +44,9 @@ public struct LoadableVideoThumbnail<Content: View>: View {
                     }
                 }
             }
-            let image = Image(uiImage: UIImage(cgImage: cgImage))
-            animateState(to: .ready(image))
+            let uiImage = UIImage(cgImage: cgImage)
+            FileManagerImageStorage.shared.saveImage(image: uiImage, url: fileURL)
+            animateState(to: .ready(Image(uiImage: uiImage)))
         } catch {
             animateState(to: .failure)
         }

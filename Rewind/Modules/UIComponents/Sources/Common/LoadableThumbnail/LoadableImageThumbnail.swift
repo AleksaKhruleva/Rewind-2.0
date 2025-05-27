@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Base
 
 public struct LoadableImageThumbnail<Content: View>: View {
     let url: URL?
@@ -13,18 +14,22 @@ public struct LoadableImageThumbnail<Content: View>: View {
             }
     }
 
-    @MainActor
-    private func loadImage(_ currentUrl: URL?) async {
+    private func loadImage(_ currentURL: URL?) async {
         animateState(to: .empty)
-        guard let url = currentUrl else {
+        guard let url = currentURL else {
             animateState(to: .failure)
             return
         }
         do {
+            let fileURL = url.deletingPathExtension().lastPathComponent
+            if let uiImage = FileManagerImageStorage.shared.getImage(url: fileURL) {
+                animateState(to: .ready(Image(uiImage: uiImage)))
+                return
+            }
             let (data, _) = try await URLSession.shared.data(from: url)
             if let uiImage = UIImage(data: data) {
-                let image = Image(uiImage: uiImage)
-                animateState(to: .ready(image))
+                FileManagerImageStorage.shared.saveImage(image: uiImage, url: fileURL)
+                animateState(to: .ready(Image(uiImage: uiImage)))
             } else {
                 animateState(to: .failure)
             }
