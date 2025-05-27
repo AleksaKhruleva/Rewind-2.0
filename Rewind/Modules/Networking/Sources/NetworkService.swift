@@ -33,6 +33,9 @@ public protocol NetworkServiceProtocol {
     func fetchFullGroupDetails(tokens: Tokens, id: Int) async throws -> GroupDetails
     func updateGroupName(tokens: Tokens, id: Int, name: String) async throws -> GroupResponse
     func createGroupInvitationCode(tokens: Tokens, id: Int) async throws -> GroupInvitationCodeResponse
+    func addUserToGroup(tokens: Tokens, invitationCode: String) async throws -> GroupResponse
+    func deleteMemberFromGroup(tokens: Tokens, groupID: Int, memberID: String) async throws -> SuccessResponse
+    func deleteGroup(tokens: Tokens, id: Int) async throws -> SuccessResponse
 
     func getMedias(tokens: Tokens, groupId: Int) async throws -> MediasResponse
     func getRandomMedias(tokens: Tokens, groupId: Int) async throws -> MediasResponse
@@ -254,7 +257,7 @@ public final class NetworkService: NetworkServiceProtocol {
             )
         }
     }
-
+    
     public func addMedia(
         tokens: Tokens,
         groupId: Int,
@@ -399,6 +402,44 @@ public final class NetworkService: NetworkServiceProtocol {
                         id: id
                     ),
                     type: GroupInvitationCodeResponse.self
+                )
+        }
+    }
+
+    public func addUserToGroup(tokens: Tokens, invitationCode: String) async throws -> GroupResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+            let response = try await provider
+                .request(
+                    .addUserToGroup(
+                        accessToken: tokens.accessToken,
+                        invitationCode: invitationCode
+                    ),
+                    type: AddUserToGroupResponse.self
+                )
+            return response.group
+        }
+    }
+
+    public func deleteMemberFromGroup(tokens: Tokens, groupID: Int, memberID: String) async throws -> SuccessResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+            try await provider
+                .request(
+                    .deleteMemberFromGroup(
+                        accessToken: tokens.accessToken,
+                        groupID: groupID,
+                        memberID: memberID
+                    ),
+                    type: SuccessResponse.self
+                )
+        }
+    }
+
+    public func deleteGroup(tokens: Tokens, id: Int) async throws -> SuccessResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+            try await provider
+                .request(
+                    .deleteGroup(accessToken: tokens.accessToken, id: id),
+                    type: SuccessResponse.self
                 )
         }
     }

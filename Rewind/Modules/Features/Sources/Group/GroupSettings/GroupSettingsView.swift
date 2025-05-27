@@ -6,6 +6,7 @@ import Base
 public struct GroupSettingsView: View {
     @State private var viewModel: GroupSettingsViewModel
     @State private var deleteGroupAlertShown = false
+    @State private var leaveGroupAlertShown = false
     @Environment(\.showToast) private var showToast
 
     public init(group: Domain.Group, router: GroupSettingsRouter) {
@@ -31,15 +32,17 @@ public struct GroupSettingsView: View {
         .sheet(isPresented: $viewModel.needNameInputView) {
             GroupNameInputView(
                 isPresented: $viewModel.needNameInputView,
-                isLoading: $viewModel.isLoading) { newName in
+                isLoading: $viewModel.isLoading,
+                message: viewModel.progressMessage
+            ) { newName in
                     Task {
                         await viewModel.dispatch(.updateName(newName))
                     }
                 }
         }
-        .onChange(of: viewModel.toastMessage) { _, newValue in
-            if let newValue {
-                showToast(newValue)
+        .onChange(of: viewModel.toastMessage) {
+            if let message = viewModel.toastMessage {
+                showToast(message)
                 viewModel.toastMessage = nil
             }
         }
@@ -58,6 +61,22 @@ public struct GroupSettingsView: View {
                 }
             }
         }
+        .alert(
+            "Are you sure you want to log out?",
+            isPresented: $leaveGroupAlertShown,
+            actions: {
+                VStack {
+                    Button(UIComponentsStrings.Buttons.cancel, role: .cancel) { }
+
+                    Button(
+                        UIComponentsStrings.Buttons.continue,
+                        role: .destructive
+                    ) {
+                        Task { await viewModel.dispatch(.leaveGroup) }
+                    }
+                }
+            }
+        )
         .overlay {
             if viewModel.isLoading {
                 ZStack {
@@ -112,7 +131,9 @@ public struct GroupSettingsView: View {
                     data: String(ownerID) == userID ? [
                         (
                             "rectangle.portrait.and.arrow.right.fill",
-                            UIComponentsStrings.Group.Settings.Risky.leave, nil, {}
+                            UIComponentsStrings.Group.Settings.Risky.leave, nil, {
+                                leaveGroupAlertShown = true
+                            }
                         ),
                         ("trash.fill", UIComponentsStrings.Group.Settings.Risky.delete, nil, {
                             deleteGroupAlertShown = true
@@ -120,7 +141,9 @@ public struct GroupSettingsView: View {
                     ] : [
                         (
                             "rectangle.portrait.and.arrow.right.fill",
-                            UIComponentsStrings.Group.Settings.Risky.leave, nil, {}
+                            UIComponentsStrings.Group.Settings.Risky.leave, nil, {
+                                leaveGroupAlertShown = true
+                            }
                         )
                     ],
                     isRisky: true

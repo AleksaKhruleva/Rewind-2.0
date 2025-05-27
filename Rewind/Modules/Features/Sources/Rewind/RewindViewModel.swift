@@ -140,6 +140,7 @@ final class RewindViewModel {
 
                 let members = sortedMembers(
                     from: response.members,
+                    groupOwnerID: response.group.ownerID,
                     currentUserID: userID
                 )
 
@@ -150,19 +151,21 @@ final class RewindViewModel {
                     members: members,
                     createdAt: DateParser.parseISODate(response.group.createdAt)
                 )
-
                 currentGroupState = .ready
                 router.navigateToGroup(currentGroup)
             } catch {
-                print(error)
-                // TODO: handle error
+                GroupStorage.currentGroup = nil
+                let message = "Error: \(error)"
+                showToast(message)
+                currentGroupState = .ready
             }
         case let .selectedNewGroup(newGroup):
             groups = sortedGroups(
                 groups,
                 currentGroupID: GroupStorage.currentGroup?.id
             )
-            print(newGroup.name)
+            userGroupsState = .ready
+            print("New group selected: \(newGroup.name)")
         }
     }
 
@@ -199,13 +202,13 @@ final class RewindViewModel {
         return sorted
     }
 
-    private func sortedMembers(from responses: [GroupMemberResponse], currentUserID: String) -> [Member] {
+    private func sortedMembers(from responses: [GroupMemberResponse], groupOwnerID: Int, currentUserID: String) -> [Member] {
         let members = responses.map { response in
             Member(
                 id: String(response.id),
                 name: response.name,
                 imageData: nil,
-                isOwner: response.isOwner,
+                isOwner: response.id == groupOwnerID,
                 isUser: String(response.id) == currentUserID
             )
         }

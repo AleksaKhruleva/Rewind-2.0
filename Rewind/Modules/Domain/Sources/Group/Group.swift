@@ -5,7 +5,7 @@ public struct Group: Hashable, Identifiable {
     public var name: String
     public let ownerID: Int?
     public private(set) var imageData: Data?
-    public let members: [Member]?
+    public var members: [Member]?
     public let createdAt: Date?
     public let gallery: [UIImage]?
     

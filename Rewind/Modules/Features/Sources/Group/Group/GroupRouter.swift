@@ -37,6 +37,10 @@ public final class GroupRouter {
         appRouter?.navigate(to: .gallery, with: .pushFromBottom)
     }
 
+    func navigateToRewind() {
+        appRouter?.navigate(to: .rewind)
+    }
+
     func dismiss() {
         appRouter?.pop()
     }

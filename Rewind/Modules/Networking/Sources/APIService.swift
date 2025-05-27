@@ -35,6 +35,8 @@ enum APIService {
     case updateGroupName(accessToken: String, id: Int, name: String)
     case createGroupInvitation(accessToken: String, id: Int)
     case deleteGroup(accessToken: String, id: Int)
+    case addUserToGroup(accessToken: String, invitationCode: String)
+    case deleteMemberFromGroup(accessToken: String, groupID: Int, memberID: String)
 
     case getMedias(accessToken: String, groupId: Int)
     case getRandomMedias(accessToken: String, groupId: Int)
@@ -104,6 +106,8 @@ extension APIService: TargetType {
             return "/groups/\(id)/invitations"
         case let .deleteGroup(_, id):
             return "/groups/\(id)"
+        case let .addUserToGroup(_, invitationCode):
+            return "/invitations/\(invitationCode)/accept"
         case let .getMedias(_, groupId):
             return "groups/\(groupId)/memories"
         case let .getRandomMedias(_, groupId):
@@ -123,6 +127,8 @@ extension APIService: TargetType {
             return "memories/\(memoryId)/favourite"
         case let .getMediaTags(_, memoryId):
             return "memories/\(memoryId)/tags"
+        case let .deleteMemberFromGroup(_, groupID, memberID):
+            return "/groups/\(groupID)/members/\(memberID)"
         }
     }
 
@@ -150,7 +156,8 @@ extension APIService: TargetType {
                 .createGroupInvitation,
                 .addTag,
                 .likeMedia,
-                .addMedia:
+                .addMedia,
+                .addUserToGroup:
             return .post
         case .updateUserName,
                 .updateUserAvatar,
@@ -161,7 +168,8 @@ extension APIService: TargetType {
                 .deleteGroup,
                 .unlikeMedia,
                 .deleteTag,
-                .deleteMedia:
+                .deleteMedia,
+                .deleteMemberFromGroup:
             return .delete
         case .updateGroupName:
             return .put
@@ -230,8 +238,17 @@ extension APIService: TargetType {
         case let .createGroup(_, name):
             return jsonRequest(["image": "aboba", "name": name])
         case let .updateGroupName(_, _, name):
-            return jsonRequest(["name": name])
-        case .createGroupInvitation:
+            guard let nameData = name.data(using: .utf8) else {
+                return .requestPlain
+            }
+            let formData = MultipartFormData(
+                provider: .data(nameData),
+                name: "name"
+            )
+            return .uploadMultipart([formData])
+        case .createGroupInvitation,
+                .addUserToGroup,
+                .deleteMemberFromGroup:
             return jsonRequest([:])
         case .fetchGroups,
                 .fetchGroup,
@@ -308,7 +325,9 @@ extension APIService: TargetType {
             let .deleteTag(accessToken, _, _, _),
             let .likeMedia(accessToken, _),
             let .unlikeMedia(accessToken, _),
-            let .getMediaTags(accessToken, _):
+            let .getMediaTags(accessToken, _),
+            let .addUserToGroup(accessToken, _),
+            let .deleteMemberFromGroup(accessToken, _, _):
             return [
                 "Authorization": "Bearer \(accessToken)",
                 "Content-Type": "application/json"
