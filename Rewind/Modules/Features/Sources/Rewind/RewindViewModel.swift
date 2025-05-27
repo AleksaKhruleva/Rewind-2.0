@@ -106,10 +106,13 @@ final class RewindViewModel {
             }
         case .fetchGroups:
             userGroupsState = .notReady
+            defer {
+                userGroupsState = .ready
+            }
             do {
                 guard let tokens = Tokens() else { return }
                 let responses = try await backend.fetchGroups(tokens: tokens)
-                groups = sortedGroups(from: responses)
+                groups = GroupUtils.sortedGroups(from: responses)
                 if let currentGroupId = GroupStorage.currentGroup?.id {
                     if let updatedGroup = groups.first(where: { $0.id == currentGroupId }) {
                         GroupStorage.set(newGroup: updatedGroup)
@@ -118,34 +121,35 @@ final class RewindViewModel {
                         print("Current group is no longer available")
                     }
                 }
-                userGroupsState = .ready
             } catch {
                 groups = []
-                print(error)
-                // TODO: handle error
+                showToast(UIComponentsStrings.Toast.error)
             }
         case .openGroup:
             currentGroupState = .notReady
+            defer {
+                currentGroupState = .ready
+            }
             do {
-                guard let currentGroupID = GroupStorage.currentGroup?.id,
+                guard var currentGroupID = GroupStorage.currentGroup?.id,
                       let tokens = Tokens(),
                       let userID = jwtDecoder.getUserId(from: tokens.accessToken)
                 else {
                     // TODO: throw error
                     return
                 }
-
+                
                 let response = try await backend.fetchFullGroupDetails(
                     tokens: tokens,
                     id: currentGroupID
                 )
-
-                let members = sortedMembers(
+                
+                let members = GroupUtils.sortedMembers(
                     from: response.members,
                     groupOwnerID: response.group.ownerID,
                     currentUserID: userID
                 )
-
+                
                 let currentGroup = Domain.Group(
                     id: currentGroupID,
                     name: response.group.name,
@@ -153,80 +157,17 @@ final class RewindViewModel {
                     members: members,
                     createdAt: DateParser.parseISODate(response.group.createdAt)
                 )
-                currentGroupState = .ready
                 router.navigateToGroup(currentGroup)
+            } catch let error as HTTPError where error == .forbidden {
+                GroupStorage.currentGroup = nil
+                showToast("You no longer have access to this group!")
             } catch {
                 GroupStorage.currentGroup = nil
-                let message = "Error: \(error)"
-                showToast(message)
-                currentGroupState = .ready
+                showToast("Error: \(error)")
             }
         case let .selectedNewGroup(newGroup):
-            groups = sortedGroups(
-                groups,
-                currentGroupID: GroupStorage.currentGroup?.id
-            )
+            groups = GroupUtils.sortedGroups(groups)
             userGroupsState = .ready
-            print("New group selected: \(newGroup.name)")
-        }
-    }
-
-    private func sortedGroups(from responses: [GroupResponse]) -> [Domain.Group] {
-        var groups = responses
-            .map { response in
-                Group(
-                    id: response.groupID,
-                    name: response.name
-                    // imageData: ...
-                )
-            }
-            .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-
-        if let currentGroupID = GroupStorage.currentGroup?.id {
-            if let currentGroup = groups.first(where: { $0.id == currentGroupID }) {
-                groups.removeAll { $0.id == currentGroupID }
-                groups.insert(currentGroup, at: 0)
-            }
-        }
-
-        return groups
-    }
-
-    private func sortedGroups(_ groups: [Domain.Group], currentGroupID: Int?) -> [Domain.Group] {
-        var sorted = groups.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-
-        if let currentGroupID,
-           let currentGroup = sorted.first(where: { $0.id == currentGroupID }) {
-            sorted.removeAll { $0.id == currentGroupID }
-            sorted.insert(currentGroup, at: 0)
-        }
-
-        return sorted
-    }
-
-    private func sortedMembers(from responses: [GroupMemberResponse], groupOwnerID: Int, currentUserID: String) -> [Member] {
-        let members = responses.map { response in
-            Member(
-                id: String(response.id),
-                name: response.name,
-                imageData: nil,
-                isOwner: response.id == groupOwnerID,
-                isUser: String(response.id) == currentUserID
-            )
-        }
-
-        return members.sorted { lhs, rhs in
-            switch (lhs.isOwner, rhs.isOwner) {
-            case (true, false): return true
-            case (false, true): return false
-            default:
-                switch (lhs.isUser, rhs.isUser) {
-                case (true, false): return true
-                case (false, true): return false
-                default:
-                    return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
-                }
-            }
         }
     }
 

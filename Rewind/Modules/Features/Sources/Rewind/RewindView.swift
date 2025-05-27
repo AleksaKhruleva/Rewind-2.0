@@ -134,7 +134,7 @@ public struct RewindView: View {
                 mapButton
             }
         } rightView: {
-            RoundImageView(image: viewModel.user.image, size: 44)
+            RoundImageView(image: viewModel.user.image)
                 .contentShape(Circle())
                 .onTapGesture {
                     if !viewModel.user.isEmpty {
