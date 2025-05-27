@@ -45,7 +45,8 @@ struct GroupSelectionView: View {
         .sheet(isPresented: $viewModel.isGroupCreationViewPresented) {
             GroupNameInputView(
                 isPresented: $viewModel.isGroupCreationViewPresented,
-                isLoading: $viewModel.isLoading
+                isLoading: $viewModel.isLoading,
+                message: "Creating new group..."
             ) { name in
                 Task {
                     await viewModel.dispatch(.createGroup(name))

@@ -29,15 +29,16 @@ final class GroupSettingsViewModel {
     func dispatch(_ intent: Intent) async {
         switch intent {
         case let .updateName(newName):
+            progressMessage = "Updating the group name..."
             isLoading = true
 
-            do {
-                guard let tokens = Tokens() else {
-                    // TODO: handle unauthorized
-                    isLoading = false
-                    return
-                }
+            guard let tokens = Tokens() else {
+                // TODO: handle unauthorized
+                isLoading = false
+                return
+            }
 
+            do {
                 let response = try await backend.updateGroupName(
                     tokens: tokens,
                     id: group.id,
@@ -54,16 +55,71 @@ final class GroupSettingsViewModel {
 
                 try await Task.sleep(for: .milliseconds(300))
                 toastMessage = "Name was successfully changed! ✍️"
+                isLoading = false
             } catch {
-                print(error)
-                // TODO: handle error
+                toastMessage = "Error: \(error). Try again later!"
+                isLoading = false
+                needNameInputView = false
+            }
+        case .leaveGroup:
+            progressMessage = "Removing you from the group..."
+            isLoading = true
+
+            guard let tokens = Tokens(),
+                  let userID = JWTDecoder().getUserId(from: tokens.accessToken)
+            else {
+                // TODO: handle unauthorized
+                isLoading = false
+                return
             }
 
-            isLoading = false
-        case .leaveGroup:
-            print("leave group")
-        case .deleteGroup: break
-            // TODO: finish later
+            do {
+                let response = try await backend.deleteMemberFromGroup(
+                    tokens: tokens,
+                    groupID: group.id,
+                    memberID: userID
+                )
+
+                if response.success {
+                    GroupStorage.clear()
+                    router.navigateToRewind()
+                    isLoading = false
+                } else {
+                    toastMessage = "Couldn't remove you from the group. Try again later!"
+                    isLoading = false
+                }
+            } catch {
+                toastMessage = "Error: \(error). Try again later!"
+                isLoading = false
+            }
+        case .deleteGroup:
+            progressMessage = "Deleting the group..."
+            isLoading = true
+
+            guard let tokens = Tokens() else {
+                // TODO: handle unauthorized
+                isLoading = false
+                return
+            }
+
+            do {
+                let response = try await backend.deleteGroup(
+                    tokens: tokens,
+                    id: group.id
+                )
+
+                if response.success {
+                    GroupStorage.clear()
+                    router.navigateToRewind()
+                    isLoading = true
+                } else {
+                    toastMessage = "Couldn't delete the group. Try again later!"
+                    isLoading = false
+                }
+            } catch {
+                toastMessage = "Error: \(error). Try again later!"
+                isLoading = false
+            }
         }
     }
 }

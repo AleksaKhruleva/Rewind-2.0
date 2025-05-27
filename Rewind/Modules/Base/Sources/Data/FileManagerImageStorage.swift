@@ -57,7 +57,7 @@ public final class FileManagerImageStorage: LocalFileManagerProtocol {
             print("Error deleting image: \(folderName). \(error)")
         }
     }
-    
+
     public func clear() {
         guard let folderURL = getURLForFolder(folderName: folderName),
               FileManager.default.fileExists(atPath: folderURL.path) else {

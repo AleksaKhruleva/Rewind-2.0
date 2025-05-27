@@ -3,35 +3,25 @@ import UIComponents
 import Domain
 
 public struct MembersListView: View {
+    @State private var viewModel: MembersListViewModel
     @State private var searchText = ""
-
-    private let router: MembersListRouter
-    private let group: Domain.Group
-
-    private var groupMembers: [Member] {
-        group.members ?? []
-    }
 
     private var filteredMembers: [Member] {
         if searchText.isEmpty {
-            return groupMembers
+            return viewModel.groupMembers
         } else {
             let searchQuery = searchText
                 .trimmingCharacters(in: .whitespacesAndNewlines)
                 .localizedLowercase
 
-            return groupMembers.filter { member in
+            return viewModel.groupMembers.filter { member in
                 member.name.localizedCaseInsensitiveContains(searchQuery)
             }
         }
     }
 
-    public init(
-        group: Domain.Group,
-        router: MembersListRouter
-    ) {
-        self.group = group
-        self.router = router
+    public init(group: Domain.Group, router: MembersListRouter) {
+        viewModel = MembersListViewModel(group: group, router: router)
     }
 
     public var body: some View {
@@ -54,14 +44,14 @@ public struct MembersListView: View {
     private var header: some View {
         RewindHeader(centerView: {
             HeaderBadgeView(
-                image: group.image,
-                text: group.name
+                image: viewModel.group.image,
+                text: viewModel.group.name
             )
         }, rightView: {
             RewindButton(type: .rightChevron) {
                 hideKeyboard()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    router.dismiss()
+                    viewModel.router.dismiss()
                 }
             }
         })
@@ -77,10 +67,15 @@ public struct MembersListView: View {
             members: filteredMembers,
             isShortened: false,
             onAddMemberTap: {
-                router.navigateToAddMember(groupName: group.name, link: "") // TODO: request link later
+                Task {
+                    await viewModel.dispatch(.createInvitation)
+                }
             },
             onMemberTap: { member in
-                router.navigateToMemberDetails(member)
+                viewModel.router.navigateToMemberDetails(member)
+            },
+            onDeleteMember: { _ in
+                // TODO: delete member
             }
         )
         .animation(.easeInOut(duration: 0.3), value: filteredMembers)

@@ -4,11 +4,13 @@ import UIComponents
 struct GroupNameInputView: View {
     @Binding var isPresented: Bool
     @Binding var isLoading: Bool
+    private let message: String
     private let onSubmit: (String) -> Void
 
-    init(isPresented: Binding<Bool>, isLoading: Binding<Bool>, onSubmit: @escaping (String) -> Void) {
+    init(isPresented: Binding<Bool>, isLoading: Binding<Bool>, message: String, onSubmit: @escaping (String) -> Void) {
         self._isPresented = isPresented
         self._isLoading = isLoading
+        self.message = message
         self.onSubmit = onSubmit
     }
 
@@ -18,7 +20,7 @@ struct GroupNameInputView: View {
                 ZStack {
                     Color.backgroundSecondary.ignoresSafeArea()
 
-                    ProgressView("Creating new group...")
+                    ProgressView(message)
                         .modifier(RoundFontModifier(size: 15))
                 }
             } else {

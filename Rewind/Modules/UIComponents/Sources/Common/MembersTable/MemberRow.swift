@@ -50,7 +50,7 @@ struct MemberRow: View {
                     Image(systemName: "star.fill")
                         .modifier(RoundFontModifier(size: 14, foregroundColor: .pinkPrimary))
                         .padding(.trailing, -2)
-                } else {
+                } else if !member.isUser {
                     Button(action: onRemove) {
                         Image(systemName: "xmark")
                             .modifier(RoundFontModifier(size: 14))

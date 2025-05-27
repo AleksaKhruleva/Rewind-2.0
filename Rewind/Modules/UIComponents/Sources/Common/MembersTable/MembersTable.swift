@@ -7,6 +7,7 @@ public struct MembersTable: View {
     private let isShortened: Bool
     private let onAddMemberTap: () -> Void
     private let onMemberTap: (Member) -> Void
+    private let onDeleteMember: (Member) -> Void
     private let onShowAllMembersTap: (() -> Void)?
 
     public init(
@@ -15,6 +16,7 @@ public struct MembersTable: View {
         isShortened: Bool,
         onAddMemberTap: @escaping () -> Void,
         onMemberTap: @escaping (Member) -> Void,
+        onDeleteMember: @escaping (Member) -> Void,
         onShowAllMembersTap: (() -> Void)? = nil
     ) {
         self.title = title
@@ -22,6 +24,7 @@ public struct MembersTable: View {
         self.isShortened = isShortened
         self.onAddMemberTap = onAddMemberTap
         self.onMemberTap = onMemberTap
+        self.onDeleteMember = onDeleteMember
         self.onShowAllMembersTap = onShowAllMembersTap
     }
 
@@ -45,12 +48,11 @@ public struct MembersTable: View {
                     MemberRow(member: member) { member in
                         onMemberTap(member)
                     } onRemove: {
-                        // TODO: show remove confirmation
-                        print("remove")
+                        onDeleteMember(member)
                     }
                 }
 
-                if isShortened {
+                if isShortened && members.count > 4 {
                     MembersTableButton(
                         systemImageName: "eye.fill",
                         title: "View all members",

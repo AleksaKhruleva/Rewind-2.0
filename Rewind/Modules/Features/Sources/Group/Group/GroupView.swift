@@ -5,6 +5,7 @@ import Domain
 public struct GroupView: View {
     @State private var viewModel: GroupViewModel
     @State private var isBlurredAvatarPresented = false
+    @Environment(\.showToast) var showToast
 
     public init(group: Domain.Group, router: GroupRouter) {
         viewModel = GroupViewModel(group: group, router: router)
@@ -33,6 +34,9 @@ public struct GroupView: View {
                 }
                 .padding(.horizontal, 16)
             }
+            .refreshable {
+                await viewModel.dispatch(.refreshGroupData)
+            }
         }
         .background(Color.background)
         .overlay {
@@ -41,6 +45,22 @@ public struct GroupView: View {
                     isPresented: $isBlurredAvatarPresented,
                     image: .constant(viewModel.group.image)
                 )
+            }
+        }
+        .overlay {
+            if viewModel.isRefreshing {
+                ZStack {
+                    Color.background.ignoresSafeArea()
+
+                    ProgressView(viewModel.refreshMessage)
+                        .modifier(RoundFontModifier(size: 15))
+                }
+            }
+        }
+        .onChange(of: viewModel.toastMessage) {
+            if let message = viewModel.toastMessage {
+                showToast(message)
+                viewModel.toastMessage = nil
             }
         }
     }
@@ -68,7 +88,7 @@ public struct GroupView: View {
 
     private var membersTable: some View {
         MembersTable(
-            members: viewModel.group.members ?? [],
+            members: viewModel.shortGroupMembers,
             isShortened: true,
             onAddMemberTap: {
                 Task {
@@ -77,6 +97,11 @@ public struct GroupView: View {
             },
             onMemberTap: { member in
                 viewModel.router.navigateToMemberDetails(member)
+            },
+            onDeleteMember: { member in
+                Task {
+                    await viewModel.dispatch(.deleteMember(member))
+                }
             },
             onShowAllMembersTap: {
                 viewModel.router.navigateToMembersList(viewModel.group)
