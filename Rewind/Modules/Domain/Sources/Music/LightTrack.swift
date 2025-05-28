@@ -6,6 +6,7 @@ public struct LightTrack: Codable, Hashable {
     public let artistName: String
     public let startTime: Double
     public let duration: Double
+    public let fullDuration: Int
     public let media: Media?
     public var streamURL: URL?
     
@@ -15,6 +16,7 @@ public struct LightTrack: Codable, Hashable {
         artistName: String,
         startTime: Double,
         duration: Double,
+        fullDuration: Int,
         media: Media? = nil,
         streamURL: URL? = nil
     ) {
@@ -23,6 +25,7 @@ public struct LightTrack: Codable, Hashable {
         self.artistName = artistName
         self.startTime = startTime
         self.duration = duration
+        self.fullDuration = fullDuration
         self.media = media
         self.streamURL = streamURL
     }

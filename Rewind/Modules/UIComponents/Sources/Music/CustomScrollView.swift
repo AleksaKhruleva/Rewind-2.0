@@ -1,17 +1,20 @@
 import SwiftUI
 
 public struct CustomScrollView<Content: View>: UIViewRepresentable {
+    private var externalOffset: CGFloat
     private let content: Content
     private let onBeginDragging: (() -> Void)
     private let onEndDragging: ((_ offset: CGFloat) -> Void)
     private let onScroll: ((_ offset: CGFloat) -> Void)
 
     public init(
+        externalOffset: CGFloat,
         @ViewBuilder content: () -> Content,
         onBeginDragging: @escaping (() -> Void),
         onEndDragging: @escaping ((_ offset: CGFloat) -> Void),
         onScroll: @escaping ((_ offset: CGFloat) -> Void)
     ) {
+        self.externalOffset = externalOffset
         self.content = content()
         self.onBeginDragging = onBeginDragging
         self.onEndDragging = onEndDragging
@@ -69,12 +72,20 @@ public struct CustomScrollView<Content: View>: UIViewRepresentable {
             hostedView.view.trailingAnchor.constraint(equalTo: uiView.trailingAnchor),
             hostedView.view.heightAnchor.constraint(equalTo: uiView.heightAnchor)
         ])
+
+        if !context.coordinator.hasAppliedOffset {
+            context.coordinator.hasAppliedOffset = true
+            DispatchQueue.main.async {
+                uiView.setContentOffset(CGPoint(x: externalOffset, y: 0), animated: false)
+            }
+        }
     }
 
     public final class Coordinator: NSObject, UIScrollViewDelegate {
         private let onBeginDragging: (() -> Void)?
         private let onEndDragging: ((_ offset: CGFloat) -> Void)?
         private let onScroll: ((_ offset: CGFloat) -> Void)?
+        var hasAppliedOffset = false
 
         init(
             onBeginDragging: (() -> Void)?,

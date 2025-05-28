@@ -53,7 +53,7 @@ final class RewindViewModel {
     private(set) var userGroupsState = UserGroupsState.notReady
     private(set) var currentGroupState = CurrentGroupState.ready
     var currentFilters = FilterSettings()
-    
+
     var currentGalleryItem: GalleryItem?
     let router: RewindRouter
 
@@ -175,21 +175,21 @@ final class RewindViewModel {
                         } else {
                             galleryItemsStack = proceededGalleryItems
                             currentGalleryItem = galleryItemsStack.first
-                            Task {
-                                if let trackInfo = currentGalleryItem?.memory.trackInfo {
-                                    do {
-                                        let response = try await soundCloudBackend.fetchTrack(by: trackInfo.id)
-                                        var lightTrack = response.toLightTrack(with: trackInfo)
+                        }
+                        Task {
+                            if let trackInfo = currentGalleryItem?.memory.trackInfo {
+                                do {
+                                    let response = try await soundCloudBackend.fetchTrack(by: trackInfo.id)
+                                    var lightTrack = response.toLightTrack(with: trackInfo)
 
-                                        if let streamURL = try await soundCloudBackend.fetchStreamURL(for: lightTrack) {
-                                            lightTrack.streamURL = streamURL
-                                        } else {
-                                            showToast("Couldn't get track stream URL.")
-                                        }
-                                        currentGalleryItem?.memory.lightTrack = lightTrack
-                                    } catch {
-                                        showToast("Couldn't download music :( Try again later!")
+                                    if let streamURL = try await soundCloudBackend.fetchStreamURL(for: lightTrack) {
+                                        lightTrack.streamURL = streamURL
+                                    } else {
+                                        showToast("Couldn't get track stream URL.")
                                     }
+                                    currentGalleryItem?.memory.lightTrack = lightTrack
+                                } catch {
+                                    showToast("Couldn't download music :( Try again later!")
                                 }
                             }
                         }
@@ -223,7 +223,7 @@ final class RewindViewModel {
                         do {
                             let response = try await soundCloudBackend.fetchTrack(by: trackInfo.id)
                             var lightTrack = response.toLightTrack(with: trackInfo)
-                            
+
                             if let streamURL = try await soundCloudBackend.fetchStreamURL(for: lightTrack) {
                                 lightTrack.streamURL = streamURL
                             } else {

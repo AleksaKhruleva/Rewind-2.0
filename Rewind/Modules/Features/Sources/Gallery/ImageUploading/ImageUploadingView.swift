@@ -11,8 +11,11 @@ public struct ImageUploadingView: View {
     @Environment(\.dismiss)
     private var dismiss
 
-    public init(media: LoadedMedia? = nil, onSave: @escaping (LoadedMedia) -> Void) {
+    private let isSingleUploading: Bool
+
+    public init(isSingleUploading: Bool, media: LoadedMedia? = nil, onSave: @escaping (LoadedMedia) -> Void) {
         viewModel = .init(loadedMedia: media)
+        self.isSingleUploading = isSingleUploading
         self.onSave = onSave
     }
 
@@ -70,6 +73,14 @@ public struct ImageUploadingView: View {
                 viewModel.dispatch(.trackSelected(selectedTrack))
             }
         }
+        .onAppear {
+            if viewModel.selectedTrack != nil {
+                viewModel.isSelectedTrackPlaying = false
+                Task {
+                    viewModel.dispatch(.resumePlayback)
+                }
+            }
+        }
     }
 
     private var header: some View {
@@ -117,6 +128,7 @@ public struct ImageUploadingView: View {
                     shouldPlay: $viewModel.isSelectedTrackPlaying,
                     startTime: $viewModel.selectedStartTime,
                     selectorDuration: $viewModel.selectedDuration,
+                    offset: $viewModel.trackScrollOffset,
                     selectedTrack: selectedTrack,
                     onTrashTap: {
                         withAnimation {
@@ -132,14 +144,28 @@ public struct ImageUploadingView: View {
     private var continueButton: some View {
         GradientButton(title: "Save image", width: .given(200)) {
             if var loadedMedia = viewModel.loadedMedia {
-                if let track = viewModel.selectedTrack {
-                    let trackInfo = TrackInformation(
-                        id: String(track.id),
-                        startTime: viewModel.selectedStartTime,
-                        duration: viewModel.selectedDuration
-                    )
-                    loadedMedia.trackInfo = trackInfo
-                    print(loadedMedia)
+                if isSingleUploading {
+                    if let track = viewModel.selectedTrack {
+                        let trackInfo = TrackInformation(
+                            id: String(track.id),
+                            startTime: viewModel.selectedStartTime,
+                            duration: viewModel.selectedDuration
+                        )
+                        loadedMedia.trackInfo = trackInfo
+                    }
+                } else {
+                    if var track = viewModel.selectedTrack {
+                        track.trackInfo = TrackInformation(
+                            id: String(track.id),
+                            startTime: viewModel.selectedStartTime,
+                            duration: viewModel.selectedDuration
+                        )
+                        viewModel.selectedTrack = track
+                    }
+                    viewModel.selectedTrack?.scrollOffset = viewModel.trackScrollOffset
+
+                    loadedMedia.trackForMultipleUploading = viewModel.selectedTrack
+                    loadedMedia.trackInfo = loadedMedia.trackForMultipleUploading?.trackInfo
                 }
 
                 onSave(loadedMedia)

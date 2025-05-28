@@ -113,7 +113,10 @@ public struct MediasUploadingView: View {
         Group {
             switch media.content {
             case .image:
-                ImageUploadingView(media: media) { newMedia in
+                ImageUploadingView(
+                    isSingleUploading: false,
+                    media: media
+                ) { newMedia in
                     if let index = viewModel.loadedMedias.firstIndex(where: { $0.id == newMedia.id }) {
                         viewModel.loadedMedias[index] = newMedia
                     }

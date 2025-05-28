@@ -14,6 +14,7 @@ public struct LoadedMedia: Hashable, Identifiable {
     public var coordinates: MediaCoordinates?
     public var videoEditingSettings: VideoEditingSettings?
     public var trackInfo: TrackInformation?
+    public var trackForMultipleUploading: Track?
 
     public init(
         content: Content,

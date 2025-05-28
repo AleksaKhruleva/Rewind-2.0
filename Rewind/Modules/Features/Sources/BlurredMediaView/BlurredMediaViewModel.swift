@@ -32,6 +32,7 @@ final class BlurredMediaViewModel {
                 audioManager.play(
                     from: track.startTime,
                     duration: track.duration,
+                    fullDurationMillis: track.fullDuration,
                     loop: true
                 ) { [weak self] isPlaying in
                     self?.isTrackPlaying = isPlaying

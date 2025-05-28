@@ -162,6 +162,9 @@ public struct RewindView: View {
     private var groupsButton: some View {
         Button {
             isSelectGroupPresented = true
+            Task {
+                await viewModel.dispatch(.stopPlayer)
+            }
         } label: {
             HStack {
                 Image(systemName: "person.2.fill")

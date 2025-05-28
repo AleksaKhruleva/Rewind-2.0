@@ -11,11 +11,11 @@ struct ChooseTrackPieceView: View {
     @Binding var shouldPlay: Bool
     @Binding var startTime: Double
     @Binding var selectorDuration: CGFloat
+    @Binding var offset: CGFloat
 
     @State private var viewModel: ChooseTrackPieceViewModel
     @State private var progress: CGFloat = 0
     @State private var timer: Timer?
-    @State private var offset: CGFloat = 0
     @State private var realTimeOffset: CGFloat = 0
     @State private var durationInPicker: CGFloat = 15
     @State private var showDurationPicker = false
@@ -26,12 +26,14 @@ struct ChooseTrackPieceView: View {
         shouldPlay: Binding<Bool>,
         startTime: Binding<Double>,
         selectorDuration: Binding<CGFloat>,
+        offset: Binding<CGFloat>,
         selectedTrack: Track,
         onTrashTap: @escaping () -> Void
     ) {
         self._shouldPlay = shouldPlay
         self._startTime = startTime
         self._selectorDuration = selectorDuration
+        self._offset = offset
         self.onTrashTap = onTrashTap
         viewModel = ChooseTrackPieceViewModel(selectedTrack: selectedTrack)
     }
@@ -102,6 +104,7 @@ struct ChooseTrackPieceView: View {
 
                 // Scroll View
                 CustomScrollView(
+                    externalOffset: offset,
                     content: {
                         WaveformView(
                             selectorDuration: $selectorDuration,
