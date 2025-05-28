@@ -81,8 +81,8 @@ final class GroupViewModel {
             // TODO: handle nil group
             return
         }
-        let image = await GroupImageProvider.loadOrGetImage(
-            for: currentGroup.imageURL
+        let image = await ImageProvider.loadOrGetImage(
+            for: currentGroup.imageURL, .group
         )
         await MainActor.run { [weak self] in
             self?.groupImage = image

@@ -46,8 +46,10 @@ public struct GalleryView: View {
                             }
                         },
                         showMediaDetails: {
-                            withAnimation {
-                                viewModel.blurredMediaShown = false
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                withAnimation {
+                                    viewModel.blurredMediaShown = false
+                                }
                             }
                             router.navigateToMediaDetails($0)
                         }

@@ -34,7 +34,7 @@ public struct AccountView: View {
                 VStack(spacing: 15) {
                     avatar.onTapGesture {
                         withAnimation(.spring(response: 0.2)) {
-                            guard viewModel.user.imageData != nil else {
+                            guard !viewModel.user.imageURL.isEmpty else {
                                 photoPickerShown = true
                                 return
                             }
@@ -82,12 +82,10 @@ public struct AccountView: View {
             }.rewindAccessibilityIdentifier(.account(.button(.editImageDialog(.delete))))
         }
         .customImagePicker(show: $photoPickerShown, croppedImage: Binding {
-            return viewModel.user.image
+            return viewModel.userImage
         } set: { newImage in
             Task { await viewModel.dispatch(.setImage(newImage)) }
-        }) {
-            showToast(UIComponentsStrings.Account.Edit.Image.Set.success)
-        }
+        })
         .sheet(item: $genericSheetItem) { item in
             switch item {
             case .name:
@@ -108,14 +106,21 @@ public struct AccountView: View {
         }
         .onAppear {
             viewModel.set(showToast: showToast)
-            Task { await viewModel.dispatch(.fetchUser) }
+        }
+        .onTopAppear {
+            Task {
+                await viewModel.dispatch(.fetchUser)
+                await viewModel.dispatch(.loadUserImage)
+            }
         }
         .overlay {
             if blurredAvatarShown {
                 BlurredAvatarView(
                     isPresented: $blurredAvatarShown,
                     image: viewModel.imageBinding
-                )
+                ) { newImage in
+                    Task { await viewModel.dispatch(.setImage(newImage)) }
+                }
             }
         }
         .alert(UIComponentsStrings.Account.SignOut.Alert.title, isPresented: $signOutAlertShown) {
@@ -142,7 +147,7 @@ public struct AccountView: View {
             RewindButton(type: .leftChevron) { viewModel.router.dismiss() }
         } centerView: {
             HeaderBadgeView(
-                image: viewModel.user.image,
+                image: viewModel.userImage,
                 text: viewModel.user.name
             )
         } rightView: {
@@ -151,7 +156,7 @@ public struct AccountView: View {
     }
 
     var avatar: some View {
-        AvatarView(image: viewModel.user.image, text: viewModel.user.name)
+        AvatarView(image: viewModel.userImage, text: viewModel.user.name)
     }
 
     var appIconsTable: some View {
@@ -221,5 +226,5 @@ public struct AccountView: View {
 
 #Preview {
     let router = AppRouter()
-    AccountView(user: User(name: "nae", email: "e,a"), router: .init(appRouter: router))
+    AccountView(user: User(name: "nae", email: "e,a", imageURL: ""), router: .init(appRouter: router))
 }

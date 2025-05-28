@@ -4,13 +4,19 @@ public struct BlurredAvatarView: View {
     @State private var showPicker: Bool = false
     @Binding var image: UIImage?
     @Binding var isPresented: Bool
+    var onSuccess: (UIImage) -> Void
 
     @Environment(\.showToast)
     private var showToast
 
-    public init(isPresented: Binding<Bool>, image: Binding<UIImage?>) {
+    public init(
+        isPresented: Binding<Bool>,
+        image: Binding<UIImage?>,
+        onSuccess: @escaping (UIImage) -> Void = { _ in }
+    ) {
         self._image = image
         self._isPresented = isPresented
+        self.onSuccess = onSuccess
     }
 
     public var body: some View {
@@ -25,9 +31,7 @@ public struct BlurredAvatarView: View {
                   isPresented = false
               }
           }
-          .customImagePicker(show: $showPicker, croppedImage: $image) {
-              showToast(UIComponentsStrings.Account.Edit.Image.Set.success)
-          }
+          .customImagePicker(show: $showPicker, croppedImage: $image, onSuccess: onSuccess)
     }
 
     public var content: some View {
@@ -47,11 +51,4 @@ public struct BlurredAvatarView: View {
             )
         }
     }
-}
-
-#Preview {
-    BlurredAvatarView(
-        isPresented: Binding.constant(true),
-        image: .constant(UIComponentsAsset.avatar.image)
-    )
 }

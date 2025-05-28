@@ -1,4 +1,4 @@
-// swiftlint:disable function_parameter_count file_length
+// swiftlint:disable function_parameter_count file_length type_body_length
 import SwiftUI
 import Moya
 import Foundation
@@ -521,4 +521,4 @@ extension NetworkService {
         }
     }
 }
-// swiftlint:enable function_parameter_count file_length
+// swiftlint:enable function_parameter_count file_length type_body_length

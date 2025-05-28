@@ -2,7 +2,7 @@ import SwiftUI
 import Domain
 
 public struct AuthorBadgeView: View {
-    private let image: UIImage
+    private let imageURL: URL?
     private let name: String
     private let date: String
     private let track: Track?
@@ -10,8 +10,8 @@ public struct AuthorBadgeView: View {
     @State private var showTrack = true
     private let timer = Timer.publish(every: 3.5, on: .main, in: .common).autoconnect()
 
-    public init(image: UIImage, name: String, date: String, track: Track?) {
-        self.image = image
+    public init(imageURL: URL?, name: String, date: String, track: Track?) {
+        self.imageURL = imageURL
         self.name = name
         self.date = date
         self.track = track
@@ -19,11 +19,8 @@ public struct AuthorBadgeView: View {
 
     public var body: some View {
         HStack(spacing: 8) {
-            Image(uiImage: image)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 30, height: 30)
-                .cornerRadius(20)
+            SquareAsyncMedia(url: imageURL, type: .image, cornerRadius: 15)
+                .frame(30)
 
             VStack(alignment: .leading, spacing: 0) {
                 Text(name)
@@ -61,13 +58,4 @@ public struct AuthorBadgeView: View {
             }
         }
     }
-}
-
-#Preview {
-    AuthorBadgeView(
-        image: UIComponentsAsset.media15.image,
-        name: "flowykk",
-        date: "23.11.2024",
-        track: nil
-    )
 }

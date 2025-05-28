@@ -62,9 +62,6 @@ public struct RewindView: View {
         }
         .onAppear {
             viewModel.set(showToast: showToast)
-            Task {
-                await viewModel.dispatch(.fetchUser)
-            }
         }
         .ignoresSafeArea(.keyboard)
         .sheet(isPresented: $isSelectGroupPresented) {
@@ -90,8 +87,9 @@ public struct RewindView: View {
         }
         .onTopAppear {
             Task {
+                await viewModel.dispatch(.fetchUser)
                 await viewModel.dispatch(.fetchGroups)
-                await viewModel.dispatch(.loadGroupImage)
+                await viewModel.dispatch(.loadAvatars)
             }
         }
     }
@@ -101,8 +99,7 @@ public struct RewindView: View {
         RewindHeader {
             if viewModel.currentGroupState == .notReady {
                 ProgressView()
-                    .frame(width: 42, height: 42)
-                    .clipShape(Circle())
+                    .frame(42)
             } else if let image = viewModel.groupImage {
                 RoundImageView(image: image)
                     .contentShape(Circle())
@@ -124,13 +121,18 @@ public struct RewindView: View {
                 mapButton
             }
         } rightView: {
-            RoundImageView(image: viewModel.user.image)
-                .contentShape(Circle())
-                .onTapGesture {
-                    if !viewModel.user.isEmpty {
-                        viewModel.router.navigateToAccount(user: viewModel.user)
-                    }
-                }.rewindAccessibilityIdentifier(.rewind(.button(.account)))
+            if let userImage = viewModel.userImage {
+                RoundImageView(image: userImage)
+                    .contentShape(Circle())
+                    .onTapGesture {
+                        if !viewModel.user.isEmpty {
+                            viewModel.router.navigateToAccount(user: viewModel.user)
+                        }
+                    }.rewindAccessibilityIdentifier(.rewind(.button(.account)))
+            } else {
+                ProgressView()
+                    .frame(42)
+            }
         }
     }
 
@@ -202,7 +204,9 @@ public struct RewindView: View {
     private var author: some View {
         HStack {
             AuthorBadgeView(
-                image: UIComponentsAsset.sasha.image,
+                imageURL: URL(
+                    string: "https://i2-prod.dailyrecord.co.uk/incoming/article1906467.ece/ALTERNATES/s1227b/laughing-animals.jpg"
+                ),
                 name: "sasha",
                 date: "22.04.2025",
                 track: viewModel.currentMediaItem.memory.track

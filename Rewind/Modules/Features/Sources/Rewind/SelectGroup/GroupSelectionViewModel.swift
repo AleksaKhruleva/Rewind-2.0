@@ -68,7 +68,7 @@ final class GroupSelectionViewModel {
                         Member(
                             id: userID,
                             name: user.name,
-                            imageData: user.imageData,
+                            imageData: Data(),
                             isOwner: true,
                             isUser: true
                         )
