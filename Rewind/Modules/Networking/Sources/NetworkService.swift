@@ -314,7 +314,7 @@ public final class NetworkService: NetworkServiceProtocol {
             )
         }
     }
-    
+
     public func getMedia(tokens: Tokens, groupId: Int, memoryId: Int) async throws -> MediasResponseItem {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(

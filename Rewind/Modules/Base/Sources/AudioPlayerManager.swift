@@ -8,6 +8,7 @@ public final class AudioPlayerManager {
     private var statusObserver: NSKeyValueObservation?
     private var playbackObserver: Any?
     private var playbackEndTime: CMTime?
+    private var timeControlObserver: NSKeyValueObservation?
 
     private init() {}
 
@@ -25,54 +26,35 @@ public final class AudioPlayerManager {
         player?.automaticallyWaitsToMinimizeStalling = true
     }
 
-    // MARK: - Play (single start)
+    // MARK: - Universal Play
 
-    public func play(from seconds: Double, completion: @escaping (Bool) -> Void) {
+    public func play(
+        from startSeconds: Double,
+        duration: Double? = nil,
+        loop: Bool = false,
+        completion: @escaping (Bool) -> Void
+    ) {
         guard let player = player, let item = player.currentItem else {
             completion(false)
             return
         }
 
-        let time = CMTime(seconds: seconds, preferredTimescale: 600)
+        let assetDuration = item.duration.seconds
+        let clampedStart = min(startSeconds, assetDuration)
 
-        player.seek(to: time, toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] _ in
-            guard let self else {
-                completion(false)
-                return
-            }
+        let startTime = CMTime(seconds: clampedStart, preferredTimescale: 600)
+        let endTime: CMTime? = {
+            guard let duration else { return nil }
+            let maxEnd = min(clampedStart + duration, assetDuration)
+            return CMTime(seconds: maxEnd, preferredTimescale: 600)
+        }()
 
-            if item.status == .readyToPlay {
-                player.play()
-                completion(true)
-            } else {
-                self.statusObserver = item.observe(\.status, options: [.new]) { [weak self] item, _ in
-                    guard let self else { return }
+        playbackEndTime = endTime
 
-                    if item.status == .readyToPlay {
-                        player.play()
-                        self.statusObserver = nil
-                        completion(true)
-                    } else if item.status == .failed {
-                        self.statusObserver = nil
-                        completion(false)
-                    }
-                }
-            }
-        }
-    }
-
-    // MARK: - Play (looping fragment)
-
-    public func play(from startSeconds: Double, duration: Double, completion: @escaping (Bool) -> Void) {
-        guard let player = player, let item = player.currentItem else {
-            completion(false)
-            return
-        }
-
-        let startTime = CMTime(seconds: startSeconds, preferredTimescale: 600)
-        let endTime = CMTime(seconds: startSeconds + duration, preferredTimescale: 600)
-
-        self.playbackEndTime = endTime
+        timeControlObserver?.invalidate()
+        timeControlObserver = nil
+        statusObserver?.invalidate()
+        statusObserver = nil
 
         if let observer = playbackObserver {
             player.removeTimeObserver(observer)
@@ -85,19 +67,41 @@ public final class AudioPlayerManager {
                 return
             }
 
+            self.timeControlObserver = player.observe(\.timeControlStatus, options: [.new]) { [weak self] player, _ in
+                guard let self else { return }
+
+                if player.timeControlStatus == .playing {
+                    self.timeControlObserver?.invalidate()
+                    self.timeControlObserver = nil
+                    completion(true)
+                }
+            }
+
+            let playBlock = {
+                if loop, let endTime {
+                    self.startLoopingPlayback(startTime: startTime, endTime: endTime)
+                } else if let endTime {
+                    self.startOneTimePlaybackSegment(startTime: startTime, endTime: endTime)
+                } else {
+                    player.play()
+                }
+            }
+
             if item.status == .readyToPlay {
-                self.startLoopingPlayback(startTime: startTime, endTime: endTime)
-                completion(true)
+                playBlock()
             } else {
                 self.statusObserver = item.observe(\.status, options: [.new]) { [weak self] item, _ in
                     guard let self else { return }
 
                     if item.status == .readyToPlay {
-                        self.startLoopingPlayback(startTime: startTime, endTime: endTime)
+                        self.statusObserver?.invalidate()
                         self.statusObserver = nil
-                        completion(true)
+                        playBlock()
                     } else if item.status == .failed {
+                        self.statusObserver?.invalidate()
                         self.statusObserver = nil
+                        self.timeControlObserver?.invalidate()
+                        self.timeControlObserver = nil
                         completion(false)
                     }
                 }
@@ -123,11 +127,29 @@ public final class AudioPlayerManager {
         }
     }
 
+    private func startOneTimePlaybackSegment(startTime: CMTime, endTime: CMTime) {
+        guard let player else { return }
+
+        player.play()
+
+        playbackObserver = player.addPeriodicTimeObserver(
+            forInterval: CMTime(seconds: 0.1, preferredTimescale: 600),
+            queue: .main
+        ) { [weak self] currentTime in
+            guard let self else { return }
+
+            if currentTime >= endTime {
+                self.stop()
+            }
+        }
+    }
+
     // MARK: - Stop / Cleanup
 
     public func stop() {
         player?.pause()
         statusObserver = nil
+        timeControlObserver = nil
 
         if let observer = playbackObserver {
             player?.removeTimeObserver(observer)
@@ -141,6 +163,7 @@ public final class AudioPlayerManager {
         player = nil
         playerItem = nil
         statusObserver = nil
+        timeControlObserver = nil
         playbackEndTime = nil
     }
 }
