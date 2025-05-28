@@ -1,12 +1,16 @@
 import SwiftUI
+import Domain
+import Base
 import UIComponents
 
 struct RewindsListCell: View {
-    var rewind: RewindOnMap
+    var rewind: GalleryItem
+
+    @State private var userImage: UIImage = DomainAsset.groupPlaceholder.image
 
     var body: some View {
         HStack {
-            Rectangle().toSquare(rewind.image, cornerRadius: 20)
+            SquareAsyncMedia(url: rewind.memory.mediaURL, type: .image, cornerRadius: 20)
                 .frame(90)
                 .padding(.trailing, 16)
 
@@ -16,19 +20,30 @@ struct RewindsListCell: View {
                         .modifier(RoundFontModifier(size: 17, weight: .bold))
 
                     HeaderBadgeView(
-                        image: UIComponentsAsset.avatar.image,
-                        text: "flowykkkkkkkk"
+                        image: userImage,
+                        text: rewind.memory.username
                     )
                     .lineLimit(1)
                 }
 
-                Text("23.11.2024").modifier(RoundFontModifier(size: 15, foregroundColor: .textTertiary))
+                Text(rewind.memory.createdAt.description)
+                    .modifier(RoundFontModifier(size: 15, foregroundColor: .textTertiary))
             }
 
             Spacer(minLength: 0)
         }
+        .task {
+            await fetchImage()
+        }
         .padding(.vertical, 12)
         .padding(.horizontal, 16)
         .contentShape(Rectangle())
+    }
+
+    private func fetchImage() async {
+        let image = await ImageProvider.loadOrGetImage(
+            for: rewind.memory.userImage?.absoluteString, .group
+        )
+        userImage = image
     }
 }

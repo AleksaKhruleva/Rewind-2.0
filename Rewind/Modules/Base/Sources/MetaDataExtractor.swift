@@ -1,13 +1,14 @@
 import SwiftUI
 import PhotosUI
 import ImageIO
+import Domain
 
 public final class MetaDataExtractor {
     public static let shared = MetaDataExtractor()
 
     private init() {}
 
-    public func extractCoordinates(from item: PhotosPickerItem) async -> (latitude: Double, longitude: Double)? {
+    public func extractCoordinates(from item: PhotosPickerItem) async -> MediaCoordinates? {
         guard let data = try? await item.loadTransferable(type: Data.self),
               let source = CGImageSourceCreateWithData(data as CFData, nil),
               let metadata = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
@@ -22,7 +23,7 @@ public final class MetaDataExtractor {
 
         let latitude = (latRef == "S" ? -lat : lat)
         let longitude = (lonRef == "W" ? -lon : lon)
-        return (latitude, longitude)
+        return MediaCoordinates(latitude: latitude, longitude: longitude)
     }
 
     public func extractOriginalDateString(from item: PhotosPickerItem) async -> String? {

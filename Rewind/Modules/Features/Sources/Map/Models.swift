@@ -1,20 +1,17 @@
 import MapKit
+import Domain
 import SwiftUI
 
-struct RewindOnMap: Identifiable, Equatable {
-    let id = UUID()
-    let coordinate: CLLocationCoordinate2D
-    let image: UIImage
-
-    static func == (lhs: RewindOnMap, rhs: RewindOnMap) -> Bool {
-        lhs.id == rhs.id
-    }
-}
-
 struct ClusteredPoint: Identifiable, Equatable {
-    let id = UUID()
+    let id: Int
     let coordinate: CLLocationCoordinate2D
-    var points: [RewindOnMap]
+    var points: [GalleryItem]
+
+    init(coordinate: CLLocationCoordinate2D, points: [GalleryItem]) {
+        self.id = points.first?.id ?? -1
+        self.coordinate = coordinate
+        self.points = points
+    }
 
     static func == (lhs: ClusteredPoint, rhs: ClusteredPoint) -> Bool {
         lhs.points == rhs.points

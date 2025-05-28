@@ -1,6 +1,7 @@
 // swiftlint:disable identifier_name
 import SwiftUI
 import MapKit
+import Domain
 import UIComponents
 
 @MainActor @Observable
@@ -11,19 +12,18 @@ final class RewindsMapViewModel {
     }
 
     enum Intent {
-        case fetchRewinds
         case zoom(Zoom)
-        case select(UUID)
+        case select(Int)
         case reset
         case updateVisiblePoints
         case updateCamera
     }
 
-    var points: [RewindOnMap]
-    var visiblePoints: [RewindOnMap]
+    var points: [GalleryItem]
+    var visiblePoints: [GalleryItem]
     var clusters: [ClusteredPoint]
 
-    var selectedPointID: UUID?
+    var selectedPointID: Int?
     var region: MKCoordinateRegion
     var cameraPosition: MapCameraPosition
 
@@ -31,8 +31,8 @@ final class RewindsMapViewModel {
         selectedPointID != nil
     }
 
-    init() {
-        points = []
+    init(galleryItems: [GalleryItem]) {
+        points = galleryItems
         visiblePoints = []
         clusters = []
         cameraPosition = .automatic
@@ -44,29 +44,6 @@ final class RewindsMapViewModel {
 
     func dispatch(_ intent: Intent) {
         switch intent {
-        case .fetchRewinds:
-            let demoImage1 = UIComponentsAsset.media1.image
-            let demoImage2 = UIComponentsAsset.media3.image
-            let demoImage3 = UIComponentsAsset.media8.image
-            let demoImage4 = UIComponentsAsset.media10.image
-            let demoImage5 = UIComponentsAsset.media2.image
-
-            let demoImage6 = UIComponentsAsset.media4.image
-            let demoImage7 = UIComponentsAsset.media7.image
-            let demoImage8 = UIComponentsAsset.media6.image
-
-            // swiftlint:disable line_length
-            points = [
-                RewindOnMap(coordinate: CLLocationCoordinate2D(latitude: 55.7558, longitude: 37.6176), image: demoImage1),
-                RewindOnMap(coordinate: CLLocationCoordinate2D(latitude: 55.8133, longitude: 37.39), image: demoImage2),
-                RewindOnMap(coordinate: CLLocationCoordinate2D(latitude: 55.682, longitude: 37.5734), image: demoImage3),
-                RewindOnMap(coordinate: CLLocationCoordinate2D(latitude: 55.782, longitude: 37.7734), image: demoImage4),
-                RewindOnMap(coordinate: CLLocationCoordinate2D(latitude: 55.702, longitude: 37.5334), image: demoImage5),
-                RewindOnMap(coordinate: CLLocationCoordinate2D(latitude: 55.902, longitude: 37.5014), image: demoImage6),
-                RewindOnMap(coordinate: CLLocationCoordinate2D(latitude: 55.862, longitude: 37.6334), image: demoImage7),
-                RewindOnMap(coordinate: CLLocationCoordinate2D(latitude: 55.812, longitude: 37.5123), image: demoImage8)
-            ]
-            // swiftlint:enable line_length
         case let .zoom(type):
             let factor = type == .in ? 0.6 : 1.4
             let span = MKCoordinateSpan(
@@ -87,6 +64,7 @@ final class RewindsMapViewModel {
                 dispatch(.updateCamera)
             }
         case .reset:
+            print("selectedPointID = nil")
             selectedPointID = nil
             region = MKCoordinateRegion(
                 center: region.center,
@@ -146,10 +124,19 @@ final class RewindsMapViewModel {
         }
     }
 
-    private func averageCoordinate(of points: [RewindOnMap]) -> CLLocationCoordinate2D {
+    private func averageCoordinate(of points: [GalleryItem]) -> CLLocationCoordinate2D {
         let lat = points.map { $0.coordinate.latitude }.reduce(0, +) / Double(points.count)
         let lon = points.map { $0.coordinate.longitude }.reduce(0, +) / Double(points.count)
         return CLLocationCoordinate2D(latitude: lat, longitude: lon)
     }
 }
 // swiftlint:enable identifier_name
+
+extension GalleryItem {
+    fileprivate var coordinate: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(
+            latitude: self.memory.latitude!,
+            longitude: self.memory.longitude!
+        )
+    }
+}
