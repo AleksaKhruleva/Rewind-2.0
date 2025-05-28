@@ -3,11 +3,11 @@ import Foundation
 public struct CurrentGroupInfo: Codable {
     public let id: Int
     public var name: String
-    public let imageData: Data?
+    public let imageURL: String
     
-    public init(id: Int, name: String, imageData: Data?) {
+    public init(id: Int, name: String, imageURL: String) {
         self.id = id
         self.name = name
-        self.imageData = imageData
+        self.imageURL = imageURL
     }
 }

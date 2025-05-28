@@ -11,6 +11,7 @@ public final class FileManagerImageStorage: LocalFileManagerProtocol {
     public static let shared = FileManagerImageStorage()
 
     private let folderName = "rewind-images"
+    private let memoryCache = NSCache<NSString, UIImage>()
 
     private init() { }
 
@@ -19,14 +20,15 @@ public final class FileManagerImageStorage: LocalFileManagerProtocol {
         let imageName = url.replacingOccurrences(of: "/", with: "_")
         createFolderIfNeeded(folderName: folderName)
 
-        guard
-            let data = image.pngData(),
-            let url = getURLForImage(urlToArticle: imageName, folderName: folderName)
-            else { return }
+        guard let data = image.pngData(),
+              let fileURL = getURLForImage(urlToArticle: imageName, folderName: folderName)
+        else { return }
+
+        memoryCache.setObject(image, forKey: url as NSString)
 
         do {
             print("SAVING IMAGE")
-            try data.write(to: url)
+            try data.write(to: fileURL)
             print("SAVED IMAGE")
         } catch let error {
             print("Error saving image: \(imageName). \(error)")
@@ -35,13 +37,27 @@ public final class FileManagerImageStorage: LocalFileManagerProtocol {
 
     public func getImage(url: String) -> UIImage? {
         print(#function)
+
+        let imageKey = url as NSString
+        if let cachedImage = memoryCache.object(forKey: imageKey) {
+            print("RETURNING IMAGE FROM CACHE")
+            return cachedImage
+        }
+
         let imageName = url.replacingOccurrences(of: "/", with: "_")
         guard let url = getURLForImage(urlToArticle: imageName, folderName: folderName),
-            FileManager.default.fileExists(atPath: url.path) else {
+              FileManager.default.fileExists(atPath: url.path)
+        else {
             return nil
         }
-        print("RETURNING IMAGE")
-        return UIImage(contentsOfFile: url.path)
+
+        if let image = UIImage(contentsOfFile: url.path) {
+            memoryCache.setObject(image, forKey: imageKey)
+            print("RETURNING IMAGE FROM DISK")
+            return image
+        }
+
+        return nil
     }
 
     public func deleteImage(url: String) {

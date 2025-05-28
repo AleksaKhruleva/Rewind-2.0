@@ -25,7 +25,7 @@ final class EmailInputViewModel {
             case .invalid:
                 return "Your email in invalid"
             case .responseError:
-                return "Something went worng,\nplease try again"
+                return "Something went wrong,\nplease try again"
             case .existing:
                 return "This email is already registered"
             }

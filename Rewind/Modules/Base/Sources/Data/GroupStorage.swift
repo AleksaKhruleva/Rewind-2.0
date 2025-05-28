@@ -5,11 +5,11 @@ public struct GroupStorage {
     @UserDefaultsCodable(key: "currentGroup", defaultValue: nil)
     public static var currentGroup: CurrentGroupInfo?
 
-    public static func set(groupID: Int, name: String, imageData: Data?) {
+    public static func set(groupID: Int, name: String, imageURL: String) {
         currentGroup = CurrentGroupInfo(
             id: groupID,
             name: name,
-            imageData: imageData
+            imageURL: imageURL
         )
     }
 
@@ -17,7 +17,7 @@ public struct GroupStorage {
         currentGroup = CurrentGroupInfo(
             id: newGroup.id,
             name: newGroup.name,
-            imageData: newGroup.imageData
+            imageURL: newGroup.imageURL
         )
     }
 

@@ -19,7 +19,7 @@ struct GroupsTableCell: View {
         } label: {
             HStack {
                 HStack(spacing: 12) {
-                    Image(uiImage: group.image)
+                    Image(uiImage: UIComponentsAsset.groupAvatar.image)
                         .resizable()
                         .scaledToFill()
                         .frame(width: 34, height: 34)

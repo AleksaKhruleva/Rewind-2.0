@@ -11,7 +11,6 @@ final class GroupSelectionViewModel {
 
     var isLoading = false
     var isGroupCreationViewPresented = false
-
     var currentGroup: Domain.CurrentGroupInfo? {
         get { GroupStorage.currentGroup }
         set {
@@ -20,6 +19,7 @@ final class GroupSelectionViewModel {
             }
         }
     }
+    var groupNameError: String?
 
     private(set) var shouldDismissSelf = false
     private(set) var groups: [Domain.Group]
@@ -40,6 +40,10 @@ final class GroupSelectionViewModel {
     func dispatch(_ intent: Intent) async {
         switch intent {
         case let .createGroup(name):
+            if name.isEmpty || name.count < 3 {
+                groupNameError = "The group name must contain\nat least three letters..."
+                return
+            }
             isLoading = true
             do {
                 guard let tokens = Tokens() else {
@@ -58,6 +62,8 @@ final class GroupSelectionViewModel {
                     id: response.groupID,
                     name: response.name,
                     ownerID: response.ownerID,
+                    imageURL: response.imageURL,
+                    createdAt: DateParser.parseISODate(response.createdAt),
                     members: [
                         Member(
                             id: userID,
@@ -66,8 +72,7 @@ final class GroupSelectionViewModel {
                             isOwner: true,
                             isUser: true
                         )
-                    ],
-                    createdAt: DateParser.parseISODate(response.createdAt)
+                    ]
                 )
 
                 GroupStorage.set(newGroup: group)

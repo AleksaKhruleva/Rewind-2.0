@@ -33,6 +33,7 @@ public protocol NetworkServiceProtocol {
     func fetchGroups(tokens: Tokens) async throws -> [GroupResponse]
     func fetchFullGroupDetails(tokens: Tokens, id: Int) async throws -> GroupDetails
     func updateGroupName(tokens: Tokens, id: Int, name: String) async throws -> GroupResponse
+    func updateGroupImage(tokens: Tokens, id: Int, image: UIImage) async throws -> GroupResponse
     func createGroupInvitationCode(tokens: Tokens, id: Int) async throws -> GroupInvitationCodeResponse
     func addUserToGroup(tokens: Tokens, invitationCode: String) async throws -> GroupResponse
     func deleteMemberFromGroup(tokens: Tokens, groupID: Int, memberID: String) async throws -> SuccessResponse
@@ -176,10 +177,10 @@ public final class NetworkService: NetworkServiceProtocol {
     }
 
     public func passwordResetSet(tokens: Tokens, password: String) async throws -> SuccessResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .passwordResetSet(
-                    accessToken: tokens.accessToken,
+                    accessToken: newToken ?? tokens.accessToken,
                     password: password
                 ),
                 type: SuccessResponse.self
@@ -188,10 +189,10 @@ public final class NetworkService: NetworkServiceProtocol {
     }
 
     public func passwordResetStart(tokens: Tokens) async throws -> SuccessResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .passwordResetStart(
-                    accessToken: tokens.accessToken
+                    accessToken: newToken ?? tokens.accessToken
                 ),
                 type: SuccessResponse.self
             )
@@ -199,10 +200,10 @@ public final class NetworkService: NetworkServiceProtocol {
     }
 
     public func passwordResetVerify(tokens: Tokens, verificationCode: String) async throws -> SuccessResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .passwordResetVerify(
-                    accessToken: tokens.accessToken,
+                    accessToken: newToken ?? tokens.accessToken,
                     verificationCode: verificationCode
                 ),
                 type: SuccessResponse.self
@@ -211,10 +212,10 @@ public final class NetworkService: NetworkServiceProtocol {
     }
 
     public func checkPassword(tokens: Tokens, password: String) async throws -> SuccessResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .checkPassword(
-                    accessToken: tokens.accessToken,
+                    accessToken: newToken ?? tokens.accessToken,
                     password: password
                 ),
                 type: SuccessResponse.self
@@ -223,10 +224,10 @@ public final class NetworkService: NetworkServiceProtocol {
     }
 
     public func emailStartChange(tokens: Tokens, email: String) async throws -> SuccessResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .emailStartChange(
-                    accessToken: tokens.accessToken,
+                    accessToken: newToken ?? tokens.accessToken,
                     email: email
                 ),
                 type: SuccessResponse.self
@@ -235,10 +236,10 @@ public final class NetworkService: NetworkServiceProtocol {
     }
 
     public func emailVerifyChange(tokens: Tokens, verificationCode: String) async throws -> SuccessResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .emailVerifyChange(
-                    accessToken: tokens.accessToken,
+                    accessToken: newToken ?? tokens.accessToken,
                     verificationCode: verificationCode
                 ),
                 type: SuccessResponse.self
@@ -247,10 +248,10 @@ public final class NetworkService: NetworkServiceProtocol {
     }
 
     public func getMedias(tokens: Tokens, groupId: Int) async throws -> MediasResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .getMedias(
-                    accessToken: tokens.accessToken,
+                    accessToken: newToken ?? tokens.accessToken,
                     groupId: groupId
                 ),
                 type: MediasResponse.self
@@ -259,17 +260,17 @@ public final class NetworkService: NetworkServiceProtocol {
     }
 
     public func getRandomMedias(tokens: Tokens, groupId: Int) async throws -> MediasResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .getRandomMedias(
-                    accessToken: tokens.accessToken,
+                    accessToken: newToken ?? tokens.accessToken,
                     groupId: groupId
                 ),
                 type: MediasResponse.self
             )
         }
     }
-    
+
     public func addMedia(
         tokens: Tokens,
         groupId: Int,
@@ -282,10 +283,10 @@ public final class NetworkService: NetworkServiceProtocol {
         duration: Double? = nil,
         tags: [String] = []
     ) async throws -> MediaResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .addMedia(
-                    accessToken: tokens.accessToken,
+                    accessToken: newToken ?? tokens.accessToken,
                     groupId: String(groupId),
                     mediaType: mediaType,
                     mediaFile: mediaFile,
@@ -302,10 +303,10 @@ public final class NetworkService: NetworkServiceProtocol {
     }
 
     public func deleteMedia(tokens: Tokens, groupId: Int, memoryId: Int) async throws -> SuccessResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .deleteMedia(
-                    accessToken: tokens.accessToken,
+                    accessToken: newToken ?? tokens.accessToken,
                     groupId: groupId,
                     memoryId: memoryId
                 ),
@@ -315,10 +316,10 @@ public final class NetworkService: NetworkServiceProtocol {
     }
 
     public func addTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> TagResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .addTag(
-                    accessToken: tokens.accessToken,
+                    accessToken: newToken ?? tokens.accessToken,
                     groupId: groupId,
                     memoryId: memoryId,
                     tag: tag
@@ -329,10 +330,10 @@ public final class NetworkService: NetworkServiceProtocol {
     }
 
     public func deleteTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> TagResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .deleteTag(
-                    accessToken: tokens.accessToken,
+                    accessToken: newToken ?? tokens.accessToken,
                     groupId: groupId,
                     memoryId: memoryId,
                     tag: tag
@@ -343,10 +344,10 @@ public final class NetworkService: NetworkServiceProtocol {
     }
 
     public func likeMedia(tokens: Tokens, memoryId: Int) async throws -> SuccessResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .likeMedia(
-                    accessToken: tokens.accessToken,
+                    accessToken: newToken ?? tokens.accessToken,
                     memoryId: memoryId
                 ),
                 type: SuccessResponse.self
@@ -355,10 +356,10 @@ public final class NetworkService: NetworkServiceProtocol {
     }
 
     public func unlikeMedia(tokens: Tokens, memoryId: Int) async throws -> SuccessResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .unlikeMedia(
-                    accessToken: tokens.accessToken,
+                    accessToken: newToken ?? tokens.accessToken,
                     memoryId: memoryId
                 ),
                 type: SuccessResponse.self
@@ -367,10 +368,10 @@ public final class NetworkService: NetworkServiceProtocol {
     }
 
     public func getMediaTags(tokens: Tokens, memoryId: Int) async throws -> TagsResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .getMediaTags(
-                    accessToken: tokens.accessToken,
+                    accessToken: newToken ?? tokens.accessToken,
                     memoryId: memoryId
                 ),
                 type: TagsResponse.self
@@ -379,18 +380,21 @@ public final class NetworkService: NetworkServiceProtocol {
     }
 
     public func createGroup(tokens: Tokens, name: String) async throws -> GroupResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await provider.request(
-                .createGroup(accessToken: tokens.accessToken, name: name),
+                .createGroup(
+                    accessToken: newToken ?? tokens.accessToken,
+                    name: name
+                ),
                 type: GroupResponse.self
             )
         }
     }
 
     public func fetchGroups(tokens: Tokens, ) async throws -> [GroupResponse] {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             let response = try await provider.request(
-                .fetchGroups(accessToken: tokens.accessToken),
+                .fetchGroups(accessToken: newToken ?? tokens.accessToken),
                 type: GroupsListResponse.self
             )
             return response.groups
@@ -404,11 +408,11 @@ public final class NetworkService: NetworkServiceProtocol {
     }
 
     public func updateGroupName(tokens: Tokens, id: Int, name: String) async throws -> GroupResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await provider
                 .request(
                     .updateGroupName(
-                        accessToken: tokens.accessToken,
+                        accessToken: newToken ?? tokens.accessToken,
                         id: id,
                         name: name
                     ),
@@ -417,12 +421,26 @@ public final class NetworkService: NetworkServiceProtocol {
         }
     }
 
+    public func updateGroupImage(tokens: Tokens, id: Int, image: UIImage) async throws -> GroupResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
+            try await provider
+                .request(
+                    .updateGroupImage(
+                        accessToken: newToken ?? tokens.accessToken,
+                        id: id,
+                        image: image
+                    ),
+                    type: GroupResponse.self
+                )
+        }
+    }
+
     public func createGroupInvitationCode(tokens: Tokens, id: Int) async throws -> GroupInvitationCodeResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await provider
                 .request(
                     .createGroupInvitation(
-                        accessToken: tokens.accessToken,
+                        accessToken: newToken ?? tokens.accessToken,
                         id: id
                     ),
                     type: GroupInvitationCodeResponse.self
@@ -431,11 +449,11 @@ public final class NetworkService: NetworkServiceProtocol {
     }
 
     public func addUserToGroup(tokens: Tokens, invitationCode: String) async throws -> GroupResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             let response = try await provider
                 .request(
                     .addUserToGroup(
-                        accessToken: tokens.accessToken,
+                        accessToken: newToken ?? tokens.accessToken,
                         invitationCode: invitationCode
                     ),
                     type: AddUserToGroupResponse.self
@@ -445,11 +463,11 @@ public final class NetworkService: NetworkServiceProtocol {
     }
 
     public func deleteMemberFromGroup(tokens: Tokens, groupID: Int, memberID: String) async throws -> SuccessResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await provider
                 .request(
                     .deleteMemberFromGroup(
-                        accessToken: tokens.accessToken,
+                        accessToken: newToken ?? tokens.accessToken,
                         groupID: groupID,
                         memberID: memberID
                     ),
@@ -459,10 +477,10 @@ public final class NetworkService: NetworkServiceProtocol {
     }
 
     public func deleteGroup(tokens: Tokens, id: Int) async throws -> SuccessResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await provider
                 .request(
-                    .deleteGroup(accessToken: tokens.accessToken, id: id),
+                    .deleteGroup(accessToken: newToken ?? tokens.accessToken, id: id),
                     type: SuccessResponse.self
                 )
         }
@@ -485,18 +503,18 @@ extension NetworkService {
     }
 
     private func fetchGroup(tokens: Tokens, id: Int) async throws -> GroupResponse {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await provider.request(
-                .fetchGroup(accessToken: tokens.accessToken, id: id),
+                .fetchGroup(accessToken: newToken ?? tokens.accessToken, id: id),
                 type: GroupResponse.self
             )
         }
     }
 
     private func fetchGroupMembers(tokens: Tokens, id: Int) async throws -> [GroupMemberResponse] {
-        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] _ in
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             let response = try await provider.request(
-                .fetchGroupMembers(accessToken: tokens.accessToken, id: id),
+                .fetchGroupMembers(accessToken: newToken ?? tokens.accessToken, id: id),
                 type: GroupMembersListResponse.self
             )
             return response.members
