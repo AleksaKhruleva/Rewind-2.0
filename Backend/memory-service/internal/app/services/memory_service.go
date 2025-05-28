@@ -174,7 +174,8 @@ func (s *MemoryService) DeleteMemory(ctx context.Context, req *pb.DeleteMemoryRe
 	memory, err := s.memoryRepo.GetMemory(ctx, nil, uint(req.GetMemoryId()))
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return &pb.DeleteMemoryResponse{}, nil
+			log.Printf("MemoryService: Failed to get memory %d: %v", req.GetMemoryId(), err)
+			return &pb.DeleteMemoryResponse{Success: true}, nil
 		}
 		log.Printf("MemoryService: Failed to get memory %d: %v", req.GetMemoryId(), err)
 		return nil, status.Errorf(codes.Internal, "failed to get memory %d: %v", req.GetMemoryId(), err)
@@ -200,6 +201,20 @@ func (s *MemoryService) DeleteMemory(ctx context.Context, req *pb.DeleteMemoryRe
 		}
 	}()
 
+	if err = s.memoryRepo.DeleteMemoryTagsByMemoryID(ctx, tx, memory.ID); err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("MemoryService: Failed to delete memory tag %d: %v", req.GetMemoryId(), err)
+			return nil, status.Errorf(codes.Internal, "failed to delete memory tag %d: %v", req.GetMemoryId(), err)
+		}
+	}
+
+	if err = s.memoryRepo.DeleteFavouritesByMemoryID(ctx, tx, memory.ID); err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("MemoryService: Failed to delete memory %d: %v", req.GetMemoryId(), err)
+			return nil, status.Errorf(codes.Internal, "failed to delete memory %d: %v", req.GetMemoryId(), err)
+		}
+	}
+
 	if err = s.memoryRepo.DeleteMemory(ctx, tx, uint(req.MemoryId)); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return &pb.DeleteMemoryResponse{Success: true}, nil
@@ -214,6 +229,25 @@ func (s *MemoryService) DeleteMemory(ctx context.Context, req *pb.DeleteMemoryRe
 	}
 
 	return &pb.DeleteMemoryResponse{Success: true}, nil
+}
+
+// GetMemory implements pb.MemoryServiceServer.GetMemory
+func (s *MemoryService) GetMemory(ctx context.Context, req *pb.GetMemoryRequest) (*pb.GetMemoryResponse, error) {
+	if err := s.validator.Struct(req); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid request: %v", err)
+	}
+
+	memory, err := s.memoryRepo.GetMemoryDetailedByID(ctx, nil, uint(req.GetMemoryId()), uint(req.GetUserId()))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("MemoryService: Failed to get memory %d: %v", req.GetMemoryId(), err)
+			return nil, status.Errorf(codes.NotFound, "failed to get memory %d: %v", req.GetMemoryId(), err)
+		}
+		log.Printf("MemoryService: Failed to get memory %d: %v", req.GetMemoryId(), err)
+		return nil, status.Errorf(codes.Internal, "failed to get memory %d: %v", req.GetMemoryId(), err)
+	}
+
+	return &pb.GetMemoryResponse{Memory: convertDetailedMemoryToProto(memory)}, nil
 }
 
 // DeleteMemoriesByGroup implements pb.MemoryServiceServer.DeleteMemoriesByGroup
@@ -236,6 +270,14 @@ func (s *MemoryService) DeleteMemoriesByGroup(ctx context.Context, req *pb.Delet
 			tx.Rollback()
 		}
 	}()
+
+	if err = s.memoryRepo.DeleteMemoryTagsByGroupID(ctx, tx, uint(req.GetGroupId())); err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("MemoryService: Failed to delete memory tag %d: %v", req.GetGroupId(), err)
+		} else {
+			return nil, status.Errorf(codes.Internal, "failed to delete memory tag %d: %v", req.GetGroupId(), err)
+		}
+	}
 
 	if err = s.memoryRepo.DeleteMemoriesByGroup(ctx, tx, uint(req.GroupId)); err != nil {
 		log.Printf("MemoryService: Failed to delete memories for group %d: %v", req.GroupId, err)

@@ -1,13 +1,15 @@
 package group
 
 import (
-	pb "Rewind-api-gateway-service/pkg/proto"
 	"context"
 	"fmt"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"os"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
+	pb "Rewind-api-gateway-service/pkg/proto"
 )
 
 // GroupServiceClient представляет собой gRPC-клиент для сервиса аутентификации.
@@ -65,6 +67,11 @@ func (c *GroupServiceClient) DeleteGroup(ctx context.Context, in *pb.DeleteGroup
 	return c.client.DeleteGroup(ctx, in, opts...)
 }
 
+// DeleteGroupAvatar вызывает RPC метод DeleteGroupAvatar в Group-Service.
+func (c *GroupServiceClient) DeleteGroupAvatar(ctx context.Context, in *pb.DeleteGroupAvatarRequest, opts ...grpc.CallOption) (*pb.DeleteGroupAvatarResponse, error) {
+	return c.client.DeleteGroupAvatar(ctx, in, opts...)
+}
+
 // ListGroupMembers вызывает RPC метод ListGroupMembers в Group-Service.
 func (c *GroupServiceClient) ListGroupMembers(ctx context.Context, in *pb.ListGroupMembersRequest, opts ...grpc.CallOption) (*pb.ListGroupMembersResponse, error) {
 	return c.client.ListGroupMembers(ctx, in, opts...)
@@ -93,4 +100,14 @@ func (c *GroupServiceClient) ListUserGroups(ctx context.Context, in *pb.ListUser
 // CheckUserInGroup вызывает RPC метод CheckUserInGroup в Group-Service
 func (c *GroupServiceClient) CheckUserInGroup(ctx context.Context, in *pb.CheckUserInGroupRequest, opts ...grpc.CallOption) (*pb.CheckUserInGroupResponse, error) {
 	return c.client.CheckUserInGroup(ctx, in, opts...)
+}
+
+// GroupMemberAddedMemory вызывает RPC метод GroupMemberAddedMemory в Group-Service
+func (c *GroupServiceClient) GroupMemberAddedMemory(ctx context.Context, in *pb.GroupMemberAddedMemoryRequest, opts ...grpc.CallOption) (*pb.GroupMemberAddedMemoryResponse, error) {
+	return c.client.GroupMemberAddedMemory(ctx, in, opts...)
+}
+
+// GroupMemberViewedMemories вызывает RPC метод GroupMemberViewedMemories в Group-Service
+func (c *GroupServiceClient) GroupMemberViewedMemories(ctx context.Context, in *pb.GroupMemberViewedMemoriesRequest, opts ...grpc.CallOption) (*pb.GroupMemberViewedMemoriesResponse, error) {
+	return c.client.GroupMemberViewedMemories(ctx, in, opts...)
 }

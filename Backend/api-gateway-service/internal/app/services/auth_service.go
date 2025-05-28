@@ -27,6 +27,7 @@ type AuthServiceInterface interface {
 	StartPasswordReset(ctx context.Context) (*pb.StartPasswordResetResponse, error)
 	VerifyPasswordResetCode(ctx context.Context, verificationCode string) (*pb.VerifyPasswordResetCodeResponse, error)
 	SetNewPassword(ctx context.Context, newPassword string) (*pb.SetNewPasswordResponse, error)
+	DeleteAvatar(ctx context.Context) (*pb.DeleteAvatarResponse, error)
 }
 
 // AuthService представляет сервис для аутентификации.
@@ -161,4 +162,13 @@ func (s *AuthService) SetNewPassword(ctx context.Context, newPassword string) (*
 		return nil, err
 	}
 	return s.authClient.SetNewPassword(ctx, &pb.SetNewPasswordRequest{UserId: userID, NewPassword: newPassword})
+}
+
+// DeleteAvatar вызывает метод DeleteAvatar сервиса аутентификации.
+func (s *AuthService) DeleteAvatar(ctx context.Context) (*pb.DeleteAvatarResponse, error) {
+	userID, err := GetRequestingUserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return s.authClient.DeleteAvatar(ctx, &pb.DeleteAvatarRequest{UserId: userID})
 }

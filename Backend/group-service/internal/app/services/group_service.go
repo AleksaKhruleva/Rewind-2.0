@@ -90,11 +90,6 @@ func (s *GroupService) CreateGroup(ctx context.Context, req *pb.CreateGroupReque
 
 	err = s.groupRepo.Group().CreateGroup(ctx, tx, groupModel)
 	if err != nil {
-		if errors.Is(err, gorm.ErrDuplicatedKey) {
-			log.Printf("CreateGroup: Duplicate key error creating group: %v", err)
-			err = status.Errorf(codes.AlreadyExists, "Group with this name already exists")
-			return nil, err
-		}
 		log.Printf("CreateGroup: Failed to create group in DB: %v", err)
 		err = status.Errorf(codes.Internal, "Failed to create group")
 		return nil, err
@@ -228,13 +223,7 @@ func (s *GroupService) UpdateGroup(ctx context.Context, req *pb.UpdateGroupReque
 		return nil, status.Errorf(codes.Internal, "Failed to retrieve group information")
 	}
 
-	// 3. Проверка прав доступа: является ли запрашивающий пользователь администратором группы?
-	if groupModel.AdminUserID != uint(requestingUserID) {
-		log.Printf("UpdateGroup: Permission denied - user %d is not admin of group %d", requestingUserID, groupID)
-		return nil, status.Errorf(codes.PermissionDenied, "Only group administrator can update group information")
-	}
-
-	// 4. Обновление полей группы (используем транзакцию для операции записи)
+	// 3. Обновление полей группы (используем транзакцию для операции записи)
 	tx, err := s.groupRepo.BeginTx(ctx)
 	if err != nil {
 		log.Printf("UpdateGroup: Failed to start transaction: %v", err)
@@ -372,19 +361,19 @@ func (s *GroupService) DeleteGroup(ctx context.Context, req *pb.DeleteGroupReque
 		}
 	}()
 
+	err = s.groupRepo.GroupInvitation().HardDeleteInvitationsByGroup(ctx, tx, uint(groupID))
+	if err != nil {
+		log.Printf("DeleteGroup: Failed to hard delete invitations for group %d: %v", groupID, err)
+		err = status.Errorf(codes.Internal, "Failed to delete group invitations")
+		return nil, err
+	}
+
 	// Удаление связанных участников группы (жесткое)
 	err = s.groupRepo.GroupMember().HardDeleteMembersByGroup(ctx, tx, uint(groupID))
 	if err != nil {
 		// Ошибка при удалении участников - внутренняя ошибка
 		log.Printf("DeleteGroup: Failed to hard delete members for group %d: %v", groupID, err)
 		err = status.Errorf(codes.Internal, "Failed to delete group members")
-		return nil, err
-	}
-
-	err = s.groupRepo.GroupInvitation().HardDeleteInvitationsByGroup(ctx, tx, uint(groupID))
-	if err != nil {
-		log.Printf("DeleteGroup: Failed to hard delete invitations for group %d: %v", groupID, err)
-		err = status.Errorf(codes.Internal, "Failed to delete group invitations")
 		return nil, err
 	}
 
@@ -416,6 +405,81 @@ func (s *GroupService) DeleteGroup(ctx context.Context, req *pb.DeleteGroupReque
 
 	// 5. Формирование успешного ответа
 	return &pb.DeleteGroupResponse{Success: true}, nil
+}
+
+// DeleteGroupAvatar реализует RPC метод обновления информации о группе
+func (s *GroupService) DeleteGroupAvatar(ctx context.Context, req *pb.DeleteGroupAvatarRequest) (*pb.DeleteGroupAvatarResponse, error) {
+	// 1. Валидация входных данных
+	groupID := req.GetGroupId()
+	if groupID <= 0 {
+		log.Printf("DeleteGroupAvatar: Invalid argument: group_id is missing or invalid: %d", groupID)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid group ID")
+	}
+	requestingUserID := req.GetRequestingUserId()
+	if requestingUserID <= 0 {
+		log.Printf("DeleteGroupAvatar: requesting_user_id is missing or invalid: %d", requestingUserID)
+		return nil, status.Errorf(codes.Unauthenticated, "User ID is required")
+	}
+
+	// 2. Получение существующей группы
+	// Эта операция только чтение, транзакция пока не нужна
+	groupModel, err := s.groupRepo.Group().GetGroupByID(ctx, nil, uint(groupID))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("DeleteGroupAvatar: Group not found: %d", groupID)
+			return nil, status.Errorf(codes.NotFound, "Group not found")
+		}
+		log.Printf("DeleteGroupAvatar: Failed to get group %d from DB: %v", groupID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to retrieve group information")
+	}
+
+	// 3. Обновление полей группы (используем транзакцию для операции записи)
+	tx, err := s.groupRepo.BeginTx(ctx)
+	if err != nil {
+		log.Printf("DeleteGroupAvatar: Failed to start transaction: %v", err)
+		return nil, status.Errorf(codes.Internal, "Internal error starting transaction")
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			log.Printf("DeleteGroupAvatar: Panic during transaction, rolling back: %v", r)
+			rollbackErr := s.groupRepo.RollbackTx(tx)
+			if rollbackErr != nil {
+				log.Printf("DeleteGroupAvatar: Error during rollback after panic: %v", rollbackErr)
+			}
+			panic(r)
+		} else if err != nil {
+			log.Printf("DeleteGroupAvatar: Transaction failed, rolling back: %v", err)
+			rollbackErr := s.groupRepo.RollbackTx(tx)
+			if rollbackErr != nil {
+				log.Printf("DeleteGroupAvatar: Error during rollback: %v", rollbackErr)
+			}
+		}
+	}()
+
+	groupModel.Image = os.Getenv("DEFAULT_GROUP_AVATAR")
+	// GORM при Save с gorm.Model автоматически обновит UpdatedAt
+
+	// Сохраняем обновленную группу в базе данных (используем транзакционный tx)
+	err = s.groupRepo.Group().UpdateGroup(ctx, tx, groupModel)
+	if err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			log.Printf("DeleteGroupAvatar: Duplicate key error updating group: %v", err)
+			err = status.Errorf(codes.AlreadyExists, "Group with this name already exists")
+			return nil, err
+		}
+		log.Printf("DeleteGroupAvatar: Failed to update group in DB: %v", err)
+		err = status.Errorf(codes.Internal, "Failed to update group information")
+		return nil, err
+	}
+
+	// Если обновление успешно, фиксируем транзакцию
+	err = s.groupRepo.CommitTx(tx)
+	if err != nil {
+		log.Printf("DeleteGroupAvatar: Failed to commit transaction: %v", err)
+		return nil, status.Errorf(codes.Internal, "Internal error finalizing group update")
+	}
+
+	return &pb.DeleteGroupAvatarResponse{Success: true}, nil
 }
 
 // ListGroupMembers реализует RPC метод получения списка участников группы
@@ -692,15 +756,28 @@ func (s *GroupService) RemoveGroupMember(ctx context.Context, req *pb.RemoveGrou
 				return nil, err
 			}
 
-			// Мягкое удаление записи участника (текущего админа)
-			softDeleteMemberErr := s.groupRepo.GroupMember().DeleteMember(ctx, tx, memberToRemove.ID)
-			if softDeleteMemberErr != nil {
-				if errors.Is(softDeleteMemberErr, gorm.ErrRecordNotFound) {
-					log.Printf("RemoveGroupMember: Member record %d not found during soft deletion after fetch", memberToRemove.ID)
+			updateNewAdminErr := s.groupRepo.GroupMember().UpdateMemberIsAdmin(ctx, tx, newAdminMember.ID, true)
+			if updateNewAdminErr != nil {
+				log.Printf("RemoveGroupMember: Failed to update member %d as admin: %v", newAdminUserID, updateNewAdminErr)
+				err = status.Errorf(codes.Internal, "Failed to update member as administrator")
+				return nil, err
+			}
+
+			// Удаление записи участника (текущего админа)
+			deleteInvitationsErr := s.groupRepo.GroupInvitation().HardDeleteInvitationsByUserID(ctx, tx, memberToRemove.ID)
+			if deleteInvitationsErr != nil {
+				if errors.Is(deleteInvitationsErr, gorm.ErrRecordNotFound) {
+					log.Printf("RemoveGroupMember: Invitation record %d not found during deletion after fetch", memberToRemove.ID)
+				}
+			}
+			deleteMemberErr := s.groupRepo.GroupMember().DeleteMember(ctx, tx, memberToRemove.ID)
+			if deleteMemberErr != nil {
+				if errors.Is(deleteMemberErr, gorm.ErrRecordNotFound) {
+					log.Printf("RemoveGroupMember: Member record %d not found during deletion after fetch", memberToRemove.ID)
 					err = status.Errorf(codes.Internal, "Internal error deleting member")
 					return nil, err
 				}
-				log.Printf("RemoveGroupMember: Failed to soft delete member %d from DB: %v", memberToRemove.ID, softDeleteMemberErr)
+				log.Printf("RemoveGroupMember: Failed to delete member %d from DB: %v", memberToRemove.ID, deleteMemberErr)
 				err = status.Errorf(codes.Internal, "Failed to remove group member")
 				return nil, err
 			}
@@ -719,9 +796,15 @@ func (s *GroupService) RemoveGroupMember(ctx context.Context, req *pb.RemoveGrou
 		}
 	} else {
 		// Сценарий: Не-администратор удаляет себя ИЛИ Администратор удаляет другого участника.
-		// В этом случае просто мягко удаляем запись участника.
+		// В этом случае просто удаляем запись участника.
 
-		// Мягкое удаление записи GroupMember
+		// Удаление записи GroupMember
+		deleteInvitationsErr := s.groupRepo.GroupInvitation().HardDeleteInvitationsByUserID(ctx, tx, memberToRemove.ID)
+		if deleteInvitationsErr != nil {
+			if errors.Is(deleteInvitationsErr, gorm.ErrRecordNotFound) {
+				log.Printf("RemoveGroupMember: Invitation record %d not found during deletion after fetch", memberToRemove.ID)
+			}
+		}
 		err = s.groupRepo.GroupMember().DeleteMember(ctx, tx, memberToRemove.ID)
 		if err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -1043,8 +1126,9 @@ func (s *GroupService) AcceptGroupInvitation(ctx context.Context, req *pb.Accept
 	}
 
 	return &pb.AcceptGroupInvitationResponse{
-		GroupMember: responseMember,
-		Group:       responseGroup,
+		GroupMember:   responseMember,
+		Group:         responseGroup,
+		InviterUserId: uint64(invitationModel.CreatedByUserID),
 	}, nil
 }
 
@@ -1078,4 +1162,58 @@ func (s *GroupService) ListUserGroups(ctx context.Context, req *pb.ListUserGroup
 	}
 
 	return &pb.ListUserGroupsResponse{Groups: responseGroups}, nil
+}
+
+// GroupMemberAddedMemory реализует RPC метод добавления воспоминания в группу
+func (s *GroupService) GroupMemberAddedMemory(ctx context.Context, req *pb.GroupMemberAddedMemoryRequest) (*pb.GroupMemberAddedMemoryResponse, error) {
+	userID := req.GetUserId()
+	if userID <= 0 {
+		log.Printf("GroupMemberAddedMemory: Invalid argument: user_id is missing or invalid: %d", userID)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid user ID")
+	}
+
+	groupID := req.GetGroupId()
+	if groupID <= 0 {
+		log.Printf("GroupMemberAddedMemory: Invalid argument: group_id is missing or invalid: %d", groupID)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid group ID")
+	}
+
+	err := s.groupRepo.GroupMember().GroupMemberAddMemory(ctx, nil, uint(groupID), uint(userID))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("GroupMemberAddedMemory: GroupMember %d not found in group %d", userID, groupID)
+			return nil, status.Errorf(codes.NotFound, "GroupMember %d not found in group %d", userID, groupID)
+		}
+	}
+	return &pb.GroupMemberAddedMemoryResponse{Success: true}, nil
+}
+
+// GroupMemberViewedMemories реализует RPC метод добавления воспоминания в группу
+func (s *GroupService) GroupMemberViewedMemories(ctx context.Context, req *pb.GroupMemberViewedMemoriesRequest) (*pb.GroupMemberViewedMemoriesResponse, error) {
+	userID := req.GetUserId()
+	if userID <= 0 {
+		log.Printf("GroupMemberViewedMemories: Invalid argument: user_id is missing or invalid: %d", userID)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid user ID")
+	}
+
+	groupID := req.GetGroupId()
+	if groupID <= 0 {
+		log.Printf("GroupMemberViewedMemories: Invalid argument: group_id is missing or invalid: %d", groupID)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid group ID")
+	}
+
+	count := req.GetCount()
+	if count <= 0 {
+		log.Printf("GroupMemberViewedMemories: Invalid argument: count is missing or invalid: %d", count)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid count value")
+	}
+
+	err := s.groupRepo.GroupMember().GroupMemberViewMemories(ctx, nil, uint(groupID), uint(userID), uint(count))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("GroupMemberViewedMemories: GroupMember %d not found in group %d", userID, groupID)
+			return nil, status.Errorf(codes.NotFound, "GroupMember %d not found in group %d", userID, groupID)
+		}
+	}
+	return &pb.GroupMemberViewedMemoriesResponse{Success: true}, nil
 }

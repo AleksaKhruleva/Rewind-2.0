@@ -38,6 +38,10 @@ const (
 	AuthService_StartPasswordReset_FullMethodName      = "/auth.AuthService/StartPasswordReset"
 	AuthService_VerifyPasswordResetCode_FullMethodName = "/auth.AuthService/VerifyPasswordResetCode"
 	AuthService_SetNewPassword_FullMethodName          = "/auth.AuthService/SetNewPassword"
+	AuthService_DeleteAvatar_FullMethodName            = "/auth.AuthService/DeleteAvatar"
+	AuthService_UserAddedMemory_FullMethodName         = "/auth.AuthService/UserAddedMemory"
+	AuthService_UserInvitedMember_FullMethodName       = "/auth.AuthService/UserInvitedMember"
+	AuthService_UserViewedMemories_FullMethodName      = "/auth.AuthService/UserViewedMemories"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -63,6 +67,10 @@ type AuthServiceClient interface {
 	StartPasswordReset(ctx context.Context, in *StartPasswordResetRequest, opts ...grpc.CallOption) (*StartPasswordResetResponse, error)
 	VerifyPasswordResetCode(ctx context.Context, in *VerifyPasswordResetCodeRequest, opts ...grpc.CallOption) (*VerifyPasswordResetCodeResponse, error)
 	SetNewPassword(ctx context.Context, in *SetNewPasswordRequest, opts ...grpc.CallOption) (*SetNewPasswordResponse, error)
+	DeleteAvatar(ctx context.Context, in *DeleteAvatarRequest, opts ...grpc.CallOption) (*DeleteAvatarResponse, error)
+	UserAddedMemory(ctx context.Context, in *UserAddedMemoryRequest, opts ...grpc.CallOption) (*UserAddedMemoryResponse, error)
+	UserInvitedMember(ctx context.Context, in *UserInvitedMemberRequest, opts ...grpc.CallOption) (*UserInvitedMemberResponse, error)
+	UserViewedMemories(ctx context.Context, in *UserViewedMemoriesRequest, opts ...grpc.CallOption) (*UserViewedMemoriesResponse, error)
 }
 
 type authServiceClient struct {
@@ -263,6 +271,46 @@ func (c *authServiceClient) SetNewPassword(ctx context.Context, in *SetNewPasswo
 	return out, nil
 }
 
+func (c *authServiceClient) DeleteAvatar(ctx context.Context, in *DeleteAvatarRequest, opts ...grpc.CallOption) (*DeleteAvatarResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteAvatarResponse)
+	err := c.cc.Invoke(ctx, AuthService_DeleteAvatar_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) UserAddedMemory(ctx context.Context, in *UserAddedMemoryRequest, opts ...grpc.CallOption) (*UserAddedMemoryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserAddedMemoryResponse)
+	err := c.cc.Invoke(ctx, AuthService_UserAddedMemory_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) UserInvitedMember(ctx context.Context, in *UserInvitedMemberRequest, opts ...grpc.CallOption) (*UserInvitedMemberResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserInvitedMemberResponse)
+	err := c.cc.Invoke(ctx, AuthService_UserInvitedMember_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) UserViewedMemories(ctx context.Context, in *UserViewedMemoriesRequest, opts ...grpc.CallOption) (*UserViewedMemoriesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserViewedMemoriesResponse)
+	err := c.cc.Invoke(ctx, AuthService_UserViewedMemories_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
@@ -286,6 +334,10 @@ type AuthServiceServer interface {
 	StartPasswordReset(context.Context, *StartPasswordResetRequest) (*StartPasswordResetResponse, error)
 	VerifyPasswordResetCode(context.Context, *VerifyPasswordResetCodeRequest) (*VerifyPasswordResetCodeResponse, error)
 	SetNewPassword(context.Context, *SetNewPasswordRequest) (*SetNewPasswordResponse, error)
+	DeleteAvatar(context.Context, *DeleteAvatarRequest) (*DeleteAvatarResponse, error)
+	UserAddedMemory(context.Context, *UserAddedMemoryRequest) (*UserAddedMemoryResponse, error)
+	UserInvitedMember(context.Context, *UserInvitedMemberRequest) (*UserInvitedMemberResponse, error)
+	UserViewedMemories(context.Context, *UserViewedMemoriesRequest) (*UserViewedMemoriesResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -352,6 +404,18 @@ func (UnimplementedAuthServiceServer) VerifyPasswordResetCode(context.Context, *
 }
 func (UnimplementedAuthServiceServer) SetNewPassword(context.Context, *SetNewPasswordRequest) (*SetNewPasswordResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetNewPassword not implemented")
+}
+func (UnimplementedAuthServiceServer) DeleteAvatar(context.Context, *DeleteAvatarRequest) (*DeleteAvatarResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAvatar not implemented")
+}
+func (UnimplementedAuthServiceServer) UserAddedMemory(context.Context, *UserAddedMemoryRequest) (*UserAddedMemoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UserAddedMemory not implemented")
+}
+func (UnimplementedAuthServiceServer) UserInvitedMember(context.Context, *UserInvitedMemberRequest) (*UserInvitedMemberResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UserInvitedMember not implemented")
+}
+func (UnimplementedAuthServiceServer) UserViewedMemories(context.Context, *UserViewedMemoriesRequest) (*UserViewedMemoriesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UserViewedMemories not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -716,6 +780,78 @@ func _AuthService_SetNewPassword_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_DeleteAvatar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAvatarRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).DeleteAvatar(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_DeleteAvatar_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).DeleteAvatar(ctx, req.(*DeleteAvatarRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_UserAddedMemory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserAddedMemoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).UserAddedMemory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_UserAddedMemory_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).UserAddedMemory(ctx, req.(*UserAddedMemoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_UserInvitedMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserInvitedMemberRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).UserInvitedMember(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_UserInvitedMember_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).UserInvitedMember(ctx, req.(*UserInvitedMemberRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_UserViewedMemories_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserViewedMemoriesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).UserViewedMemories(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_UserViewedMemories_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).UserViewedMemories(ctx, req.(*UserViewedMemoriesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -798,6 +934,22 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetNewPassword",
 			Handler:    _AuthService_SetNewPassword_Handler,
+		},
+		{
+			MethodName: "DeleteAvatar",
+			Handler:    _AuthService_DeleteAvatar_Handler,
+		},
+		{
+			MethodName: "UserAddedMemory",
+			Handler:    _AuthService_UserAddedMemory_Handler,
+		},
+		{
+			MethodName: "UserInvitedMember",
+			Handler:    _AuthService_UserInvitedMember_Handler,
+		},
+		{
+			MethodName: "UserViewedMemories",
+			Handler:    _AuthService_UserViewedMemories_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

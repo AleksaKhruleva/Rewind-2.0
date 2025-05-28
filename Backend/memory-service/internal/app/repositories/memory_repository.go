@@ -17,6 +17,7 @@ import (
 type MemoryRepositoryInterface interface {
 	CreateMemory(ctx context.Context, tx *gorm.DB, memory *models.Memory) error
 	GetMemory(ctx context.Context, tx *gorm.DB, memoryId uint) (*models.Memory, error)
+	GetMemoryDetailedByID(ctx context.Context, tx *gorm.DB, memoryID uint, userID uint) (*models.MemoryDetailed, error)
 	DeleteMemory(ctx context.Context, tx *gorm.DB, memoryID uint) error
 	DeleteMemoriesByGroup(ctx context.Context, tx *gorm.DB, groupID uint) error
 	ListMemoriesByGroupDetailed(ctx context.Context, tx *gorm.DB, groupID uint, userID uint) ([]models.MemoryDetailed, error)
@@ -25,11 +26,14 @@ type MemoryRepositoryInterface interface {
 
 	CreateMemoryTag(ctx context.Context, tx *gorm.DB, tag *models.MemoryTag) error
 	DeleteMemoryTag(ctx context.Context, tx *gorm.DB, memoryID uint, tag string) error
+	DeleteMemoryTagsByMemoryID(ctx context.Context, tx *gorm.DB, memoryID uint) error
+	DeleteMemoryTagsByGroupID(ctx context.Context, tx *gorm.DB, memoryID uint) error
 	ListMemoryTagsByMemoryID(ctx context.Context, tx *gorm.DB, memoryID uint) ([]models.MemoryTag, error)
 
 	CreateFavourite(ctx context.Context, tx *gorm.DB, favourite *models.Favourite) error
 	DeleteFavourite(ctx context.Context, tx *gorm.DB, favouriteMemoryID uint, favouriteUserID uint) error
 	DeleteFavouritesByUserID(ctx context.Context, tx *gorm.DB, userID uint) error
+	DeleteFavouritesByMemoryID(ctx context.Context, tx *gorm.DB, memoryID uint) error
 
 	// Методы для транзакций
 	BeginTx(ctx context.Context) (*gorm.DB, error)
@@ -79,6 +83,48 @@ func (r *MemoryRepository) GetMemory(ctx context.Context, tx *gorm.DB, memoryID 
 		}
 		log.Printf("MemoryRepository: Failed to get memory %d: %v", memoryID, result.Error)
 		return nil, fmt.Errorf("failed to get memory: %w", result.Error)
+	}
+
+	return &memory, nil
+}
+
+// GetMemoryDetailedByID получает одно воспоминание по его ID с тегами и информацией об избранном.
+func (r *MemoryRepository) GetMemoryDetailedByID(ctx context.Context, tx *gorm.DB, memoryID uint, userID uint) (*models.MemoryDetailed, error) {
+	db := r.getDB(tx).WithContext(ctx)
+	var memory models.MemoryDetailed
+
+	query := `
+        SELECT
+            m.*,
+            COALESCE(string_agg(DISTINCT mt.tag, ','), '') AS tags,
+            CASE
+                WHEN EXISTS (
+                    SELECT 1 FROM favourites f
+                    WHERE f.memory_id = m.id AND f.user_id = ?
+                ) THEN TRUE
+                ELSE FALSE
+            END AS is_favourite
+        FROM memories m
+        LEFT JOIN memory_tags mt ON mt.memory_id = m.id
+        LEFT JOIN favourites f ON f.memory_id = m.id AND f.user_id = ?
+        WHERE m.id = ?
+        GROUP BY m.id
+        LIMIT 1
+    `
+
+	result := db.Raw(query, userID, userID, memoryID).Scan(&memory)
+	if result.Error != nil {
+		log.Printf("MemoryRepository: Failed to get detailed memory by ID %d: %v", memoryID, result.Error)
+		return nil, fmt.Errorf("failed to get detailed memory by ID: %w", result.Error)
+	}
+	if result.RowsAffected == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+
+	if memory.Tags != "" {
+		memory.TagsArray = strings.Split(memory.Tags, ",")
+	} else {
+		memory.TagsArray = []string{}
 	}
 
 	return &memory, nil
@@ -146,7 +192,7 @@ func (r *MemoryRepository) ListMemoriesByGroupDetailed(ctx context.Context, tx *
 	return memories, nil
 }
 
-// ListMemoriesByGroupWithFilters получает список воспоминаний в заданной группе с применением фильтров и детальной информацией.
+// ListMemoriesByGroupWithFiltersDetailed получает список воспоминаний в заданной группе с применением фильтров и детальной информацией.
 func (r *MemoryRepository) ListMemoriesByGroupWithFiltersDetailed(ctx context.Context, tx *gorm.DB, groupID uint, userID uint, filters map[string]string, numberOfMemories uint) ([]models.MemoryDetailed, error) {
 	db := r.getDB(tx).WithContext(ctx)
 	var memoriesDetailed []models.MemoryDetailed
@@ -174,8 +220,14 @@ func (r *MemoryRepository) ListMemoriesByGroupWithFiltersDetailed(ctx context.Co
 		switch key {
 		case "media_type":
 			if value != "" {
-				whereClauses = append(whereClauses, "m.media_type = ?")
-				args = append(args, value)
+				types := strings.Split(value, ",")
+				if len(types) > 0 {
+					placeholders := strings.Repeat("?,", len(types)-1) + "?"
+					whereClauses = append(whereClauses, fmt.Sprintf("m.media_type IN (%s)", placeholders))
+					for _, t := range types {
+						args = append(args, t)
+					}
+				}
 			}
 		case "is_favourite":
 			if value == "true" {
@@ -305,10 +357,41 @@ func (r *MemoryRepository) DeleteMemoryTag(ctx context.Context, tx *gorm.DB, mem
 	}
 
 	// Удаляем найденный тег
-	deleteResult := db.Delete(&memoryTag)
+	deleteResult := db.Unscoped().Delete(&memoryTag)
 	if deleteResult.Error != nil {
 		log.Printf("MemoryRepository: Failed to delete memory tag with value '%s': %v", tag, deleteResult.Error)
 		return fmt.Errorf("failed to delete memory tag: %w", deleteResult.Error)
+	}
+
+	return nil
+}
+
+func (r *MemoryRepository) DeleteMemoryTagsByMemoryID(ctx context.Context, tx *gorm.DB, memoryID uint) error {
+	db := r.getDB(tx).WithContext(ctx)
+	deleteResult := db.Unscoped().Where("memory_id = ?", memoryID).Delete(&models.MemoryTag{})
+	if deleteResult.Error != nil {
+		log.Printf("MemoryRepository: Failed to delete memory tags: %v", deleteResult.Error)
+		return fmt.Errorf("failed to delete memory tags: %w", deleteResult.Error)
+	}
+	return nil
+}
+
+func (r *MemoryRepository) DeleteMemoryTagsByGroupID(ctx context.Context, tx *gorm.DB, groupID uint) error {
+	db := r.getDB(tx).WithContext(ctx)
+
+	var memoryIDs []uint
+	result := db.Model(&models.Memory{}).
+		Where("group_id = ?", groupID).
+		Pluck("id", &memoryIDs)
+	if result.Error != nil {
+		return fmt.Errorf("failed to find memory IDs for group %d: %w", groupID, result.Error)
+	}
+
+	if len(memoryIDs) > 0 {
+		deleteResult := db.Where("memory_id IN (?)", memoryIDs).Delete(&models.MemoryTag{})
+		if deleteResult.Error != nil {
+			return fmt.Errorf("failed to delete memory tags for group %d: %w", groupID, deleteResult.Error)
+		}
 	}
 
 	return nil
@@ -353,6 +436,16 @@ func (r *MemoryRepository) DeleteFavouritesByUserID(ctx context.Context, tx *gor
 	if result.Error != nil {
 		log.Printf("MemoryRepository: Failed to delete favourites by user ID: %v", result.Error)
 		return fmt.Errorf("failed to delete favourites by user ID: %w", result.Error)
+	}
+	return nil
+}
+
+func (r *MemoryRepository) DeleteFavouritesByMemoryID(ctx context.Context, tx *gorm.DB, memoryID uint) error {
+	db := r.getDB(tx).WithContext(ctx)
+	result := db.Unscoped().Where("memory_id = ?", memoryID).Delete(&models.Favourite{})
+	if result.Error != nil {
+		log.Printf("MemoryRepository: Failed to delete favourites by memory ID: %v", result.Error)
+		return fmt.Errorf("failed to delete favourites by memory ID: %w", result.Error)
 	}
 	return nil
 }

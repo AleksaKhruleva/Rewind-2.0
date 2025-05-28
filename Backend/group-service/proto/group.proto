@@ -13,6 +13,7 @@ service GroupService {
   rpc GetGroup (GetGroupRequest) returns (GetGroupResponse);
   rpc UpdateGroup (UpdateGroupRequest) returns (UpdateGroupResponse);
   rpc DeleteGroup (DeleteGroupRequest) returns (DeleteGroupResponse);
+  rpc DeleteGroupAvatar (DeleteGroupAvatarRequest) returns (DeleteGroupAvatarResponse);
 
   rpc ListGroupMembers (ListGroupMembersRequest) returns (ListGroupMembersResponse);
   rpc RemoveGroupMember (RemoveGroupMemberRequest) returns (RemoveGroupMemberResponse);
@@ -22,6 +23,9 @@ service GroupService {
   rpc AcceptGroupInvitation (AcceptGroupInvitationRequest) returns (AcceptGroupInvitationResponse);
 
   rpc ListUserGroups (ListUserGroupsRequest) returns (ListUserGroupsResponse);
+
+  rpc GroupMemberAddedMemory (GroupMemberAddedMemoryRequest) returns (GroupMemberAddedMemoryResponse);
+  rpc GroupMemberViewedMemories (GroupMemberViewedMemoriesRequest) returns (GroupMemberViewedMemoriesResponse);
 }
 
 // GroupMessage представляет структуру группы
@@ -179,6 +183,7 @@ message AcceptGroupInvitationRequest {
 message AcceptGroupInvitationResponse {
   GroupMember group_member = 1; // Информация о только что созданном участии
   Group group = 2; // Возможно, вернуть информацию о группе, к которой присоединился
+  uint64 inviter_user_id = 3; // ID пользователя, который создал приглашение
 }
 
 // Запрос на получение списка групп пользователя
@@ -197,4 +202,32 @@ message ListUserGroupsResponse {
   //    bool is_admin = 2;
   // }
   // repeated UserGroupDetails user_groups = 1;
+}
+
+message DeleteGroupAvatarRequest {
+  uint64 requesting_user_id = 1; // ID пользователя, обновляющего группу
+  uint64 group_id = 2;
+}
+
+message DeleteGroupAvatarResponse {
+  bool success = 1;
+}
+
+message GroupMemberAddedMemoryRequest {
+  uint64 group_id = 1;
+  uint64 user_id = 2;
+}
+
+message GroupMemberAddedMemoryResponse {
+  bool success = 1;
+}
+
+message GroupMemberViewedMemoriesRequest {
+  uint64 group_id = 1;
+  uint64 user_id = 2;
+  uint64 count = 3;
+}
+
+message GroupMemberViewedMemoriesResponse {
+  bool success = 1;
 }

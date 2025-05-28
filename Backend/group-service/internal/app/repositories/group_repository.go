@@ -5,8 +5,9 @@ import (
 	"errors"
 	"time"
 
-	"Rewind-group-service/internal/app/models"
 	"gorm.io/gorm"
+
+	"Rewind-group-service/internal/app/models"
 )
 
 // gormRepository реализует интерфейс Repository с использованием GORM
@@ -174,7 +175,7 @@ func (r *gormGroupMemberRepository) ListMembersByGroup(ctx context.Context, tx *
 
 func (r *gormGroupMemberRepository) DeleteMember(ctx context.Context, tx *gorm.DB, memberID uint) error {
 	db := r.getDB(tx).WithContext(ctx)
-	result := db.Delete(&models.GroupMember{}, memberID)
+	result := db.Unscoped().Delete(&models.GroupMember{}, memberID)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -213,7 +214,7 @@ func (r *gormGroupMemberRepository) ListGroupsByUserID(ctx context.Context, tx *
 	var groups []models.Group
 	result := db.
 		Joins("JOIN group_members ON groups.id = group_members.group_id").
-		Where("group_members.user_id = ?", userID).
+		Where("group_members.user_id = ? AND group_members.deleted_at IS NULL", userID).
 		Find(&groups)
 	if result.Error != nil {
 		return nil, result.Error
@@ -278,6 +279,32 @@ func (r *gormGroupMemberRepository) CheckUserInGroup(ctx context.Context, tx *go
 	return true, groupMember.IsAdmin, nil
 }
 
+func (r *gormGroupMemberRepository) GroupMemberAddMemory(ctx context.Context, tx *gorm.DB, groupID uint, userID uint) error {
+	db := r.getDB(tx).WithContext(ctx)
+	result := db.Model(&models.GroupMember{}).Where("group_id = ? AND user_id = ?", groupID, userID).Update("memories_added_count", gorm.Expr("memories_added_count + 1"))
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
+
+func (r *gormGroupMemberRepository) GroupMemberViewMemories(ctx context.Context, tx *gorm.DB, groupID, userID, count uint) error {
+	db := r.getDB(tx).WithContext(ctx)
+	result := db.Model(&models.GroupMember{}).
+		Where("group_id = ? AND user_id = ?", groupID, userID).
+		Update("memories_viewed_count", gorm.Expr("memories_viewed_count + ?", count))
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
+
 type gormGroupInvitationRepository struct {
 	db *gorm.DB
 }
@@ -297,7 +324,9 @@ func (r *gormGroupInvitationRepository) CreateInvitation(ctx context.Context, tx
 func (r *gormGroupInvitationRepository) GetInvitationByCode(ctx context.Context, tx *gorm.DB, invitationCode string) (*models.GroupInvitation, error) {
 	db := r.getDB(tx).WithContext(ctx)
 	var invitation models.GroupInvitation
-	result := db.Where("invitation_code = ?", invitationCode).First(&invitation)
+	result := db.Where("invitation_code = ?", invitationCode).
+		Where("expires_at > ?", time.Now()). // Add this line to check expiration
+		First(&invitation)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -352,6 +381,16 @@ func (r *gormGroupInvitationRepository) HardDeleteInvitationsByGroup(ctx context
 	db := r.getDB(tx).WithContext(ctx)
 	// Unscoped() для жесткого удаления, Where по group_id
 	result := db.Unscoped().Where("group_id = ?", groupID).Delete(&models.GroupInvitation{})
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (r *gormGroupInvitationRepository) HardDeleteInvitationsByUserID(ctx context.Context, tx *gorm.DB, userID uint) error {
+	db := r.getDB(tx).WithContext(ctx)
+	// Unscoped() для жесткого удаления
+	result := db.Unscoped().Where("created_by_user_id = ?", userID).Delete(&models.GroupInvitation{})
 	if result.Error != nil {
 		return result.Error
 	}

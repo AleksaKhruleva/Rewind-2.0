@@ -363,10 +363,13 @@ func (h *AuthHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responseBody := responses.GetUserByIDResponse{
-		ID:       userPB.GetId(),
-		Username: userPB.GetUsername(),
-		Email:    userPB.GetEmail(),
-		Image:    userPB.GetImage(),
+		ID:                  userPB.GetId(),
+		Username:            userPB.GetUsername(),
+		Email:               userPB.GetEmail(),
+		Image:               userPB.GetImage(),
+		MemoriesAddedCount:  userPB.GetMemoriesAddedCount(),
+		InvitedMembersCount: userPB.GetInvitedMembersCount(),
+		MemoriesViewedCount: userPB.GetMemoriesViewedCount(),
 	}
 
 	respondJSON(w, http.StatusOK, responseBody)
@@ -555,6 +558,38 @@ func (h *AuthHandler) UpdateAvatar(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responseBody := responses.UpdateAvatarResponse{
+		Success: resp.GetSuccess(),
+	}
+
+	respondJSON(w, http.StatusOK, responseBody)
+}
+
+// DeleteAvatar обработчик для DELETE /api/users/avatar.
+// @Summary Delete user avatar.
+// @Description Deletes the avatar for the authenticated user.
+// @Tags users
+// @Produce json
+// @Success 200 {object} responses.DeleteAvatarResponse "Avatar successfully deleted".
+// @Failure 401 {object} responses.ErrorResponse "Unauthorized - Missing or invalid API key".
+// @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
+// @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Security ApiKeyAuth
+// @Router /api/users/avatar [delete].
+func (h *AuthHandler) DeleteAvatar(w http.ResponseWriter, r *http.Request) {
+	resp, err := h.authService.DeleteAvatar(r.Context())
+	if err != nil {
+		handleServiceError(w, err, "DeleteAvatar")
+		return
+	}
+
+	if !resp.GetSuccess() {
+		// This case might indicate a logical failure in the service that wasn't mapped to a gRPC error code
+		log.Printf("AuthHandler.DeleteAvatar: Service reported failure for")
+		respondError(w, http.StatusInternalServerError, "Failed to delete avatar")
+		return
+	}
+
+	responseBody := responses.DeleteAvatarResponse{
 		Success: resp.GetSuccess(),
 	}
 

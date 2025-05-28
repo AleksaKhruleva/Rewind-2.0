@@ -3,6 +3,8 @@ package services
 import (
 	"context"
 	"log"
+	"strings"
+	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -20,7 +22,8 @@ import (
 // Methods accept simple data types and return protobuf messages from the microservice.
 // The requesting user's ID is extracted from the context.
 type MemoryServiceInterface interface {
-	CreateMemory(ctx context.Context, req *requests.CreateMemoryRequest, mediaFileBytes []byte) (*pb.CreateMemoryResponse, error)
+	CreateMemory(ctx context.Context, req *requests.CreateMemoryRequest, mediaFileBytes []byte) (*responses.MemoryResponse, error)
+	GetMemory(ctx context.Context, req *requests.GetMemoryRequest) (*responses.DetailedMemoryResponse, error)
 	DeleteMemory(ctx context.Context, req *requests.DeleteMemoryRequest) (*pb.DeleteMemoryResponse, error)
 	ListMemoriesByGroup(ctx context.Context, req *requests.ListMemoriesByGroupRequest) ([]responses.DetailedMemoryResponse, error)
 	ListMemoriesByGroupWithFilters(ctx context.Context, req *requests.ListMemoriesByGroupWithFiltersRequest) ([]responses.DetailedMemoryResponse, error)
@@ -83,7 +86,7 @@ func (s *MemoryService) verifyUserExists(ctx context.Context, userID uint64, gro
 }
 
 // CreateMemory calls the CreateMemory RPC method in Memory-Service.
-func (s *MemoryService) CreateMemory(ctx context.Context, req *requests.CreateMemoryRequest, mediaFileBytes []byte) (*pb.CreateMemoryResponse, error) {
+func (s *MemoryService) CreateMemory(ctx context.Context, req *requests.CreateMemoryRequest, mediaFileBytes []byte) (*responses.MemoryResponse, error) {
 	userID, err := GetRequestingUserIDFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -113,7 +116,89 @@ func (s *MemoryService) CreateMemory(ctx context.Context, req *requests.CreateMe
 		Tags:      req.Tags,
 	}
 
-	return s.memoryClient.CreateMemory(ctx, pbReq)
+	resp, err := s.memoryClient.CreateMemory(ctx, pbReq)
+	if err != nil {
+		return nil, err
+	}
+
+	userContext, userCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	go func() {
+		defer userCancel()
+		_, err2 := s.authClient.UserAddedMemory(userContext, &pb.UserAddedMemoryRequest{UserId: userID})
+		if err2 != nil {
+			log.Printf("API GW UserService: Failed to increment memory count to user with ID %d", userID)
+			return
+		}
+	}()
+
+	groupContext, groupCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	go func() {
+		defer groupCancel()
+		_, err2 := s.groupClient.GroupMemberAddedMemory(groupContext, &pb.GroupMemberAddedMemoryRequest{GroupId: req.GroupID, UserId: userID})
+		if err2 != nil {
+			log.Printf("API GW MemoryService: Failed to increment memory count to group member with userID %d", userID)
+			return
+		}
+	}()
+
+	return s.AddUserInfoToMemory(ctx, resp.GetMemory())
+}
+
+// GetMemory calls the GetMemory RPC method in Memory-Service.
+func (s *MemoryService) GetMemory(ctx context.Context, req *requests.GetMemoryRequest) (*responses.DetailedMemoryResponse, error) {
+	userID, err := GetRequestingUserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("API GW MemoryService: Calling GetMemory RPC for user %d", userID)
+
+	if _, err := s.verifyUserExists(ctx, userID, &req.GroupID); err != nil {
+		return nil, err
+	}
+
+	pbReq := &pb.GetMemoryRequest{
+		MemoryId: req.MemoryID,
+		UserId:   userID,
+	}
+
+	resp, err := s.memoryClient.GetMemory(ctx, pbReq)
+	if err != nil {
+		return nil, err
+	}
+	memories, err := s.AddUserInfoToDetailedMemories(ctx, []*pb.DetailedMemory{resp.GetMemory()})
+	if err != nil {
+		return nil, err
+	}
+	if len(memories) != 1 {
+		log.Printf("API GW MemoryService: Unexpected number of memories returned on get")
+		return nil, status.Errorf(codes.Internal, "unexpected number of memories returned")
+	}
+	return &memories[0], nil
+}
+
+func (s *MemoryService) AddUserInfoToMemory(ctx context.Context, memory *pb.Memory) (*responses.MemoryResponse, error) {
+	userID := memory.UserId
+	user, err := s.authClient.GetUserByID(ctx, &pb.GetUserByIDRequest{UserId: userID})
+	if err != nil {
+		return nil, err
+	}
+	respMemory := &responses.MemoryResponse{
+		Id:        memory.GetId(),
+		GroupID:   memory.GetGroupId(),
+		UserID:    memory.GetUserId(),
+		Username:  user.GetUser().GetUsername(),
+		UserImage: user.GetUser().GetImage(),
+		MediaType: memory.GetMediaType().String(),
+		MediaURL:  memory.GetMediaUrl(),
+		Latitude:  memory.GetLatitude(),
+		Longitude: memory.GetLongitude(),
+		MusicID:   memory.GetMusicId(),
+		Offset:    memory.GetOffset(),
+		Duration:  memory.GetDuration(),
+		CreatedAt: memory.GetCreatedAt().AsTime(),
+		UpdatedAt: memory.GetUpdatedAt().AsTime(),
+	}
+	return respMemory, nil
 }
 
 // DeleteMemory calls the DeleteMemory RPC method in Memory-Service.
@@ -161,10 +246,10 @@ func (s *MemoryService) ListMemoriesByGroup(ctx context.Context, req *requests.L
 		return nil, err
 	}
 
-	return s.AddUserInfoToMemories(ctx, resp.GetMemories())
+	return s.AddUserInfoToDetailedMemories(ctx, resp.GetMemories())
 }
 
-func (s *MemoryService) AddUserInfoToMemories(ctx context.Context, detailedMemories []*pb.DetailedMemory) ([]responses.DetailedMemoryResponse, error) {
+func (s *MemoryService) AddUserInfoToDetailedMemories(ctx context.Context, detailedMemories []*pb.DetailedMemory) ([]responses.DetailedMemoryResponse, error) {
 	userIDs := make([]uint64, len(detailedMemories))
 	for i, m := range detailedMemories {
 		userIDs[i] = m.GetMemory().GetUserId()
@@ -233,11 +318,15 @@ func (s *MemoryService) ListMemoriesByGroupWithFilters(ctx context.Context, req 
 		NumberOfMemories: req.NumberOfMemories,
 	}
 
-	mediaType, found := req.Filters["media_type"]
+	mtRaw, found := req.Filters["media_type"]
 	if found {
-		mediaTypeValue, ok := pb.MediaType_value[mediaType]
-		if !ok || mediaTypeValue == int32(pb.MediaType_UNSPECIFIED) {
-			return nil, status.Errorf(codes.InvalidArgument, "invalid mediaType: %s", mediaType)
+		values := strings.Split(mtRaw, ",")
+		for _, v := range values {
+			v = strings.TrimSpace(v)
+			enumValue, ok := pb.MediaType_value[v]
+			if !ok || enumValue == int32(pb.MediaType_UNSPECIFIED) {
+				return nil, status.Errorf(codes.InvalidArgument, "invalid media_type value: %s", v)
+			}
 		}
 	}
 
@@ -249,7 +338,7 @@ func (s *MemoryService) ListMemoriesByGroupWithFilters(ctx context.Context, req 
 	if err != nil {
 		return nil, err
 	}
-	return s.AddUserInfoToMemories(ctx, resp.GetMemories())
+	return s.AddUserInfoToDetailedMemories(ctx, resp.GetMemories())
 }
 
 // CreateMemoryTag calls the CreateMemoryTag RPC method in Memory-Service.

@@ -18,6 +18,12 @@ type DeleteMemoryRequest struct {
 	MemoryID uint64 `json:"memoryId"`
 }
 
+// GetMemoryRequest represents the HTTP request for deleting a memory.
+type GetMemoryRequest struct {
+	GroupID  uint64 `json:"groupId"`
+	MemoryID uint64 `json:"memoryId"`
+}
+
 // ListMemoriesByGroupRequest represents the HTTP request for listing memories by group.
 type ListMemoriesByGroupRequest struct {
 	GroupID uint64 `json:"groupId"`

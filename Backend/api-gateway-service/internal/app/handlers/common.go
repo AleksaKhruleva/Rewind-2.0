@@ -68,6 +68,8 @@ func handleServiceError(w http.ResponseWriter, err error, action string) {
 			respondError(w, http.StatusConflict, st.Message())
 		case codes.Unavailable:
 			respondError(w, http.StatusServiceUnavailable, "Service is unavailable. Please try again later.")
+		case codes.DeadlineExceeded:
+			respondError(w, http.StatusGatewayTimeout, st.Message())
 		default:
 			// Для всех остальных ошибок gRPC (Internal, Unknown, etc.) возвращаем Internal Server Error
 			respondError(w, http.StatusInternalServerError, "Internal Server Error from service")

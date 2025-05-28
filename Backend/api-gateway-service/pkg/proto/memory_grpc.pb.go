@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	MemoryService_CreateMemory_FullMethodName                   = "/memory.MemoryService/CreateMemory"
+	MemoryService_GetMemory_FullMethodName                      = "/memory.MemoryService/GetMemory"
 	MemoryService_DeleteMemory_FullMethodName                   = "/memory.MemoryService/DeleteMemory"
 	MemoryService_DeleteMemoriesByGroup_FullMethodName          = "/memory.MemoryService/DeleteMemoriesByGroup"
 	MemoryService_ListMemoriesByGroup_FullMethodName            = "/memory.MemoryService/ListMemoriesByGroup"
@@ -39,6 +40,7 @@ const (
 // Сервис для работы с воспоминаниями
 type MemoryServiceClient interface {
 	CreateMemory(ctx context.Context, in *CreateMemoryRequest, opts ...grpc.CallOption) (*CreateMemoryResponse, error)
+	GetMemory(ctx context.Context, in *GetMemoryRequest, opts ...grpc.CallOption) (*GetMemoryResponse, error)
 	DeleteMemory(ctx context.Context, in *DeleteMemoryRequest, opts ...grpc.CallOption) (*DeleteMemoryResponse, error)
 	DeleteMemoriesByGroup(ctx context.Context, in *DeleteMemoriesByGroupRequest, opts ...grpc.CallOption) (*DeleteMemoriesByGroupResponse, error)
 	ListMemoriesByGroup(ctx context.Context, in *ListMemoriesByGroupRequest, opts ...grpc.CallOption) (*ListMemoriesByGroupResponse, error)
@@ -63,6 +65,16 @@ func (c *memoryServiceClient) CreateMemory(ctx context.Context, in *CreateMemory
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CreateMemoryResponse)
 	err := c.cc.Invoke(ctx, MemoryService_CreateMemory_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *memoryServiceClient) GetMemory(ctx context.Context, in *GetMemoryRequest, opts ...grpc.CallOption) (*GetMemoryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetMemoryResponse)
+	err := c.cc.Invoke(ctx, MemoryService_GetMemory_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -176,6 +188,7 @@ func (c *memoryServiceClient) DeleteFavouritesByUserID(ctx context.Context, in *
 // Сервис для работы с воспоминаниями
 type MemoryServiceServer interface {
 	CreateMemory(context.Context, *CreateMemoryRequest) (*CreateMemoryResponse, error)
+	GetMemory(context.Context, *GetMemoryRequest) (*GetMemoryResponse, error)
 	DeleteMemory(context.Context, *DeleteMemoryRequest) (*DeleteMemoryResponse, error)
 	DeleteMemoriesByGroup(context.Context, *DeleteMemoriesByGroupRequest) (*DeleteMemoriesByGroupResponse, error)
 	ListMemoriesByGroup(context.Context, *ListMemoriesByGroupRequest) (*ListMemoriesByGroupResponse, error)
@@ -198,6 +211,9 @@ type UnimplementedMemoryServiceServer struct{}
 
 func (UnimplementedMemoryServiceServer) CreateMemory(context.Context, *CreateMemoryRequest) (*CreateMemoryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateMemory not implemented")
+}
+func (UnimplementedMemoryServiceServer) GetMemory(context.Context, *GetMemoryRequest) (*GetMemoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMemory not implemented")
 }
 func (UnimplementedMemoryServiceServer) DeleteMemory(context.Context, *DeleteMemoryRequest) (*DeleteMemoryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteMemory not implemented")
@@ -264,6 +280,24 @@ func _MemoryService_CreateMemory_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MemoryServiceServer).CreateMemory(ctx, req.(*CreateMemoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MemoryService_GetMemory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMemoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MemoryServiceServer).GetMemory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MemoryService_GetMemory_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MemoryServiceServer).GetMemory(ctx, req.(*GetMemoryRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -458,6 +492,10 @@ var MemoryService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateMemory",
 			Handler:    _MemoryService_CreateMemory_Handler,
+		},
+		{
+			MethodName: "GetMemory",
+			Handler:    _MemoryService_GetMemory_Handler,
 		},
 		{
 			MethodName: "DeleteMemory",

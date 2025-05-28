@@ -162,32 +162,10 @@ func (h *MemoryHandler) CreateMemory(w http.ResponseWriter, r *http.Request) {
 		Tags:      tags,
 	}
 
-	resp, err := h.memoryService.CreateMemory(r.Context(), &req, mediaFileBytes)
+	responseBody, err := h.memoryService.CreateMemory(r.Context(), &req, mediaFileBytes)
 	if err != nil {
 		handleServiceError(w, err, "CreateMemory")
 		return
-	}
-
-	memory := resp.GetMemory()
-	if memory == nil {
-		log.Println("MemoryHandler.CreateMemory: Service returned success but memory is nil")
-		respondError(w, http.StatusInternalServerError, "Failed to create memory: unexpected service response")
-		return
-	}
-
-	responseBody := responses.MemoryResponse{
-		Id:        memory.GetId(),
-		GroupID:   memory.GetGroupId(),
-		UserID:    memory.GetUserId(),
-		MediaType: memory.MediaType.String(),
-		MediaURL:  memory.GetMediaUrl(),
-		Latitude:  memory.GetLatitude(),
-		Longitude: memory.GetLongitude(),
-		MusicID:   memory.GetMusicId(),
-		Offset:    memory.GetOffset(),
-		Duration:  memory.GetDuration(),
-		CreatedAt: memory.GetCreatedAt().AsTime(),
-		UpdatedAt: memory.GetUpdatedAt().AsTime(),
 	}
 
 	respondJSON(w, http.StatusOK, responseBody)
@@ -198,8 +176,8 @@ func (h *MemoryHandler) CreateMemory(w http.ResponseWriter, r *http.Request) {
 // @Tags memories
 // @Accept json
 // @Produce json
-// @Param memoryId path int true "Memory ID"
 // @Param groupId path int true "Group ID"
+// @Param memoryId path int true "Memory ID"
 // @Success 200 {object} responses.DeleteMemoryResponse "Successfully deleted memory"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid memory ID"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
@@ -247,6 +225,50 @@ func (h *MemoryHandler) DeleteMemory(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, responseBody)
 }
 
+// GetMemory handles GET /api/groups/{groupId}/memories/{memoryId}
+// @Summary Get a memory by ID
+// @Tags memories
+// @Accept json
+// @Produce json
+// @Param groupId path int true "Group ID"
+// @Param memoryId path int true "Memory ID"
+// @Success 200 {object} responses.DetailedMemoryResponse "Successfully got memory"
+// @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid memory ID"
+// @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
+// @Failure 403 {object} responses.ErrorResponse "Forbidden - Permission denied by service"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - Memory not found"
+// @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
+// @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Security ApiKeyAuth
+// @Router /api/groups/{groupId}/memories/{memoryId} [get]
+func (h *MemoryHandler) GetMemory(w http.ResponseWriter, r *http.Request) {
+	groupIDStr := chi.URLParam(r, "groupId")
+	groupID, err := strconv.ParseUint(groupIDStr, 10, 64)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid memory ID")
+		return
+	}
+	memoryIDStr := chi.URLParam(r, "memoryId")
+	memoryID, err := strconv.ParseUint(memoryIDStr, 10, 64)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid memory ID")
+		return
+	}
+
+	req := requests.GetMemoryRequest{
+		GroupID:  groupID,
+		MemoryID: memoryID,
+	}
+
+	responseBody, err := h.memoryService.GetMemory(r.Context(), &req)
+	if err != nil {
+		handleServiceError(w, err, "GetMemory")
+		return
+	}
+
+	respondJSON(w, http.StatusOK, responseBody)
+}
+
 // ListMemoriesByGroup handles GET /api/groups/{groupId}/memories
 // @Summary List memories by group
 // @Tags memories
@@ -289,7 +311,7 @@ func (h *MemoryHandler) ListMemoriesByGroup(w http.ResponseWriter, r *http.Reque
 // @Accept json
 // @Produce json
 // @Param groupId path int true "Group ID"
-// @Param media_type query string false "Filter by media type (image, video, quote)"
+// @Param media_type query string false "Filter by media type (image, video, quote) (comma-separated)"
 // @Param is_favourite query string false "Filter by favourite status (true, false)"
 // @Param start_time query string false "Filter by start time (ISO 8601 format)"
 // @Param end_time query string false "Filter by end time (ISO 8601 format)"

@@ -138,3 +138,23 @@ func (c *AuthServiceClient) VerifyPasswordResetCode(ctx context.Context, req *pb
 func (c *AuthServiceClient) SetNewPassword(ctx context.Context, req *pb.SetNewPasswordRequest) (*pb.SetNewPasswordResponse, error) {
 	return c.client.SetNewPassword(ctx, req)
 }
+
+// DeleteAvatar вызывает метод DeleteAvatar сервиса аутентификации
+func (c *AuthServiceClient) DeleteAvatar(ctx context.Context, req *pb.DeleteAvatarRequest) (*pb.DeleteAvatarResponse, error) {
+	return c.client.DeleteAvatar(ctx, req)
+}
+
+// UserAddedMemory вызывает метод UserAddedMemory сервиса аутентификации
+func (c *AuthServiceClient) UserAddedMemory(ctx context.Context, req *pb.UserAddedMemoryRequest) (*pb.UserAddedMemoryResponse, error) {
+	return c.client.UserAddedMemory(ctx, req)
+}
+
+// UserInvitedMember вызывает метод UserInvitedMember сервиса аутентификации
+func (c *AuthServiceClient) UserInvitedMember(ctx context.Context, req *pb.UserInvitedMemberRequest) (*pb.UserInvitedMemberResponse, error) {
+	return c.client.UserInvitedMember(ctx, req)
+}
+
+// UserViewedMemories вызывает метод UserViewedMemories сервиса аутентификации
+func (c *AuthServiceClient) UserViewedMemories(ctx context.Context, req *pb.UserViewedMemoriesRequest) (*pb.UserViewedMemoriesResponse, error) {
+	return c.client.UserViewedMemories(ctx, req)
+}

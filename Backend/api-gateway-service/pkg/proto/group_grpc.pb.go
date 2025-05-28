@@ -19,16 +19,19 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	GroupService_CreateGroup_FullMethodName           = "/group.GroupService/CreateGroup"
-	GroupService_GetGroup_FullMethodName              = "/group.GroupService/GetGroup"
-	GroupService_UpdateGroup_FullMethodName           = "/group.GroupService/UpdateGroup"
-	GroupService_DeleteGroup_FullMethodName           = "/group.GroupService/DeleteGroup"
-	GroupService_ListGroupMembers_FullMethodName      = "/group.GroupService/ListGroupMembers"
-	GroupService_RemoveGroupMember_FullMethodName     = "/group.GroupService/RemoveGroupMember"
-	GroupService_CheckUserInGroup_FullMethodName      = "/group.GroupService/CheckUserInGroup"
-	GroupService_CreateGroupInvitation_FullMethodName = "/group.GroupService/CreateGroupInvitation"
-	GroupService_AcceptGroupInvitation_FullMethodName = "/group.GroupService/AcceptGroupInvitation"
-	GroupService_ListUserGroups_FullMethodName        = "/group.GroupService/ListUserGroups"
+	GroupService_CreateGroup_FullMethodName               = "/group.GroupService/CreateGroup"
+	GroupService_GetGroup_FullMethodName                  = "/group.GroupService/GetGroup"
+	GroupService_UpdateGroup_FullMethodName               = "/group.GroupService/UpdateGroup"
+	GroupService_DeleteGroup_FullMethodName               = "/group.GroupService/DeleteGroup"
+	GroupService_DeleteGroupAvatar_FullMethodName         = "/group.GroupService/DeleteGroupAvatar"
+	GroupService_ListGroupMembers_FullMethodName          = "/group.GroupService/ListGroupMembers"
+	GroupService_RemoveGroupMember_FullMethodName         = "/group.GroupService/RemoveGroupMember"
+	GroupService_CheckUserInGroup_FullMethodName          = "/group.GroupService/CheckUserInGroup"
+	GroupService_CreateGroupInvitation_FullMethodName     = "/group.GroupService/CreateGroupInvitation"
+	GroupService_AcceptGroupInvitation_FullMethodName     = "/group.GroupService/AcceptGroupInvitation"
+	GroupService_ListUserGroups_FullMethodName            = "/group.GroupService/ListUserGroups"
+	GroupService_GroupMemberAddedMemory_FullMethodName    = "/group.GroupService/GroupMemberAddedMemory"
+	GroupService_GroupMemberViewedMemories_FullMethodName = "/group.GroupService/GroupMemberViewedMemories"
 )
 
 // GroupServiceClient is the client API for GroupService service.
@@ -41,12 +44,15 @@ type GroupServiceClient interface {
 	GetGroup(ctx context.Context, in *GetGroupRequest, opts ...grpc.CallOption) (*GetGroupResponse, error)
 	UpdateGroup(ctx context.Context, in *UpdateGroupRequest, opts ...grpc.CallOption) (*UpdateGroupResponse, error)
 	DeleteGroup(ctx context.Context, in *DeleteGroupRequest, opts ...grpc.CallOption) (*DeleteGroupResponse, error)
+	DeleteGroupAvatar(ctx context.Context, in *DeleteGroupAvatarRequest, opts ...grpc.CallOption) (*DeleteGroupAvatarResponse, error)
 	ListGroupMembers(ctx context.Context, in *ListGroupMembersRequest, opts ...grpc.CallOption) (*ListGroupMembersResponse, error)
 	RemoveGroupMember(ctx context.Context, in *RemoveGroupMemberRequest, opts ...grpc.CallOption) (*RemoveGroupMemberResponse, error)
 	CheckUserInGroup(ctx context.Context, in *CheckUserInGroupRequest, opts ...grpc.CallOption) (*CheckUserInGroupResponse, error)
 	CreateGroupInvitation(ctx context.Context, in *CreateGroupInvitationRequest, opts ...grpc.CallOption) (*CreateGroupInvitationResponse, error)
 	AcceptGroupInvitation(ctx context.Context, in *AcceptGroupInvitationRequest, opts ...grpc.CallOption) (*AcceptGroupInvitationResponse, error)
 	ListUserGroups(ctx context.Context, in *ListUserGroupsRequest, opts ...grpc.CallOption) (*ListUserGroupsResponse, error)
+	GroupMemberAddedMemory(ctx context.Context, in *GroupMemberAddedMemoryRequest, opts ...grpc.CallOption) (*GroupMemberAddedMemoryResponse, error)
+	GroupMemberViewedMemories(ctx context.Context, in *GroupMemberViewedMemoriesRequest, opts ...grpc.CallOption) (*GroupMemberViewedMemoriesResponse, error)
 }
 
 type groupServiceClient struct {
@@ -91,6 +97,16 @@ func (c *groupServiceClient) DeleteGroup(ctx context.Context, in *DeleteGroupReq
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DeleteGroupResponse)
 	err := c.cc.Invoke(ctx, GroupService_DeleteGroup_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupServiceClient) DeleteGroupAvatar(ctx context.Context, in *DeleteGroupAvatarRequest, opts ...grpc.CallOption) (*DeleteGroupAvatarResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteGroupAvatarResponse)
+	err := c.cc.Invoke(ctx, GroupService_DeleteGroupAvatar_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -157,6 +173,26 @@ func (c *groupServiceClient) ListUserGroups(ctx context.Context, in *ListUserGro
 	return out, nil
 }
 
+func (c *groupServiceClient) GroupMemberAddedMemory(ctx context.Context, in *GroupMemberAddedMemoryRequest, opts ...grpc.CallOption) (*GroupMemberAddedMemoryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GroupMemberAddedMemoryResponse)
+	err := c.cc.Invoke(ctx, GroupService_GroupMemberAddedMemory_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupServiceClient) GroupMemberViewedMemories(ctx context.Context, in *GroupMemberViewedMemoriesRequest, opts ...grpc.CallOption) (*GroupMemberViewedMemoriesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GroupMemberViewedMemoriesResponse)
+	err := c.cc.Invoke(ctx, GroupService_GroupMemberViewedMemories_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GroupServiceServer is the server API for GroupService service.
 // All implementations must embed UnimplementedGroupServiceServer
 // for forward compatibility.
@@ -167,12 +203,15 @@ type GroupServiceServer interface {
 	GetGroup(context.Context, *GetGroupRequest) (*GetGroupResponse, error)
 	UpdateGroup(context.Context, *UpdateGroupRequest) (*UpdateGroupResponse, error)
 	DeleteGroup(context.Context, *DeleteGroupRequest) (*DeleteGroupResponse, error)
+	DeleteGroupAvatar(context.Context, *DeleteGroupAvatarRequest) (*DeleteGroupAvatarResponse, error)
 	ListGroupMembers(context.Context, *ListGroupMembersRequest) (*ListGroupMembersResponse, error)
 	RemoveGroupMember(context.Context, *RemoveGroupMemberRequest) (*RemoveGroupMemberResponse, error)
 	CheckUserInGroup(context.Context, *CheckUserInGroupRequest) (*CheckUserInGroupResponse, error)
 	CreateGroupInvitation(context.Context, *CreateGroupInvitationRequest) (*CreateGroupInvitationResponse, error)
 	AcceptGroupInvitation(context.Context, *AcceptGroupInvitationRequest) (*AcceptGroupInvitationResponse, error)
 	ListUserGroups(context.Context, *ListUserGroupsRequest) (*ListUserGroupsResponse, error)
+	GroupMemberAddedMemory(context.Context, *GroupMemberAddedMemoryRequest) (*GroupMemberAddedMemoryResponse, error)
+	GroupMemberViewedMemories(context.Context, *GroupMemberViewedMemoriesRequest) (*GroupMemberViewedMemoriesResponse, error)
 	mustEmbedUnimplementedGroupServiceServer()
 }
 
@@ -195,6 +234,9 @@ func (UnimplementedGroupServiceServer) UpdateGroup(context.Context, *UpdateGroup
 func (UnimplementedGroupServiceServer) DeleteGroup(context.Context, *DeleteGroupRequest) (*DeleteGroupResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteGroup not implemented")
 }
+func (UnimplementedGroupServiceServer) DeleteGroupAvatar(context.Context, *DeleteGroupAvatarRequest) (*DeleteGroupAvatarResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteGroupAvatar not implemented")
+}
 func (UnimplementedGroupServiceServer) ListGroupMembers(context.Context, *ListGroupMembersRequest) (*ListGroupMembersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListGroupMembers not implemented")
 }
@@ -212,6 +254,12 @@ func (UnimplementedGroupServiceServer) AcceptGroupInvitation(context.Context, *A
 }
 func (UnimplementedGroupServiceServer) ListUserGroups(context.Context, *ListUserGroupsRequest) (*ListUserGroupsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListUserGroups not implemented")
+}
+func (UnimplementedGroupServiceServer) GroupMemberAddedMemory(context.Context, *GroupMemberAddedMemoryRequest) (*GroupMemberAddedMemoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GroupMemberAddedMemory not implemented")
+}
+func (UnimplementedGroupServiceServer) GroupMemberViewedMemories(context.Context, *GroupMemberViewedMemoriesRequest) (*GroupMemberViewedMemoriesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GroupMemberViewedMemories not implemented")
 }
 func (UnimplementedGroupServiceServer) mustEmbedUnimplementedGroupServiceServer() {}
 func (UnimplementedGroupServiceServer) testEmbeddedByValue()                      {}
@@ -302,6 +350,24 @@ func _GroupService_DeleteGroup_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GroupServiceServer).DeleteGroup(ctx, req.(*DeleteGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GroupService_DeleteGroupAvatar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteGroupAvatarRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServiceServer).DeleteGroupAvatar(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GroupService_DeleteGroupAvatar_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServiceServer).DeleteGroupAvatar(ctx, req.(*DeleteGroupAvatarRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -414,6 +480,42 @@ func _GroupService_ListUserGroups_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GroupService_GroupMemberAddedMemory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GroupMemberAddedMemoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServiceServer).GroupMemberAddedMemory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GroupService_GroupMemberAddedMemory_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServiceServer).GroupMemberAddedMemory(ctx, req.(*GroupMemberAddedMemoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GroupService_GroupMemberViewedMemories_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GroupMemberViewedMemoriesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServiceServer).GroupMemberViewedMemories(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GroupService_GroupMemberViewedMemories_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServiceServer).GroupMemberViewedMemories(ctx, req.(*GroupMemberViewedMemoriesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // GroupService_ServiceDesc is the grpc.ServiceDesc for GroupService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -438,6 +540,10 @@ var GroupService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _GroupService_DeleteGroup_Handler,
 		},
 		{
+			MethodName: "DeleteGroupAvatar",
+			Handler:    _GroupService_DeleteGroupAvatar_Handler,
+		},
+		{
 			MethodName: "ListGroupMembers",
 			Handler:    _GroupService_ListGroupMembers_Handler,
 		},
@@ -460,6 +566,14 @@ var GroupService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListUserGroups",
 			Handler:    _GroupService_ListUserGroups_Handler,
+		},
+		{
+			MethodName: "GroupMemberAddedMemory",
+			Handler:    _GroupService_GroupMemberAddedMemory_Handler,
+		},
+		{
+			MethodName: "GroupMemberViewedMemories",
+			Handler:    _GroupService_GroupMemberViewedMemories_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

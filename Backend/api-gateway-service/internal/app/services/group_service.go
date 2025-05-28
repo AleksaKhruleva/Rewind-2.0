@@ -24,11 +24,13 @@ type GroupServiceInterface interface {
 	GetGroup(ctx context.Context, groupID uint64) (*pb.GetGroupResponse, error)
 	UpdateGroup(ctx context.Context, groupID uint64, name *string, imageData []byte) (*pb.UpdateGroupResponse, error)
 	DeleteGroup(ctx context.Context, groupID uint64) (*pb.DeleteGroupResponse, error)
+	DeleteAvatar(ctx context.Context, groupID uint64) (*pb.DeleteGroupAvatarResponse, error)
 	ListGroupMembers(ctx context.Context, groupID uint64) (*pb.ListGroupMembersResponse, error)
 	RemoveGroupMember(ctx context.Context, groupID uint64, userToRemoveID uint64) (*pb.RemoveGroupMemberResponse, error)
 	CreateGroupInvitation(ctx context.Context, groupID uint64, duration *time.Duration) (*pb.CreateGroupInvitationResponse, error)
 	AcceptGroupInvitation(ctx context.Context, invitationCode string) (*pb.AcceptGroupInvitationResponse, error)
 	ListUserGroups(ctx context.Context) (*pb.ListUserGroupsResponse, error)
+	IncrementMemoriesViewed(ctx context.Context, groupID, count uint64) (*pb.UserViewedMemoriesResponse, error)
 }
 
 // GroupService представляет сервис для взаимодействия с Group-Service через gRPC.
@@ -161,6 +163,26 @@ func (s *GroupService) DeleteGroup(ctx context.Context, groupID uint64) (*pb.Del
 	return s.groupClient.DeleteGroup(ctx, req)
 }
 
+// DeleteAvatar вызывает RPC метод DeleteAvatar в Group-Service.
+func (s *GroupService) DeleteAvatar(ctx context.Context, groupID uint64) (*pb.DeleteGroupAvatarResponse, error) {
+	requestingUserID, err := GetRequestingUserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("API GW GroupService: Calling DeleteGroupAvatar RPC for user %d, group %d", requestingUserID, groupID)
+
+	if err := s.verifyUserExists(ctx, requestingUserID); err != nil {
+		return nil, err
+	}
+
+	req := &pb.DeleteGroupAvatarRequest{
+		RequestingUserId: requestingUserID,
+		GroupId:          groupID,
+	}
+
+	return s.groupClient.DeleteGroupAvatar(ctx, req)
+}
+
 // ListGroupMembers вызывает RPC метод ListGroupMembers в Group-Service.
 // Group-Service, как предполагается, уже обогащает данные участников информацией о пользователях.
 func (s *GroupService) ListGroupMembers(ctx context.Context, groupID uint64) (*pb.ListGroupMembersResponse, error) {
@@ -253,7 +275,25 @@ func (s *GroupService) AcceptGroupInvitation(ctx context.Context, invitationCode
 		InvitationCode:   invitationCode,
 	}
 
-	return s.groupClient.AcceptGroupInvitation(ctx, req)
+	resp, err := s.groupClient.AcceptGroupInvitation(ctx, req)
+
+	if err != nil {
+		return nil, err
+	}
+
+	inviterUserID := resp.InviterUserId
+
+	newContext, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	go func() {
+		defer cancel()
+		_, err2 := s.authClient.UserInvitedMember(newContext, &pb.UserInvitedMemberRequest{UserId: inviterUserID})
+		if err2 != nil {
+			log.Printf("API GW UserService: Failed to increment invited members count to user with ID %d", inviterUserID)
+			return
+		}
+	}()
+
+	return resp, err
 }
 
 // ListUserGroups вызывает RPC метод ListUserGroups в Group-Service.
@@ -273,4 +313,44 @@ func (s *GroupService) ListUserGroups(ctx context.Context) (*pb.ListUserGroupsRe
 	}
 
 	return s.groupClient.ListUserGroups(ctx, req)
+}
+
+func (s *GroupService) IncrementMemoriesViewed(ctx context.Context, groupID, count uint64) (*pb.UserViewedMemoriesResponse, error) {
+	requestingUserID, err := GetRequestingUserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("API GW GroupService: Calling IncrementMemoriesViewed RPC for user %d", requestingUserID)
+
+	if err := s.verifyUserExists(ctx, requestingUserID); err != nil {
+		return nil, err
+	}
+
+	newContext, newCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	go func() {
+		defer newCancel()
+
+		reqGroup := &pb.GroupMemberViewedMemoriesRequest{
+			GroupId: groupID,
+			UserId:  requestingUserID,
+			Count:   count,
+		}
+
+		_, err2 := s.groupClient.GroupMemberViewedMemories(newContext, reqGroup)
+		if err2 != nil {
+			log.Printf("API GW GroupService: Failed to increment viewed memories count to group with ID %d and userID %d", groupID, requestingUserID)
+			return
+		}
+
+		req := &pb.UserViewedMemoriesRequest{
+			UserId: requestingUserID,
+			Count:  count,
+		}
+		_, err2 = s.authClient.UserViewedMemories(newContext, req)
+		if err2 != nil {
+			log.Printf("API GW UserService: Failed to increment viewed memories count to user with ID %d", requestingUserID)
+			return
+		}
+	}()
+	return &pb.UserViewedMemoriesResponse{Success: true}, nil
 }
