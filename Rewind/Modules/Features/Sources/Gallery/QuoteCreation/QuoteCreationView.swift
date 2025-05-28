@@ -107,6 +107,7 @@ public struct QuoteCreationView: View {
                     Spacer()
                     Text(viewModel.author)
                         .font(.system(size: 20, weight: .semibold, design: .monospaced))
+                        .padding(.bottom, 36)
                 }
             }
         }
@@ -194,10 +195,12 @@ public struct QuoteCreationView: View {
 
             print(trackInfo)
 
-            viewModel.dispatch(.saveQuote(AnyView(quoteContent)))
-
-            showToast(UIComponentsStrings.Quote.Toast.success)
-            router.pop()
+            viewModel.dispatch(.createQuote(AnyView(quoteContent))) {
+                showToast(UIComponentsStrings.Quote.Toast.success)
+                router.pop()
+            } onFailure: {
+                showToast(UIComponentsStrings.Toast.error)
+            }
         }
         .disabledWithOpacity(viewModel.quoteState == .empty)
     }
