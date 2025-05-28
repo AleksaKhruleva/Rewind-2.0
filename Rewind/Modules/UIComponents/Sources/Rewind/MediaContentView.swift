@@ -4,12 +4,14 @@ import Domain
 import Base
 
 public struct MediaContentView: View {
-    private let galleryItem: GalleryItem
+    private let galleryItem: GalleryItem?
     private let cornerRadius: CGFloat
     private let onSave: () -> Void
     private let onLike: (Bool) -> Void
     private let onToggleSound: () -> Void
     @Binding var isTrackPlaying: Bool
+
+    @State private var isLiked: Bool
 
     // Video player state
     @State private var player: AVPlayer?
@@ -22,7 +24,7 @@ public struct MediaContentView: View {
     @State private var shouldSeekToStartTime = false
 
     public init(
-        galleryItem: GalleryItem,
+        galleryItem: GalleryItem?,
         cornerRadius: CGFloat = 35,
         onSave: @escaping () -> Void,
         onLike: @escaping (Bool) -> Void,
@@ -35,27 +37,35 @@ public struct MediaContentView: View {
         self.onLike = onLike
         self.onToggleSound = onToggleSound
         self._isTrackPlaying = isTrackPlaying
+        self.isLiked = galleryItem?.isFavourite ?? false
     }
 
     public var body: some View {
-        ZStack {
-            switch galleryItem.memory.mediaType {
-            case .image, .quote:
-                imageContent
-            case .video:
-                videoContent
+        if let galleryItem {
+            ZStack {
+                switch galleryItem.memory.mediaType {
+                case .image, .quote:
+                    imageContent(for: galleryItem)
+                case .video:
+                    videoContent(for: galleryItem)
+                }
             }
-        }
-        .overlay {
-            RewindMediaButtonsOverlay(
-                isLiked: galleryItem.isFavourite,
-                likeAction: onLike,
-                saveAction: onSave
-            )
+            .overlay {
+                RewindMediaButtonsOverlay(
+                    isLiked: $isLiked,
+                    likeAction: onLike,
+                    saveAction: onSave
+                )
+            }
+            .onChange(of: galleryItem) {
+                withAnimation {
+                    isLiked = galleryItem.isFavourite
+                }
+            }
         }
     }
 
-    private var imageContent: some View {
+    private func imageContent(for galleryItem: GalleryItem) -> some View {
         SquareAsyncMedia(url: galleryItem.memory.mediaURL, type: .image)
             .overlay(alignment: .topTrailing) {
                 if galleryItem.memory.lightTrack != nil {
@@ -79,7 +89,7 @@ public struct MediaContentView: View {
             }
     }
 
-    private var videoContent: some View {
+    private func videoContent(for galleryItem: GalleryItem) -> some View {
         ZStack {
             SquareAsyncMedia(url: galleryItem.memory.mediaURL, type: .video)
 
@@ -100,14 +110,14 @@ public struct MediaContentView: View {
             }
         }
         .onAppear {
-            setupPlayer()
+            setupPlayer(for: galleryItem)
         }
         .onDisappear {
             resetPlayer()
         }
     }
 
-    private func setupPlayer() {
+    private func setupPlayer(for galleryItem: GalleryItem) {
         guard let url = galleryItem.memory.mediaURL else { return }
 
         let item = AVPlayerItem(url: url)

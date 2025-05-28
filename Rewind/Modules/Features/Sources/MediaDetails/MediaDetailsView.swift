@@ -6,7 +6,7 @@ public struct MediaDetailsView: View {
     @State private var viewModel: MediaDetailsViewModel
     @State private var tags: [MediaTag]
     @State private var isTrackPlaying: Bool = false
-    private let galleryItem: GalleryItem
+    @State private var galleryItem: GalleryItem
     private let router: AppRouter
 
     @Environment(\.showToast)

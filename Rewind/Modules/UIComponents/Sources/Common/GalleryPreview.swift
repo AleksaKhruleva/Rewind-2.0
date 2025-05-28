@@ -2,11 +2,11 @@ import SwiftUI
 
 public struct GalleryPreview: View {
     private let gallerySize: Int
-    private let images: [UIImage]
+    private let imageURLs: [URL?]
 
-    public init(gallerySize: Int, images: [UIImage]) {
+    public init(gallerySize: Int, imageURLs: [URL?]) {
         self.gallerySize = gallerySize
-        self.images = images
+        self.imageURLs = Array(imageURLs.prefix(4))
     }
 
     public var body: some View {
@@ -14,20 +14,17 @@ public struct GalleryPreview: View {
             Text(UIComponentsStrings.Gallery.Media.count(gallerySize))
                 .modifier(RoundFontModifier(size: 17))
 
-            if !images.isEmpty {
+            if !imageURLs.isEmpty {
                 HStack(spacing: -8) {
-                    ForEach(Array(images.prefix(4).enumerated()), id: \.offset) { index, image in
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 40, height: 40)
-                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    ForEach(Array(imageURLs.enumerated()), id: \.offset) { index, imageURL in
+                        SquareAsyncMedia(url: imageURL, type: .image, cornerRadius: 12)
+                            .frame(40)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                                     .stroke(Color.background, lineWidth: 2)
                             )
-                            .rotationEffect(rotation(for: images.count, at: index))
-                            .offset(y: verticalOffset(for: images.count, at: index))
+                            .rotationEffect(rotation(for: imageURLs.count, at: index))
+                            .offset(y: verticalOffset(for: imageURLs.count, at: index))
                             .zIndex(Double(index))
                     }
                 }
@@ -60,22 +57,5 @@ public struct GalleryPreview: View {
         default:
             return 0
         }
-    }
-}
-
-#Preview {
-    let images = [
-        UIComponentsAsset.media1.image,
-        UIComponentsAsset.media2.image,
-        UIComponentsAsset.media3.image,
-        UIComponentsAsset.media4.image
-    ]
-
-    VStack {
-        GalleryPreview(gallerySize: 0, images: Array(images.prefix(0)))
-        GalleryPreview(gallerySize: 1, images: Array(images.prefix(1)))
-        GalleryPreview(gallerySize: 2, images: Array(images.prefix(2)))
-        GalleryPreview(gallerySize: 3, images: Array(images.prefix(3)))
-        GalleryPreview(gallerySize: 56, images: Array(images.prefix(4)))
     }
 }

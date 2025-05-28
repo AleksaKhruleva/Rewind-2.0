@@ -48,13 +48,6 @@ struct BlurredMediaView: View {
             author
 
             mediaView
-                .overlay {
-                    RewindMediaButtonsOverlay(isLiked: galleryItem.isFavourite) { liked in
-                        onLike(galleryItem, liked)
-                    } saveAction: {
-                        // TODO: сделать сохранение фото или видео
-                    }
-                }
 
             actionsTable
 
@@ -83,7 +76,9 @@ struct BlurredMediaView: View {
         MediaContentView(
             galleryItem: galleryItem,
             onSave: {},
-            onLike: { _ in },
+            onLike: { liked in
+                onLike(galleryItem, liked)
+            },
             onToggleSound: {
                 viewModel.dispatch(.toggleTrackPlaying)
             },

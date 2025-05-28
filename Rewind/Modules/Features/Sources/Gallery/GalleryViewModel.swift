@@ -139,9 +139,11 @@ final class GalleryViewModel {
             do {
                 if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
                     let response = try await backend.getMedias(tokens: tokens, groupId: groupId)
-                    galleryItems = response.memories?.map {
-                        return $0.toGalleryItem()
-                    } ?? []
+                    withAnimation {
+                        galleryItems = response.memories?.map {
+                            return $0.toGalleryItem()
+                        } ?? []
+                    }
                 }
             } catch {
                 showToast(UIComponentsStrings.Toast.error)
@@ -172,6 +174,9 @@ final class GalleryViewModel {
                         groupId: groupId,
                         memoryId: galleryItem.id
                     )
+                    if let index = galleryItems.firstIndex(where: { $0.id == galleryItem.id }) {
+                        galleryItems[index].isFavourite = true
+                    }
                 }
             } catch {
                 showToast(UIComponentsStrings.Toast.error)
