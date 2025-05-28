@@ -60,9 +60,9 @@ public struct BlurredMediaView: View {
     private var author: some View {
         HStack {
             AuthorBadgeView(
-                image: UIComponentsAsset.avatar.image,
-                name: "flowykk",
-                date: "23.11.2024",
+                imageURL: galleryItem.memory.userImage,
+                name: galleryItem.memory.username,
+                date: galleryItem.memory.createdAt,
                 track: galleryItem.memory.track
             )
             .padding(.leading, 6)

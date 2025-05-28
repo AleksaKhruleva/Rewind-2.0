@@ -6,7 +6,7 @@ extension View {
         show: Binding<Bool>,
         cropType: CropType = .circle,
         croppedImage: Binding<UIImage?>,
-        onSuccess: @escaping () -> Void = {}
+        onSuccess: @escaping (UIImage) -> Void = { _ in }
     ) -> some View {
         RewindImagePicker(show: show, croppedImage: croppedImage, cropType: cropType, onSuccess: onSuccess) {
             self

@@ -7,7 +7,7 @@ struct RewindImagePicker<Content: View>: View {
     @Binding var show: Bool
     @Binding var cropedImage: UIImage?
     var cropType: CropType
-    var onSuccess: () -> Void
+    var onSuccess: (UIImage) -> Void
 
     @State private var pickerItem: PhotosPickerItem?
     @State private var selectedImage: UIImage?
@@ -17,7 +17,7 @@ struct RewindImagePicker<Content: View>: View {
         show: Binding<Bool>,
         croppedImage: Binding<UIImage?>,
         cropType: CropType,
-        onSuccess: @escaping () -> Void,
+        onSuccess: @escaping (UIImage) -> Void,
         @ViewBuilder content: @escaping () -> Content
     ) {
         self._show = show
@@ -50,7 +50,7 @@ struct RewindImagePicker<Content: View>: View {
                 RewindImageEditor(image: selectedImage, cropType: cropType) { croppedImage, status in
                     guard let croppedImage else { return }
                     self.cropedImage = croppedImage
-                    if status { onSuccess() }
+                    if status { onSuccess(croppedImage) }
                 }
             }
     }

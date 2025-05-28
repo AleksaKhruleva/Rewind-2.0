@@ -82,9 +82,9 @@ final class GalleryViewModel {
             } catch {
                 showToast(UIComponentsStrings.MediaUpload.error)
             }
-        case let .viewBlurredMedia(media):
+        case let .viewBlurredMedia(galleryItem):
             withAnimation {
-                blurredMediaSelection = media
+                blurredMediaSelection = galleryItem
                 blurredMediaShown = true
             }
         case .openFilters:

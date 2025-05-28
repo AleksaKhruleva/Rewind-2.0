@@ -70,9 +70,7 @@ public struct GalleryView: View {
                 viewModel.set(showToast: showToast)
             }
             .onTopAppear {
-//                if !viewModel.galleryItems.isEmpty {
-                    Task { await viewModel.dispatch(.fetchGallery) }
-//                }
+                Task { await viewModel.dispatch(.fetchGallery) }
             }
             .onChange(of: viewModel.mediaSelection) { _, newValue in
                 if let newValue {

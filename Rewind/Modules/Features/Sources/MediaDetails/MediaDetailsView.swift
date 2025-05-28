@@ -84,9 +84,9 @@ public struct MediaDetailsView: View {
 
     private var author: some View {
         AuthorBadgeView(
-            image: UIComponentsAsset.media15.image,
-            name: "flowykk",
-            date: "23.11.2024",
+            imageURL: galleryItem.memory.userImage,
+            name: galleryItem.memory.username,
+            date: galleryItem.memory.createdAt,
             track: galleryItem.memory.track
         )
     }

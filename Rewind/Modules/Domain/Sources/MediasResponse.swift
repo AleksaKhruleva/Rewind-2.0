@@ -6,7 +6,7 @@ public struct MediaResponse: Codable {
     public let groupId: Int
     public let userId: Int
     public let username: String
-    public let userImage: String
+    public let userImage: String?
     public let mediaType: String
     public let mediaURL: URL?
     public let latitude: Double?
@@ -39,13 +39,15 @@ public struct MediaResponse: Codable {
             id: self.id,
             userId: self.userId,
             groupId: self.groupId,
+            username: self.username,
+            userImage: URL(string: self.userImage ?? ""),
             mediaType: self.mediaType.toMediaType(),
             mediaURL: self.mediaURL,
             latitude: self.latitude,
             longitude: self.longitude,
             duration: self.duration,
             offset: self.offset,
-            createdAt: self.createdAt,
+            createdAt: self.createdAt.toRewindDate(),
         )
     }
 }
@@ -66,4 +68,21 @@ public struct MediasResponseItem: Codable {
 
 public struct MediasResponse: Codable {
     public let memories: [MediasResponseItem]?
+}
+
+extension String {
+    fileprivate func toRewindDate() -> Self {
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+        guard let date = isoFormatter.date(from: self) else {
+            return "N/D"
+        }
+
+        let outputFormatter = DateFormatter()
+        outputFormatter.dateFormat = "dd.MM.yyyy HH:mm"
+        outputFormatter.timeZone = .current
+
+        return outputFormatter.string(from: date)
+    }
 }

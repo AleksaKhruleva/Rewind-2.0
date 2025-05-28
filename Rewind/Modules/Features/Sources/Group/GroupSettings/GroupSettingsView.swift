@@ -106,9 +106,7 @@ public struct GroupSettingsView: View {
             return viewModel.groupImage
         } set: { newImage in
             Task { await viewModel.dispatch(.updateImage(newImage)) }
-        }) {
-//            showToast(UIComponentsStrings.Account.Edit.Image.Set.success)
-        }
+        })
         .task {
             await viewModel.dispatch(.loadGroupImage)
         }
