@@ -29,13 +29,23 @@ public enum ImageProvider {
         }
 
         do {
-            let (data, _) = try await URLSession.shared.data(from: url)
+            let (data, response) = try await URLSession.shared.data(from: url)
+
+            if let httpResponse = response as? HTTPURLResponse {
+                print("→ Status code:", httpResponse.statusCode)
+                print("→ Content-Type:", httpResponse.value(forHTTPHeaderField: "Content-Type") ?? "none")
+            }
+
+            print("→ Loaded data size:", data.count)
+
             if let image = UIImage(data: data) {
                 FileManagerImageStorage.shared.saveImage(image: image, url: urlString)
                 return image
+            } else {
+                print("→ Failed to convert data to UIImage")
             }
         } catch {
-            print("Failed to load image for \(urlString): \(error)")
+            print("❌ Failed to load image for \(urlString): \(error)")
         }
 
         return type.placeholder

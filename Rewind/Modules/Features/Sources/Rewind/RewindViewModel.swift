@@ -188,10 +188,6 @@ final class RewindViewModel {
                 showToast("Error: \(error)")
             }
         case .selectedNewGroup:
-            currentGroupState = .notReady
-            defer {
-                currentGroupState = .ready
-            }
             groups = GroupUtils.sortedGroups(groups)
             await loadGroupImage()
         case .loadAvatars:
@@ -211,7 +207,9 @@ final class RewindViewModel {
             for: currentGroup.imageURL, .group
         )
         await MainActor.run { [weak self] in
-            self?.groupImage = image
+            withAnimation {
+                self?.groupImage = image
+            }
         }
     }
 
