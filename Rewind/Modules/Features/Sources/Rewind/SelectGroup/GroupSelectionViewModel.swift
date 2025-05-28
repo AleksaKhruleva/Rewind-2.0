@@ -59,7 +59,7 @@ final class GroupSelectionViewModel {
                 }
 
                 let response = try await backend.createGroup(tokens: tokens, name: name)
-                
+
                 let members = [
                     Member(
                         id: userID,
@@ -69,7 +69,7 @@ final class GroupSelectionViewModel {
                         isUser: true
                     )
                 ]
-                
+
                 await ImageProvider.loadAndCacheImage(for: user.imageURL, .user)
 
                 let group = Group(

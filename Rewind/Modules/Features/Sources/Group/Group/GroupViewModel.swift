@@ -144,7 +144,7 @@ final class GroupViewModel {
                 groupOwnerID: response.group.ownerID,
                 currentUserID: userID
             )
-            
+
             await withTaskGroup(of: Void.self) { group in
                 for member in members {
                     group.addTask {
@@ -161,7 +161,7 @@ final class GroupViewModel {
                 imageURL: response.group.imageURL,
                 createdAt: DateParser.parseISODate(response.group.createdAt), members: members
             )
-            
+
             GroupStorage.set(newGroup: currentGroup)
             self.group = currentGroup
             await loadGroupImage()

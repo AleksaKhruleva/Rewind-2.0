@@ -44,7 +44,7 @@ final class LinkProcessingViewModel {
                 groupOwnerID: responseGroupDetails.group.ownerID,
                 currentUserID: userID
             )
-            
+
             await withTaskGroup(of: Void.self) { group in
                 for member in members {
                     group.addTask {

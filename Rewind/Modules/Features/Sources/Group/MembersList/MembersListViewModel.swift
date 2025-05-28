@@ -37,12 +37,12 @@ final class MembersListViewModel {
 
         case let .deleteMember(member):
             await deleteMember(member)
-            
+
         case .loadGroupImage:
             await loadGroupImage()
         }
     }
-    
+
     private func loadGroupImage() async {
         guard let currentGroup = GroupStorage.currentGroup else {
             // TODO: handle nil group

@@ -160,7 +160,7 @@ final class RewindViewModel {
                     groupOwnerID: response.group.ownerID,
                     currentUserID: userID
                 )
-                
+
                 await withTaskGroup(of: Void.self) { group in
                     for member in members {
                         group.addTask {
@@ -188,13 +188,30 @@ final class RewindViewModel {
                 showToast("Error: \(error)")
             }
         case .selectedNewGroup:
+            currentGroupState = .notReady
+            defer {
+                currentGroupState = .ready
+            }
             groups = GroupUtils.sortedGroups(groups)
-            userGroupsState = .ready
+            await loadGroupImage()
         case .loadAvatars:
             if let url = GroupStorage.currentGroup?.imageURL {
                 groupImage = await loadImage(urlString: url)
             }
             userImage = await loadImage(urlString: user.imageURL)
+        }
+    }
+
+    private func loadGroupImage() async {
+        guard let currentGroup = GroupStorage.currentGroup else {
+            // TODO: handle nil group
+            return
+        }
+        let image = await ImageProvider.loadOrGetImage(
+            for: currentGroup.imageURL, .group
+        )
+        await MainActor.run { [weak self] in
+            self?.groupImage = image
         }
     }
 

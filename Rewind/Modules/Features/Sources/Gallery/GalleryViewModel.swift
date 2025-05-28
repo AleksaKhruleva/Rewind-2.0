@@ -20,10 +20,10 @@ final class GalleryViewModel {
 
         case likeMedia(GalleryItem)
         case unlikeMedia(GalleryItem)
-        
+
         case loadGroupImage
     }
-    
+
     var currentGroup: CurrentGroupInfo {
         GroupStorage.currentGroup ?? CurrentGroupInfo(id: -1, name: "Anonymous", imageURL: "")
     }
@@ -174,7 +174,7 @@ final class GalleryViewModel {
             await loadGroupImage()
         }
     }
-    
+
     private func loadGroupImage() async {
         guard let currentGroup = GroupStorage.currentGroup else {
             // TODO: handle nil group

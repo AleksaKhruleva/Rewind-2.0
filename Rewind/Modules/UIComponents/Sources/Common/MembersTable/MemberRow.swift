@@ -3,7 +3,7 @@ import Base
 import Domain
 
 struct MemberRow: View {
-    @State private var image: UIImage? = nil
+    @State private var image: UIImage?
     private let member: Member
     private let onTap: (Member) -> Void
     private let onRemove: () -> Void
