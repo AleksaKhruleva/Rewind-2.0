@@ -75,6 +75,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -124,6 +130,12 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -185,6 +197,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -240,6 +258,12 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -301,6 +325,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - Response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -356,6 +386,12 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -420,6 +456,12 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -497,6 +539,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -566,6 +614,12 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -680,6 +734,12 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -804,6 +864,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -883,6 +949,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             },
@@ -957,6 +1029,12 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1045,6 +1123,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             },
@@ -1119,6 +1203,12 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1198,6 +1288,12 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1287,6 +1383,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             },
@@ -1371,6 +1473,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -1437,6 +1545,12 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1522,6 +1636,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             },
@@ -1586,6 +1706,12 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1655,6 +1781,12 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1739,6 +1871,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -1805,6 +1943,12 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -1884,6 +2028,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -1945,6 +2095,18 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -2017,6 +2179,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -2060,6 +2228,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -2100,6 +2274,12 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -2159,6 +2339,12 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -2231,6 +2417,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -2277,6 +2469,12 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -2349,6 +2547,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -2418,6 +2622,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -2478,6 +2688,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -2532,6 +2748,12 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -2598,6 +2820,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -2647,6 +2875,12 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -2713,6 +2947,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -2776,6 +3016,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
                     }
                 }
             }
@@ -2831,6 +3077,12 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "504": {
+                        "description": "Deadline Exceeded - response timed out\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -3176,6 +3428,9 @@ const docTemplate = `{
         "responses.GetUserByIDResponse": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
                 "email": {
                     "description": "Email address",
                     "type": "string"

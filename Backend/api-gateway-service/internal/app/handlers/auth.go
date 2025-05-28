@@ -36,6 +36,7 @@ func NewAuthHandler(authService services.AuthServiceInterface) *AuthHandler {
 // @Failure 409 {object} responses.ErrorResponse "Conflict - User with this email already exists".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - Response timed out".
 // @Router /api/auth/register [post].
 func (h *AuthHandler) StartRegistration(w http.ResponseWriter, r *http.Request) {
 	var req requests.StartRegistrationRequest
@@ -72,6 +73,7 @@ func (h *AuthHandler) StartRegistration(w http.ResponseWriter, r *http.Request) 
 // @Failure 409 {object} responses.ErrorResponse "Conflict - Registration ID or code already used".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Router /api/auth/verify-email [post].
 func (h *AuthHandler) VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 	var req requests.VerifyEmailCodeRequest
@@ -107,6 +109,7 @@ func (h *AuthHandler) VerifyEmailCode(w http.ResponseWriter, r *http.Request) {
 // @Failure 409 {object} responses.ErrorResponse "Conflict - User with this email or username already exists".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Router /api/auth/finish-register [post].
 func (h *AuthHandler) SetPasswordAndUsername(w http.ResponseWriter, r *http.Request) {
 	var req requests.SetPasswordAndUsernameRequest
@@ -142,6 +145,7 @@ func (h *AuthHandler) SetPasswordAndUsername(w http.ResponseWriter, r *http.Requ
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - Invalid credentials".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Router /api/auth/login [post].
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var req requests.LoginRequest
@@ -177,6 +181,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - Invalid or expired refresh token".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Router /api/auth/refresh [post].
 func (h *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	var req requests.RefreshTokenRequest
@@ -210,6 +215,7 @@ func (h *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid email format or request body".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Router /api/auth/forgot-password [post].
 func (h *AuthHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 	var req requests.ForgotPasswordRequest
@@ -244,6 +250,7 @@ func (h *AuthHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Invalid or expired reset token".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Router /api/auth/reset-password [post].
 func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	var req requests.ResetPasswordRequest
@@ -277,6 +284,7 @@ func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid refresh token format or request body".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/users/logout [post].
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
@@ -310,6 +318,7 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/users/delete-user [delete].
 func (h *AuthHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
@@ -338,6 +347,7 @@ func (h *AuthHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/users/{id} [get].
 func (h *AuthHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
@@ -370,6 +380,7 @@ func (h *AuthHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 		MemoriesAddedCount:  userPB.GetMemoriesAddedCount(),
 		InvitedMembersCount: userPB.GetInvitedMembersCount(),
 		MemoriesViewedCount: userPB.GetMemoriesViewedCount(),
+		CreatedAt:           userPB.GetCreatedAt().AsTime(),
 	}
 
 	respondJSON(w, http.StatusOK, responseBody)
@@ -387,6 +398,7 @@ func (h *AuthHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/users/username [patch].
 func (h *AuthHandler) UpdateUsername(w http.ResponseWriter, r *http.Request) {
@@ -422,6 +434,7 @@ func (h *AuthHandler) UpdateUsername(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/users/check-password [post].
 func (h *AuthHandler) CheckPassword(w http.ResponseWriter, r *http.Request) {
@@ -457,6 +470,7 @@ func (h *AuthHandler) CheckPassword(w http.ResponseWriter, r *http.Request) {
 // @Failure 409 {object} responses.ErrorResponse "Conflict - User already has this email".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/users/email/start-change [post].
 func (h *AuthHandler) UpdateEmail(w http.ResponseWriter, r *http.Request) {
@@ -492,6 +506,7 @@ func (h *AuthHandler) UpdateEmail(w http.ResponseWriter, r *http.Request) {
 // @Failure 409 {object} responses.ErrorResponse "Conflict - User with this email already exists".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/users/email/verify-change [patch].
 func (h *AuthHandler) VerifyNewEmailCode(w http.ResponseWriter, r *http.Request) {
@@ -526,6 +541,7 @@ func (h *AuthHandler) VerifyNewEmailCode(w http.ResponseWriter, r *http.Request)
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/users/avatar [patch].
 func (h *AuthHandler) UpdateAvatar(w http.ResponseWriter, r *http.Request) {
@@ -573,6 +589,7 @@ func (h *AuthHandler) UpdateAvatar(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - Missing or invalid API key".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/users/avatar [delete].
 func (h *AuthHandler) DeleteAvatar(w http.ResponseWriter, r *http.Request) {
@@ -607,6 +624,7 @@ func (h *AuthHandler) DeleteAvatar(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/users/password/reset/start [post].
 func (h *AuthHandler) StartPasswordReset(w http.ResponseWriter, r *http.Request) {
@@ -635,6 +653,7 @@ func (h *AuthHandler) StartPasswordReset(w http.ResponseWriter, r *http.Request)
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found or invalid code".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/users/password/reset/verify [post].
 func (h *AuthHandler) VerifyPasswordResetCode(w http.ResponseWriter, r *http.Request) {
@@ -669,6 +688,7 @@ func (h *AuthHandler) VerifyPasswordResetCode(w http.ResponseWriter, r *http.Req
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found or password reset process not initiated".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/users/password/reset/set [patch].
 func (h *AuthHandler) SetNewPassword(w http.ResponseWriter, r *http.Request) {
@@ -700,6 +720,7 @@ func (h *AuthHandler) SetNewPassword(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/users/achievements [get].
 func (h *AuthHandler) GetUserAchievements(w http.ResponseWriter, r *http.Request) {

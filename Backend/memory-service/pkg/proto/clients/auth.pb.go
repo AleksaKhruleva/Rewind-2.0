@@ -9,6 +9,7 @@ package proto
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -30,6 +31,7 @@ type User struct {
 	MemoriesAddedCount  uint64                 `protobuf:"varint,5,opt,name=memories_added_count,json=memoriesAddedCount,proto3" json:"memories_added_count,omitempty"`
 	InvitedMembersCount uint64                 `protobuf:"varint,6,opt,name=invited_members_count,json=invitedMembersCount,proto3" json:"invited_members_count,omitempty"`
 	MemoriesViewedCount uint64                 `protobuf:"varint,7,opt,name=memories_viewed_count,json=memoriesViewedCount,proto3" json:"memories_viewed_count,omitempty"`
+	CreatedAt           *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -111,6 +113,13 @@ func (x *User) GetMemoriesViewedCount() uint64 {
 		return x.MemoriesViewedCount
 	}
 	return 0
+}
+
+func (x *User) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
 }
 
 type UserAchievement struct {
@@ -2425,7 +2434,7 @@ var File_proto_clients_auth_proto protoreflect.FileDescriptor
 
 const file_proto_clients_auth_proto_rawDesc = "" +
 	"\n" +
-	"\x18proto/clients/auth.proto\x12\x04auth\"\xf8\x01\n" +
+	"\x18proto/clients/auth.proto\x12\x04auth\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb3\x02\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x14\n" +
@@ -2433,7 +2442,9 @@ const file_proto_clients_auth_proto_rawDesc = "" +
 	"\x05image\x18\x04 \x01(\tR\x05image\x120\n" +
 	"\x14memories_added_count\x18\x05 \x01(\x04R\x12memoriesAddedCount\x122\n" +
 	"\x15invited_members_count\x18\x06 \x01(\x04R\x13invitedMembersCount\x122\n" +
-	"\x15memories_viewed_count\x18\a \x01(\x04R\x13memoriesViewedCount\"j\n" +
+	"\x15memories_viewed_count\x18\a \x01(\x04R\x13memoriesViewedCount\x129\n" +
+	"\n" +
+	"created_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"j\n" +
 	"\x0fUserAchievement\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
@@ -2645,64 +2656,66 @@ var file_proto_clients_auth_proto_goTypes = []any{
 	(*UserViewedMemoriesResponse)(nil),      // 47: auth.UserViewedMemoriesResponse
 	(*GetUserAchievementsRequest)(nil),      // 48: auth.GetUserAchievementsRequest
 	(*GetUserAchievementsResponse)(nil),     // 49: auth.GetUserAchievementsResponse
+	(*timestamppb.Timestamp)(nil),           // 50: google.protobuf.Timestamp
 }
 var file_proto_clients_auth_proto_depIdxs = []int32{
-	0,  // 0: auth.GetUsersByIDsResponse.users:type_name -> auth.User
-	0,  // 1: auth.GetUserByIDResponse.user:type_name -> auth.User
-	1,  // 2: auth.GetUserAchievementsResponse.achievements:type_name -> auth.UserAchievement
-	2,  // 3: auth.AuthService.StartRegistration:input_type -> auth.StartRegistrationRequest
-	4,  // 4: auth.AuthService.VerifyEmailCode:input_type -> auth.VerifyEmailCodeRequest
-	6,  // 5: auth.AuthService.SetPasswordAndUsername:input_type -> auth.SetPasswordAndUsernameRequest
-	8,  // 6: auth.AuthService.Login:input_type -> auth.LoginRequest
-	10, // 7: auth.AuthService.RefreshToken:input_type -> auth.RefreshTokenRequest
-	12, // 8: auth.AuthService.ForgotPassword:input_type -> auth.ForgotPasswordRequest
-	14, // 9: auth.AuthService.ResetPassword:input_type -> auth.ResetPasswordRequest
-	16, // 10: auth.AuthService.Logout:input_type -> auth.LogoutRequest
-	18, // 11: auth.AuthService.DeleteUser:input_type -> auth.DeleteUserRequest
-	20, // 12: auth.AuthService.GetUsersByIDs:input_type -> auth.GetUsersByIDsRequest
-	22, // 13: auth.AuthService.GetUserByID:input_type -> auth.GetUserByIDRequest
-	24, // 14: auth.AuthService.UpdateUsername:input_type -> auth.UpdateUsernameRequest
-	26, // 15: auth.AuthService.CheckPassword:input_type -> auth.CheckPasswordRequest
-	28, // 16: auth.AuthService.UpdateEmail:input_type -> auth.UpdateEmailRequest
-	30, // 17: auth.AuthService.VerifyNewEmailCode:input_type -> auth.VerifyNewEmailCodeRequest
-	32, // 18: auth.AuthService.UpdateAvatar:input_type -> auth.UpdateAvatarRequest
-	34, // 19: auth.AuthService.StartPasswordReset:input_type -> auth.StartPasswordResetRequest
-	36, // 20: auth.AuthService.VerifyPasswordResetCode:input_type -> auth.VerifyPasswordResetCodeRequest
-	38, // 21: auth.AuthService.SetNewPassword:input_type -> auth.SetNewPasswordRequest
-	40, // 22: auth.AuthService.DeleteAvatar:input_type -> auth.DeleteAvatarRequest
-	42, // 23: auth.AuthService.UserAddedMemory:input_type -> auth.UserAddedMemoryRequest
-	44, // 24: auth.AuthService.UserInvitedMember:input_type -> auth.UserInvitedMemberRequest
-	46, // 25: auth.AuthService.UserViewedMemories:input_type -> auth.UserViewedMemoriesRequest
-	48, // 26: auth.AuthService.GetUserAchievements:input_type -> auth.GetUserAchievementsRequest
-	3,  // 27: auth.AuthService.StartRegistration:output_type -> auth.StartRegistrationResponse
-	5,  // 28: auth.AuthService.VerifyEmailCode:output_type -> auth.VerifyEmailCodeResponse
-	7,  // 29: auth.AuthService.SetPasswordAndUsername:output_type -> auth.SetPasswordAndUsernameResponse
-	9,  // 30: auth.AuthService.Login:output_type -> auth.LoginResponse
-	11, // 31: auth.AuthService.RefreshToken:output_type -> auth.RefreshTokenResponse
-	13, // 32: auth.AuthService.ForgotPassword:output_type -> auth.ForgotPasswordResponse
-	15, // 33: auth.AuthService.ResetPassword:output_type -> auth.ResetPasswordResponse
-	17, // 34: auth.AuthService.Logout:output_type -> auth.LogoutResponse
-	19, // 35: auth.AuthService.DeleteUser:output_type -> auth.DeleteUserResponse
-	21, // 36: auth.AuthService.GetUsersByIDs:output_type -> auth.GetUsersByIDsResponse
-	23, // 37: auth.AuthService.GetUserByID:output_type -> auth.GetUserByIDResponse
-	25, // 38: auth.AuthService.UpdateUsername:output_type -> auth.UpdateUsernameResponse
-	27, // 39: auth.AuthService.CheckPassword:output_type -> auth.CheckPasswordResponse
-	29, // 40: auth.AuthService.UpdateEmail:output_type -> auth.UpdateEmailResponse
-	31, // 41: auth.AuthService.VerifyNewEmailCode:output_type -> auth.VerifyNewEmailCodeResponse
-	33, // 42: auth.AuthService.UpdateAvatar:output_type -> auth.UpdateAvatarResponse
-	35, // 43: auth.AuthService.StartPasswordReset:output_type -> auth.StartPasswordResetResponse
-	37, // 44: auth.AuthService.VerifyPasswordResetCode:output_type -> auth.VerifyPasswordResetCodeResponse
-	39, // 45: auth.AuthService.SetNewPassword:output_type -> auth.SetNewPasswordResponse
-	41, // 46: auth.AuthService.DeleteAvatar:output_type -> auth.DeleteAvatarResponse
-	43, // 47: auth.AuthService.UserAddedMemory:output_type -> auth.UserAddedMemoryResponse
-	45, // 48: auth.AuthService.UserInvitedMember:output_type -> auth.UserInvitedMemberResponse
-	47, // 49: auth.AuthService.UserViewedMemories:output_type -> auth.UserViewedMemoriesResponse
-	49, // 50: auth.AuthService.GetUserAchievements:output_type -> auth.GetUserAchievementsResponse
-	27, // [27:51] is the sub-list for method output_type
-	3,  // [3:27] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	50, // 0: auth.User.created_at:type_name -> google.protobuf.Timestamp
+	0,  // 1: auth.GetUsersByIDsResponse.users:type_name -> auth.User
+	0,  // 2: auth.GetUserByIDResponse.user:type_name -> auth.User
+	1,  // 3: auth.GetUserAchievementsResponse.achievements:type_name -> auth.UserAchievement
+	2,  // 4: auth.AuthService.StartRegistration:input_type -> auth.StartRegistrationRequest
+	4,  // 5: auth.AuthService.VerifyEmailCode:input_type -> auth.VerifyEmailCodeRequest
+	6,  // 6: auth.AuthService.SetPasswordAndUsername:input_type -> auth.SetPasswordAndUsernameRequest
+	8,  // 7: auth.AuthService.Login:input_type -> auth.LoginRequest
+	10, // 8: auth.AuthService.RefreshToken:input_type -> auth.RefreshTokenRequest
+	12, // 9: auth.AuthService.ForgotPassword:input_type -> auth.ForgotPasswordRequest
+	14, // 10: auth.AuthService.ResetPassword:input_type -> auth.ResetPasswordRequest
+	16, // 11: auth.AuthService.Logout:input_type -> auth.LogoutRequest
+	18, // 12: auth.AuthService.DeleteUser:input_type -> auth.DeleteUserRequest
+	20, // 13: auth.AuthService.GetUsersByIDs:input_type -> auth.GetUsersByIDsRequest
+	22, // 14: auth.AuthService.GetUserByID:input_type -> auth.GetUserByIDRequest
+	24, // 15: auth.AuthService.UpdateUsername:input_type -> auth.UpdateUsernameRequest
+	26, // 16: auth.AuthService.CheckPassword:input_type -> auth.CheckPasswordRequest
+	28, // 17: auth.AuthService.UpdateEmail:input_type -> auth.UpdateEmailRequest
+	30, // 18: auth.AuthService.VerifyNewEmailCode:input_type -> auth.VerifyNewEmailCodeRequest
+	32, // 19: auth.AuthService.UpdateAvatar:input_type -> auth.UpdateAvatarRequest
+	34, // 20: auth.AuthService.StartPasswordReset:input_type -> auth.StartPasswordResetRequest
+	36, // 21: auth.AuthService.VerifyPasswordResetCode:input_type -> auth.VerifyPasswordResetCodeRequest
+	38, // 22: auth.AuthService.SetNewPassword:input_type -> auth.SetNewPasswordRequest
+	40, // 23: auth.AuthService.DeleteAvatar:input_type -> auth.DeleteAvatarRequest
+	42, // 24: auth.AuthService.UserAddedMemory:input_type -> auth.UserAddedMemoryRequest
+	44, // 25: auth.AuthService.UserInvitedMember:input_type -> auth.UserInvitedMemberRequest
+	46, // 26: auth.AuthService.UserViewedMemories:input_type -> auth.UserViewedMemoriesRequest
+	48, // 27: auth.AuthService.GetUserAchievements:input_type -> auth.GetUserAchievementsRequest
+	3,  // 28: auth.AuthService.StartRegistration:output_type -> auth.StartRegistrationResponse
+	5,  // 29: auth.AuthService.VerifyEmailCode:output_type -> auth.VerifyEmailCodeResponse
+	7,  // 30: auth.AuthService.SetPasswordAndUsername:output_type -> auth.SetPasswordAndUsernameResponse
+	9,  // 31: auth.AuthService.Login:output_type -> auth.LoginResponse
+	11, // 32: auth.AuthService.RefreshToken:output_type -> auth.RefreshTokenResponse
+	13, // 33: auth.AuthService.ForgotPassword:output_type -> auth.ForgotPasswordResponse
+	15, // 34: auth.AuthService.ResetPassword:output_type -> auth.ResetPasswordResponse
+	17, // 35: auth.AuthService.Logout:output_type -> auth.LogoutResponse
+	19, // 36: auth.AuthService.DeleteUser:output_type -> auth.DeleteUserResponse
+	21, // 37: auth.AuthService.GetUsersByIDs:output_type -> auth.GetUsersByIDsResponse
+	23, // 38: auth.AuthService.GetUserByID:output_type -> auth.GetUserByIDResponse
+	25, // 39: auth.AuthService.UpdateUsername:output_type -> auth.UpdateUsernameResponse
+	27, // 40: auth.AuthService.CheckPassword:output_type -> auth.CheckPasswordResponse
+	29, // 41: auth.AuthService.UpdateEmail:output_type -> auth.UpdateEmailResponse
+	31, // 42: auth.AuthService.VerifyNewEmailCode:output_type -> auth.VerifyNewEmailCodeResponse
+	33, // 43: auth.AuthService.UpdateAvatar:output_type -> auth.UpdateAvatarResponse
+	35, // 44: auth.AuthService.StartPasswordReset:output_type -> auth.StartPasswordResetResponse
+	37, // 45: auth.AuthService.VerifyPasswordResetCode:output_type -> auth.VerifyPasswordResetCodeResponse
+	39, // 46: auth.AuthService.SetNewPassword:output_type -> auth.SetNewPasswordResponse
+	41, // 47: auth.AuthService.DeleteAvatar:output_type -> auth.DeleteAvatarResponse
+	43, // 48: auth.AuthService.UserAddedMemory:output_type -> auth.UserAddedMemoryResponse
+	45, // 49: auth.AuthService.UserInvitedMember:output_type -> auth.UserInvitedMemberResponse
+	47, // 50: auth.AuthService.UserViewedMemories:output_type -> auth.UserViewedMemoriesResponse
+	49, // 51: auth.AuthService.GetUserAchievements:output_type -> auth.GetUserAchievementsResponse
+	28, // [28:52] is the sub-list for method output_type
+	4,  // [4:28] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_proto_clients_auth_proto_init() }

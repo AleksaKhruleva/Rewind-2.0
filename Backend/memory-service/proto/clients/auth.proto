@@ -4,6 +4,8 @@ package auth;
 
 option go_package = "Rewind-2.0/Backend/auth_service/proto";
 
+import "google/protobuf/timestamp.proto"; // Для работы со временем
+
 service AuthService {
   rpc StartRegistration(StartRegistrationRequest) returns (StartRegistrationResponse) {}
   rpc VerifyEmailCode(VerifyEmailCodeRequest) returns (VerifyEmailCodeResponse) {}
@@ -39,6 +41,7 @@ message User {
   uint64 memories_added_count = 5;
   uint64 invited_members_count = 6;
   uint64 memories_viewed_count = 7;
+  google.protobuf.Timestamp created_at = 8;
 }
 
 message UserAchievement {

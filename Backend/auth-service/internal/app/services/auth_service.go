@@ -14,6 +14,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
 
 	"Rewind-auth-service/clients/media"
@@ -579,6 +580,7 @@ func (s *AuthService) GetUsersByIDs(ctx context.Context, req *pb.GetUsersByIDsRe
 			MemoriesAddedCount:  uint64(user.MemoriesAddedCount),
 			InvitedMembersCount: uint64(user.InvitedMembersCount),
 			MemoriesViewedCount: uint64(user.MemoriesViewedCount),
+			CreatedAt:           timestamppb.New(user.CreatedAt),
 		})
 	}
 
@@ -625,6 +627,7 @@ func (s *AuthService) GetUserByID(ctx context.Context, req *pb.GetUserByIDReques
 		MemoriesAddedCount:  uint64(user.MemoriesAddedCount),
 		InvitedMembersCount: uint64(user.InvitedMembersCount),
 		MemoriesViewedCount: uint64(user.MemoriesViewedCount),
+		CreatedAt:           timestamppb.New(user.CreatedAt),
 	}
 
 	// Формирование и возврат ответа
