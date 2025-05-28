@@ -58,6 +58,7 @@ public protocol NetworkServiceProtocol {
         duration: Double?,
         tags: [MediaTag]
     ) async throws -> MediaResponse
+    func getMedia(tokens: Tokens, groupId: Int, memoryId: Int) async throws -> MediasResponseItem
     func deleteMedia(tokens: Tokens, groupId: Int, memoryId: Int) async throws -> SuccessResponse
     func addTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> MediaTag
     func deleteTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> SuccessResponse
@@ -310,6 +311,19 @@ public final class NetworkService: NetworkServiceProtocol {
                     tags: tags.map { $0.tag }
                 ),
                 type: MediaResponse.self
+            )
+        }
+    }
+    
+    public func getMedia(tokens: Tokens, groupId: Int, memoryId: Int) async throws -> MediasResponseItem {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
+            try await self.provider.request(
+                .getMedia(
+                    accessToken: newToken ?? tokens.accessToken,
+                    groupId: groupId,
+                    memoryId: memoryId
+                ),
+                type: MediasResponseItem.self
             )
         }
     }

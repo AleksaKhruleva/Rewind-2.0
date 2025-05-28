@@ -4,19 +4,17 @@ import Domain
 
 public struct MediaDetailsView: View {
     @State private var viewModel: MediaDetailsViewModel
-    @State private var tags: [MediaTag]
     @State private var isTrackPlaying: Bool = false
-    @State private var galleryItem: GalleryItem
+    @State private var galleryItemId: Int
     private let router: AppRouter
 
     @Environment(\.showToast)
     private var showToast
 
-    public init(galleryItem: GalleryItem, router: AppRouter) {
+    public init(galleryItemId: Int, router: AppRouter) {
         viewModel = MediaDetailsViewModel()
-        self.galleryItem = galleryItem
+        self.galleryItemId = galleryItemId
         self.router = router
-        self.tags = galleryItem.tags.map { MediaTag(tag: $0) }
     }
 
     public var body: some View {
@@ -30,17 +28,17 @@ public struct MediaDetailsView: View {
                     author
                         .padding(.leading)
 
-                    TagsSectionView(tags: $tags) { tag in
+                    TagsSectionView(tags: $viewModel.tags) { tag in
                         Task {
-                            await viewModel.dispatch(.addTag(galleryItem, tag.tag)) {
-                                tags.append(tag)
+                            await viewModel.dispatch(.addTag(tag.tag)) {
+                                viewModel.tags.append(tag)
                             }
                         }
                     } onTagDelete: { tag in
                         Task {
-                            await viewModel.dispatch(.deleteTag(galleryItem, tag.tag)) {
+                            await viewModel.dispatch(.deleteTag(tag.tag)) {
                                 withAnimation {
-                                    tags.removeAll { $0.tag == tag.tag }
+                                    viewModel.tags.removeAll { $0.tag == tag.tag }
                                 }
                             }
                         }
@@ -56,6 +54,9 @@ public struct MediaDetailsView: View {
         }
         .background(Color.background)
         .onAppear {
+            Task {
+                await viewModel.dispatch(.fetchMemory(galleryItemId))
+            }
             viewModel.set(showToast: showToast)
         }
     }
@@ -72,34 +73,40 @@ public struct MediaDetailsView: View {
         }
     }
 
+    @ViewBuilder
     private var rewind: some View {
-        MediaContentView(
-            galleryItem: galleryItem,
-            onSave: {},
-            onLike: { liked in
-                Task {
-                    await viewModel.dispatch(liked ? .unlikeMedia(galleryItem) : .likeMedia(galleryItem))
-                }
-            },
-            onToggleSound: {},
-            isTrackPlaying: $isTrackPlaying
-        )
+        if let galleryItem = viewModel.galleryItem {
+            MediaContentView(
+                galleryItem: galleryItem,
+                onSave: {},
+                onLike: { liked in
+                    Task {
+                        await viewModel.dispatch(liked ? .unlikeMedia : .likeMedia)
+                    }
+                },
+                onToggleSound: {},
+                isTrackPlaying: $isTrackPlaying
+            )
+        }
     }
 
+    @ViewBuilder
     private var author: some View {
-        AuthorBadgeView(
-            imageURL: galleryItem.memory.userImage,
-            name: galleryItem.memory.username,
-            date: galleryItem.memory.createdAt,
-            track: galleryItem.memory.lightTrack
-        )
+        if let galleryItem = viewModel.galleryItem {
+            AuthorBadgeView(
+                imageURL: galleryItem.memory.userImage,
+                name: galleryItem.memory.username,
+                date: galleryItem.memory.createdAt,
+                track: galleryItem.memory.lightTrack
+            )
+        }
     }
 
     private var riskyTable: some View {
         InformationTable(title: UIComponentsStrings.MediaDetails.risky, data: [
             ("rectangle.portrait.and.arrow.right.fill", UIComponentsStrings.MediaDetails.delete, nil, {
                 Task {
-                    await viewModel.dispatch(.deleteMedia(galleryItem)) {
+                    await viewModel.dispatch(.deleteMedia) {
                         router.pop()
                     }
                 }

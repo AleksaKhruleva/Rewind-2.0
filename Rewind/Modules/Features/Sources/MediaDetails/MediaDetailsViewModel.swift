@@ -7,44 +7,65 @@ import Base
 @MainActor @Observable
 final class MediaDetailsViewModel {
     enum Intent {
-        case deleteMedia(GalleryItem)
-        case addTag(GalleryItem, String)
-        case deleteTag(GalleryItem, String)
+        case fetchMemory(Int)
+        case deleteMedia
+        case addTag(String)
+        case deleteTag(String)
 
-        case likeMedia(GalleryItem)
-        case unlikeMedia(GalleryItem)
+        case likeMedia
+        case unlikeMedia
     }
 
+    var galleryItem: GalleryItem?
+    var tags: [MediaTag]
     var showToast: (String) -> Void
     let backend: NetworkServiceProtocol
 
     init() {
         self.showToast = { _ in }
+        self.tags = []
         self.backend = NetworkService()
     }
 
     func dispatch(_ intent: Intent, onSuccess: @escaping () -> Void = {}) async {
         switch intent {
-        case let .deleteMedia(galleryItem):
+        case let .fetchMemory(memoryId):
             do {
                 if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                    galleryItem = try await backend.getMedia(
+                        tokens: tokens,
+                        groupId: groupId,
+                        memoryId: memoryId
+                    ).toGalleryItem()
+                    tags = galleryItem?.tags.map { MediaTag(tag: $0) } ?? []
+                }
+            } catch {
+                showToast(UIComponentsStrings.Toast.error)
+            }
+        case .deleteMedia:
+            do {
+                if let tokens = Tokens(),
+                   let groupId = GroupStorage.currentGroup?.id,
+                   let galleryItemId = galleryItem?.id {
                     _ = try await backend.deleteMedia(
                         tokens: tokens,
                         groupId: groupId,
-                        memoryId: galleryItem.id
+                        memoryId: galleryItemId
                     )
                     onSuccess()
                 }
             } catch {
                 showToast(UIComponentsStrings.Toast.error)
             }
-        case let .addTag(galleryItem, tag):
+        case let .addTag(tag):
             do {
-                if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                if let tokens = Tokens(),
+                   let groupId = GroupStorage.currentGroup?.id,
+                   let galleryItemId = galleryItem?.id {
                     _ = try await backend.addTag(
                         tokens: tokens,
                         groupId: groupId,
-                        memoryId: galleryItem.id,
+                        memoryId: galleryItemId,
                         tag: tag
                     )
                     onSuccess()
@@ -52,13 +73,15 @@ final class MediaDetailsViewModel {
             } catch {
                 showToast(UIComponentsStrings.Toast.error)
             }
-        case let .deleteTag(galleryItem, tag):
+        case let .deleteTag(tag):
             do {
-                if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                if let tokens = Tokens(),
+                   let groupId = GroupStorage.currentGroup?.id,
+                   let galleryItemId = galleryItem?.id {
                     _ = try await backend.deleteTag(
                         tokens: tokens,
                         groupId: groupId,
-                        memoryId: galleryItem.id,
+                        memoryId: galleryItemId,
                         tag: tag
                     )
                     onSuccess()
@@ -68,25 +91,29 @@ final class MediaDetailsViewModel {
             } catch {
                 showToast(UIComponentsStrings.Toast.error)
             }
-        case let .likeMedia(galleryItem):
+        case .likeMedia:
             do {
-                if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                if let tokens = Tokens(),
+                   let groupId = GroupStorage.currentGroup?.id,
+                   let galleryItemId = galleryItem?.id {
                     _ = try await backend.likeMedia(
                         tokens: tokens,
                         groupId: groupId,
-                        memoryId: galleryItem.id
+                        memoryId: galleryItemId
                     )
                 }
             } catch {
                 showToast(UIComponentsStrings.Toast.error)
             }
-        case let .unlikeMedia(galleryItem):
+        case .unlikeMedia:
             do {
-                if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                if let tokens = Tokens(),
+                   let groupId = GroupStorage.currentGroup?.id,
+                   let galleryItemId = galleryItem?.id {
                     _ = try await backend.unlikeMedia(
                         tokens: tokens,
                         groupId: groupId,
-                        memoryId: galleryItem.id
+                        memoryId: galleryItemId
                     )
                 }
             } catch {

@@ -61,7 +61,7 @@ public struct GalleryView: View {
                             }
                         },
                         showMediaDetails: {
-                            router.navigateToMediaDetails($0)
+                            router.navigateToMediaDetails($0.id)
                             // Small 🩼 for mor beautiful animation
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: {
                                 withAnimation {

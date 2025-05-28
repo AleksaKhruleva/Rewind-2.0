@@ -28,7 +28,7 @@ public final class AppRouter {
         case gallery
         case quoteCreation
         case mediasUploading
-        case mediaDetails(GalleryItem)
+        case mediaDetails(Int)
 
         case groupsList
         case group(Domain.Group)

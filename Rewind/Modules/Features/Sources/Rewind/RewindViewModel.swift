@@ -22,8 +22,9 @@ final class RewindViewModel {
         case fetchGallery
         case fetchRandomGalleryItems
 
-        case likeMedia(GalleryItem)
-        case unlikeMedia(GalleryItem)
+        case likeMedia
+        case unlikeMedia
+        case fetchCurrentMedia
     }
 
     enum UserGroupsState {
@@ -88,6 +89,20 @@ final class RewindViewModel {
             } catch {
                 showToast("\(error.localizedDescription) 😨")
             }
+        case .fetchCurrentMedia:
+            do {
+                if let tokens = Tokens(),
+                   let groupId = GroupStorage.currentGroup?.id,
+                   let memoryId = currentGalleryItem?.id {
+                    currentGalleryItem = try await backend.getMedia(
+                        tokens: tokens,
+                        groupId: groupId,
+                        memoryId: memoryId
+                    ).toGalleryItem()
+                }
+            } catch {
+                await dispatch(.showNextMediaItem)
+            }
         case .fetchGallery:
             do {
                 if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
@@ -110,6 +125,13 @@ final class RewindViewModel {
                         mediaType: "",
                         limit: 10
                     )
+                    if response.memories?.isEmpty ?? true {
+                        withAnimation {
+                            currentGalleryItem = nil
+                            galleryItemsStack = []
+                        }
+                        return
+                    }
                     withAnimation(.easeInOut(duration: 0.1)) {
                         galleryItemsStack.append(contentsOf: response.memories?.map {
                             $0.toGalleryItem()
@@ -140,7 +162,7 @@ final class RewindViewModel {
             if let galleryItem = galleryItemsStack.popLast() {
                 currentGalleryItem = galleryItem
             }
-            if galleryItemsStack.count <= 2 {
+            if galleryItemsStack.count <= 1 {
                 await dispatch(.fetchRandomGalleryItems)
             }
         case .fetchGroups:
@@ -236,25 +258,29 @@ final class RewindViewModel {
                 groupImage = await loadImage(urlString: url)
             }
             userImage = await loadImage(urlString: user.imageURL)
-        case let .likeMedia(galleryItem):
+        case .likeMedia:
             do {
-                if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                if let tokens = Tokens(),
+                   let groupId = GroupStorage.currentGroup?.id,
+                   let galleryItemId = currentGalleryItem?.id {
                     _ = try await backend.likeMedia(
                         tokens: tokens,
                         groupId: groupId,
-                        memoryId: galleryItem.id
+                        memoryId: galleryItemId
                     )
                 }
             } catch {
                 showToast(UIComponentsStrings.Toast.error)
             }
-        case let .unlikeMedia(galleryItem):
+        case .unlikeMedia:
             do {
-                if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                if let tokens = Tokens(),
+                   let groupId = GroupStorage.currentGroup?.id,
+                   let galleryItemId = currentGalleryItem?.id {
                     _ = try await backend.unlikeMedia(
                         tokens: tokens,
                         groupId: groupId,
-                        memoryId: galleryItem.id
+                        memoryId: galleryItemId
                     )
                 }
             } catch {
