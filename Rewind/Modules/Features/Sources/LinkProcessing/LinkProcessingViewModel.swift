@@ -49,8 +49,9 @@ final class LinkProcessingViewModel {
                 id: responseGroupDetails.group.groupID,
                 name: responseGroupDetails.group.name,
                 ownerID: responseGroupDetails.group.ownerID,
-                members: members,
-                createdAt: DateParser.parseISODate(responseGroupDetails.group.createdAt)
+                imageURL: responseGroupDetails.group.imageURL,
+                createdAt: DateParser.parseISODate(responseGroupDetails.group.createdAt),
+                members: members
             )
 
             GroupStorage.set(newGroup: currentGroup)

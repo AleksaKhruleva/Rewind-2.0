@@ -50,7 +50,7 @@ final class MembersListViewModel {
             )
             let link = "https://rewindapp.ru/join/\(response.invitationCode)"
             router.navigateToAddMember(groupName: group.name, link: link)
-        } catch let error as HTTPError where error == .forbidden {
+        } catch let error as HTTPError where error == .forbidden || error == .notFound {
             toastMessage = "You no longer have access to this group!"
             GroupStorage.clear()
             router.navigateToRewind()
@@ -79,7 +79,7 @@ final class MembersListViewModel {
                 groupMembers.removeAll { $0.id == member.id }
                 toastMessage = "\(member.name) have been successfully removed from the group!"
             }
-        } catch let error as HTTPError where error == .forbidden {
+        } catch let error as HTTPError where error == .forbidden || error == .notFound {
             toastMessage = "You no longer have access to this group!"
             GroupStorage.clear()
             router.navigateToRewind()

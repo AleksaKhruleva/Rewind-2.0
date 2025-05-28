@@ -7,6 +7,8 @@ public struct GroupSettingsView: View {
     @State private var viewModel: GroupSettingsViewModel
     @State private var deleteGroupAlertShown = false
     @State private var leaveGroupAlertShown = false
+    @State private var imageEditDialogShown = false
+    @State private var photoPickerShown = false
     @Environment(\.showToast) private var showToast
 
     public init(group: Domain.Group, router: GroupSettingsRouter) {
@@ -36,10 +38,10 @@ public struct GroupSettingsView: View {
                 error: $viewModel.groupNameError,
                 message: viewModel.progressMessage
             ) { newName in
-                    Task {
-                        await viewModel.dispatch(.updateName(newName))
-                    }
+                Task {
+                    await viewModel.dispatch(.updateName(newName))
                 }
+            }
         }
         .onChange(of: viewModel.toastMessage) {
             if let message = viewModel.toastMessage {
@@ -88,6 +90,28 @@ public struct GroupSettingsView: View {
                 }
             }
         }
+        .confirmationDialog(
+            "What to do with the group image?",
+            isPresented: $imageEditDialogShown,
+            actions: {
+                Button(UIComponentsStrings.Account.Edit.Image.Dialog.setNew) {
+                    photoPickerShown = true
+                }
+                Button(UIComponentsStrings.Account.Edit.Image.Dialog.delete, role: .destructive) {
+                    print("delete")
+                }
+            }
+        )
+        .customImagePicker(show: $photoPickerShown, croppedImage: Binding {
+            return viewModel.groupImage
+        } set: { newImage in
+            Task { await viewModel.dispatch(.updateImage(newImage)) }
+        }) {
+//            showToast(UIComponentsStrings.Account.Edit.Image.Set.success)
+        }
+        .task {
+            await viewModel.dispatch(.loadGroupImage)
+        }
     }
 
     private var header: some View {
@@ -95,7 +119,7 @@ public struct GroupSettingsView: View {
             RewindButton(type: .rightChevron).hidden()
         } centerView: {
             HeaderBadgeView(
-                image: viewModel.group.image,
+                image: viewModel.groupImage,
                 text: viewModel.group.name
             )
         } rightView: {
@@ -107,29 +131,33 @@ public struct GroupSettingsView: View {
 
     private var avatar: some View {
         AvatarView(
-            image: viewModel.group.image,
+            image: viewModel.groupImage,
             text: viewModel.group.name
         )
     }
 
     private var generalTable: some View {
         let generalData = [
-            ("photo.fill", UIComponentsStrings.Group.Settings.General.name, nilAccessibility, {
+            ("pencil", UIComponentsStrings.Group.Settings.General.name, nilAccessibility, {
                 viewModel.needNameInputView = true
             }),
-            ("pencil", UIComponentsStrings.Group.Settings.General.image, nilAccessibility, {})
+            ("photo.fill", UIComponentsStrings.Group.Settings.General.image, nilAccessibility, {
+                imageEditDialogShown = true
+            })
         ]
-        return InformationTable(title: UIComponentsStrings.Group.Settings.general, data: generalData, isRisky: false)
+        return InformationTable(
+            title: UIComponentsStrings.Group.Settings.general,
+            data: generalData,
+            isRisky: false
+        )
     }
 
     private var riskyTable: some View {
         Group {
-            if let tokens = Tokens(),
-               let userID = JWTDecoder().getUserId(from: tokens.accessToken),
-               let ownerID = viewModel.group.ownerID {
+            if let tokens = Tokens(), let userID = JWTDecoder().getUserId(from: tokens.accessToken) {
                 InformationTable(
                     title: UIComponentsStrings.Group.Settings.risky,
-                    data: String(ownerID) == userID ? [
+                    data: String(viewModel.group.ownerID) == userID ? [
                         (
                             "rectangle.portrait.and.arrow.right.fill",
                             UIComponentsStrings.Group.Settings.Risky.leave, nil, {

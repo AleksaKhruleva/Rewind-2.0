@@ -87,7 +87,7 @@ struct GroupSelectionView: View {
                         viewModel.currentGroup = CurrentGroupInfo(
                             id: newGroup.id,
                             name: newGroup.name,
-                            imageData: newGroup.imageData
+                            imageURL: newGroup.imageURL
                         )
                         onGroupSelected?(newGroup)
                         dismiss()

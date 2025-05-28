@@ -1,11 +1,12 @@
 import SwiftUI
 import UIComponents
 import Domain
+import Base
 
 public struct GroupView: View {
     @State private var viewModel: GroupViewModel
     @State private var isBlurredAvatarPresented = false
-    @Environment(\.showToast) var showToast
+    @Environment(\.showToast) private var showToast
 
     public init(group: Domain.Group, router: GroupRouter) {
         viewModel = GroupViewModel(group: group, router: router)
@@ -18,11 +19,12 @@ public struct GroupView: View {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 15) {
                     avatar
-                        .onTapGesture {
-                            withAnimation {
-                                isBlurredAvatarPresented.toggle()
-                            }
-                        }
+                    // TODO: finish later
+//                        .onTapGesture {
+//                            withAnimation {
+//                                isBlurredAvatarPresented.toggle()
+//                            }
+//                        }
 
                     membersTable
 
@@ -43,7 +45,7 @@ public struct GroupView: View {
             if isBlurredAvatarPresented {
                 BlurredAvatarView(
                     isPresented: $isBlurredAvatarPresented,
-                    image: .constant(viewModel.group.image)
+                    image: .constant(viewModel.groupImage)
                 )
             }
         }
@@ -63,6 +65,11 @@ public struct GroupView: View {
                 viewModel.toastMessage = nil
             }
         }
+        .onTopAppear {
+            Task {
+                await viewModel.dispatch(.loadGroupImage)
+            }
+        }
     }
 
     private var header: some View {
@@ -72,7 +79,7 @@ public struct GroupView: View {
             }
         } centerView: {
             HeaderBadgeView(
-                image: viewModel.group.image,
+                image: viewModel.groupImage,
                 text: viewModel.group.name
             )
         } rightView: {
@@ -83,7 +90,7 @@ public struct GroupView: View {
     }
 
     private var avatar: some View {
-        AvatarView(image: viewModel.group.image, text: viewModel.group.name)
+        AvatarView(image: viewModel.groupImage, text: viewModel.group.name)
     }
 
     private var membersTable: some View {
@@ -148,9 +155,7 @@ public struct GroupView: View {
 
     @ViewBuilder
     private var groupExistenceNote: some View {
-        if let days = viewModel.group.daysSinceCreation {
-            RewindNoteTextView(text: UIComponentsStrings.Group.note(days))
-                .padding(.vertical, 4)
-        }
+        RewindNoteTextView(text: UIComponentsStrings.Group.note(viewModel.group.daysSinceCreation))
+            .padding(.vertical, 4)
     }
 }

@@ -16,6 +16,7 @@ final class RewindViewModel {
         case fetchGroups
         case openGroup
         case selectedNewGroup(Domain.Group)
+        case loadGroupImage
     }
 
     enum UserGroupsState {
@@ -31,6 +32,7 @@ final class RewindViewModel {
     var showToast: (String) -> Void
     var isTrackPlaying = false
     var rolls = 0
+    var groupImage: UIImage?
     private(set) var groups = [Domain.Group]()
     private(set) var userGroupsState = UserGroupsState.notReady
     private(set) var currentGroupState = CurrentGroupState.ready
@@ -112,7 +114,15 @@ final class RewindViewModel {
             do {
                 guard let tokens = Tokens() else { return }
                 let responses = try await backend.fetchGroups(tokens: tokens)
-                groups = GroupUtils.sortedGroups(from: responses)
+                let sorted = GroupUtils.sortedGroups(from: responses)
+                await withTaskGroup(of: Void.self) { group in
+                    for groupItem in sorted {
+                        group.addTask {
+                            await GroupImageProvider.loadAndCacheImage(for: groupItem.imageURL)
+                        }
+                    }
+                }
+                groups = sorted
                 if let currentGroupId = GroupStorage.currentGroup?.id {
                     if let updatedGroup = groups.first(where: { $0.id == currentGroupId }) {
                         GroupStorage.set(newGroup: updatedGroup)
@@ -154,11 +164,13 @@ final class RewindViewModel {
                     id: currentGroupID,
                     name: response.group.name,
                     ownerID: response.group.ownerID,
-                    members: members,
-                    createdAt: DateParser.parseISODate(response.group.createdAt)
+                    imageURL: response.group.imageURL,
+                    createdAt: DateParser.parseISODate(response.group.createdAt),
+                    members: members
                 )
+                GroupStorage.set(newGroup: currentGroup)
                 router.navigateToGroup(currentGroup)
-            } catch let error as HTTPError where error == .forbidden {
+            } catch let error as HTTPError where error == .forbidden || error == .notFound {
                 GroupStorage.currentGroup = nil
                 showToast("You no longer have access to this group!")
             } catch {
@@ -168,6 +180,14 @@ final class RewindViewModel {
         case .selectedNewGroup:
             groups = GroupUtils.sortedGroups(groups)
             userGroupsState = .ready
+        case .loadGroupImage:
+            await loadGroupImage()
+        }
+    }
+
+    private func loadGroupImage() async {
+        if let url = GroupStorage.currentGroup?.imageURL {
+            groupImage = await GroupImageProvider.loadOrGetImage(for: url)
         }
     }
 

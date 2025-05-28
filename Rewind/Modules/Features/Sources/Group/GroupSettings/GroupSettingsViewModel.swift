@@ -8,14 +8,17 @@ import UIComponents
 final class GroupSettingsViewModel {
     enum Intent {
         case updateName(String)
+        case updateImage(UIImage?)
         case leaveGroup
         case deleteGroup
+        case loadGroupImage
     }
 
     var toastMessage: String?
     var groupNameError: String?
     var needNameInputView = false
     var isLoading = false
+    private(set) var groupImage: UIImage = DomainAsset.groupPlaceholder.image
     private(set) var progressMessage = ""
     private(set) var group: Domain.Group
 
@@ -50,21 +53,61 @@ final class GroupSettingsViewModel {
                     id: group.id,
                     name: newName
                 )
-                let newGroup = CurrentGroupInfo(id: response.groupID, name: response.name, imageData: nil)
+                let newGroup = CurrentGroupInfo(
+                    id: response.groupID,
+                    name: response.name,
+                    imageURL: response.imageURL
+                )
                 GroupStorage.set(newGroup: newGroup)
                 group.name = response.name
                 withAnimation(.easeInOut(duration: 0.3)) {
                     needNameInputView = false
                 }
                 toastMessage = UIComponentsStrings.Account.Edit.Name.success
-                isLoading = false
-            } catch let error as HTTPError where error == .forbidden {
+            } catch let error as HTTPError where error == .forbidden || error == .notFound {
                 toastMessage = "You no longer have access to this group!"
                 GroupStorage.clear()
                 router.navigateToRewind()
             } catch {
                 toastMessage = "Error: \(error). Try again later!"
+                needNameInputView = false
+            }
+
+        case let .updateImage(newImage):
+            progressMessage = "Updating the group image..."
+            isLoading = true
+            defer {
                 isLoading = false
+            }
+            guard let newImage else {
+                // TODO: handle nil newImage
+                return
+            }
+            guard let tokens = Tokens() else {
+                // TODO: handle unauthorized
+                return
+            }
+            do {
+                let response = try await backend.updateGroupImage(
+                    tokens: tokens,
+                    id: group.id,
+                    image: newImage
+                )
+                let newGroup = CurrentGroupInfo(
+                    id: response.groupID,
+                    name: response.name,
+                    imageURL: response.imageURL
+                )
+                GroupStorage.set(newGroup: newGroup)
+                group.imageURL = response.imageURL
+                await loadGroupImage()
+                toastMessage = UIComponentsStrings.Account.Edit.Image.Set.success
+            } catch let error as HTTPError where error == .forbidden || error == .notFound {
+                toastMessage = "You no longer have access to this group!"
+                GroupStorage.clear()
+                router.navigateToRewind()
+            } catch {
+                toastMessage = "Error: \(error). Try again later!"
                 needNameInputView = false
             }
 
@@ -92,7 +135,7 @@ final class GroupSettingsViewModel {
                 } else {
                     toastMessage = "Couldn't remove you from the group. Try again later!"
                 }
-            } catch let error as HTTPError where error == .forbidden {
+            } catch let error as HTTPError where error == .forbidden || error == .notFound {
                 toastMessage = "You no longer have access to this group!"
                 GroupStorage.clear()
                 router.navigateToRewind()
@@ -121,13 +164,29 @@ final class GroupSettingsViewModel {
                 } else {
                     toastMessage = UIComponentsStrings.Toast.error
                 }
-            } catch let error as HTTPError where error == .forbidden {
+            } catch let error as HTTPError where error == .forbidden || error == .notFound {
                 toastMessage = "You no longer have access to this group!"
                 GroupStorage.clear()
                 router.navigateToRewind()
             } catch {
                 toastMessage = "Error: \(error). Try again later!"
             }
+
+        case .loadGroupImage:
+            await loadGroupImage()
+        }
+    }
+
+    private func loadGroupImage() async {
+        guard let currentGroup = GroupStorage.currentGroup else {
+            // TODO: handle nil group
+            return
+        }
+        let image = await GroupImageProvider.loadOrGetImage(
+            for: currentGroup.imageURL
+        )
+        await MainActor.run { [weak self] in
+            self?.groupImage = image
         }
     }
 }

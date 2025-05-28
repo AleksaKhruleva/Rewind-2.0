@@ -18,20 +18,20 @@ final class GalleryViewModel {
         case addMedia(LoadedMedia)
         case deleteMedia(GalleryItem)
     }
-    
+
     var group: Domain.Group {
         if let currentGroup = GroupStorage.currentGroup {
             return Domain.Group(
-                id: currentGroup.id,
-                name: currentGroup.name,
-                imageData: currentGroup.imageData
-            )
+                    id: currentGroup.id,
+                    name: currentGroup.name,
+                    imageURL: currentGroup.imageURL
+                )
         } else {
             return Domain.Group(
-                id: -1,
-                name: "Без имени",
-                imageData: nil
-            )
+                    id: -1,
+                    name: "Anonymous",
+                    imageURL: ""
+                )
         }
     }
 

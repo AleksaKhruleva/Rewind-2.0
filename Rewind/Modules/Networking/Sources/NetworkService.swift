@@ -33,6 +33,7 @@ public protocol NetworkServiceProtocol {
     func fetchGroups(tokens: Tokens) async throws -> [GroupResponse]
     func fetchFullGroupDetails(tokens: Tokens, id: Int) async throws -> GroupDetails
     func updateGroupName(tokens: Tokens, id: Int, name: String) async throws -> GroupResponse
+    func updateGroupImage(tokens: Tokens, id: Int, image: UIImage) async throws -> GroupResponse
     func createGroupInvitationCode(tokens: Tokens, id: Int) async throws -> GroupInvitationCodeResponse
     func addUserToGroup(tokens: Tokens, invitationCode: String) async throws -> GroupResponse
     func deleteMemberFromGroup(tokens: Tokens, groupID: Int, memberID: String) async throws -> SuccessResponse
@@ -414,6 +415,20 @@ public final class NetworkService: NetworkServiceProtocol {
                         accessToken: newToken ?? tokens.accessToken,
                         id: id,
                         name: name
+                    ),
+                    type: GroupResponse.self
+                )
+        }
+    }
+
+    public func updateGroupImage(tokens: Tokens, id: Int, image: UIImage) async throws -> GroupResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
+            try await provider
+                .request(
+                    .updateGroupImage(
+                        accessToken: newToken ?? tokens.accessToken,
+                        id: id,
+                        image: image
                     ),
                     type: GroupResponse.self
                 )

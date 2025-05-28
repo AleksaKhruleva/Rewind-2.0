@@ -10,7 +10,6 @@ public struct RewindView: View {
     @State private var isSelectGroupPresented = false
 
     @Environment(\.showToast) private var showToast
-    @Environment(\.isTopScreen) private var isTopScreen
 
     public init(router: RewindRouter) {
         viewModel = RewindViewModel(router: router)
@@ -92,18 +91,9 @@ public struct RewindView: View {
         .onTopAppear {
             Task {
                 await viewModel.dispatch(.fetchGroups)
+                await viewModel.dispatch(.loadGroupImage)
             }
         }
-    }
-
-    private var groupImage: UIImage? {
-        guard let currentGroup = GroupStorage.currentGroup else { return nil }
-
-        guard let data = currentGroup.imageData, let image = UIImage(data: data) else {
-            return DomainAsset.groupPlaceholder.image
-        }
-
-        return image
     }
 
     @ViewBuilder
@@ -113,7 +103,7 @@ public struct RewindView: View {
                 ProgressView()
                     .frame(width: 42, height: 42)
                     .clipShape(Circle())
-            } else if let image = groupImage {
+            } else if let image = viewModel.groupImage {
                 RoundImageView(image: image)
                     .contentShape(Circle())
                     .onTapGesture {
@@ -164,7 +154,7 @@ public struct RewindView: View {
             .background(Color.backgroundSecondary)
             .clipShape(Capsule())
         }
-        .padding(.horizontal, groupImage == nil ? -8 : 0)
+        .padding(.horizontal, viewModel.groupImage == nil ? -8 : 0)
         .foregroundStyle(Color.textPrimary)
         .blur(radius: viewModel.userGroupsState == .notReady ? 3 : 0)
         .animation(.easeInOut(duration: 0.2), value: viewModel.userGroupsState)

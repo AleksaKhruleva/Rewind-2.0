@@ -10,6 +10,7 @@ final class GroupViewModel {
         case createInvitation
         case deleteMember(Member)
         case refreshGroupData
+        case loadGroupImage
     }
 
     enum InvitationState {
@@ -22,6 +23,8 @@ final class GroupViewModel {
     var shortGroupMembers: [Member] {
         group.members?.prefix(4).map { $0 } ?? []
     }
+    private(set) var isGroupImageReady = true
+    private(set) var groupImage: UIImage = DomainAsset.groupPlaceholder.image
     private(set) var progressMessage = ""
     private(set) var isLoading = false
     private(set) var invitationState = InvitationState.ready
@@ -53,7 +56,7 @@ final class GroupViewModel {
                         groupName: group.name,
                         link: link
                     )
-            } catch let error as HTTPError where error == .forbidden {
+            } catch let error as HTTPError where error == .forbidden || error == .notFound {
                 toastMessage = "You no longer have access to this group!"
                 GroupStorage.clear()
                 router.navigateToRewind()
@@ -66,6 +69,24 @@ final class GroupViewModel {
 
         case .refreshGroupData:
             await refreshGroupData()
+
+        case .loadGroupImage:
+            await loadGroupImage()
+        }
+    }
+
+    private func loadGroupImage() async {
+        isGroupImageReady = false
+        guard let currentGroup = GroupStorage.currentGroup else {
+            // TODO: handle nil group
+            return
+        }
+        let image = await GroupImageProvider.loadOrGetImage(
+            for: currentGroup.imageURL
+        )
+        await MainActor.run { [weak self] in
+            self?.groupImage = image
+            self?.isGroupImageReady = true
         }
     }
 
@@ -91,7 +112,7 @@ final class GroupViewModel {
             } else {
                 toastMessage = UIComponentsStrings.Toast.error
             }
-        } catch let error as HTTPError where error == .forbidden {
+        } catch let error as HTTPError where error == .forbidden || error == .notFound {
             toastMessage = "You no longer have access to this group!"
             GroupStorage.clear()
             router.navigateToRewind()
@@ -128,13 +149,13 @@ final class GroupViewModel {
                 id: currentGroupID,
                 name: response.group.name,
                 ownerID: response.group.ownerID,
-                members: members,
-                createdAt: DateParser.parseISODate(response.group.createdAt)
+                imageURL: response.group.imageURL,
+                createdAt: DateParser.parseISODate(response.group.createdAt), members: members
             )
 
             self.group = currentGroup
             toastMessage = "Group data has been successfully updated!"
-        } catch let error as HTTPError where error == .forbidden {
+        } catch let error as HTTPError where error == .forbidden || error == .notFound {
             toastMessage = "You no longer have access to this group!"
             GroupStorage.clear()
             router.navigateToRewind()

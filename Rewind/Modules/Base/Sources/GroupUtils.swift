@@ -6,10 +6,12 @@ public enum GroupUtils {
         var groups = responses
             .map { response in
                 Domain.Group(
-                    id: response.groupID,
-                    name: response.name
-                    // imageData: ...
-                )
+                        id: response.groupID,
+                        name: response.name,
+                        ownerID: response.ownerID,
+                        imageURL: response.imageURL,
+                        createdAt: DateParser.parseISODate(response.createdAt)
+                    )
             }
             .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
 

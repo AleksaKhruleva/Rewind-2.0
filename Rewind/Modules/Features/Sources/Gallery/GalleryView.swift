@@ -88,7 +88,7 @@ public struct GalleryView: View {
 
     private var headerView: some View {
         GalleryHeader(
-            image: viewModel.group.image,
+            image: UIComponentsAsset.groupAvatar.image, // TODO: get real group image
             groupName: viewModel.group.name,
             onDismiss: {
                 DispatchQueue.main.async {

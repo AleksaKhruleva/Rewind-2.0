@@ -62,6 +62,8 @@ final class GroupSelectionViewModel {
                     id: response.groupID,
                     name: response.name,
                     ownerID: response.ownerID,
+                    imageURL: response.imageURL,
+                    createdAt: DateParser.parseISODate(response.createdAt),
                     members: [
                         Member(
                             id: userID,
@@ -70,8 +72,7 @@ final class GroupSelectionViewModel {
                             isOwner: true,
                             isUser: true
                         )
-                    ],
-                    createdAt: DateParser.parseISODate(response.createdAt)
+                    ]
                 )
 
                 GroupStorage.set(newGroup: group)

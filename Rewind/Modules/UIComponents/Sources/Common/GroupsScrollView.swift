@@ -149,7 +149,7 @@ public final class Cell: UICollectionViewCell {
     }
 
     func configure(with group: Domain.Group, imageSize: CGFloat, isSelected: Bool) {
-        imageView.image = group.image
+        imageView.image = UIComponentsAsset.groupAvatar.image
         titleLabel.text = group.name
         widthConstraint?.constant = imageSize
 
