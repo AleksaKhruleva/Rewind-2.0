@@ -10,6 +10,9 @@ final class MediaDetailsViewModel {
         case deleteMedia(GalleryItem)
         case addTag(GalleryItem, String)
         case deleteTag(GalleryItem, String)
+
+        case likeMedia(GalleryItem)
+        case unlikeMedia(GalleryItem)
     }
 
     var showToast: (String) -> Void
@@ -62,6 +65,30 @@ final class MediaDetailsViewModel {
                 }
             } catch let httpError as HTTPError where httpError == .conflict {
                 showToast("Your tags must be unique 🏷️")
+            } catch {
+                showToast(UIComponentsStrings.Toast.error)
+            }
+        case let .likeMedia(galleryItem):
+            do {
+                if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                    _ = try await backend.likeMedia(
+                        tokens: tokens,
+                        groupId: groupId,
+                        memoryId: galleryItem.id
+                    )
+                }
+            } catch {
+                showToast(UIComponentsStrings.Toast.error)
+            }
+        case let .unlikeMedia(galleryItem):
+            do {
+                if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                    _ = try await backend.unlikeMedia(
+                        tokens: tokens,
+                        groupId: groupId,
+                        memoryId: galleryItem.id
+                    )
+                }
             } catch {
                 showToast(UIComponentsStrings.Toast.error)
             }

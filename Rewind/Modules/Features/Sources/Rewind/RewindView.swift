@@ -178,9 +178,9 @@ public struct RewindView: View {
 
     private var mediaView: some View {
         MediaContentView(
-            mediaItem: viewModel.currentMediaItem.memory,
+            galleryItem: viewModel.currentMediaItem,
             onSave: {},
-            onLike: {},
+            onLike: { _ in },
             onToggleSound: {
                 Task {
                     await viewModel.dispatch(.toggleTrackPlaying)

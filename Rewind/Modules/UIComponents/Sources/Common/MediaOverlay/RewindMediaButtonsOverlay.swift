@@ -1,13 +1,16 @@
 import SwiftUI
 
 public struct RewindMediaButtonsOverlay: View {
-    private let likeAction: () -> Void
+    private let isLiked: Bool
+    private let likeAction: (Bool) -> Void
     private let saveAction: () -> Void
 
     public init(
-        likeAction: @escaping () -> Void,
+        isLiked: Bool,
+        likeAction: @escaping (Bool) -> Void,
         saveAction: @escaping () -> Void
     ) {
+        self.isLiked = isLiked
         self.likeAction = likeAction
         self.saveAction = saveAction
     }
@@ -18,7 +21,12 @@ public struct RewindMediaButtonsOverlay: View {
             HStack {
                 RewindMediaButton(type: .save) { saveAction() }
                 Spacer()
-                RewindMediaButton(type: .like, fillable: true) { likeAction() }
+                RewindMediaButton(
+                    type: .like,
+                    fillable: true,
+                    filled: isLiked,
+                    fillableAction: likeAction
+                )
             }
         }
         .padding(8 * 1.5)

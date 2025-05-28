@@ -15,23 +15,28 @@ public struct RewindMediaButton: View {
     private let fillable: Bool
     private let filledColor: Color
     private let action: () -> Void
+    private let fillableAction: ((Bool) -> Void)?
 
-    @State private var filled: Bool = false
+    @State private var filled: Bool
 
     public init(
         size: CGFloat = 40,
         fontSize: CGFloat = 22,
         type: ButtonType,
         fillable: Bool = false,
+        filled: Bool = false,
         filledColor: Color = .pinkPrimary,
-        action: @escaping () -> Void = {}
+        action: @escaping () -> Void = {},
+        fillableAction: ((Bool) -> Void)? = nil,
     ) {
         self.size = size
         self.fontSize = fontSize
         self.type = type
         self.fillable = fillable
+        self.filled = filled
         self.filledColor = filledColor
         self.action = action
+        self.fillableAction = fillableAction
     }
 
     public var body: some View {
@@ -43,6 +48,7 @@ public struct RewindMediaButton: View {
             .clipShape(Circle())
             .highPriorityGesture(
                 TapGesture().onEnded {
+                    fillableAction?(filled)
                     action()
                     toggle()
                 }
@@ -70,22 +76,6 @@ extension RewindMediaButton {
     private func toggle() {
         withAnimation(.easeInOut(duration: 0.1)) {
             filled.toggle()
-        }
-    }
-}
-
-#Preview {
-    ZStack {
-        Color.black.opacity(0.9).ignoresSafeArea()
-
-        HStack {
-            RewindMediaButton(type: .like, fillable: true) {
-                print("like")
-            }
-
-            RewindMediaButton(type: .save) {
-                print("save")
-            }
         }
     }
 }

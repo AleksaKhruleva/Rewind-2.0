@@ -17,6 +17,9 @@ final class GalleryViewModel {
         case fetchGallery
         case addMedia(LoadedMedia)
         case deleteMedia(GalleryItem)
+
+        case likeMedia(GalleryItem)
+        case unlikeMedia(GalleryItem)
     }
 
     var group: Domain.Group {
@@ -148,6 +151,30 @@ final class GalleryViewModel {
                             galleryItems.removeAll { $0.id == galleryItem.id }
                         }
                     }
+                }
+            } catch {
+                showToast(UIComponentsStrings.Toast.error)
+            }
+        case let .likeMedia(galleryItem):
+            do {
+                if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                    _ = try await backend.likeMedia(
+                        tokens: tokens,
+                        groupId: groupId,
+                        memoryId: galleryItem.id
+                    )
+                }
+            } catch {
+                showToast(UIComponentsStrings.Toast.error)
+            }
+        case let .unlikeMedia(galleryItem):
+            do {
+                if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                    _ = try await backend.unlikeMedia(
+                        tokens: tokens,
+                        groupId: groupId,
+                        memoryId: galleryItem.id
+                    )
                 }
             } catch {
                 showToast(UIComponentsStrings.Toast.error)
