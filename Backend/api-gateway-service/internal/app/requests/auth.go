@@ -60,3 +60,7 @@ type VerifyPasswordResetCodeRequest struct {
 type SetNewPasswordRequest struct {
 	NewPassword string `json:"new_password"`
 }
+
+type UpdateMemoriesViewedRequest struct {
+	Increment uint32 `json:"increment" validate:"required,gt=0"`
+}

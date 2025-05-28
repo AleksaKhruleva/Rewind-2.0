@@ -507,6 +507,102 @@ func (x *CreateMemoryResponse) GetMemory() *Memory {
 	return nil
 }
 
+type GetMemoryRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MemoryId      uint64                 `protobuf:"varint,1,opt,name=memory_id,json=memoryId,proto3" json:"memory_id,omitempty"`
+	UserId        uint64                 `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMemoryRequest) Reset() {
+	*x = GetMemoryRequest{}
+	mi := &file_proto_memory_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMemoryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMemoryRequest) ProtoMessage() {}
+
+func (x *GetMemoryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_memory_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMemoryRequest.ProtoReflect.Descriptor instead.
+func (*GetMemoryRequest) Descriptor() ([]byte, []int) {
+	return file_proto_memory_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *GetMemoryRequest) GetMemoryId() uint64 {
+	if x != nil {
+		return x.MemoryId
+	}
+	return 0
+}
+
+func (x *GetMemoryRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+type GetMemoryResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Memory        *DetailedMemory        `protobuf:"bytes,1,opt,name=memory,proto3" json:"memory,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMemoryResponse) Reset() {
+	*x = GetMemoryResponse{}
+	mi := &file_proto_memory_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMemoryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMemoryResponse) ProtoMessage() {}
+
+func (x *GetMemoryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_memory_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMemoryResponse.ProtoReflect.Descriptor instead.
+func (*GetMemoryResponse) Descriptor() ([]byte, []int) {
+	return file_proto_memory_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GetMemoryResponse) GetMemory() *DetailedMemory {
+	if x != nil {
+		return x.Memory
+	}
+	return nil
+}
+
 // Запрос на удаление воспоминаний по Group ID
 type DeleteMemoriesByGroupRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -517,7 +613,7 @@ type DeleteMemoriesByGroupRequest struct {
 
 func (x *DeleteMemoriesByGroupRequest) Reset() {
 	*x = DeleteMemoriesByGroupRequest{}
-	mi := &file_proto_memory_proto_msgTypes[5]
+	mi := &file_proto_memory_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -529,7 +625,7 @@ func (x *DeleteMemoriesByGroupRequest) String() string {
 func (*DeleteMemoriesByGroupRequest) ProtoMessage() {}
 
 func (x *DeleteMemoriesByGroupRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[5]
+	mi := &file_proto_memory_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -542,7 +638,7 @@ func (x *DeleteMemoriesByGroupRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteMemoriesByGroupRequest.ProtoReflect.Descriptor instead.
 func (*DeleteMemoriesByGroupRequest) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{5}
+	return file_proto_memory_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *DeleteMemoriesByGroupRequest) GetGroupId() uint64 {
@@ -562,7 +658,7 @@ type DeleteMemoriesByGroupResponse struct {
 
 func (x *DeleteMemoriesByGroupResponse) Reset() {
 	*x = DeleteMemoriesByGroupResponse{}
-	mi := &file_proto_memory_proto_msgTypes[6]
+	mi := &file_proto_memory_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -574,7 +670,7 @@ func (x *DeleteMemoriesByGroupResponse) String() string {
 func (*DeleteMemoriesByGroupResponse) ProtoMessage() {}
 
 func (x *DeleteMemoriesByGroupResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[6]
+	mi := &file_proto_memory_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -587,7 +683,7 @@ func (x *DeleteMemoriesByGroupResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteMemoriesByGroupResponse.ProtoReflect.Descriptor instead.
 func (*DeleteMemoriesByGroupResponse) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{6}
+	return file_proto_memory_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *DeleteMemoriesByGroupResponse) GetSuccess() bool {
@@ -609,7 +705,7 @@ type DeleteMemoryRequest struct {
 
 func (x *DeleteMemoryRequest) Reset() {
 	*x = DeleteMemoryRequest{}
-	mi := &file_proto_memory_proto_msgTypes[7]
+	mi := &file_proto_memory_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -621,7 +717,7 @@ func (x *DeleteMemoryRequest) String() string {
 func (*DeleteMemoryRequest) ProtoMessage() {}
 
 func (x *DeleteMemoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[7]
+	mi := &file_proto_memory_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -634,7 +730,7 @@ func (x *DeleteMemoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteMemoryRequest.ProtoReflect.Descriptor instead.
 func (*DeleteMemoryRequest) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{7}
+	return file_proto_memory_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *DeleteMemoryRequest) GetMemoryId() uint64 {
@@ -668,7 +764,7 @@ type DeleteMemoryResponse struct {
 
 func (x *DeleteMemoryResponse) Reset() {
 	*x = DeleteMemoryResponse{}
-	mi := &file_proto_memory_proto_msgTypes[8]
+	mi := &file_proto_memory_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -680,7 +776,7 @@ func (x *DeleteMemoryResponse) String() string {
 func (*DeleteMemoryResponse) ProtoMessage() {}
 
 func (x *DeleteMemoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[8]
+	mi := &file_proto_memory_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -693,7 +789,7 @@ func (x *DeleteMemoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteMemoryResponse.ProtoReflect.Descriptor instead.
 func (*DeleteMemoryResponse) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{8}
+	return file_proto_memory_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *DeleteMemoryResponse) GetSuccess() bool {
@@ -714,7 +810,7 @@ type ListMemoriesByGroupRequest struct {
 
 func (x *ListMemoriesByGroupRequest) Reset() {
 	*x = ListMemoriesByGroupRequest{}
-	mi := &file_proto_memory_proto_msgTypes[9]
+	mi := &file_proto_memory_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -726,7 +822,7 @@ func (x *ListMemoriesByGroupRequest) String() string {
 func (*ListMemoriesByGroupRequest) ProtoMessage() {}
 
 func (x *ListMemoriesByGroupRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[9]
+	mi := &file_proto_memory_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -739,7 +835,7 @@ func (x *ListMemoriesByGroupRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMemoriesByGroupRequest.ProtoReflect.Descriptor instead.
 func (*ListMemoriesByGroupRequest) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{9}
+	return file_proto_memory_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ListMemoriesByGroupRequest) GetGroupId() uint64 {
@@ -766,7 +862,7 @@ type ListMemoriesByGroupResponse struct {
 
 func (x *ListMemoriesByGroupResponse) Reset() {
 	*x = ListMemoriesByGroupResponse{}
-	mi := &file_proto_memory_proto_msgTypes[10]
+	mi := &file_proto_memory_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -778,7 +874,7 @@ func (x *ListMemoriesByGroupResponse) String() string {
 func (*ListMemoriesByGroupResponse) ProtoMessage() {}
 
 func (x *ListMemoriesByGroupResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[10]
+	mi := &file_proto_memory_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -791,7 +887,7 @@ func (x *ListMemoriesByGroupResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMemoriesByGroupResponse.ProtoReflect.Descriptor instead.
 func (*ListMemoriesByGroupResponse) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{10}
+	return file_proto_memory_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ListMemoriesByGroupResponse) GetMemories() []*DetailedMemory {
@@ -814,7 +910,7 @@ type ListMemoriesByGroupWithFiltersRequest struct {
 
 func (x *ListMemoriesByGroupWithFiltersRequest) Reset() {
 	*x = ListMemoriesByGroupWithFiltersRequest{}
-	mi := &file_proto_memory_proto_msgTypes[11]
+	mi := &file_proto_memory_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -826,7 +922,7 @@ func (x *ListMemoriesByGroupWithFiltersRequest) String() string {
 func (*ListMemoriesByGroupWithFiltersRequest) ProtoMessage() {}
 
 func (x *ListMemoriesByGroupWithFiltersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[11]
+	mi := &file_proto_memory_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -839,7 +935,7 @@ func (x *ListMemoriesByGroupWithFiltersRequest) ProtoReflect() protoreflect.Mess
 
 // Deprecated: Use ListMemoriesByGroupWithFiltersRequest.ProtoReflect.Descriptor instead.
 func (*ListMemoriesByGroupWithFiltersRequest) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{11}
+	return file_proto_memory_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *ListMemoriesByGroupWithFiltersRequest) GetGroupId() uint64 {
@@ -880,7 +976,7 @@ type ListMemoriesByGroupWithFiltersResponse struct {
 
 func (x *ListMemoriesByGroupWithFiltersResponse) Reset() {
 	*x = ListMemoriesByGroupWithFiltersResponse{}
-	mi := &file_proto_memory_proto_msgTypes[12]
+	mi := &file_proto_memory_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -892,7 +988,7 @@ func (x *ListMemoriesByGroupWithFiltersResponse) String() string {
 func (*ListMemoriesByGroupWithFiltersResponse) ProtoMessage() {}
 
 func (x *ListMemoriesByGroupWithFiltersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[12]
+	mi := &file_proto_memory_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -905,7 +1001,7 @@ func (x *ListMemoriesByGroupWithFiltersResponse) ProtoReflect() protoreflect.Mes
 
 // Deprecated: Use ListMemoriesByGroupWithFiltersResponse.ProtoReflect.Descriptor instead.
 func (*ListMemoriesByGroupWithFiltersResponse) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{12}
+	return file_proto_memory_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *ListMemoriesByGroupWithFiltersResponse) GetMemories() []*DetailedMemory {
@@ -927,7 +1023,7 @@ type DetailedMemory struct {
 
 func (x *DetailedMemory) Reset() {
 	*x = DetailedMemory{}
-	mi := &file_proto_memory_proto_msgTypes[13]
+	mi := &file_proto_memory_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -939,7 +1035,7 @@ func (x *DetailedMemory) String() string {
 func (*DetailedMemory) ProtoMessage() {}
 
 func (x *DetailedMemory) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[13]
+	mi := &file_proto_memory_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -952,7 +1048,7 @@ func (x *DetailedMemory) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DetailedMemory.ProtoReflect.Descriptor instead.
 func (*DetailedMemory) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{13}
+	return file_proto_memory_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *DetailedMemory) GetMemory() *Memory {
@@ -988,7 +1084,7 @@ type CreateMemoryTagRequest struct {
 
 func (x *CreateMemoryTagRequest) Reset() {
 	*x = CreateMemoryTagRequest{}
-	mi := &file_proto_memory_proto_msgTypes[14]
+	mi := &file_proto_memory_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1000,7 +1096,7 @@ func (x *CreateMemoryTagRequest) String() string {
 func (*CreateMemoryTagRequest) ProtoMessage() {}
 
 func (x *CreateMemoryTagRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[14]
+	mi := &file_proto_memory_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1013,7 +1109,7 @@ func (x *CreateMemoryTagRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateMemoryTagRequest.ProtoReflect.Descriptor instead.
 func (*CreateMemoryTagRequest) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{14}
+	return file_proto_memory_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *CreateMemoryTagRequest) GetMemoryId() uint64 {
@@ -1047,7 +1143,7 @@ type CreateMemoryTagResponse struct {
 
 func (x *CreateMemoryTagResponse) Reset() {
 	*x = CreateMemoryTagResponse{}
-	mi := &file_proto_memory_proto_msgTypes[15]
+	mi := &file_proto_memory_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1059,7 +1155,7 @@ func (x *CreateMemoryTagResponse) String() string {
 func (*CreateMemoryTagResponse) ProtoMessage() {}
 
 func (x *CreateMemoryTagResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[15]
+	mi := &file_proto_memory_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1072,7 +1168,7 @@ func (x *CreateMemoryTagResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateMemoryTagResponse.ProtoReflect.Descriptor instead.
 func (*CreateMemoryTagResponse) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{15}
+	return file_proto_memory_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *CreateMemoryTagResponse) GetTag() *MemoryTag {
@@ -1094,7 +1190,7 @@ type DeleteMemoryTagRequest struct {
 
 func (x *DeleteMemoryTagRequest) Reset() {
 	*x = DeleteMemoryTagRequest{}
-	mi := &file_proto_memory_proto_msgTypes[16]
+	mi := &file_proto_memory_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1106,7 +1202,7 @@ func (x *DeleteMemoryTagRequest) String() string {
 func (*DeleteMemoryTagRequest) ProtoMessage() {}
 
 func (x *DeleteMemoryTagRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[16]
+	mi := &file_proto_memory_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1119,7 +1215,7 @@ func (x *DeleteMemoryTagRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteMemoryTagRequest.ProtoReflect.Descriptor instead.
 func (*DeleteMemoryTagRequest) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{16}
+	return file_proto_memory_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *DeleteMemoryTagRequest) GetMemoryId() uint64 {
@@ -1153,7 +1249,7 @@ type DeleteMemoryTagResponse struct {
 
 func (x *DeleteMemoryTagResponse) Reset() {
 	*x = DeleteMemoryTagResponse{}
-	mi := &file_proto_memory_proto_msgTypes[17]
+	mi := &file_proto_memory_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1165,7 +1261,7 @@ func (x *DeleteMemoryTagResponse) String() string {
 func (*DeleteMemoryTagResponse) ProtoMessage() {}
 
 func (x *DeleteMemoryTagResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[17]
+	mi := &file_proto_memory_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1178,7 +1274,7 @@ func (x *DeleteMemoryTagResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteMemoryTagResponse.ProtoReflect.Descriptor instead.
 func (*DeleteMemoryTagResponse) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{17}
+	return file_proto_memory_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *DeleteMemoryTagResponse) GetSuccess() bool {
@@ -1199,7 +1295,7 @@ type ListMemoryTagsByMemoryIDRequest struct {
 
 func (x *ListMemoryTagsByMemoryIDRequest) Reset() {
 	*x = ListMemoryTagsByMemoryIDRequest{}
-	mi := &file_proto_memory_proto_msgTypes[18]
+	mi := &file_proto_memory_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1211,7 +1307,7 @@ func (x *ListMemoryTagsByMemoryIDRequest) String() string {
 func (*ListMemoryTagsByMemoryIDRequest) ProtoMessage() {}
 
 func (x *ListMemoryTagsByMemoryIDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[18]
+	mi := &file_proto_memory_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1224,7 +1320,7 @@ func (x *ListMemoryTagsByMemoryIDRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMemoryTagsByMemoryIDRequest.ProtoReflect.Descriptor instead.
 func (*ListMemoryTagsByMemoryIDRequest) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{18}
+	return file_proto_memory_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *ListMemoryTagsByMemoryIDRequest) GetMemoryId() uint64 {
@@ -1251,7 +1347,7 @@ type ListMemoryTagsByMemoryIDResponse struct {
 
 func (x *ListMemoryTagsByMemoryIDResponse) Reset() {
 	*x = ListMemoryTagsByMemoryIDResponse{}
-	mi := &file_proto_memory_proto_msgTypes[19]
+	mi := &file_proto_memory_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1263,7 +1359,7 @@ func (x *ListMemoryTagsByMemoryIDResponse) String() string {
 func (*ListMemoryTagsByMemoryIDResponse) ProtoMessage() {}
 
 func (x *ListMemoryTagsByMemoryIDResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[19]
+	mi := &file_proto_memory_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1276,7 +1372,7 @@ func (x *ListMemoryTagsByMemoryIDResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMemoryTagsByMemoryIDResponse.ProtoReflect.Descriptor instead.
 func (*ListMemoryTagsByMemoryIDResponse) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{19}
+	return file_proto_memory_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *ListMemoryTagsByMemoryIDResponse) GetTags() []*MemoryTag {
@@ -1297,7 +1393,7 @@ type CreateFavouriteRequest struct {
 
 func (x *CreateFavouriteRequest) Reset() {
 	*x = CreateFavouriteRequest{}
-	mi := &file_proto_memory_proto_msgTypes[20]
+	mi := &file_proto_memory_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1309,7 +1405,7 @@ func (x *CreateFavouriteRequest) String() string {
 func (*CreateFavouriteRequest) ProtoMessage() {}
 
 func (x *CreateFavouriteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[20]
+	mi := &file_proto_memory_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1322,7 +1418,7 @@ func (x *CreateFavouriteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateFavouriteRequest.ProtoReflect.Descriptor instead.
 func (*CreateFavouriteRequest) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{20}
+	return file_proto_memory_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *CreateFavouriteRequest) GetMemoryId() uint64 {
@@ -1349,7 +1445,7 @@ type CreateFavouriteResponse struct {
 
 func (x *CreateFavouriteResponse) Reset() {
 	*x = CreateFavouriteResponse{}
-	mi := &file_proto_memory_proto_msgTypes[21]
+	mi := &file_proto_memory_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1361,7 +1457,7 @@ func (x *CreateFavouriteResponse) String() string {
 func (*CreateFavouriteResponse) ProtoMessage() {}
 
 func (x *CreateFavouriteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[21]
+	mi := &file_proto_memory_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1374,7 +1470,7 @@ func (x *CreateFavouriteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateFavouriteResponse.ProtoReflect.Descriptor instead.
 func (*CreateFavouriteResponse) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{21}
+	return file_proto_memory_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *CreateFavouriteResponse) GetFavourite() *Favourite {
@@ -1395,7 +1491,7 @@ type DeleteFavouriteRequest struct {
 
 func (x *DeleteFavouriteRequest) Reset() {
 	*x = DeleteFavouriteRequest{}
-	mi := &file_proto_memory_proto_msgTypes[22]
+	mi := &file_proto_memory_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1407,7 +1503,7 @@ func (x *DeleteFavouriteRequest) String() string {
 func (*DeleteFavouriteRequest) ProtoMessage() {}
 
 func (x *DeleteFavouriteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[22]
+	mi := &file_proto_memory_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1420,7 +1516,7 @@ func (x *DeleteFavouriteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFavouriteRequest.ProtoReflect.Descriptor instead.
 func (*DeleteFavouriteRequest) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{22}
+	return file_proto_memory_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *DeleteFavouriteRequest) GetMemoryId() uint64 {
@@ -1447,7 +1543,7 @@ type DeleteFavouriteResponse struct {
 
 func (x *DeleteFavouriteResponse) Reset() {
 	*x = DeleteFavouriteResponse{}
-	mi := &file_proto_memory_proto_msgTypes[23]
+	mi := &file_proto_memory_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1459,7 +1555,7 @@ func (x *DeleteFavouriteResponse) String() string {
 func (*DeleteFavouriteResponse) ProtoMessage() {}
 
 func (x *DeleteFavouriteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[23]
+	mi := &file_proto_memory_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1472,7 +1568,7 @@ func (x *DeleteFavouriteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFavouriteResponse.ProtoReflect.Descriptor instead.
 func (*DeleteFavouriteResponse) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{23}
+	return file_proto_memory_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *DeleteFavouriteResponse) GetSuccess() bool {
@@ -1492,7 +1588,7 @@ type DeleteFavouritedByUserIDRequest struct {
 
 func (x *DeleteFavouritedByUserIDRequest) Reset() {
 	*x = DeleteFavouritedByUserIDRequest{}
-	mi := &file_proto_memory_proto_msgTypes[24]
+	mi := &file_proto_memory_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1504,7 +1600,7 @@ func (x *DeleteFavouritedByUserIDRequest) String() string {
 func (*DeleteFavouritedByUserIDRequest) ProtoMessage() {}
 
 func (x *DeleteFavouritedByUserIDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[24]
+	mi := &file_proto_memory_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1517,7 +1613,7 @@ func (x *DeleteFavouritedByUserIDRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFavouritedByUserIDRequest.ProtoReflect.Descriptor instead.
 func (*DeleteFavouritedByUserIDRequest) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{24}
+	return file_proto_memory_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *DeleteFavouritedByUserIDRequest) GetUserId() uint64 {
@@ -1537,7 +1633,7 @@ type DeleteFavouritedByUserIDResponse struct {
 
 func (x *DeleteFavouritedByUserIDResponse) Reset() {
 	*x = DeleteFavouritedByUserIDResponse{}
-	mi := &file_proto_memory_proto_msgTypes[25]
+	mi := &file_proto_memory_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1549,7 +1645,7 @@ func (x *DeleteFavouritedByUserIDResponse) String() string {
 func (*DeleteFavouritedByUserIDResponse) ProtoMessage() {}
 
 func (x *DeleteFavouritedByUserIDResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_memory_proto_msgTypes[25]
+	mi := &file_proto_memory_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1562,7 +1658,7 @@ func (x *DeleteFavouritedByUserIDResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFavouritedByUserIDResponse.ProtoReflect.Descriptor instead.
 func (*DeleteFavouritedByUserIDResponse) Descriptor() ([]byte, []int) {
-	return file_proto_memory_proto_rawDescGZIP(), []int{25}
+	return file_proto_memory_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *DeleteFavouritedByUserIDResponse) GetSuccess() bool {
@@ -1628,7 +1724,12 @@ const file_proto_memory_proto_rawDesc = "" +
 	"\a_offsetB\v\n" +
 	"\t_duration\">\n" +
 	"\x14CreateMemoryResponse\x12&\n" +
-	"\x06memory\x18\x01 \x01(\v2\x0e.memory.MemoryR\x06memory\"9\n" +
+	"\x06memory\x18\x01 \x01(\v2\x0e.memory.MemoryR\x06memory\"H\n" +
+	"\x10GetMemoryRequest\x12\x1b\n" +
+	"\tmemory_id\x18\x01 \x01(\x04R\bmemoryId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\x04R\x06userId\"C\n" +
+	"\x11GetMemoryResponse\x12.\n" +
+	"\x06memory\x18\x01 \x01(\v2\x16.memory.DetailedMemoryR\x06memory\"9\n" +
 	"\x1cDeleteMemoriesByGroupRequest\x12\x19\n" +
 	"\bgroup_id\x18\x01 \x01(\x04R\agroupId\"9\n" +
 	"\x1dDeleteMemoriesByGroupResponse\x12\x18\n" +
@@ -1693,9 +1794,10 @@ const file_proto_memory_proto_rawDesc = "" +
 	"\vUNSPECIFIED\x10\x00\x12\t\n" +
 	"\x05image\x10\x01\x12\t\n" +
 	"\x05video\x10\x02\x12\t\n" +
-	"\x05quote\x10\x032\x9a\b\n" +
+	"\x05quote\x10\x032\xdc\b\n" +
 	"\rMemoryService\x12I\n" +
-	"\fCreateMemory\x12\x1b.memory.CreateMemoryRequest\x1a\x1c.memory.CreateMemoryResponse\x12I\n" +
+	"\fCreateMemory\x12\x1b.memory.CreateMemoryRequest\x1a\x1c.memory.CreateMemoryResponse\x12@\n" +
+	"\tGetMemory\x12\x18.memory.GetMemoryRequest\x1a\x19.memory.GetMemoryResponse\x12I\n" +
 	"\fDeleteMemory\x12\x1b.memory.DeleteMemoryRequest\x1a\x1c.memory.DeleteMemoryResponse\x12d\n" +
 	"\x15DeleteMemoriesByGroup\x12$.memory.DeleteMemoriesByGroupRequest\x1a%.memory.DeleteMemoriesByGroupResponse\x12^\n" +
 	"\x13ListMemoriesByGroup\x12\".memory.ListMemoriesByGroupRequest\x1a#.memory.ListMemoriesByGroupResponse\x12\x7f\n" +
@@ -1720,7 +1822,7 @@ func file_proto_memory_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_memory_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_memory_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
+var file_proto_memory_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_proto_memory_proto_goTypes = []any{
 	(MediaType)(0),                                 // 0: memory.MediaType
 	(*Memory)(nil),                                 // 1: memory.Memory
@@ -1728,73 +1830,78 @@ var file_proto_memory_proto_goTypes = []any{
 	(*Favourite)(nil),                              // 3: memory.Favourite
 	(*CreateMemoryRequest)(nil),                    // 4: memory.CreateMemoryRequest
 	(*CreateMemoryResponse)(nil),                   // 5: memory.CreateMemoryResponse
-	(*DeleteMemoriesByGroupRequest)(nil),           // 6: memory.DeleteMemoriesByGroupRequest
-	(*DeleteMemoriesByGroupResponse)(nil),          // 7: memory.DeleteMemoriesByGroupResponse
-	(*DeleteMemoryRequest)(nil),                    // 8: memory.DeleteMemoryRequest
-	(*DeleteMemoryResponse)(nil),                   // 9: memory.DeleteMemoryResponse
-	(*ListMemoriesByGroupRequest)(nil),             // 10: memory.ListMemoriesByGroupRequest
-	(*ListMemoriesByGroupResponse)(nil),            // 11: memory.ListMemoriesByGroupResponse
-	(*ListMemoriesByGroupWithFiltersRequest)(nil),  // 12: memory.ListMemoriesByGroupWithFiltersRequest
-	(*ListMemoriesByGroupWithFiltersResponse)(nil), // 13: memory.ListMemoriesByGroupWithFiltersResponse
-	(*DetailedMemory)(nil),                         // 14: memory.DetailedMemory
-	(*CreateMemoryTagRequest)(nil),                 // 15: memory.CreateMemoryTagRequest
-	(*CreateMemoryTagResponse)(nil),                // 16: memory.CreateMemoryTagResponse
-	(*DeleteMemoryTagRequest)(nil),                 // 17: memory.DeleteMemoryTagRequest
-	(*DeleteMemoryTagResponse)(nil),                // 18: memory.DeleteMemoryTagResponse
-	(*ListMemoryTagsByMemoryIDRequest)(nil),        // 19: memory.ListMemoryTagsByMemoryIDRequest
-	(*ListMemoryTagsByMemoryIDResponse)(nil),       // 20: memory.ListMemoryTagsByMemoryIDResponse
-	(*CreateFavouriteRequest)(nil),                 // 21: memory.CreateFavouriteRequest
-	(*CreateFavouriteResponse)(nil),                // 22: memory.CreateFavouriteResponse
-	(*DeleteFavouriteRequest)(nil),                 // 23: memory.DeleteFavouriteRequest
-	(*DeleteFavouriteResponse)(nil),                // 24: memory.DeleteFavouriteResponse
-	(*DeleteFavouritedByUserIDRequest)(nil),        // 25: memory.DeleteFavouritedByUserIDRequest
-	(*DeleteFavouritedByUserIDResponse)(nil),       // 26: memory.DeleteFavouritedByUserIDResponse
-	nil,                                            // 27: memory.ListMemoriesByGroupWithFiltersRequest.FiltersEntry
-	(*timestamppb.Timestamp)(nil),                  // 28: google.protobuf.Timestamp
+	(*GetMemoryRequest)(nil),                       // 6: memory.GetMemoryRequest
+	(*GetMemoryResponse)(nil),                      // 7: memory.GetMemoryResponse
+	(*DeleteMemoriesByGroupRequest)(nil),           // 8: memory.DeleteMemoriesByGroupRequest
+	(*DeleteMemoriesByGroupResponse)(nil),          // 9: memory.DeleteMemoriesByGroupResponse
+	(*DeleteMemoryRequest)(nil),                    // 10: memory.DeleteMemoryRequest
+	(*DeleteMemoryResponse)(nil),                   // 11: memory.DeleteMemoryResponse
+	(*ListMemoriesByGroupRequest)(nil),             // 12: memory.ListMemoriesByGroupRequest
+	(*ListMemoriesByGroupResponse)(nil),            // 13: memory.ListMemoriesByGroupResponse
+	(*ListMemoriesByGroupWithFiltersRequest)(nil),  // 14: memory.ListMemoriesByGroupWithFiltersRequest
+	(*ListMemoriesByGroupWithFiltersResponse)(nil), // 15: memory.ListMemoriesByGroupWithFiltersResponse
+	(*DetailedMemory)(nil),                         // 16: memory.DetailedMemory
+	(*CreateMemoryTagRequest)(nil),                 // 17: memory.CreateMemoryTagRequest
+	(*CreateMemoryTagResponse)(nil),                // 18: memory.CreateMemoryTagResponse
+	(*DeleteMemoryTagRequest)(nil),                 // 19: memory.DeleteMemoryTagRequest
+	(*DeleteMemoryTagResponse)(nil),                // 20: memory.DeleteMemoryTagResponse
+	(*ListMemoryTagsByMemoryIDRequest)(nil),        // 21: memory.ListMemoryTagsByMemoryIDRequest
+	(*ListMemoryTagsByMemoryIDResponse)(nil),       // 22: memory.ListMemoryTagsByMemoryIDResponse
+	(*CreateFavouriteRequest)(nil),                 // 23: memory.CreateFavouriteRequest
+	(*CreateFavouriteResponse)(nil),                // 24: memory.CreateFavouriteResponse
+	(*DeleteFavouriteRequest)(nil),                 // 25: memory.DeleteFavouriteRequest
+	(*DeleteFavouriteResponse)(nil),                // 26: memory.DeleteFavouriteResponse
+	(*DeleteFavouritedByUserIDRequest)(nil),        // 27: memory.DeleteFavouritedByUserIDRequest
+	(*DeleteFavouritedByUserIDResponse)(nil),       // 28: memory.DeleteFavouritedByUserIDResponse
+	nil,                                            // 29: memory.ListMemoriesByGroupWithFiltersRequest.FiltersEntry
+	(*timestamppb.Timestamp)(nil),                  // 30: google.protobuf.Timestamp
 }
 var file_proto_memory_proto_depIdxs = []int32{
 	0,  // 0: memory.Memory.media_type:type_name -> memory.MediaType
-	28, // 1: memory.Memory.created_at:type_name -> google.protobuf.Timestamp
-	28, // 2: memory.Memory.updated_at:type_name -> google.protobuf.Timestamp
-	28, // 3: memory.MemoryTag.created_at:type_name -> google.protobuf.Timestamp
-	28, // 4: memory.MemoryTag.updated_at:type_name -> google.protobuf.Timestamp
-	28, // 5: memory.Favourite.created_at:type_name -> google.protobuf.Timestamp
+	30, // 1: memory.Memory.created_at:type_name -> google.protobuf.Timestamp
+	30, // 2: memory.Memory.updated_at:type_name -> google.protobuf.Timestamp
+	30, // 3: memory.MemoryTag.created_at:type_name -> google.protobuf.Timestamp
+	30, // 4: memory.MemoryTag.updated_at:type_name -> google.protobuf.Timestamp
+	30, // 5: memory.Favourite.created_at:type_name -> google.protobuf.Timestamp
 	0,  // 6: memory.CreateMemoryRequest.media_type:type_name -> memory.MediaType
 	1,  // 7: memory.CreateMemoryResponse.memory:type_name -> memory.Memory
-	14, // 8: memory.ListMemoriesByGroupResponse.memories:type_name -> memory.DetailedMemory
-	27, // 9: memory.ListMemoriesByGroupWithFiltersRequest.filters:type_name -> memory.ListMemoriesByGroupWithFiltersRequest.FiltersEntry
-	14, // 10: memory.ListMemoriesByGroupWithFiltersResponse.memories:type_name -> memory.DetailedMemory
-	1,  // 11: memory.DetailedMemory.memory:type_name -> memory.Memory
-	2,  // 12: memory.CreateMemoryTagResponse.tag:type_name -> memory.MemoryTag
-	2,  // 13: memory.ListMemoryTagsByMemoryIDResponse.tags:type_name -> memory.MemoryTag
-	3,  // 14: memory.CreateFavouriteResponse.favourite:type_name -> memory.Favourite
-	4,  // 15: memory.MemoryService.CreateMemory:input_type -> memory.CreateMemoryRequest
-	8,  // 16: memory.MemoryService.DeleteMemory:input_type -> memory.DeleteMemoryRequest
-	6,  // 17: memory.MemoryService.DeleteMemoriesByGroup:input_type -> memory.DeleteMemoriesByGroupRequest
-	10, // 18: memory.MemoryService.ListMemoriesByGroup:input_type -> memory.ListMemoriesByGroupRequest
-	12, // 19: memory.MemoryService.ListMemoriesByGroupWithFilters:input_type -> memory.ListMemoriesByGroupWithFiltersRequest
-	15, // 20: memory.MemoryService.CreateMemoryTag:input_type -> memory.CreateMemoryTagRequest
-	17, // 21: memory.MemoryService.DeleteMemoryTag:input_type -> memory.DeleteMemoryTagRequest
-	19, // 22: memory.MemoryService.ListMemoryTagsByMemoryID:input_type -> memory.ListMemoryTagsByMemoryIDRequest
-	21, // 23: memory.MemoryService.CreateFavourite:input_type -> memory.CreateFavouriteRequest
-	23, // 24: memory.MemoryService.DeleteFavourite:input_type -> memory.DeleteFavouriteRequest
-	25, // 25: memory.MemoryService.DeleteFavouritesByUserID:input_type -> memory.DeleteFavouritedByUserIDRequest
-	5,  // 26: memory.MemoryService.CreateMemory:output_type -> memory.CreateMemoryResponse
-	9,  // 27: memory.MemoryService.DeleteMemory:output_type -> memory.DeleteMemoryResponse
-	7,  // 28: memory.MemoryService.DeleteMemoriesByGroup:output_type -> memory.DeleteMemoriesByGroupResponse
-	11, // 29: memory.MemoryService.ListMemoriesByGroup:output_type -> memory.ListMemoriesByGroupResponse
-	13, // 30: memory.MemoryService.ListMemoriesByGroupWithFilters:output_type -> memory.ListMemoriesByGroupWithFiltersResponse
-	16, // 31: memory.MemoryService.CreateMemoryTag:output_type -> memory.CreateMemoryTagResponse
-	18, // 32: memory.MemoryService.DeleteMemoryTag:output_type -> memory.DeleteMemoryTagResponse
-	20, // 33: memory.MemoryService.ListMemoryTagsByMemoryID:output_type -> memory.ListMemoryTagsByMemoryIDResponse
-	22, // 34: memory.MemoryService.CreateFavourite:output_type -> memory.CreateFavouriteResponse
-	24, // 35: memory.MemoryService.DeleteFavourite:output_type -> memory.DeleteFavouriteResponse
-	26, // 36: memory.MemoryService.DeleteFavouritesByUserID:output_type -> memory.DeleteFavouritedByUserIDResponse
-	26, // [26:37] is the sub-list for method output_type
-	15, // [15:26] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	16, // 8: memory.GetMemoryResponse.memory:type_name -> memory.DetailedMemory
+	16, // 9: memory.ListMemoriesByGroupResponse.memories:type_name -> memory.DetailedMemory
+	29, // 10: memory.ListMemoriesByGroupWithFiltersRequest.filters:type_name -> memory.ListMemoriesByGroupWithFiltersRequest.FiltersEntry
+	16, // 11: memory.ListMemoriesByGroupWithFiltersResponse.memories:type_name -> memory.DetailedMemory
+	1,  // 12: memory.DetailedMemory.memory:type_name -> memory.Memory
+	2,  // 13: memory.CreateMemoryTagResponse.tag:type_name -> memory.MemoryTag
+	2,  // 14: memory.ListMemoryTagsByMemoryIDResponse.tags:type_name -> memory.MemoryTag
+	3,  // 15: memory.CreateFavouriteResponse.favourite:type_name -> memory.Favourite
+	4,  // 16: memory.MemoryService.CreateMemory:input_type -> memory.CreateMemoryRequest
+	6,  // 17: memory.MemoryService.GetMemory:input_type -> memory.GetMemoryRequest
+	10, // 18: memory.MemoryService.DeleteMemory:input_type -> memory.DeleteMemoryRequest
+	8,  // 19: memory.MemoryService.DeleteMemoriesByGroup:input_type -> memory.DeleteMemoriesByGroupRequest
+	12, // 20: memory.MemoryService.ListMemoriesByGroup:input_type -> memory.ListMemoriesByGroupRequest
+	14, // 21: memory.MemoryService.ListMemoriesByGroupWithFilters:input_type -> memory.ListMemoriesByGroupWithFiltersRequest
+	17, // 22: memory.MemoryService.CreateMemoryTag:input_type -> memory.CreateMemoryTagRequest
+	19, // 23: memory.MemoryService.DeleteMemoryTag:input_type -> memory.DeleteMemoryTagRequest
+	21, // 24: memory.MemoryService.ListMemoryTagsByMemoryID:input_type -> memory.ListMemoryTagsByMemoryIDRequest
+	23, // 25: memory.MemoryService.CreateFavourite:input_type -> memory.CreateFavouriteRequest
+	25, // 26: memory.MemoryService.DeleteFavourite:input_type -> memory.DeleteFavouriteRequest
+	27, // 27: memory.MemoryService.DeleteFavouritesByUserID:input_type -> memory.DeleteFavouritedByUserIDRequest
+	5,  // 28: memory.MemoryService.CreateMemory:output_type -> memory.CreateMemoryResponse
+	7,  // 29: memory.MemoryService.GetMemory:output_type -> memory.GetMemoryResponse
+	11, // 30: memory.MemoryService.DeleteMemory:output_type -> memory.DeleteMemoryResponse
+	9,  // 31: memory.MemoryService.DeleteMemoriesByGroup:output_type -> memory.DeleteMemoriesByGroupResponse
+	13, // 32: memory.MemoryService.ListMemoriesByGroup:output_type -> memory.ListMemoriesByGroupResponse
+	15, // 33: memory.MemoryService.ListMemoriesByGroupWithFilters:output_type -> memory.ListMemoriesByGroupWithFiltersResponse
+	18, // 34: memory.MemoryService.CreateMemoryTag:output_type -> memory.CreateMemoryTagResponse
+	20, // 35: memory.MemoryService.DeleteMemoryTag:output_type -> memory.DeleteMemoryTagResponse
+	22, // 36: memory.MemoryService.ListMemoryTagsByMemoryID:output_type -> memory.ListMemoryTagsByMemoryIDResponse
+	24, // 37: memory.MemoryService.CreateFavourite:output_type -> memory.CreateFavouriteResponse
+	26, // 38: memory.MemoryService.DeleteFavourite:output_type -> memory.DeleteFavouriteResponse
+	28, // 39: memory.MemoryService.DeleteFavouritesByUserID:output_type -> memory.DeleteFavouritedByUserIDResponse
+	28, // [28:40] is the sub-list for method output_type
+	16, // [16:28] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_proto_memory_proto_init() }
@@ -1809,7 +1916,7 @@ func file_proto_memory_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_memory_proto_rawDesc), len(file_proto_memory_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   27,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

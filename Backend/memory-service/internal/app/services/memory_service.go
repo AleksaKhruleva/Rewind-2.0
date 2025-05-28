@@ -231,6 +231,25 @@ func (s *MemoryService) DeleteMemory(ctx context.Context, req *pb.DeleteMemoryRe
 	return &pb.DeleteMemoryResponse{Success: true}, nil
 }
 
+// GetMemory implements pb.MemoryServiceServer.GetMemory
+func (s *MemoryService) GetMemory(ctx context.Context, req *pb.GetMemoryRequest) (*pb.GetMemoryResponse, error) {
+	if err := s.validator.Struct(req); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid request: %v", err)
+	}
+
+	memory, err := s.memoryRepo.GetMemoryDetailedByID(ctx, nil, uint(req.GetMemoryId()), uint(req.GetUserId()))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("MemoryService: Failed to get memory %d: %v", req.GetMemoryId(), err)
+			return nil, status.Errorf(codes.NotFound, "failed to get memory %d: %v", req.GetMemoryId(), err)
+		}
+		log.Printf("MemoryService: Failed to get memory %d: %v", req.GetMemoryId(), err)
+		return nil, status.Errorf(codes.Internal, "failed to get memory %d: %v", req.GetMemoryId(), err)
+	}
+
+	return &pb.GetMemoryResponse{Memory: convertDetailedMemoryToProto(memory)}, nil
+}
+
 // DeleteMemoriesByGroup implements pb.MemoryServiceServer.DeleteMemoriesByGroup
 func (s *MemoryService) DeleteMemoriesByGroup(ctx context.Context, req *pb.DeleteMemoriesByGroupRequest) (*pb.DeleteMemoriesByGroupResponse, error) {
 	if err := s.validator.Struct(req); err != nil {

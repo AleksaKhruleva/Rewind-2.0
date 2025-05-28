@@ -17,6 +17,7 @@ import (
 type MemoryRepositoryInterface interface {
 	CreateMemory(ctx context.Context, tx *gorm.DB, memory *models.Memory) error
 	GetMemory(ctx context.Context, tx *gorm.DB, memoryId uint) (*models.Memory, error)
+	GetMemoryDetailedByID(ctx context.Context, tx *gorm.DB, memoryID uint, userID uint) (*models.MemoryDetailed, error)
 	DeleteMemory(ctx context.Context, tx *gorm.DB, memoryID uint) error
 	DeleteMemoriesByGroup(ctx context.Context, tx *gorm.DB, groupID uint) error
 	ListMemoriesByGroupDetailed(ctx context.Context, tx *gorm.DB, groupID uint, userID uint) ([]models.MemoryDetailed, error)
@@ -82,6 +83,48 @@ func (r *MemoryRepository) GetMemory(ctx context.Context, tx *gorm.DB, memoryID 
 		}
 		log.Printf("MemoryRepository: Failed to get memory %d: %v", memoryID, result.Error)
 		return nil, fmt.Errorf("failed to get memory: %w", result.Error)
+	}
+
+	return &memory, nil
+}
+
+// GetMemoryDetailedByID получает одно воспоминание по его ID с тегами и информацией об избранном.
+func (r *MemoryRepository) GetMemoryDetailedByID(ctx context.Context, tx *gorm.DB, memoryID uint, userID uint) (*models.MemoryDetailed, error) {
+	db := r.getDB(tx).WithContext(ctx)
+	var memory models.MemoryDetailed
+
+	query := `
+        SELECT
+            m.*,
+            COALESCE(string_agg(DISTINCT mt.tag, ','), '') AS tags,
+            CASE
+                WHEN EXISTS (
+                    SELECT 1 FROM favourites f
+                    WHERE f.memory_id = m.id AND f.user_id = ?
+                ) THEN TRUE
+                ELSE FALSE
+            END AS is_favourite
+        FROM memories m
+        LEFT JOIN memory_tags mt ON mt.memory_id = m.id
+        LEFT JOIN favourites f ON f.memory_id = m.id AND f.user_id = ?
+        WHERE m.id = ?
+        GROUP BY m.id
+        LIMIT 1
+    `
+
+	result := db.Raw(query, userID, userID, memoryID).Scan(&memory)
+	if result.Error != nil {
+		log.Printf("MemoryRepository: Failed to get detailed memory by ID %d: %v", memoryID, result.Error)
+		return nil, fmt.Errorf("failed to get detailed memory by ID: %w", result.Error)
+	}
+	if result.RowsAffected == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+
+	if memory.Tags != "" {
+		memory.TagsArray = strings.Split(memory.Tags, ",")
+	} else {
+		memory.TagsArray = []string{}
 	}
 
 	return &memory, nil

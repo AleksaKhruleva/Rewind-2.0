@@ -1,13 +1,15 @@
 package memory
 
 import (
-	pb "Rewind-api-gateway-service/pkg/proto"
 	"context"
 	"fmt"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"os"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
+	pb "Rewind-api-gateway-service/pkg/proto"
 )
 
 // MemoryServiceClient представляет собой gRPC-клиент для сервиса воспоминаний.
@@ -48,6 +50,11 @@ func (c *MemoryServiceClient) Close() error {
 // CreateMemory вызывает RPC метод CreateMemory в Memory-Service.
 func (c *MemoryServiceClient) CreateMemory(ctx context.Context, in *pb.CreateMemoryRequest, opts ...grpc.CallOption) (*pb.CreateMemoryResponse, error) {
 	return c.client.CreateMemory(ctx, in, opts...)
+}
+
+// GetMemory вызывает RPC метод GetMemory в Memory-Service.
+func (c *MemoryServiceClient) GetMemory(ctx context.Context, in *pb.GetMemoryRequest, opts ...grpc.CallOption) (*pb.GetMemoryResponse, error) {
+	return c.client.GetMemory(ctx, in, opts...)
 }
 
 // DeleteMemory вызывает RPC метод DeleteMemory в Memory-Service.

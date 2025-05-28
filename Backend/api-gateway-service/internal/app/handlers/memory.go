@@ -225,6 +225,50 @@ func (h *MemoryHandler) DeleteMemory(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, responseBody)
 }
 
+// GetMemory handles GET /api/groups/{groupId}/memories/{memoryId}
+// @Summary Get a memory by ID
+// @Tags memories
+// @Accept json
+// @Produce json
+// @Param groupId path int true "Group ID"
+// @Param memoryId path int true "Memory ID"
+// @Success 200 {object} responses.DetailedMemoryResponse "Successfully got memory"
+// @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid memory ID"
+// @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
+// @Failure 403 {object} responses.ErrorResponse "Forbidden - Permission denied by service"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - Memory not found"
+// @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
+// @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Security ApiKeyAuth
+// @Router /api/groups/{groupId}/memories/{memoryId} [get]
+func (h *MemoryHandler) GetMemory(w http.ResponseWriter, r *http.Request) {
+	groupIDStr := chi.URLParam(r, "groupId")
+	groupID, err := strconv.ParseUint(groupIDStr, 10, 64)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid memory ID")
+		return
+	}
+	memoryIDStr := chi.URLParam(r, "memoryId")
+	memoryID, err := strconv.ParseUint(memoryIDStr, 10, 64)
+	if err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid memory ID")
+		return
+	}
+
+	req := requests.GetMemoryRequest{
+		GroupID:  groupID,
+		MemoryID: memoryID,
+	}
+
+	responseBody, err := h.memoryService.GetMemory(r.Context(), &req)
+	if err != nil {
+		handleServiceError(w, err, "GetMemory")
+		return
+	}
+
+	respondJSON(w, http.StatusOK, responseBody)
+}
+
 // ListMemoriesByGroup handles GET /api/groups/{groupId}/memories
 // @Summary List memories by group
 // @Tags memories

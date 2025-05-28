@@ -70,6 +70,7 @@ func NewServer(dependencies *di.Dependencies) *Server {
 		r.Post("/api/users/password/reset/start", dependencies.AuthHandler.StartPasswordReset)
 		r.Post("/api/users/password/reset/verify", dependencies.AuthHandler.VerifyPasswordResetCode)
 		r.Patch("/api/users/password/reset/set", dependencies.AuthHandler.SetNewPassword)
+		// r.Patch("/api/users/memories/viewed", dependencies.AuthHandler.UpdateMemoriesViewed)
 	})
 
 	// Group routes (typically require authentication middleware)
@@ -86,13 +87,13 @@ func NewServer(dependencies *di.Dependencies) *Server {
 		r.Delete("/api/groups/{group_id}/members/{user_id}", dependencies.GroupHandler.RemoveGroupMember)
 		r.Post("/api/groups/{id}/invitations", dependencies.GroupHandler.CreateGroupInvitation)
 		r.Post("/api/invitations/{code}/accept", dependencies.GroupHandler.AcceptGroupInvitation)
-		// Note: ListUserGroups path might be better under /api/users/{user_id}/groups
-		r.Get("/api/users/groups", dependencies.GroupHandler.ListUserGroups) // Assuming GET method
+		r.Get("/api/users/groups", dependencies.GroupHandler.ListUserGroups)
 	})
 
 	// Memory routes (typically require authentication middleware)
 	mux.Group(func(r chi.Router) {
 		r.Post("/api/groups/{groupId}/memories", dependencies.MemoryHandler.CreateMemory)
+		r.Get("/api/groups/{groupId}/memories/{memoryId}", dependencies.MemoryHandler.GetMemory)
 		r.Delete("/api/groups/{groupId}/memories/{memoryId}", dependencies.MemoryHandler.DeleteMemory)
 		r.Get("/api/groups/{groupId}/memories", dependencies.MemoryHandler.ListMemoriesByGroup)
 		r.Get("/api/groups/{groupId}/memories/random", dependencies.MemoryHandler.ListMemoriesByGroupWithFilters)

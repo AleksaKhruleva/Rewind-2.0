@@ -94,3 +94,7 @@ type SetNewPasswordResponse struct {
 type DeleteAvatarResponse struct {
 	Success bool `json:"success"`
 }
+
+type UpdateMemoriesViewedResponse struct {
+	Success bool `json:"success"`
+}

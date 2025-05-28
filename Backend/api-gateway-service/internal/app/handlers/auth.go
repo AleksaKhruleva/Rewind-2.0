@@ -690,3 +690,32 @@ func (h *AuthHandler) SetNewPassword(w http.ResponseWriter, r *http.Request) {
 
 	respondJSON(w, http.StatusOK, responseBody)
 }
+
+// // UpdateMemoriesViewed обработчик для PATCH /api/users/memories/viewed.
+// // @Summary Increment user's viewed memories count.
+// // @Description Increments the count of memories the user has viewed by a given number.
+// // @Tags users
+// // @Accept json
+// // @Produce json
+// // @Param request body requests.UpdateMemoriesViewedRequest true "Increment data"
+// // @Success 200 {object} responses.UpdateMemoriesViewedResponse
+// // @Failure 400 {object} responses.ErrorResponse
+// // @Failure 401 {object} responses.ErrorResponse
+// // @Failure 500 {object} responses.ErrorResponse
+// // @Security ApiKeyAuth
+// // @Router /api/users/memories/viewed [patch]
+// func (h *AuthHandler) UpdateMemoriesViewed(w http.ResponseWriter, r *http.Request) {
+// 	var req requests.UpdateMemoriesViewedRequest
+// 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+// 		respondError(w, http.StatusBadRequest, "Invalid request body")
+// 		return
+// 	}
+//
+// 	resp, err := h.authService.IncrementMemoriesViewed(r.Context(), req.Increment)
+// 	if err != nil {
+// 		handleServiceError(w, err, "IncrementMemoriesViewed")
+// 		return
+// 	}
+//
+// 	respondJSON(w, http.StatusOK, responses.UpdateMemoriesViewedResponse{Success: resp.GetSuccess()})
+// }

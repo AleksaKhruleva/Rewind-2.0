@@ -9,6 +9,7 @@ import "google/protobuf/timestamp.proto";
 // Сервис для работы с воспоминаниями
 service MemoryService {
   rpc CreateMemory (CreateMemoryRequest) returns (CreateMemoryResponse);
+  rpc GetMemory (GetMemoryRequest) returns (GetMemoryResponse);
   rpc DeleteMemory (DeleteMemoryRequest) returns (DeleteMemoryResponse);
   rpc DeleteMemoriesByGroup (DeleteMemoriesByGroupRequest) returns (DeleteMemoriesByGroupResponse);
   rpc ListMemoriesByGroup (ListMemoriesByGroupRequest) returns (ListMemoriesByGroupResponse);
@@ -79,6 +80,15 @@ message CreateMemoryRequest {
 // Ответ на создание воспоминания
 message CreateMemoryResponse {
   Memory memory = 1;
+}
+
+message GetMemoryRequest {
+  uint64 memory_id = 1;
+  uint64 user_id = 2;
+}
+
+message GetMemoryResponse {
+  DetailedMemory memory = 1;
 }
 
 // Запрос на удаление воспоминаний по Group ID
