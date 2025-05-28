@@ -44,6 +44,10 @@ enum APIService {
         accessToken: String,
         groupId: Int,
         mediaType: String?,
+        favourites: Bool?,
+        startTime: String?,
+        endTime: String?,
+        tags: [String]?,
         limit: Int
     )
     case addMedia(
@@ -129,7 +133,7 @@ extension APIService: TargetType {
             return "/invitations/\(invitationCode)/accept"
         case let .getMedias(_, groupId):
             return "groups/\(groupId)/memories"
-        case let .getRandomMedias(_, groupId, _, _):
+        case let .getRandomMedias(_, groupId, _, _, _, _, _, _):
             return "groups/\(groupId)/memories/random"
         case let .addMedia(_, groupId, _, _, _, _, _, _, _, _):
             return "groups/\(groupId)/memories"
@@ -291,8 +295,13 @@ extension APIService: TargetType {
             return .requestPlain
         case .getMedias:
             return .requestPlain
-        case let .getRandomMedias(_, _, _, limit):
-            let parameters = ["numberOfMemories": limit]
+        case let .getRandomMedias(_, _, mediaType, favourites, startDate, endDate, tags, limit):
+            var parameters: [String: Any] = ["numberOfMemories": limit]
+            if let mediaType { parameters["media_type"] = mediaType }
+            if let favourites { parameters["is_favourite"] = favourites ? true.description : nil }
+            if let startDate { parameters["start_time"] = startDate.toISO8601String() }
+            if let endDate { parameters["end_time"] = endDate.toISO8601String() }
+            if let tags { parameters["tags"] = tags.joined(separator: ",") }
             return .requestParameters(parameters: parameters, encoding: URLEncoding.queryString)
         case let .addMedia(
             _,
@@ -382,7 +391,7 @@ extension APIService: TargetType {
             let .deleteGroup(accessToken, _),
             let .createGroupInvitation(accessToken, _),
             let .getMedias(accessToken, _),
-            let .getRandomMedias(accessToken, _, _, _),
+            let .getRandomMedias(accessToken, _, _, _, _, _, _, _),
             let .addMedia(accessToken, _, _, _, _, _, _, _, _, _),
             let .getMedia(accessToken, _, _),
             let .deleteMedia(accessToken, _, _),
@@ -411,5 +420,17 @@ extension APIService: TargetType {
 extension String {
     func defaultUTF8Data() -> Data? {
         self.data(using: .utf8)
+    }
+    
+    func toISO8601String() -> String? {
+        let inputFormatter = DateFormatter()
+        inputFormatter.locale = Locale(identifier: "en_US_POSIX")
+        inputFormatter.dateFormat = "dd.MM.yyyy HH:mm"
+
+        guard let date = inputFormatter.date(from: self) else { return nil }
+
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return isoFormatter.string(from: date)
     }
 }

@@ -37,10 +37,7 @@ public struct GalleryView: View {
                 FilterView(
                     title: UIComponentsStrings.Gallery.Filters.title,
                     filters: $viewModel.currentFilters
-                ) { filters in
-                    viewModel.currentFilters = filters
-                    viewModel.filterGallery()
-                }
+                ) { viewModel.filterGallery() }
             }
             .safeAreaInset(edge: .bottom) {
                 footer

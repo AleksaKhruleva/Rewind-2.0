@@ -44,6 +44,10 @@ public protocol NetworkServiceProtocol {
         tokens: Tokens,
         groupId: Int,
         mediaType: String?,
+        favourites: Bool?,
+        startTime: String?,
+        endTime: String?,
+        tags: [String]?,
         limit: Int
     ) async throws -> MediasResponse
     func addMedia(
@@ -269,6 +273,10 @@ public final class NetworkService: NetworkServiceProtocol {
         tokens: Tokens,
         groupId: Int,
         mediaType: String?,
+        favourites: Bool?,
+        startTime: String?,
+        endTime: String?,
+        tags: [String]?,
         limit: Int
     ) async throws -> MediasResponse {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
@@ -277,6 +285,10 @@ public final class NetworkService: NetworkServiceProtocol {
                     accessToken: newToken ?? tokens.accessToken,
                     groupId: groupId,
                     mediaType: mediaType,
+                    favourites: favourites,
+                    startTime: startTime,
+                    endTime: endTime,
+                    tags: tags,
                     limit: limit
                 ),
                 type: MediasResponse.self
