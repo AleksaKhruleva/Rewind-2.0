@@ -111,7 +111,17 @@ definitions:
         description: The generated invitation code
         type: string
     type: object
+  responses.DeleteAvatarResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
   responses.DeleteFavouriteResponse:
+    properties:
+      success:
+        type: boolean
+    type: object
+  responses.DeleteGroupAvatarResponse:
     properties:
       success:
         type: boolean
@@ -705,10 +715,6 @@ paths:
           description: Not Found - User not found
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
-        "409":
-          description: Conflict - Group with this name already exists
-          schema:
-            $ref: '#/definitions/responses.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
@@ -898,14 +904,14 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: Memory ID
-        in: path
-        name: memoryId
-        required: true
-        type: integer
       - description: Group ID
         in: path
         name: groupId
+        required: true
+        type: integer
+      - description: Memory ID
+        in: path
+        name: memoryId
         required: true
         type: integer
       produces:
@@ -1430,6 +1436,50 @@ paths:
       summary: Update group details by ID
       tags:
       - groups
+  /api/groups/{id}/avatar:
+    delete:
+      parameters:
+      - description: Group ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted group avatar
+          schema:
+            $ref: '#/definitions/responses.DeleteGroupAvatarResponse'
+        "400":
+          description: Bad Request - Invalid group ID format
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "403":
+          description: Forbidden - User is not an administrator of the group
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - Group not found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a group's avatar by ID
+      tags:
+      - groups
   /api/groups/{id}/invitations:
     post:
       consumes:
@@ -1608,6 +1658,32 @@ paths:
       tags:
       - users
   /api/users/avatar:
+    delete:
+      description: Deletes the avatar for the authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Avatar successfully deleted".
+          schema:
+            $ref: '#/definitions/responses.DeleteAvatarResponse'
+        "401":
+          description: Unauthorized - Missing or invalid API key".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete user avatar.
+      tags:
+      - users
     patch:
       consumes:
       - multipart/form-data

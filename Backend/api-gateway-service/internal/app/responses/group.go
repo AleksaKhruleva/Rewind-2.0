@@ -85,3 +85,8 @@ type ListUserGroupsResponse struct {
 type DeleteGroupResponse struct {
 	Success bool `json:"success"`
 }
+
+// DeleteGroupAvatarResponse represents the response for the DeleteGroupAvatar endpoint.
+type DeleteGroupAvatarResponse struct {
+	Success bool `json:"success"`
+}

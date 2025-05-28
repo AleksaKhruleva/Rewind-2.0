@@ -20,7 +20,7 @@ import (
 // Methods accept simple data types and return protobuf messages from the microservice.
 // The requesting user's ID is extracted from the context.
 type MemoryServiceInterface interface {
-	CreateMemory(ctx context.Context, req *requests.CreateMemoryRequest, mediaFileBytes []byte) (*pb.CreateMemoryResponse, error)
+	CreateMemory(ctx context.Context, req *requests.CreateMemoryRequest, mediaFileBytes []byte) (*responses.MemoryResponse, error)
 	DeleteMemory(ctx context.Context, req *requests.DeleteMemoryRequest) (*pb.DeleteMemoryResponse, error)
 	ListMemoriesByGroup(ctx context.Context, req *requests.ListMemoriesByGroupRequest) ([]responses.DetailedMemoryResponse, error)
 	ListMemoriesByGroupWithFilters(ctx context.Context, req *requests.ListMemoriesByGroupWithFiltersRequest) ([]responses.DetailedMemoryResponse, error)
@@ -83,7 +83,7 @@ func (s *MemoryService) verifyUserExists(ctx context.Context, userID uint64, gro
 }
 
 // CreateMemory calls the CreateMemory RPC method in Memory-Service.
-func (s *MemoryService) CreateMemory(ctx context.Context, req *requests.CreateMemoryRequest, mediaFileBytes []byte) (*pb.CreateMemoryResponse, error) {
+func (s *MemoryService) CreateMemory(ctx context.Context, req *requests.CreateMemoryRequest, mediaFileBytes []byte) (*responses.MemoryResponse, error) {
 	userID, err := GetRequestingUserIDFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -113,7 +113,37 @@ func (s *MemoryService) CreateMemory(ctx context.Context, req *requests.CreateMe
 		Tags:      req.Tags,
 	}
 
-	return s.memoryClient.CreateMemory(ctx, pbReq)
+	resp, err := s.memoryClient.CreateMemory(ctx, pbReq)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.AddUserInfoToMemory(ctx, resp.GetMemory())
+}
+
+func (s *MemoryService) AddUserInfoToMemory(ctx context.Context, memory *pb.Memory) (*responses.MemoryResponse, error) {
+	userID := memory.UserId
+	user, err := s.authClient.GetUserByID(ctx, &pb.GetUserByIDRequest{UserId: userID})
+	if err != nil {
+		return nil, err
+	}
+	respMemory := &responses.MemoryResponse{
+		Id:        memory.GetId(),
+		GroupID:   memory.GetGroupId(),
+		UserID:    memory.GetUserId(),
+		Username:  user.GetUser().GetUsername(),
+		UserImage: user.GetUser().GetImage(),
+		MediaType: memory.GetMediaType().String(),
+		MediaURL:  memory.GetMediaUrl(),
+		Latitude:  memory.GetLatitude(),
+		Longitude: memory.GetLongitude(),
+		MusicID:   memory.GetMusicId(),
+		Offset:    memory.GetOffset(),
+		Duration:  memory.GetDuration(),
+		CreatedAt: memory.GetCreatedAt().AsTime(),
+		UpdatedAt: memory.GetUpdatedAt().AsTime(),
+	}
+	return respMemory, nil
 }
 
 // DeleteMemory calls the DeleteMemory RPC method in Memory-Service.

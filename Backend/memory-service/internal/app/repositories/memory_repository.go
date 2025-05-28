@@ -32,6 +32,7 @@ type MemoryRepositoryInterface interface {
 	CreateFavourite(ctx context.Context, tx *gorm.DB, favourite *models.Favourite) error
 	DeleteFavourite(ctx context.Context, tx *gorm.DB, favouriteMemoryID uint, favouriteUserID uint) error
 	DeleteFavouritesByUserID(ctx context.Context, tx *gorm.DB, userID uint) error
+	DeleteFavouritesByMemoryID(ctx context.Context, tx *gorm.DB, memoryID uint) error
 
 	// Методы для транзакций
 	BeginTx(ctx context.Context) (*gorm.DB, error)
@@ -386,6 +387,16 @@ func (r *MemoryRepository) DeleteFavouritesByUserID(ctx context.Context, tx *gor
 	if result.Error != nil {
 		log.Printf("MemoryRepository: Failed to delete favourites by user ID: %v", result.Error)
 		return fmt.Errorf("failed to delete favourites by user ID: %w", result.Error)
+	}
+	return nil
+}
+
+func (r *MemoryRepository) DeleteFavouritesByMemoryID(ctx context.Context, tx *gorm.DB, memoryID uint) error {
+	db := r.getDB(tx).WithContext(ctx)
+	result := db.Unscoped().Where("memory_id = ?", memoryID).Delete(&models.Favourite{})
+	if result.Error != nil {
+		log.Printf("MemoryRepository: Failed to delete favourites by memory ID: %v", result.Error)
+		return fmt.Errorf("failed to delete favourites by memory ID: %w", result.Error)
 	}
 	return nil
 }

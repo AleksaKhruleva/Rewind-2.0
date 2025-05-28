@@ -162,32 +162,10 @@ func (h *MemoryHandler) CreateMemory(w http.ResponseWriter, r *http.Request) {
 		Tags:      tags,
 	}
 
-	resp, err := h.memoryService.CreateMemory(r.Context(), &req, mediaFileBytes)
+	responseBody, err := h.memoryService.CreateMemory(r.Context(), &req, mediaFileBytes)
 	if err != nil {
 		handleServiceError(w, err, "CreateMemory")
 		return
-	}
-
-	memory := resp.GetMemory()
-	if memory == nil {
-		log.Println("MemoryHandler.CreateMemory: Service returned success but memory is nil")
-		respondError(w, http.StatusInternalServerError, "Failed to create memory: unexpected service response")
-		return
-	}
-
-	responseBody := responses.MemoryResponse{
-		Id:        memory.GetId(),
-		GroupID:   memory.GetGroupId(),
-		UserID:    memory.GetUserId(),
-		MediaType: memory.MediaType.String(),
-		MediaURL:  memory.GetMediaUrl(),
-		Latitude:  memory.GetLatitude(),
-		Longitude: memory.GetLongitude(),
-		MusicID:   memory.GetMusicId(),
-		Offset:    memory.GetOffset(),
-		Duration:  memory.GetDuration(),
-		CreatedAt: memory.GetCreatedAt().AsTime(),
-		UpdatedAt: memory.GetUpdatedAt().AsTime(),
 	}
 
 	respondJSON(w, http.StatusOK, responseBody)
@@ -198,8 +176,8 @@ func (h *MemoryHandler) CreateMemory(w http.ResponseWriter, r *http.Request) {
 // @Tags memories
 // @Accept json
 // @Produce json
-// @Param memoryId path int true "Memory ID"
 // @Param groupId path int true "Group ID"
+// @Param memoryId path int true "Memory ID"
 // @Success 200 {object} responses.DeleteMemoryResponse "Successfully deleted memory"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid memory ID"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"

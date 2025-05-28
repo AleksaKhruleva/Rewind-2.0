@@ -87,3 +87,7 @@ type VerifyPasswordResetCodeResponse struct {
 type SetNewPasswordResponse struct {
 	Success bool `json:"success"`
 }
+
+type DeleteAvatarResponse struct {
+	Success bool `json:"success"`
+}

@@ -138,3 +138,8 @@ func (c *AuthServiceClient) VerifyPasswordResetCode(ctx context.Context, req *pb
 func (c *AuthServiceClient) SetNewPassword(ctx context.Context, req *pb.SetNewPasswordRequest) (*pb.SetNewPasswordResponse, error) {
 	return c.client.SetNewPassword(ctx, req)
 }
+
+// DeleteAvatar вызывает метод DeleteAvatar сервиса аутентификации
+func (c *AuthServiceClient) DeleteAvatar(ctx context.Context, req *pb.DeleteAvatarRequest) (*pb.DeleteAvatarResponse, error) {
+	return c.client.DeleteAvatar(ctx, req)
+}

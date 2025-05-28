@@ -561,6 +561,38 @@ func (h *AuthHandler) UpdateAvatar(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, responseBody)
 }
 
+// DeleteAvatar обработчик для DELETE /api/users/avatar.
+// @Summary Delete user avatar.
+// @Description Deletes the avatar for the authenticated user.
+// @Tags users
+// @Produce json
+// @Success 200 {object} responses.DeleteAvatarResponse "Avatar successfully deleted".
+// @Failure 401 {object} responses.ErrorResponse "Unauthorized - Missing or invalid API key".
+// @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
+// @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
+// @Security ApiKeyAuth
+// @Router /api/users/avatar [delete].
+func (h *AuthHandler) DeleteAvatar(w http.ResponseWriter, r *http.Request) {
+	resp, err := h.authService.DeleteAvatar(r.Context())
+	if err != nil {
+		handleServiceError(w, err, "DeleteAvatar")
+		return
+	}
+
+	if !resp.GetSuccess() {
+		// This case might indicate a logical failure in the service that wasn't mapped to a gRPC error code
+		log.Printf("AuthHandler.DeleteAvatar: Service reported failure for")
+		respondError(w, http.StatusInternalServerError, "Failed to delete avatar")
+		return
+	}
+
+	responseBody := responses.DeleteAvatarResponse{
+		Success: resp.GetSuccess(),
+	}
+
+	respondJSON(w, http.StatusOK, responseBody)
+}
+
 // StartPasswordReset обработчик для POST /api/users/password/reset/start.
 // @Summary Start password reset process.
 // @Description Initiates the password reset process by sending a verification code to the user's email.

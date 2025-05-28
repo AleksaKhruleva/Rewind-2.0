@@ -1881,6 +1881,94 @@ func (x *SetNewPasswordResponse) GetSuccess() bool {
 	return false
 }
 
+type DeleteAvatarRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteAvatarRequest) Reset() {
+	*x = DeleteAvatarRequest{}
+	mi := &file_proto_auth_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteAvatarRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteAvatarRequest) ProtoMessage() {}
+
+func (x *DeleteAvatarRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_auth_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteAvatarRequest.ProtoReflect.Descriptor instead.
+func (*DeleteAvatarRequest) Descriptor() ([]byte, []int) {
+	return file_proto_auth_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *DeleteAvatarRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+type DeleteAvatarResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteAvatarResponse) Reset() {
+	*x = DeleteAvatarResponse{}
+	mi := &file_proto_auth_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteAvatarResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteAvatarResponse) ProtoMessage() {}
+
+func (x *DeleteAvatarResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_auth_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteAvatarResponse.ProtoReflect.Descriptor instead.
+func (*DeleteAvatarResponse) Descriptor() ([]byte, []int) {
+	return file_proto_auth_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *DeleteAvatarResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
 var File_proto_auth_proto protoreflect.FileDescriptor
 
 const file_proto_auth_proto_rawDesc = "" +
@@ -1983,7 +2071,11 @@ const file_proto_auth_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12!\n" +
 	"\fnew_password\x18\x02 \x01(\tR\vnewPassword\"2\n" +
 	"\x16SetNewPasswordResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess2\xdb\v\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\".\n" +
+	"\x13DeleteAvatarRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\"0\n" +
+	"\x14DeleteAvatarResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess2\xa4\f\n" +
 	"\vAuthService\x12V\n" +
 	"\x11StartRegistration\x12\x1e.auth.StartRegistrationRequest\x1a\x1f.auth.StartRegistrationResponse\"\x00\x12P\n" +
 	"\x0fVerifyEmailCode\x12\x1c.auth.VerifyEmailCodeRequest\x1a\x1d.auth.VerifyEmailCodeResponse\"\x00\x12e\n" +
@@ -2004,7 +2096,8 @@ const file_proto_auth_proto_rawDesc = "" +
 	"\fUpdateAvatar\x12\x19.auth.UpdateAvatarRequest\x1a\x1a.auth.UpdateAvatarResponse\"\x00\x12Y\n" +
 	"\x12StartPasswordReset\x12\x1f.auth.StartPasswordResetRequest\x1a .auth.StartPasswordResetResponse\"\x00\x12h\n" +
 	"\x17VerifyPasswordResetCode\x12$.auth.VerifyPasswordResetCodeRequest\x1a%.auth.VerifyPasswordResetCodeResponse\"\x00\x12M\n" +
-	"\x0eSetNewPassword\x12\x1b.auth.SetNewPasswordRequest\x1a\x1c.auth.SetNewPasswordResponse\"\x00B'Z%Rewind-2.0/Backend/auth_service/protob\x06proto3"
+	"\x0eSetNewPassword\x12\x1b.auth.SetNewPasswordRequest\x1a\x1c.auth.SetNewPasswordResponse\"\x00\x12G\n" +
+	"\fDeleteAvatar\x12\x19.auth.DeleteAvatarRequest\x1a\x1a.auth.DeleteAvatarResponse\"\x00B'Z%Rewind-2.0/Backend/auth_service/protob\x06proto3"
 
 var (
 	file_proto_auth_proto_rawDescOnce sync.Once
@@ -2018,7 +2111,7 @@ func file_proto_auth_proto_rawDescGZIP() []byte {
 	return file_proto_auth_proto_rawDescData
 }
 
-var file_proto_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 39)
+var file_proto_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 41)
 var file_proto_auth_proto_goTypes = []any{
 	(*User)(nil),                            // 0: auth.User
 	(*StartRegistrationRequest)(nil),        // 1: auth.StartRegistrationRequest
@@ -2059,6 +2152,8 @@ var file_proto_auth_proto_goTypes = []any{
 	(*VerifyPasswordResetCodeResponse)(nil), // 36: auth.VerifyPasswordResetCodeResponse
 	(*SetNewPasswordRequest)(nil),           // 37: auth.SetNewPasswordRequest
 	(*SetNewPasswordResponse)(nil),          // 38: auth.SetNewPasswordResponse
+	(*DeleteAvatarRequest)(nil),             // 39: auth.DeleteAvatarRequest
+	(*DeleteAvatarResponse)(nil),            // 40: auth.DeleteAvatarResponse
 }
 var file_proto_auth_proto_depIdxs = []int32{
 	0,  // 0: auth.GetUsersByIDsResponse.users:type_name -> auth.User
@@ -2082,27 +2177,29 @@ var file_proto_auth_proto_depIdxs = []int32{
 	33, // 18: auth.AuthService.StartPasswordReset:input_type -> auth.StartPasswordResetRequest
 	35, // 19: auth.AuthService.VerifyPasswordResetCode:input_type -> auth.VerifyPasswordResetCodeRequest
 	37, // 20: auth.AuthService.SetNewPassword:input_type -> auth.SetNewPasswordRequest
-	2,  // 21: auth.AuthService.StartRegistration:output_type -> auth.StartRegistrationResponse
-	4,  // 22: auth.AuthService.VerifyEmailCode:output_type -> auth.VerifyEmailCodeResponse
-	6,  // 23: auth.AuthService.SetPasswordAndUsername:output_type -> auth.SetPasswordAndUsernameResponse
-	8,  // 24: auth.AuthService.Login:output_type -> auth.LoginResponse
-	10, // 25: auth.AuthService.RefreshToken:output_type -> auth.RefreshTokenResponse
-	12, // 26: auth.AuthService.ForgotPassword:output_type -> auth.ForgotPasswordResponse
-	14, // 27: auth.AuthService.ResetPassword:output_type -> auth.ResetPasswordResponse
-	16, // 28: auth.AuthService.Logout:output_type -> auth.LogoutResponse
-	18, // 29: auth.AuthService.DeleteUser:output_type -> auth.DeleteUserResponse
-	20, // 30: auth.AuthService.GetUsersByIDs:output_type -> auth.GetUsersByIDsResponse
-	22, // 31: auth.AuthService.GetUserByID:output_type -> auth.GetUserByIDResponse
-	24, // 32: auth.AuthService.UpdateUsername:output_type -> auth.UpdateUsernameResponse
-	26, // 33: auth.AuthService.CheckPassword:output_type -> auth.CheckPasswordResponse
-	28, // 34: auth.AuthService.UpdateEmail:output_type -> auth.UpdateEmailResponse
-	30, // 35: auth.AuthService.VerifyNewEmailCode:output_type -> auth.VerifyNewEmailCodeResponse
-	32, // 36: auth.AuthService.UpdateAvatar:output_type -> auth.UpdateAvatarResponse
-	34, // 37: auth.AuthService.StartPasswordReset:output_type -> auth.StartPasswordResetResponse
-	36, // 38: auth.AuthService.VerifyPasswordResetCode:output_type -> auth.VerifyPasswordResetCodeResponse
-	38, // 39: auth.AuthService.SetNewPassword:output_type -> auth.SetNewPasswordResponse
-	21, // [21:40] is the sub-list for method output_type
-	2,  // [2:21] is the sub-list for method input_type
+	39, // 21: auth.AuthService.DeleteAvatar:input_type -> auth.DeleteAvatarRequest
+	2,  // 22: auth.AuthService.StartRegistration:output_type -> auth.StartRegistrationResponse
+	4,  // 23: auth.AuthService.VerifyEmailCode:output_type -> auth.VerifyEmailCodeResponse
+	6,  // 24: auth.AuthService.SetPasswordAndUsername:output_type -> auth.SetPasswordAndUsernameResponse
+	8,  // 25: auth.AuthService.Login:output_type -> auth.LoginResponse
+	10, // 26: auth.AuthService.RefreshToken:output_type -> auth.RefreshTokenResponse
+	12, // 27: auth.AuthService.ForgotPassword:output_type -> auth.ForgotPasswordResponse
+	14, // 28: auth.AuthService.ResetPassword:output_type -> auth.ResetPasswordResponse
+	16, // 29: auth.AuthService.Logout:output_type -> auth.LogoutResponse
+	18, // 30: auth.AuthService.DeleteUser:output_type -> auth.DeleteUserResponse
+	20, // 31: auth.AuthService.GetUsersByIDs:output_type -> auth.GetUsersByIDsResponse
+	22, // 32: auth.AuthService.GetUserByID:output_type -> auth.GetUserByIDResponse
+	24, // 33: auth.AuthService.UpdateUsername:output_type -> auth.UpdateUsernameResponse
+	26, // 34: auth.AuthService.CheckPassword:output_type -> auth.CheckPasswordResponse
+	28, // 35: auth.AuthService.UpdateEmail:output_type -> auth.UpdateEmailResponse
+	30, // 36: auth.AuthService.VerifyNewEmailCode:output_type -> auth.VerifyNewEmailCodeResponse
+	32, // 37: auth.AuthService.UpdateAvatar:output_type -> auth.UpdateAvatarResponse
+	34, // 38: auth.AuthService.StartPasswordReset:output_type -> auth.StartPasswordResetResponse
+	36, // 39: auth.AuthService.VerifyPasswordResetCode:output_type -> auth.VerifyPasswordResetCodeResponse
+	38, // 40: auth.AuthService.SetNewPassword:output_type -> auth.SetNewPasswordResponse
+	40, // 41: auth.AuthService.DeleteAvatar:output_type -> auth.DeleteAvatarResponse
+	22, // [22:42] is the sub-list for method output_type
+	2,  // [2:22] is the sub-list for method input_type
 	2,  // [2:2] is the sub-list for extension type_name
 	2,  // [2:2] is the sub-list for extension extendee
 	0,  // [0:2] is the sub-list for field type_name
@@ -2119,7 +2216,7 @@ func file_proto_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_auth_proto_rawDesc), len(file_proto_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   39,
+			NumMessages:   41,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -958,3 +958,18 @@ func (s *AuthService) UpdateAvatar(ctx context.Context, req *pb.UpdateAvatarRequ
 
 	return &pb.UpdateAvatarResponse{Success: true}, nil
 }
+
+// DeleteAvatar реализует RPC метод для обновления изображения аккаунта пользователя.
+func (s *AuthService) DeleteAvatar(ctx context.Context, req *pb.DeleteAvatarRequest) (*pb.DeleteAvatarResponse, error) {
+	userID := req.GetUserId()
+
+	mediaURL := os.Getenv("DEFAULT_AVATAR")
+
+	err := s.userRepo.UpdateAvatar(nil, uint(userID), mediaURL)
+	if err != nil {
+		log.Printf("Failed to update avatar for user %d: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to Delete avatar")
+	}
+
+	return &pb.DeleteAvatarResponse{Success: true}, nil
+}

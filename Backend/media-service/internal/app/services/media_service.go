@@ -13,7 +13,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/gabriel-vasile/mimetype" // For better MIME detection
+	"github.com/gabriel-vasile/mimetype"
 	"github.com/go-playground/validator/v10"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -21,14 +21,13 @@ import (
 	pb "Rewind-media-service/pkg/proto"
 )
 
-// MediaService implements the media.MediaServiceServer interface
 type MediaService struct {
 	pb.UnimplementedMediaServiceServer
 	validator         *validator.Validate
 	s3Client          *s3.S3
-	endpointURL       string                    // URL эндпоинта Yandex Object Storage
-	bucketNames       map[pb.MediaType]string   // Map для хранения имен бакетов по MediaType
-	allowedExtensions map[pb.MediaType][]string // Map для допустимых расширений
+	endpointURL       string
+	bucketNames       map[pb.MediaType]string
+	allowedExtensions map[pb.MediaType][]string
 }
 
 // NewMediaService создает новый экземпляр MediaService
@@ -103,19 +102,10 @@ func (s *MediaService) UploadMedia(ctx context.Context, req *pb.UploadMediaReque
 	randomStr := generateRandomString(8)
 	objectKey := fmt.Sprintf("%s_%s%s", timestamp, randomStr, fileExt)
 
-	// Загрузка файла в Yandex Object Storage
-	_, err = s.s3Client.PutObjectWithContext(ctx, &s3.PutObjectInput{
-		Bucket:      aws.String(bucketName), // Используем bucketName, полученный из map
-		Key:         aws.String(objectKey),
-		Body:        bytes.NewReader(fileData),
-		ContentType: aws.String(mimeType), // Use the detected MIME type
-	})
-	if err != nil {
-		log.Printf("MediaService.UploadMedia: failed to upload to S3: %v", err)
-		return nil, status.Errorf(codes.Internal, "failed to upload media")
-	}
-
 	fileURL := fmt.Sprintf("%s/%s/%s", s.endpointURL, bucketName, objectKey)
+
+	// Передаём задачу в горутину-обёртку
+	s.startUploadTask(ctx, bucketName, objectKey, fileData, mimeType)
 
 	return &pb.UploadMediaResponse{
 		FileUrl: fileURL,
@@ -123,7 +113,27 @@ func (s *MediaService) UploadMedia(ctx context.Context, req *pb.UploadMediaReque
 	}, nil
 }
 
-// Вспомогательная функция для генерации случайной строки
+// startUploadTask оборачивает запуск асинхронной задачи (можно будет заменить на отправку в очередь)
+func (s *MediaService) startUploadTask(parentCtx context.Context, bucket, key string, fileData []byte, mimeType string) {
+	// Создаем новый контекст без дедлайна и отмены
+	bgCtx := context.Background()
+
+	go func() {
+		// Если понадобится, можно будет сюда логгер, метрики и т.п. протащить
+		_, err := s.s3Client.PutObjectWithContext(bgCtx, &s3.PutObjectInput{
+			Bucket:      aws.String(bucket),
+			Key:         aws.String(key),
+			Body:        bytes.NewReader(fileData),
+			ContentType: aws.String(mimeType),
+		})
+		if err != nil {
+			log.Printf("Error MediaService.startUploadTask: failed to upload to S3: %v", err)
+		} else {
+			log.Printf("MediaService.startUploadTask: uploaded %s to bucket %s", key, bucket)
+		}
+	}()
+}
+
 func generateRandomString(length int) string {
 	const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
 	b := make([]byte, length)
@@ -142,7 +152,7 @@ func getMIMEType(fileData []byte) (string, error) {
 		return "", fmt.Errorf("failed to detect MIME type: %w", err)
 	}
 	if kind == nil {
-		return "application/octet-stream", nil // Default to binary if not detected
+		return "application/octet-stream", nil
 	}
 	return kind.String(), nil
 }
@@ -161,7 +171,7 @@ func getExtensionFromMIMEType(mimeType string) string {
 	case "image/heic":
 		return ".heic"
 	default:
-		return ".bin" // Generic binary extension
+		return ".bin"
 	}
 }
 
@@ -169,7 +179,7 @@ func getExtensionFromMIMEType(mimeType string) string {
 func isExtensionAllowed(ext string, mediaType pb.MediaType, allowedExtensions map[pb.MediaType][]string) bool {
 	allowed, ok := allowedExtensions[mediaType]
 	if !ok {
-		return false // No allowed extensions defined for this media type
+		return false
 	}
 
 	for _, allowedExt := range allowed {

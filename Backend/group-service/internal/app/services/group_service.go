@@ -90,11 +90,6 @@ func (s *GroupService) CreateGroup(ctx context.Context, req *pb.CreateGroupReque
 
 	err = s.groupRepo.Group().CreateGroup(ctx, tx, groupModel)
 	if err != nil {
-		if errors.Is(err, gorm.ErrDuplicatedKey) {
-			log.Printf("CreateGroup: Duplicate key error creating group: %v", err)
-			err = status.Errorf(codes.AlreadyExists, "Group with this name already exists")
-			return nil, err
-		}
 		log.Printf("CreateGroup: Failed to create group in DB: %v", err)
 		err = status.Errorf(codes.Internal, "Failed to create group")
 		return nil, err
@@ -366,19 +361,19 @@ func (s *GroupService) DeleteGroup(ctx context.Context, req *pb.DeleteGroupReque
 		}
 	}()
 
+	err = s.groupRepo.GroupInvitation().HardDeleteInvitationsByGroup(ctx, tx, uint(groupID))
+	if err != nil {
+		log.Printf("DeleteGroup: Failed to hard delete invitations for group %d: %v", groupID, err)
+		err = status.Errorf(codes.Internal, "Failed to delete group invitations")
+		return nil, err
+	}
+
 	// Удаление связанных участников группы (жесткое)
 	err = s.groupRepo.GroupMember().HardDeleteMembersByGroup(ctx, tx, uint(groupID))
 	if err != nil {
 		// Ошибка при удалении участников - внутренняя ошибка
 		log.Printf("DeleteGroup: Failed to hard delete members for group %d: %v", groupID, err)
 		err = status.Errorf(codes.Internal, "Failed to delete group members")
-		return nil, err
-	}
-
-	err = s.groupRepo.GroupInvitation().HardDeleteInvitationsByGroup(ctx, tx, uint(groupID))
-	if err != nil {
-		log.Printf("DeleteGroup: Failed to hard delete invitations for group %d: %v", groupID, err)
-		err = status.Errorf(codes.Internal, "Failed to delete group invitations")
 		return nil, err
 	}
 
@@ -410,6 +405,81 @@ func (s *GroupService) DeleteGroup(ctx context.Context, req *pb.DeleteGroupReque
 
 	// 5. Формирование успешного ответа
 	return &pb.DeleteGroupResponse{Success: true}, nil
+}
+
+// DeleteGroupAvatar реализует RPC метод обновления информации о группе
+func (s *GroupService) DeleteGroupAvatar(ctx context.Context, req *pb.DeleteGroupAvatarRequest) (*pb.DeleteGroupAvatarResponse, error) {
+	// 1. Валидация входных данных
+	groupID := req.GetGroupId()
+	if groupID <= 0 {
+		log.Printf("DeleteGroupAvatar: Invalid argument: group_id is missing or invalid: %d", groupID)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid group ID")
+	}
+	requestingUserID := req.GetRequestingUserId()
+	if requestingUserID <= 0 {
+		log.Printf("DeleteGroupAvatar: requesting_user_id is missing or invalid: %d", requestingUserID)
+		return nil, status.Errorf(codes.Unauthenticated, "User ID is required")
+	}
+
+	// 2. Получение существующей группы
+	// Эта операция только чтение, транзакция пока не нужна
+	groupModel, err := s.groupRepo.Group().GetGroupByID(ctx, nil, uint(groupID))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("DeleteGroupAvatar: Group not found: %d", groupID)
+			return nil, status.Errorf(codes.NotFound, "Group not found")
+		}
+		log.Printf("DeleteGroupAvatar: Failed to get group %d from DB: %v", groupID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to retrieve group information")
+	}
+
+	// 3. Обновление полей группы (используем транзакцию для операции записи)
+	tx, err := s.groupRepo.BeginTx(ctx)
+	if err != nil {
+		log.Printf("DeleteGroupAvatar: Failed to start transaction: %v", err)
+		return nil, status.Errorf(codes.Internal, "Internal error starting transaction")
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			log.Printf("DeleteGroupAvatar: Panic during transaction, rolling back: %v", r)
+			rollbackErr := s.groupRepo.RollbackTx(tx)
+			if rollbackErr != nil {
+				log.Printf("DeleteGroupAvatar: Error during rollback after panic: %v", rollbackErr)
+			}
+			panic(r)
+		} else if err != nil {
+			log.Printf("DeleteGroupAvatar: Transaction failed, rolling back: %v", err)
+			rollbackErr := s.groupRepo.RollbackTx(tx)
+			if rollbackErr != nil {
+				log.Printf("DeleteGroupAvatar: Error during rollback: %v", rollbackErr)
+			}
+		}
+	}()
+
+	groupModel.Image = os.Getenv("DEFAULT_GROUP_AVATAR")
+	// GORM при Save с gorm.Model автоматически обновит UpdatedAt
+
+	// Сохраняем обновленную группу в базе данных (используем транзакционный tx)
+	err = s.groupRepo.Group().UpdateGroup(ctx, tx, groupModel)
+	if err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			log.Printf("DeleteGroupAvatar: Duplicate key error updating group: %v", err)
+			err = status.Errorf(codes.AlreadyExists, "Group with this name already exists")
+			return nil, err
+		}
+		log.Printf("DeleteGroupAvatar: Failed to update group in DB: %v", err)
+		err = status.Errorf(codes.Internal, "Failed to update group information")
+		return nil, err
+	}
+
+	// Если обновление успешно, фиксируем транзакцию
+	err = s.groupRepo.CommitTx(tx)
+	if err != nil {
+		log.Printf("DeleteGroupAvatar: Failed to commit transaction: %v", err)
+		return nil, status.Errorf(codes.Internal, "Internal error finalizing group update")
+	}
+
+	return &pb.DeleteGroupAvatarResponse{Success: true}, nil
 }
 
 // ListGroupMembers реализует RPC метод получения списка участников группы

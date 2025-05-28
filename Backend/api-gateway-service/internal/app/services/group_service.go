@@ -24,6 +24,7 @@ type GroupServiceInterface interface {
 	GetGroup(ctx context.Context, groupID uint64) (*pb.GetGroupResponse, error)
 	UpdateGroup(ctx context.Context, groupID uint64, name *string, imageData []byte) (*pb.UpdateGroupResponse, error)
 	DeleteGroup(ctx context.Context, groupID uint64) (*pb.DeleteGroupResponse, error)
+	DeleteAvatar(ctx context.Context, groupID uint64) (*pb.DeleteGroupAvatarResponse, error)
 	ListGroupMembers(ctx context.Context, groupID uint64) (*pb.ListGroupMembersResponse, error)
 	RemoveGroupMember(ctx context.Context, groupID uint64, userToRemoveID uint64) (*pb.RemoveGroupMemberResponse, error)
 	CreateGroupInvitation(ctx context.Context, groupID uint64, duration *time.Duration) (*pb.CreateGroupInvitationResponse, error)
@@ -159,6 +160,26 @@ func (s *GroupService) DeleteGroup(ctx context.Context, groupID uint64) (*pb.Del
 	}
 
 	return s.groupClient.DeleteGroup(ctx, req)
+}
+
+// DeleteAvatar вызывает RPC метод DeleteAvatar в Group-Service.
+func (s *GroupService) DeleteAvatar(ctx context.Context, groupID uint64) (*pb.DeleteGroupAvatarResponse, error) {
+	requestingUserID, err := GetRequestingUserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("API GW GroupService: Calling DeleteGroupAvatar RPC for user %d, group %d", requestingUserID, groupID)
+
+	if err := s.verifyUserExists(ctx, requestingUserID); err != nil {
+		return nil, err
+	}
+
+	req := &pb.DeleteGroupAvatarRequest{
+		RequestingUserId: requestingUserID,
+		GroupId:          groupID,
+	}
+
+	return s.groupClient.DeleteGroupAvatar(ctx, req)
 }
 
 // ListGroupMembers вызывает RPC метод ListGroupMembers в Group-Service.

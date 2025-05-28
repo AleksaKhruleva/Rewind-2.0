@@ -23,6 +23,7 @@ const (
 	GroupService_GetGroup_FullMethodName              = "/group.GroupService/GetGroup"
 	GroupService_UpdateGroup_FullMethodName           = "/group.GroupService/UpdateGroup"
 	GroupService_DeleteGroup_FullMethodName           = "/group.GroupService/DeleteGroup"
+	GroupService_DeleteGroupAvatar_FullMethodName     = "/group.GroupService/DeleteGroupAvatar"
 	GroupService_ListGroupMembers_FullMethodName      = "/group.GroupService/ListGroupMembers"
 	GroupService_RemoveGroupMember_FullMethodName     = "/group.GroupService/RemoveGroupMember"
 	GroupService_CheckUserInGroup_FullMethodName      = "/group.GroupService/CheckUserInGroup"
@@ -41,6 +42,7 @@ type GroupServiceClient interface {
 	GetGroup(ctx context.Context, in *GetGroupRequest, opts ...grpc.CallOption) (*GetGroupResponse, error)
 	UpdateGroup(ctx context.Context, in *UpdateGroupRequest, opts ...grpc.CallOption) (*UpdateGroupResponse, error)
 	DeleteGroup(ctx context.Context, in *DeleteGroupRequest, opts ...grpc.CallOption) (*DeleteGroupResponse, error)
+	DeleteGroupAvatar(ctx context.Context, in *DeleteGroupAvatarRequest, opts ...grpc.CallOption) (*DeleteGroupAvatarResponse, error)
 	ListGroupMembers(ctx context.Context, in *ListGroupMembersRequest, opts ...grpc.CallOption) (*ListGroupMembersResponse, error)
 	RemoveGroupMember(ctx context.Context, in *RemoveGroupMemberRequest, opts ...grpc.CallOption) (*RemoveGroupMemberResponse, error)
 	CheckUserInGroup(ctx context.Context, in *CheckUserInGroupRequest, opts ...grpc.CallOption) (*CheckUserInGroupResponse, error)
@@ -91,6 +93,16 @@ func (c *groupServiceClient) DeleteGroup(ctx context.Context, in *DeleteGroupReq
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DeleteGroupResponse)
 	err := c.cc.Invoke(ctx, GroupService_DeleteGroup_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *groupServiceClient) DeleteGroupAvatar(ctx context.Context, in *DeleteGroupAvatarRequest, opts ...grpc.CallOption) (*DeleteGroupAvatarResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteGroupAvatarResponse)
+	err := c.cc.Invoke(ctx, GroupService_DeleteGroupAvatar_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -167,6 +179,7 @@ type GroupServiceServer interface {
 	GetGroup(context.Context, *GetGroupRequest) (*GetGroupResponse, error)
 	UpdateGroup(context.Context, *UpdateGroupRequest) (*UpdateGroupResponse, error)
 	DeleteGroup(context.Context, *DeleteGroupRequest) (*DeleteGroupResponse, error)
+	DeleteGroupAvatar(context.Context, *DeleteGroupAvatarRequest) (*DeleteGroupAvatarResponse, error)
 	ListGroupMembers(context.Context, *ListGroupMembersRequest) (*ListGroupMembersResponse, error)
 	RemoveGroupMember(context.Context, *RemoveGroupMemberRequest) (*RemoveGroupMemberResponse, error)
 	CheckUserInGroup(context.Context, *CheckUserInGroupRequest) (*CheckUserInGroupResponse, error)
@@ -194,6 +207,9 @@ func (UnimplementedGroupServiceServer) UpdateGroup(context.Context, *UpdateGroup
 }
 func (UnimplementedGroupServiceServer) DeleteGroup(context.Context, *DeleteGroupRequest) (*DeleteGroupResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteGroup not implemented")
+}
+func (UnimplementedGroupServiceServer) DeleteGroupAvatar(context.Context, *DeleteGroupAvatarRequest) (*DeleteGroupAvatarResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteGroupAvatar not implemented")
 }
 func (UnimplementedGroupServiceServer) ListGroupMembers(context.Context, *ListGroupMembersRequest) (*ListGroupMembersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListGroupMembers not implemented")
@@ -302,6 +318,24 @@ func _GroupService_DeleteGroup_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GroupServiceServer).DeleteGroup(ctx, req.(*DeleteGroupRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GroupService_DeleteGroupAvatar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteGroupAvatarRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServiceServer).DeleteGroupAvatar(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GroupService_DeleteGroupAvatar_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServiceServer).DeleteGroupAvatar(ctx, req.(*DeleteGroupAvatarRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -436,6 +470,10 @@ var GroupService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteGroup",
 			Handler:    _GroupService_DeleteGroup_Handler,
+		},
+		{
+			MethodName: "DeleteGroupAvatar",
+			Handler:    _GroupService_DeleteGroupAvatar_Handler,
 		},
 		{
 			MethodName: "ListGroupMembers",

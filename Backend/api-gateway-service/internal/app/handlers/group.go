@@ -38,7 +38,6 @@ func NewGroupHandler(groupService services.GroupServiceInterface) *GroupHandler 
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 403 {object} responses.ErrorResponse "Forbidden - Permission denied by service"
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found"
-// @Failure 409 {object} responses.ErrorResponse "Conflict - Group with this name already exists"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
@@ -246,6 +245,49 @@ func (h *GroupHandler) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responseBody := responses.DeleteGroupResponse{
+		Success: resp.GetSuccess(),
+	}
+
+	respondJSON(w, http.StatusOK, responseBody)
+}
+
+// DeleteGroupAvatar обработчик для DELETE /api/groups/{id}/avatar
+// @Summary Delete a group's avatar by ID
+// @Tags groups
+// @Produce json
+// @Param id path int true "Group ID"
+// @Success 200 {object} responses.DeleteGroupAvatarResponse "Successfully deleted group avatar"
+// @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid group ID format"
+// @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
+// @Failure 403 {object} responses.ErrorResponse "Forbidden - User is not an administrator of the group"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - Group not found"
+// @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
+// @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Security ApiKeyAuth
+// @Router /api/groups/{id}/avatar [delete]
+func (h *GroupHandler) DeleteGroupAvatar(w http.ResponseWriter, r *http.Request) {
+	groupIDStr := chi.URLParam(r, "id")
+	groupID, err := strconv.ParseUint(groupIDStr, 10, 64)
+	if err != nil || groupID == 0 {
+		log.Printf("GroupHandler.DeleteGroupAvatar: Invalid group ID in URL: %s", groupIDStr)
+		respondError(w, http.StatusBadRequest, "Invalid group ID format")
+		return
+	}
+
+	resp, err := h.groupService.DeleteAvatar(r.Context(), groupID)
+	if err != nil {
+		handleServiceError(w, err, "DeleteGroupAvatar")
+		return
+	}
+
+	if !resp.GetSuccess() {
+		// This case might indicate a logical failure in the service that wasn't mapped to a gRPC error code
+		log.Printf("GroupHandler.DeleteGroupAvatar: Service reported failure for group %d", groupID)
+		respondError(w, http.StatusInternalServerError, "Failed to delete group avatar")
+		return
+	}
+
+	responseBody := responses.DeleteGroupAvatarResponse{
 		Success: resp.GetSuccess(),
 	}
 

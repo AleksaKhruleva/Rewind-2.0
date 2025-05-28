@@ -1,13 +1,15 @@
 package group
 
 import (
-	pb "Rewind-api-gateway-service/pkg/proto"
 	"context"
 	"fmt"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"os"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
+	pb "Rewind-api-gateway-service/pkg/proto"
 )
 
 // GroupServiceClient представляет собой gRPC-клиент для сервиса аутентификации.
@@ -63,6 +65,11 @@ func (c *GroupServiceClient) UpdateGroup(ctx context.Context, in *pb.UpdateGroup
 // DeleteGroup вызывает RPC метод DeleteGroup в Group-Service.
 func (c *GroupServiceClient) DeleteGroup(ctx context.Context, in *pb.DeleteGroupRequest, opts ...grpc.CallOption) (*pb.DeleteGroupResponse, error) {
 	return c.client.DeleteGroup(ctx, in, opts...)
+}
+
+// DeleteGroupAvatar вызывает RPC метод DeleteGroupAvatar в Group-Service.
+func (c *GroupServiceClient) DeleteGroupAvatar(ctx context.Context, in *pb.DeleteGroupAvatarRequest, opts ...grpc.CallOption) (*pb.DeleteGroupAvatarResponse, error) {
+	return c.client.DeleteGroupAvatar(ctx, in, opts...)
 }
 
 // ListGroupMembers вызывает RPC метод ListGroupMembers в Group-Service.

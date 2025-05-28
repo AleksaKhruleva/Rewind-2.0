@@ -208,6 +208,13 @@ func (s *MemoryService) DeleteMemory(ctx context.Context, req *pb.DeleteMemoryRe
 		}
 	}
 
+	if err = s.memoryRepo.DeleteFavouritesByMemoryID(ctx, tx, memory.ID); err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("MemoryService: Failed to delete memory %d: %v", req.GetMemoryId(), err)
+			return nil, status.Errorf(codes.Internal, "failed to delete memory %d: %v", req.GetMemoryId(), err)
+		}
+	}
+
 	if err = s.memoryRepo.DeleteMemory(ctx, tx, uint(req.MemoryId)); err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return &pb.DeleteMemoryResponse{Success: true}, nil

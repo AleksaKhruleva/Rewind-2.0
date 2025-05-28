@@ -486,12 +486,6 @@ const docTemplate = `{
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
-                    "409": {
-                        "description": "Conflict - Group with this name already exists",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -834,15 +828,15 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Memory ID",
-                        "name": "memoryId",
+                        "description": "Group ID",
+                        "name": "groupId",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "integer",
-                        "description": "Group ID",
-                        "name": "groupId",
+                        "description": "Memory ID",
+                        "name": "memoryId",
                         "in": "path",
                         "required": true
                     }
@@ -1598,6 +1592,75 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/groups/{id}/avatar": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groups"
+                ],
+                "summary": "Delete a group's avatar by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Group ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully deleted group avatar",
+                        "schema": {
+                            "$ref": "#/definitions/responses.DeleteGroupAvatarResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid group ID format",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - User not authenticated",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - User is not an administrator of the group",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - Group not found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/groups/{id}/invitations": {
             "post": {
                 "security": [
@@ -1818,6 +1881,47 @@ const docTemplate = `{
             }
         },
         "/api/users/avatar": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Deletes the avatar for the authenticated user.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Delete user avatar.",
+                "responses": {
+                    "200": {
+                        "description": "Avatar successfully deleted\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.DeleteAvatarResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Missing or invalid API key\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "patch": {
                 "security": [
                     {
@@ -2730,7 +2834,23 @@ const docTemplate = `{
                 }
             }
         },
+        "responses.DeleteAvatarResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
         "responses.DeleteFavouriteResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "responses.DeleteGroupAvatarResponse": {
             "type": "object",
             "properties": {
                 "success": {

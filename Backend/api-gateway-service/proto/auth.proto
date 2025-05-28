@@ -24,6 +24,7 @@ service AuthService {
   rpc StartPasswordReset(StartPasswordResetRequest) returns (StartPasswordResetResponse) {}
   rpc VerifyPasswordResetCode(VerifyPasswordResetCodeRequest) returns (VerifyPasswordResetCodeResponse) {}
   rpc SetNewPassword(SetNewPasswordRequest) returns (SetNewPasswordResponse) {}
+  rpc DeleteAvatar(DeleteAvatarRequest) returns (DeleteAvatarResponse) {}
 }
 
 message User {
@@ -197,5 +198,13 @@ message SetNewPasswordRequest {
 }
 
 message SetNewPasswordResponse {
+  bool success = 1;
+}
+
+message DeleteAvatarRequest {
+  uint64 user_id = 1;
+}
+
+message DeleteAvatarResponse {
   bool success = 1;
 }
