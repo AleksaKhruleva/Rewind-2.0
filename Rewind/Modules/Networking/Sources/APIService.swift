@@ -421,7 +421,7 @@ extension String {
     func defaultUTF8Data() -> Data? {
         self.data(using: .utf8)
     }
-    
+
     func toISO8601String() -> String? {
         let inputFormatter = DateFormatter()
         inputFormatter.locale = Locale(identifier: "en_US_POSIX")

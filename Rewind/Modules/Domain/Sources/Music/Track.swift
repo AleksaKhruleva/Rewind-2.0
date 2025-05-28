@@ -13,6 +13,8 @@ public struct Track: Identifiable, Codable, Hashable {
     public var durationString: String
     public let media: Media?
     public var streamURL: URL?
+    public var scrollOffset: CGFloat?
+    public var trackInfo: TrackInformation?
 
     enum CodingKeys: String, CodingKey {
         case id

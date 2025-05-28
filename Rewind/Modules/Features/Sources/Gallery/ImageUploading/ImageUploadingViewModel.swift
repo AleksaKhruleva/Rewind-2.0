@@ -25,6 +25,7 @@ final class ImageUploadingViewModel {
     var isSelectedTrackPlaying: Bool = true
 
     var selectedTrack: Track?
+    var trackScrollOffset: CGFloat
     var selectedStartTime: Double = 0
     var selectedDuration: CGFloat = 15
 
@@ -64,6 +65,10 @@ final class ImageUploadingViewModel {
         if case let .image(image) = loadedMedia?.content {
             initialImage = image
         }
+        selectedTrack = loadedMedia?.trackForMultipleUploading
+        trackScrollOffset = loadedMedia?.trackForMultipleUploading?.scrollOffset ?? 0
+        selectedStartTime = loadedMedia?.trackForMultipleUploading?.trackInfo?.startTime ?? 0
+        selectedDuration = loadedMedia?.trackForMultipleUploading?.trackInfo?.duration ?? 15
     }
 
     func dispatch(_ intent: Intent) {

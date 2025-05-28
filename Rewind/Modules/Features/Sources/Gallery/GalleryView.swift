@@ -164,7 +164,11 @@ public struct GalleryView: View {
     ) -> some View {
         switch media.content {
         case .image:
-            ImageUploadingView(media: media, onSave: onSave)
+            ImageUploadingView(
+                isSingleUploading: true,
+                media: media,
+                onSave: onSave
+            )
         case .video:
             VideoUploadingView(media: media, onSave: onSave)
         }

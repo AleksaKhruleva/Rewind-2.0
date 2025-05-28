@@ -1,5 +1,6 @@
 import SwiftUI
 import UIComponents
+import Domain
 
 public struct QuoteCreationView: View {
     @State private var viewModel = QuoteCreationViewModel()
@@ -167,6 +168,7 @@ public struct QuoteCreationView: View {
                     shouldPlay: $viewModel.isSelectedTrackPlaying,
                     startTime: $viewModel.selectedStartTime,
                     selectorDuration: $viewModel.selectedDuration,
+                    offset: $viewModel.trackScrollOffset,
                     selectedTrack: selectedTrack,
                     onTrashTap: {
                         withAnimation {
@@ -185,15 +187,6 @@ public struct QuoteCreationView: View {
                 showToast(UIComponentsStrings.Quote.Toast.empty)
                 return
             }
-
-            // TODO: delete later
-            let trackInfo = (
-                viewModel.selectedTrack?.id,
-                viewModel.selectedStartTime,
-                viewModel.selectedDuration
-            )
-
-            print(trackInfo)
 
             viewModel.dispatch(.createQuote(AnyView(quoteContent))) {
                 showToast(UIComponentsStrings.Quote.Toast.success)

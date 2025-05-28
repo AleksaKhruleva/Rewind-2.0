@@ -36,6 +36,7 @@ final class QuoteCreationViewModel {
     var selectedTrack: Track?
     var selectedStartTime: Double = 0
     var selectedDuration: CGFloat = 15
+    var trackScrollOffset: CGFloat = 0
 
     var quoteState: QuoteState {
         !quote.isEmpty && !author.isEmpty ? .ready : .empty
@@ -72,14 +73,23 @@ final class QuoteCreationViewModel {
                     if let quoteImage = renderer.uiImage,
                         let tokens = Tokens(),
                         let groupId = GroupStorage.currentGroup?.id {
-                        _ = try await backend.addMedia(
-                            tokens: tokens,
-                            groupId: groupId,
-                            mediaType: "quote",
-                            mediaFile: quoteImage,
-                            musicId: "id",
-                            tags: tags
-                        )
+
+                        var musicId: String?
+                        if let selectedTrack {
+                            musicId = String(selectedTrack.id)
+                        }
+
+                        _ = try await backend
+                            .addMedia(
+                                tokens: tokens,
+                                groupId: groupId,
+                                mediaType: "quote",
+                                mediaFile: quoteImage,
+                                musicId: musicId,
+                                offset: selectedStartTime,
+                                duration: selectedDuration,
+                                tags: tags
+                            )
                         onSuccess()
                     }
                 } catch {
