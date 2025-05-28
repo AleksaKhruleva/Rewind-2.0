@@ -14,6 +14,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
 
 	"Rewind-auth-service/clients/media"
@@ -579,6 +580,7 @@ func (s *AuthService) GetUsersByIDs(ctx context.Context, req *pb.GetUsersByIDsRe
 			MemoriesAddedCount:  uint64(user.MemoriesAddedCount),
 			InvitedMembersCount: uint64(user.InvitedMembersCount),
 			MemoriesViewedCount: uint64(user.MemoriesViewedCount),
+			CreatedAt:           timestamppb.New(user.CreatedAt),
 		})
 	}
 
@@ -625,6 +627,7 @@ func (s *AuthService) GetUserByID(ctx context.Context, req *pb.GetUserByIDReques
 		MemoriesAddedCount:  uint64(user.MemoriesAddedCount),
 		InvitedMembersCount: uint64(user.InvitedMembersCount),
 		MemoriesViewedCount: uint64(user.MemoriesViewedCount),
+		CreatedAt:           timestamppb.New(user.CreatedAt),
 	}
 
 	// Формирование и возврат ответа
@@ -636,7 +639,7 @@ func (s *AuthService) UpdateUsername(ctx context.Context, req *pb.UpdateUsername
 	userID := req.GetUserId()
 	newUsername := req.GetNewUsername()
 
-	if err := s.validator.Var(newUsername, "required,min=3,max=50"); err != nil {
+	if err := s.validator.Var(newUsername, "required,min=4,max=20"); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid username")
 	}
 
@@ -1044,4 +1047,35 @@ func (s *AuthService) UserViewedMemories(ctx context.Context, req *pb.UserViewed
 		return nil, status.Errorf(codes.Internal, "Failed to increment viewed memories")
 	}
 	return &pb.UserViewedMemoriesResponse{Success: true}, nil
+}
+
+// GetUserAchievements реализует RPC метод для получения достижений пользователя
+func (s *AuthService) GetUserAchievements(ctx context.Context, req *pb.GetUserAchievementsRequest) (*pb.GetUserAchievementsResponse, error) {
+	userID := req.GetUserId()
+	if userID <= 0 {
+		log.Printf("GetUserAchievements: Invalid argument: user_id is missing or invalid: %d", userID)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid user ID")
+	}
+
+	achievements, err := s.userRepo.GetUserAchievements(nil, uint(userID))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("GetUserAchievements: User %d not found", userID)
+			return nil, status.Errorf(codes.NotFound, "User %d not found", userID)
+		}
+		log.Printf("GetUserAchievements: Failed to retrieve achievements for user %d: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to retrieve achievements")
+	}
+
+	achievementsResponse := make([]*pb.UserAchievement, len(achievements))
+	for i, achievement := range achievements {
+		achievementsResponse[i] = &pb.UserAchievement{
+			Id:         uint64(achievement.ID),
+			Name:       achievement.Name,
+			Icon:       achievement.Icon,
+			IsUnlocked: achievement.IsUnlocked,
+		}
+	}
+
+	return &pb.GetUserAchievementsResponse{Achievements: achievementsResponse}, nil
 }

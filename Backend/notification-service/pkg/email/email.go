@@ -1,12 +1,15 @@
 package email
 
 import (
+	"encoding/base64"
 	"fmt"
 	"log"
 	"net/smtp"
 	"os"
+	"strings"
 )
 
+// sendEmail отправляет email с корректным MIME и заголовками
 func sendEmail(toEmail, subject, body string) error {
 	fromEmail := os.Getenv("SMTP_FROM_EMAIL")
 	fromPassword := os.Getenv("SMTP_PASSWORD")
@@ -21,18 +24,35 @@ func sendEmail(toEmail, subject, body string) error {
 	auth := smtp.PlainAuth("", fromEmail, fromPassword, smtpHost)
 	addr := fmt.Sprintf("%s:%s", smtpHost, smtpPort)
 
-	msg := []byte("To: " + toEmail + "\r\n" +
-		"Subject: " + subject + "\r\n" +
-		"\r\n" +
-		body + "\r\n")
+	encodedSubject := encodeRFC2047(subject)
 
-	log.Println("Sending email to ", toEmail)
-	err := smtp.SendMail(addr, auth, fromEmail, []string{toEmail}, msg)
+	headers := make(map[string]string)
+	headers["From"] = fromEmail
+	headers["To"] = toEmail
+	headers["Subject"] = encodedSubject
+	headers["MIME-Version"] = "1.0"
+	headers["Content-Type"] = "text/plain; charset=\"UTF-8\""
+	headers["Content-Transfer-Encoding"] = "8bit"
+
+	var msg strings.Builder
+	for k, v := range headers {
+		msg.WriteString(fmt.Sprintf("%s: %s\r\n", k, v))
+	}
+	msg.WriteString("\r\n" + body + "\r\n")
+
+	log.Println("Sending email to", toEmail)
+	err := smtp.SendMail(addr, auth, fromEmail, []string{toEmail}, []byte(msg.String()))
 	if err != nil {
 		return fmt.Errorf("failed to send email: %w", err)
 	}
 	log.Printf("Email sent successfully to %s", toEmail)
 	return nil
+}
+
+// encodeRFC2047 кодирует строку для использования в заголовках письма (Subject)
+func encodeRFC2047(str string) string {
+	// =?UTF-8?B?<base64>?=
+	return fmt.Sprintf("=?UTF-8?B?%s?=", base64.StdEncoding.EncodeToString([]byte(str)))
 }
 
 // SendVerificationEmail отправляет email с кодом верификации

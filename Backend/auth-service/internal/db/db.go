@@ -2,6 +2,7 @@
 package db
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -45,10 +46,61 @@ func InitDB() *gorm.DB {
 
 	log.Println("Connected to DB")
 
-	err = db.AutoMigrate(&models.User{}, &models.RefreshToken{})
+	err = db.AutoMigrate(&models.User{}, &models.RefreshToken{}, &models.Rewards{}, &models.UserRewards{})
 	if err != nil {
 		log.Fatal("Tables migration error: ", err)
 	}
 
+	initDBRewards(db)
+
 	return db
+}
+
+func initDBRewards(db *gorm.DB) {
+
+	// Добавляем дефолтные награды, если они ещё не существуют
+	defaultRewards := []models.Rewards{
+		{
+			Name:           "20 rewinds",
+			Icon:           "RewindGradient",
+			Condition:      "memories_added_count",
+			ConditionValue: 20,
+		},
+		{
+			Name:           "100 rewinds",
+			Icon:           "RewindSakura",
+			Condition:      "memories_added_count",
+			ConditionValue: 2,
+		},
+		{
+			Name:           "5 invites",
+			Icon:           "RewindLazer",
+			Condition:      "invited_members_count",
+			ConditionValue: 5,
+		},
+		{
+			Name:           "100 rolls",
+			Icon:           "RewindForest",
+			Condition:      "memories_viewed_count",
+			ConditionValue: 100,
+		},
+		{
+			Name:           "5 days",
+			Icon:           "RewindSea",
+			Condition:      "days_count",
+			ConditionValue: 5,
+		},
+	}
+
+	for _, reward := range defaultRewards {
+		var existing models.Rewards
+		err := db.Where("name = ?", reward.Name).First(&existing).Error
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			if err := db.Create(&reward).Error; err != nil {
+				log.Printf("Failed to insert reward '%s': %v", reward.Name, err)
+			} else {
+				log.Printf("Inserted default reward: %s", reward.Name)
+			}
+		}
+	}
 }

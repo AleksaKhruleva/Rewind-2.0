@@ -44,7 +44,7 @@ func NewGroupService(repo repositories.Repository, validate *validator.Validate,
 // CreateGroup реализует RPC метод создания группы
 func (s *GroupService) CreateGroup(ctx context.Context, req *pb.CreateGroupRequest) (*pb.CreateGroupResponse, error) {
 	// 1. Валидация входных данных
-	if err := s.validator.Var(req.GetName(), "required,min=3,max=100"); err != nil {
+	if err := s.validator.Var(req.GetName(), "required,min=4,max=50"); err != nil {
 		log.Printf("CreateGroup: Invalid argument (Name): %v", err)
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid group name: %v", err)
 	}

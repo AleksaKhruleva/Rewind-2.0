@@ -41,6 +41,7 @@ func NewGroupHandler(groupService services.GroupServiceInterface) *GroupHandler 
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/groups [post]
 func (h *GroupHandler) CreateGroup(w http.ResponseWriter, r *http.Request) {
@@ -89,6 +90,7 @@ func (h *GroupHandler) CreateGroup(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/groups/{group_id} [get]
 func (h *GroupHandler) GetGroup(w http.ResponseWriter, r *http.Request) {
@@ -143,6 +145,7 @@ func (h *GroupHandler) GetGroup(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/groups/{group_id} [put]
 func (h *GroupHandler) UpdateGroup(w http.ResponseWriter, r *http.Request) {
@@ -220,6 +223,7 @@ func (h *GroupHandler) UpdateGroup(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/groups/{group_id} [delete]
 func (h *GroupHandler) DeleteGroup(w http.ResponseWriter, r *http.Request) {
@@ -264,6 +268,7 @@ func (h *GroupHandler) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/groups/{group_id}/avatar [delete]
 func (h *GroupHandler) DeleteGroupAvatar(w http.ResponseWriter, r *http.Request) {
@@ -307,6 +312,7 @@ func (h *GroupHandler) DeleteGroupAvatar(w http.ResponseWriter, r *http.Request)
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/groups/{group_id}/members [get]
 func (h *GroupHandler) ListGroupMembers(w http.ResponseWriter, r *http.Request) {
@@ -356,6 +362,7 @@ func (h *GroupHandler) ListGroupMembers(w http.ResponseWriter, r *http.Request) 
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/groups/{group_id}/members/{user_id} [delete]
 func (h *GroupHandler) RemoveGroupMember(w http.ResponseWriter, r *http.Request) {
@@ -409,6 +416,7 @@ func (h *GroupHandler) RemoveGroupMember(w http.ResponseWriter, r *http.Request)
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/groups/{group_id}/invitations [post]
 func (h *GroupHandler) CreateGroupInvitation(w http.ResponseWriter, r *http.Request) {
@@ -467,6 +475,7 @@ func (h *GroupHandler) CreateGroupInvitation(w http.ResponseWriter, r *http.Requ
 // @Failure 409 {object} responses.ErrorResponse "Conflict - User is already a member of the group"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/invitations/{code}/accept [post]
 func (h *GroupHandler) AcceptGroupInvitation(w http.ResponseWriter, r *http.Request) {
@@ -519,6 +528,7 @@ func (h *GroupHandler) AcceptGroupInvitation(w http.ResponseWriter, r *http.Requ
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/users/groups [get]
 func (h *GroupHandler) ListUserGroups(w http.ResponseWriter, r *http.Request) {
@@ -559,6 +569,8 @@ func (h *GroupHandler) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} responses.ErrorResponse
 // @Failure 401 {object} responses.ErrorResponse
 // @Failure 500 {object} responses.ErrorResponse
+// @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/groups/{group_id}/memories/viewed [patch]
 func (h *GroupHandler) UpdateMemoriesViewed(w http.ResponseWriter, r *http.Request) {

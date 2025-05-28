@@ -47,6 +47,7 @@ func NewMemoryHandler(memoryService services.MemoryServiceInterface) *MemoryHand
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/groups/{groupId}/memories [post]
 func (h *MemoryHandler) CreateMemory(w http.ResponseWriter, r *http.Request) {
@@ -185,6 +186,7 @@ func (h *MemoryHandler) CreateMemory(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Memory not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/groups/{groupId}/memories/{memoryId} [delete]
 func (h *MemoryHandler) DeleteMemory(w http.ResponseWriter, r *http.Request) {
@@ -239,6 +241,7 @@ func (h *MemoryHandler) DeleteMemory(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Memory not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/groups/{groupId}/memories/{memoryId} [get]
 func (h *MemoryHandler) GetMemory(w http.ResponseWriter, r *http.Request) {
@@ -282,6 +285,7 @@ func (h *MemoryHandler) GetMemory(w http.ResponseWriter, r *http.Request) {
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/groups/{groupId}/memories [get]
 func (h *MemoryHandler) ListMemoriesByGroup(w http.ResponseWriter, r *http.Request) {
@@ -326,6 +330,7 @@ func (h *MemoryHandler) ListMemoriesByGroup(w http.ResponseWriter, r *http.Reque
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/groups/{groupId}/memories/random [get]
 func (h *MemoryHandler) ListMemoriesByGroupWithFilters(w http.ResponseWriter, r *http.Request) {
@@ -409,6 +414,7 @@ func (h *MemoryHandler) ListMemoriesByGroupWithFilters(w http.ResponseWriter, r 
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User or Memory not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/groups/{groupId}/memories/{memoryId}/tags/{tag} [post]
 func (h *MemoryHandler) CreateMemoryTag(w http.ResponseWriter, r *http.Request) {
@@ -461,6 +467,7 @@ func (h *MemoryHandler) CreateMemoryTag(w http.ResponseWriter, r *http.Request) 
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/groups/{groupId}/memories/{memoryId}/tags/{tag} [delete]
 func (h *MemoryHandler) DeleteMemoryTag(w http.ResponseWriter, r *http.Request) {
@@ -519,6 +526,7 @@ func (h *MemoryHandler) DeleteMemoryTag(w http.ResponseWriter, r *http.Request) 
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User or Memory not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/groups/{groupId}/memories/{memoryId}/tags [get]
 func (h *MemoryHandler) ListMemoryTagsByMemoryID(w http.ResponseWriter, r *http.Request) {
@@ -572,6 +580,7 @@ func (h *MemoryHandler) ListMemoryTagsByMemoryID(w http.ResponseWriter, r *http.
 // @Failure 409 {object} responses.ErrorResponse "Conflict - Memory is already a favourite"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/groups/{groupId}/memories/{memoryId}/favourite [post]
 func (h *MemoryHandler) CreateFavourite(w http.ResponseWriter, r *http.Request) {
@@ -622,6 +631,7 @@ func (h *MemoryHandler) CreateFavourite(w http.ResponseWriter, r *http.Request) 
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Memory or User not found"
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
+// @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
 // @Security ApiKeyAuth
 // @Router /api/groups/{groupId}/memories/{memoryId}/favourite [delete]
 func (h *MemoryHandler) DeleteFavourite(w http.ResponseWriter, r *http.Request) {

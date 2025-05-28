@@ -158,3 +158,8 @@ func (c *AuthServiceClient) UserInvitedMember(ctx context.Context, req *pb.UserI
 func (c *AuthServiceClient) UserViewedMemories(ctx context.Context, req *pb.UserViewedMemoriesRequest) (*pb.UserViewedMemoriesResponse, error) {
 	return c.client.UserViewedMemories(ctx, req)
 }
+
+// GetUserAchievements вызывает метод GetUserAchievements сервиса аутентификации
+func (c *AuthServiceClient) GetUserAchievements(ctx context.Context, req *pb.GetUserAchievementsRequest) (*pb.GetUserAchievementsResponse, error) {
+	return c.client.GetUserAchievements(ctx, req)
+}

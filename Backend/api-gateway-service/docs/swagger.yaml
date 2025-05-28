@@ -205,8 +205,17 @@ definitions:
         description: Last update timestamp
         type: string
     type: object
+  responses.GetUserAchievementsResponse:
+    properties:
+      achievements:
+        items:
+          $ref: '#/definitions/responses.UserAchievement'
+        type: array
+    type: object
   responses.GetUserByIDResponse:
     properties:
+      created_at:
+        type: string
       email:
         description: Email address
         type: string
@@ -407,6 +416,18 @@ definitions:
       success:
         type: boolean
     type: object
+  responses.UserAchievement:
+    properties:
+      icon:
+        description: URL к иконке
+        type: string
+      id:
+        type: integer
+      is_unlocked:
+        type: boolean
+      name:
+        type: string
+    type: object
   responses.VerifyEmailCodeResponse:
     properties:
       success:
@@ -468,6 +489,10 @@ paths:
           description: Service Unavailable".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       summary: Set password and username (Third stage of registration).
       tags:
       - auth
@@ -501,6 +526,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
           description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       summary: Request password reset.
@@ -541,6 +570,10 @@ paths:
           description: Service Unavailable".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       summary: User login.
       tags:
       - auth
@@ -577,6 +610,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
           description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       summary: Refresh access token.
@@ -618,6 +655,10 @@ paths:
           description: Service Unavailable".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - Response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       summary: Start user registration (First stage of registration).
       tags:
       - auth
@@ -654,6 +695,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
           description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       summary: Reset password.
@@ -697,6 +742,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
           description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       summary: Verify email code (Second stage of registration).
@@ -744,6 +793,10 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Create a new group
@@ -788,6 +841,10 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Delete a group by ID
@@ -829,6 +886,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
           description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       security:
@@ -884,6 +945,10 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Update group details by ID
@@ -926,6 +991,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
           description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       security:
@@ -980,6 +1049,10 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Create a group invitation
@@ -1022,6 +1095,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
           description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       security:
@@ -1074,6 +1151,10 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Remove a member from a group
@@ -1114,6 +1195,14 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       security:
@@ -1160,6 +1249,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
           description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       security:
@@ -1237,6 +1330,10 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Create a new memory
@@ -1286,6 +1383,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
           description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       security:
@@ -1338,6 +1439,10 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Get a memory by ID
@@ -1387,6 +1492,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
           description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       security:
@@ -1443,6 +1552,10 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Mark a memory as favourite
@@ -1492,6 +1605,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
           description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       security:
@@ -1550,6 +1667,10 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Delete a tag from a memory
@@ -1603,6 +1724,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
           description: Service Unavailable
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       security:
@@ -1684,6 +1809,10 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: List memories by group with filters
@@ -1728,6 +1857,10 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Accept a group invitation
@@ -1765,9 +1898,44 @@ paths:
           description: Service Unavailable".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Get user details by ID.
+      tags:
+      - users
+  /api/users/achievements:
+    get:
+      description: Returns a list of achievements earned by the authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of achievements
+          schema:
+            $ref: '#/definitions/responses.GetUserAchievementsResponse'
+        "401":
+          description: Unauthorized - User not authenticated
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "404":
+          description: Not Found - User not found
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user achievements.
       tags:
       - users
   /api/users/avatar:
@@ -1790,6 +1958,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
           description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       security:
@@ -1828,6 +2000,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
           description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       security:
@@ -1874,6 +2050,10 @@ paths:
           description: Service Unavailable".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Check user password.
@@ -1903,6 +2083,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
           description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       security:
@@ -1947,6 +2131,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
           description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       security:
@@ -1994,6 +2182,10 @@ paths:
           description: Service Unavailable".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Verify new email code and change user email.
@@ -2033,6 +2225,10 @@ paths:
           description: Service Unavailable
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: List groups for a specific user
@@ -2068,6 +2264,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
           description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       security:
@@ -2110,6 +2310,10 @@ paths:
           description: Service Unavailable".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Set new password.
@@ -2142,6 +2346,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
           description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       security:
@@ -2184,6 +2392,10 @@ paths:
           description: Service Unavailable".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Verify password reset code.
@@ -2222,6 +2434,10 @@ paths:
             $ref: '#/definitions/responses.ErrorResponse'
         "503":
           description: Service Unavailable".
+          schema:
+            $ref: '#/definitions/responses.ErrorResponse'
+        "504":
+          description: Deadline Exceeded - response timed out".
           schema:
             $ref: '#/definitions/responses.ErrorResponse'
       security:
