@@ -19,10 +19,12 @@ public struct RewindView: View {
         ZStack {
             Color.background.ignoresSafeArea()
 
-            if let currentGalleryItem = viewModel.currentGalleryItem {
+            if !viewModel.groupGallery.isEmpty {
                 VStack(spacing: 10) {
                     MediaTopButtons {
-                        viewModel.router.navigateToMediaDetails(currentGalleryItem.id)
+                        if let currentGalleryItemId = viewModel.currentGalleryItem?.id {
+                            viewModel.router.navigateToMediaDetails(currentGalleryItemId)
+                        }
                     } onSettingsTap: {
                         filterSettingsShown = true
                         Task {
@@ -30,7 +32,15 @@ public struct RewindView: View {
                         }
                     }
 
-                    mediaView
+                    if viewModel.currentGalleryItem != nil {
+                        mediaView
+                    } else {
+                        DomainAsset.defaultPlaceholder.swiftUIImage
+                            .opacity(0)
+                            .overlay {
+                                RewindNoteTextView(text: "There are no medias for such filters 🫥")
+                            }
+                    }
 
                     HStack {
                         author
@@ -73,7 +83,6 @@ public struct RewindView: View {
                 groups: viewModel.groups,
                 router: viewModel.router,
                 onGroupSelected: { newGroup in
-                    print("New group selected, need to update rewind")
                     Task {
                         await viewModel.dispatch(.selectedNewGroup(newGroup))
                     }
@@ -86,9 +95,9 @@ public struct RewindView: View {
         .sheet(isPresented: $filterSettingsShown) {
             FilterView(
                 title: UIComponentsStrings.Rewind.Filters.title,
-                filters: .constant(FilterSettings())
-            ) { settings in
-                print(settings)
+                filters: $viewModel.currentFilters
+            ) {
+                Task { await viewModel.dispatch(.fetchRandomGalleryItems(.hard)) }
             }
         }
         .onTopAppear {
@@ -96,7 +105,7 @@ public struct RewindView: View {
                 await viewModel.dispatch(.fetchUser)
                 await viewModel.dispatch(.fetchGroups)
                 await viewModel.dispatch(.fetchGallery)
-                await viewModel.dispatch(.fetchRandomGalleryItems)
+                await viewModel.dispatch(.fetchRandomGalleryItems(.soft))
                 await viewModel.dispatch(.fetchCurrentMedia)
                 await viewModel.dispatch(.loadAvatars)
             }
@@ -181,7 +190,10 @@ public struct RewindView: View {
         Button {
             viewModel.router.navigateToMap(
                 galleryItems: viewModel.groupGallery
-                    .filter { $0.memory.latitude != nil && $0.memory.longitude != nil }
+                    .filter {
+                        $0.memory.latitude != nil && $0.memory.longitude != nil &&
+                        $0.memory.latitude != 0 && $0.memory.longitude != 0
+                    }
             )
         } label: {
             Image(systemName: "globe.asia.australia.fill")

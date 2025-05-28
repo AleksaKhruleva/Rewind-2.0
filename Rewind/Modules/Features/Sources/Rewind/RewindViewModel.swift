@@ -11,6 +11,11 @@ import Domain
 @MainActor @Observable
 final class RewindViewModel {
     enum Intent {
+        enum RandomGalleryItemsFetchType {
+            case hard
+            case soft
+        }
+
         case fetchUser
         case toggleTrackPlaying
         case stopPlayer
@@ -21,7 +26,7 @@ final class RewindViewModel {
         case loadAvatars
 
         case fetchGallery
-        case fetchRandomGalleryItems
+        case fetchRandomGalleryItems(RandomGalleryItemsFetchType)
 
         case likeMedia
         case unlikeMedia
@@ -47,6 +52,8 @@ final class RewindViewModel {
     private(set) var groups = [Domain.Group]()
     private(set) var userGroupsState = UserGroupsState.notReady
     private(set) var currentGroupState = CurrentGroupState.ready
+    var currentFilters = FilterSettings()
+    
     var currentGalleryItem: GalleryItem?
     let router: RewindRouter
 
@@ -137,14 +144,18 @@ final class RewindViewModel {
             } catch {
                 showToast(UIComponentsStrings.Toast.error)
             }
-        case .fetchRandomGalleryItems:
+        case let .fetchRandomGalleryItems(type):
             stopPlayer()
             do {
                 if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
                     let response = try await backend.getRandomMedias(
                         tokens: tokens,
                         groupId: groupId,
-                        mediaType: "",
+                        mediaType: currentFilters.mediaTypes,
+                        favourites: currentFilters.favourites,
+                        startTime: currentFilters.startDate?.toISO8601String(),
+                        endTime: currentFilters.endDate?.toISO8601String(),
+                        tags: currentFilters.tags,
                         limit: 10
                     )
                     if response.memories?.isEmpty ?? true {
@@ -154,11 +165,15 @@ final class RewindViewModel {
                         }
                         return
                     }
+                    let proceededGalleryItems = response.memories?.map { $0.toGalleryItem() }.shuffled() ?? []
                     withAnimation(.easeInOut(duration: 0.1)) {
-                        galleryItemsStack.append(contentsOf: response.memories?.map {
-                            $0.toGalleryItem()
-                        }.shuffled() ?? [])
-                        if currentGalleryItem == nil {
+                        if type == .soft {
+                            galleryItemsStack.append(contentsOf: proceededGalleryItems)
+                            if currentGalleryItem == nil {
+                                currentGalleryItem = galleryItemsStack.first
+                            }
+                        } else {
+                            galleryItemsStack = proceededGalleryItems
                             currentGalleryItem = galleryItemsStack.first
                             Task {
                                 if let trackInfo = currentGalleryItem?.memory.trackInfo {
@@ -200,28 +215,30 @@ final class RewindViewModel {
                 stopPlayer()
             }
         case .showNextMediaItem:
+            if galleryItemsStack.count != 0 {
             stopPlayer()
             rolls += 1
-            if var galleryItem = galleryItemsStack.popLast() {
-                if let trackInfo = galleryItem.memory.trackInfo {
-                    do {
-                        let response = try await soundCloudBackend.fetchTrack(by: trackInfo.id)
-                        var lightTrack = response.toLightTrack(with: trackInfo)
-
-                        if let streamURL = try await soundCloudBackend.fetchStreamURL(for: lightTrack) {
-                            lightTrack.streamURL = streamURL
-                        } else {
-                            showToast("Couldn't get track stream URL.")
+                if var galleryItem = galleryItemsStack.popLast() {
+                    if let trackInfo = galleryItem.memory.trackInfo {
+                        do {
+                            let response = try await soundCloudBackend.fetchTrack(by: trackInfo.id)
+                            var lightTrack = response.toLightTrack(with: trackInfo)
+                            
+                            if let streamURL = try await soundCloudBackend.fetchStreamURL(for: lightTrack) {
+                                lightTrack.streamURL = streamURL
+                            } else {
+                                showToast("Couldn't get track stream URL.")
+                            }
+                            galleryItem.memory.lightTrack = lightTrack
+                        } catch {
+                            showToast("Couldn't download music :( Try again later!")
                         }
-                        galleryItem.memory.lightTrack = lightTrack
-                    } catch {
-                        showToast("Couldn't download music :( Try again later!")
                     }
+                    currentGalleryItem = galleryItem
                 }
-                currentGalleryItem = galleryItem
             }
-            if galleryItemsStack.count <= 1 {
-                await dispatch(.fetchRandomGalleryItems)
+            if galleryItemsStack.count == 0 {
+                await dispatch(.fetchRandomGalleryItems(.soft))
             }
         case .fetchGroups:
             stopPlayer()
@@ -312,7 +329,7 @@ final class RewindViewModel {
                 galleryItemsStack = []
             }
             await dispatch(.fetchGallery)
-            await dispatch(.fetchRandomGalleryItems)
+            await dispatch(.fetchRandomGalleryItems(.soft))
             await dispatch(.loadAvatars)
         case .loadAvatars:
             if let url = GroupStorage.currentGroup?.imageURL {

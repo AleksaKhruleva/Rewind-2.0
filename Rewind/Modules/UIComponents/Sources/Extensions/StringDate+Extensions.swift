@@ -14,11 +14,11 @@ extension String {
     }
 
     public func toDate() -> Date? {
-            let formatter = DateFormatter()
-            formatter.locale = Locale(identifier: "en_US_POSIX")
-            formatter.dateFormat = "dd.MM.yyyy HH:mm"
-            return formatter.date(from: self)
-        }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "dd.MM.yyyy HH:mm"
+        return formatter.date(from: self)
+    }
 }
 
 extension Date {

@@ -5,7 +5,7 @@ import Domain
 public struct FilterView: View {
     @Binding var filters: FilterSettings
     var title: String
-    var onSave: (FilterSettings) -> Void
+    var onSave: () -> Void
 
     @State private var date = Date()
     @State private var invalidDatesShown = false
@@ -18,7 +18,7 @@ public struct FilterView: View {
     public init(
         title: String,
         filters: Binding<FilterSettings>,
-        onSave: @escaping (FilterSettings) -> Void
+        onSave: @escaping () -> Void
     ) {
         self.title = title
         self._filters = filters
@@ -142,7 +142,7 @@ public struct FilterView: View {
             title: UIComponentsStrings.FilterSettings.save,
             width: .generic
         ) {
-            onSave(filters)
+            onSave()
             showToast("Filters were applied successfully! ⚙️")
             dismiss()
         }
