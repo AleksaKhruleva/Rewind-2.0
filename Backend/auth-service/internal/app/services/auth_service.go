@@ -1045,3 +1045,34 @@ func (s *AuthService) UserViewedMemories(ctx context.Context, req *pb.UserViewed
 	}
 	return &pb.UserViewedMemoriesResponse{Success: true}, nil
 }
+
+// GetUserAchievements реализует RPC метод для получения достижений пользователя
+func (s *AuthService) GetUserAchievements(ctx context.Context, req *pb.GetUserAchievementsRequest) (*pb.GetUserAchievementsResponse, error) {
+	userID := req.GetUserId()
+	if userID <= 0 {
+		log.Printf("GetUserAchievements: Invalid argument: user_id is missing or invalid: %d", userID)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid user ID")
+	}
+
+	achievements, err := s.userRepo.GetUserAchievements(nil, uint(userID))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("GetUserAchievements: User %d not found", userID)
+			return nil, status.Errorf(codes.NotFound, "User %d not found", userID)
+		}
+		log.Printf("GetUserAchievements: Failed to retrieve achievements for user %d: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to retrieve achievements")
+	}
+
+	achievementsResponse := make([]*pb.UserAchievement, len(achievements))
+	for i, achievement := range achievements {
+		achievementsResponse[i] = &pb.UserAchievement{
+			Id:         uint64(achievement.ID),
+			Name:       achievement.Name,
+			Icon:       achievement.Icon,
+			IsUnlocked: achievement.IsUnlocked,
+		}
+	}
+
+	return &pb.GetUserAchievementsResponse{Achievements: achievementsResponse}, nil
+}

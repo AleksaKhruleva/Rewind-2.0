@@ -690,3 +690,39 @@ func (h *AuthHandler) SetNewPassword(w http.ResponseWriter, r *http.Request) {
 
 	respondJSON(w, http.StatusOK, responseBody)
 }
+
+// GetUserAchievements обработчик для GET /api/users/achievements.
+// @Summary Get user achievements.
+// @Description Returns a list of achievements earned by the authenticated user.
+// @Tags users
+// @Produce json
+// @Success 200 {object} responses.GetUserAchievementsResponse "List of achievements"
+// @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
+// @Failure 404 {object} responses.ErrorResponse "Not Found - User not found"
+// @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
+// @Security ApiKeyAuth
+// @Router /api/users/achievements [get].
+func (h *AuthHandler) GetUserAchievements(w http.ResponseWriter, r *http.Request) {
+	resp, err := h.authService.GetUserAchievements(r.Context())
+	if err != nil {
+		handleServiceError(w, err, "GetUserAchievements")
+		return
+	}
+
+	achievements := resp.GetAchievements()
+	achievementsResp := make([]responses.UserAchievement, len(achievements))
+	for i, achievement := range achievements {
+		achievementsResp[i] = responses.UserAchievement{
+			ID:         uint(achievement.GetId()),
+			Name:       achievement.GetName(),
+			Icon:       achievement.GetIcon(),
+			IsUnlocked: achievement.GetIsUnlocked(),
+		}
+	}
+
+	responseBody := responses.GetUserAchievementsResponse{
+		Achievements: achievementsResp,
+	}
+
+	respondJSON(w, http.StatusOK, responseBody)
+}

@@ -4,7 +4,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// RefreshToken модель для таблицы refresh_tokens
+// RefreshToken model
 type RefreshToken struct {
 	gorm.Model
 	UserID uint   `gorm:"not null;index"` // Внешний ключ на таблицу users

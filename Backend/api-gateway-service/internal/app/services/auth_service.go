@@ -28,6 +28,7 @@ type AuthServiceInterface interface {
 	VerifyPasswordResetCode(ctx context.Context, verificationCode string) (*pb.VerifyPasswordResetCodeResponse, error)
 	SetNewPassword(ctx context.Context, newPassword string) (*pb.SetNewPasswordResponse, error)
 	DeleteAvatar(ctx context.Context) (*pb.DeleteAvatarResponse, error)
+	GetUserAchievements(ctx context.Context) (*pb.GetUserAchievementsResponse, error)
 }
 
 // AuthService представляет сервис для аутентификации.
@@ -171,4 +172,13 @@ func (s *AuthService) DeleteAvatar(ctx context.Context) (*pb.DeleteAvatarRespons
 		return nil, err
 	}
 	return s.authClient.DeleteAvatar(ctx, &pb.DeleteAvatarRequest{UserId: userID})
+}
+
+// GetUserAchievements вызывает метод GetUserAchievements сервиса аутентификации.
+func (s *AuthService) GetUserAchievements(ctx context.Context) (*pb.GetUserAchievementsResponse, error) {
+	userID, err := GetRequestingUserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return s.authClient.GetUserAchievements(ctx, &pb.GetUserAchievementsRequest{UserId: userID})
 }

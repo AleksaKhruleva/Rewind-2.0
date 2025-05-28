@@ -70,6 +70,7 @@ func NewServer(dependencies *di.Dependencies) *Server {
 		r.Post("/api/users/password/reset/start", dependencies.AuthHandler.StartPasswordReset)
 		r.Post("/api/users/password/reset/verify", dependencies.AuthHandler.VerifyPasswordResetCode)
 		r.Patch("/api/users/password/reset/set", dependencies.AuthHandler.SetNewPassword)
+		r.Get("/api/users/achievements", dependencies.AuthHandler.GetUserAchievements)
 	})
 
 	// Group routes (typically require authentication middleware)

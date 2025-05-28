@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"fmt"
+	"time"
 
 	"golang.org/x/crypto/bcrypt"
 
@@ -32,6 +33,7 @@ type UserRepositoryInterface interface {
 	UserAddMemory(tx *gorm.DB, userID uint) error
 	UserAddMember(tx *gorm.DB, userID uint) error
 	UserViewedMemories(tx *gorm.DB, userID, count uint) error
+	GetUserAchievements(tx *gorm.DB, userID uint) ([]models.UserRewardDetailed, error)
 }
 
 type UserRepository struct {
@@ -236,4 +238,72 @@ func (r *UserRepository) UserViewedMemories(tx *gorm.DB, userID, count uint) err
 		return gorm.ErrRecordNotFound
 	}
 	return nil
+}
+
+func (r *UserRepository) GetUserAchievements(tx *gorm.DB, userID uint) ([]models.UserRewardDetailed, error) {
+	if tx == nil {
+		tx = r.db
+	}
+
+	var user models.User
+	if err := tx.First(&user, userID).Error; err != nil {
+		return nil, fmt.Errorf("failed to find user: %w", err)
+	}
+
+	var allRewards []models.Rewards
+	if err := tx.Find(&allRewards).Error; err != nil {
+		return nil, fmt.Errorf("failed to fetch rewards: %w", err)
+	}
+
+	var userRewards []models.UserRewards
+	if err := tx.Where("user_id = ?", userID).Find(&userRewards).Error; err != nil {
+		return nil, fmt.Errorf("failed to fetch user rewards: %w", err)
+	}
+
+	receivedRewardIDs := make(map[uint]bool)
+	for _, ur := range userRewards {
+		receivedRewardIDs[ur.RewardID] = true
+	}
+
+	var rewardList []models.UserRewardDetailed
+
+	for _, reward := range allRewards {
+		var statValue uint
+
+		switch reward.Condition {
+		case "memories_added_count":
+			statValue = user.MemoriesAddedCount
+		case "invited_members_count":
+			statValue = user.InvitedMembersCount
+		case "memories_viewed_count":
+			statValue = user.MemoriesViewedCount
+		case "days_count":
+			statValue = uint(time.Since(user.CreatedAt).Hours() / 24)
+		default:
+			continue
+		}
+
+		isUnlocked := receivedRewardIDs[reward.ID] || statValue >= reward.ConditionValue
+
+		// Если условие выполнено, но награда ещё не выдана — выдаём
+		if statValue >= reward.ConditionValue && !receivedRewardIDs[reward.ID] {
+			newUserReward := models.UserRewards{
+				UserID:   userID,
+				RewardID: reward.ID,
+			}
+			if err := tx.Create(&newUserReward).Error; err != nil {
+				return nil, fmt.Errorf("failed to assign reward to user: %w", err)
+			}
+			receivedRewardIDs[reward.ID] = true
+		}
+
+		rewardList = append(rewardList, models.UserRewardDetailed{
+			ID:         reward.ID,
+			Name:       reward.Name,
+			Icon:       reward.Icon,
+			IsUnlocked: isUnlocked,
+		})
+	}
+
+	return rewardList, nil
 }

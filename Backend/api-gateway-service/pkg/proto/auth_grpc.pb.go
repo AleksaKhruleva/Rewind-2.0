@@ -42,6 +42,7 @@ const (
 	AuthService_UserAddedMemory_FullMethodName         = "/auth.AuthService/UserAddedMemory"
 	AuthService_UserInvitedMember_FullMethodName       = "/auth.AuthService/UserInvitedMember"
 	AuthService_UserViewedMemories_FullMethodName      = "/auth.AuthService/UserViewedMemories"
+	AuthService_GetUserAchievements_FullMethodName     = "/auth.AuthService/GetUserAchievements"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -71,6 +72,7 @@ type AuthServiceClient interface {
 	UserAddedMemory(ctx context.Context, in *UserAddedMemoryRequest, opts ...grpc.CallOption) (*UserAddedMemoryResponse, error)
 	UserInvitedMember(ctx context.Context, in *UserInvitedMemberRequest, opts ...grpc.CallOption) (*UserInvitedMemberResponse, error)
 	UserViewedMemories(ctx context.Context, in *UserViewedMemoriesRequest, opts ...grpc.CallOption) (*UserViewedMemoriesResponse, error)
+	GetUserAchievements(ctx context.Context, in *GetUserAchievementsRequest, opts ...grpc.CallOption) (*GetUserAchievementsResponse, error)
 }
 
 type authServiceClient struct {
@@ -311,6 +313,16 @@ func (c *authServiceClient) UserViewedMemories(ctx context.Context, in *UserView
 	return out, nil
 }
 
+func (c *authServiceClient) GetUserAchievements(ctx context.Context, in *GetUserAchievementsRequest, opts ...grpc.CallOption) (*GetUserAchievementsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUserAchievementsResponse)
+	err := c.cc.Invoke(ctx, AuthService_GetUserAchievements_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
@@ -338,6 +350,7 @@ type AuthServiceServer interface {
 	UserAddedMemory(context.Context, *UserAddedMemoryRequest) (*UserAddedMemoryResponse, error)
 	UserInvitedMember(context.Context, *UserInvitedMemberRequest) (*UserInvitedMemberResponse, error)
 	UserViewedMemories(context.Context, *UserViewedMemoriesRequest) (*UserViewedMemoriesResponse, error)
+	GetUserAchievements(context.Context, *GetUserAchievementsRequest) (*GetUserAchievementsResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -416,6 +429,9 @@ func (UnimplementedAuthServiceServer) UserInvitedMember(context.Context, *UserIn
 }
 func (UnimplementedAuthServiceServer) UserViewedMemories(context.Context, *UserViewedMemoriesRequest) (*UserViewedMemoriesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserViewedMemories not implemented")
+}
+func (UnimplementedAuthServiceServer) GetUserAchievements(context.Context, *GetUserAchievementsRequest) (*GetUserAchievementsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserAchievements not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -852,6 +868,24 @@ func _AuthService_UserViewedMemories_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_GetUserAchievements_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserAchievementsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GetUserAchievements(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_GetUserAchievements_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GetUserAchievements(ctx, req.(*GetUserAchievementsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -950,6 +984,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UserViewedMemories",
 			Handler:    _AuthService_UserViewedMemories_Handler,
+		},
+		{
+			MethodName: "GetUserAchievements",
+			Handler:    _AuthService_GetUserAchievements_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

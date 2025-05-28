@@ -28,6 +28,7 @@ service AuthService {
   rpc UserAddedMemory(UserAddedMemoryRequest) returns (UserAddedMemoryResponse) {}
   rpc UserInvitedMember(UserInvitedMemberRequest) returns (UserInvitedMemberResponse) {}
   rpc UserViewedMemories(UserViewedMemoriesRequest) returns (UserViewedMemoriesResponse) {}
+  rpc GetUserAchievements(GetUserAchievementsRequest) returns (GetUserAchievementsResponse) {}
 }
 
 message User {
@@ -38,6 +39,13 @@ message User {
   uint64 memories_added_count = 5;
   uint64 invited_members_count = 6;
   uint64 memories_viewed_count = 7;
+}
+
+message UserAchievement {
+  uint64 id = 1;
+  string name = 2;
+  string icon = 3;
+  bool is_unlocked = 4;
 }
 
 message StartRegistrationRequest {
@@ -238,4 +246,12 @@ message UserViewedMemoriesRequest {
 
 message UserViewedMemoriesResponse {
   bool success = 1;
+}
+
+message GetUserAchievementsRequest {
+  uint64 user_id = 1;
+}
+
+message GetUserAchievementsResponse {
+  repeated UserAchievement achievements = 1;
 }

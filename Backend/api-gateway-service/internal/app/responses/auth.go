@@ -98,3 +98,14 @@ type DeleteAvatarResponse struct {
 type UpdateMemoriesViewedResponse struct {
 	Success bool `json:"success"`
 }
+
+type GetUserAchievementsResponse struct {
+	Achievements []UserAchievement `json:"achievements"`
+}
+
+type UserAchievement struct {
+	ID         uint   `json:"id"`
+	Name       string `json:"name"`
+	Icon       string `json:"icon"` // URL к иконке
+	IsUnlocked bool   `json:"is_unlocked"`
+}
