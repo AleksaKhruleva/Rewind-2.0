@@ -30,10 +30,14 @@ public struct LoadableImageThumbnail<Content: View>: View {
         }
         await withTaskGroup(of: Void.self) { group in
             group.addTask {
-                await ImageProvider.loadAndCacheImage(for: url.absoluteString, .group)
+                await ImageProvider
+                    .loadAndCacheImage(for: url.absoluteString, .media)
             }
         }
-        let uiImage = await ImageProvider.loadOrGetImage(for: url.absoluteString, .group)
+        let uiImage = await ImageProvider.loadOrGetImage(
+            for: url.absoluteString,
+            .media
+        )
         animateState(to: .ready(uiImage))
     }
 

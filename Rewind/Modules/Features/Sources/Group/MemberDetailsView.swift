@@ -1,8 +1,8 @@
 import SwiftUI
 import UIComponents
 import Domain
+import Base
 
-// let nilAction: (() -> Void)? = nil // temporary
 let groupsData = [("person.2.fill", UIComponentsStrings.Account.Groups.count(8), nilAccessibility, nilAction)]
 let activitiesData = [
     ("photo.fill.on.rectangle.fill", UIComponentsStrings.Account.Activity.rewinds(245), nilAccessibility, nilAction),
@@ -11,6 +11,7 @@ let activitiesData = [
 ]
 
 public struct MemberDetailsView: View {
+    @State private var image: UIImage = DomainAsset.userPlacholder.image
     private let member: Member
 
     private weak var router: AppRouter?
@@ -38,11 +39,14 @@ public struct MemberDetailsView: View {
             }
         }
         .background(Color.background)
+        .task {
+            image = await ImageProvider.loadOrGetImage(for: member.imageURL, .user)
+        }
     }
 
     private var header: some View {
         RewindHeader(centerView: {
-            HeaderBadgeView(image: member.image, text: member.name)
+            HeaderBadgeView(image: image, text: member.name)
         }, rightView: {
             RewindButton(type: .rightChevron) {
                 router?.pop()
@@ -51,7 +55,7 @@ public struct MemberDetailsView: View {
     }
 
     private var avatar: some View {
-        AvatarView(image: member.image, text: member.name)
+        AvatarView(image: image, text: member.name)
     }
 
     private var groupsTable: some View {

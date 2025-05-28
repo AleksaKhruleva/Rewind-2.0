@@ -45,10 +45,12 @@ final class GroupSelectionViewModel {
                 return
             }
             isLoading = true
+            defer {
+                isLoading = false
+            }
             do {
                 guard let tokens = Tokens() else {
-                    // TODO: handle error
-                    isLoading = false
+                    // TODO: handle unauthorized
                     return
                 }
 
@@ -57,6 +59,18 @@ final class GroupSelectionViewModel {
                 }
 
                 let response = try await backend.createGroup(tokens: tokens, name: name)
+                
+                let members = [
+                    Member(
+                        id: userID,
+                        name: user.name,
+                        imageURL: user.imageURL,
+                        isOwner: true,
+                        isUser: true
+                    )
+                ]
+                
+                await ImageProvider.loadAndCacheImage(for: user.imageURL, .user)
 
                 let group = Group(
                     id: response.groupID,
@@ -64,15 +78,7 @@ final class GroupSelectionViewModel {
                     ownerID: response.ownerID,
                     imageURL: response.imageURL,
                     createdAt: DateParser.parseISODate(response.createdAt),
-                    members: [
-                        Member(
-                            id: userID,
-                            name: user.name,
-                            imageData: Data(),
-                            isOwner: true,
-                            isUser: true
-                        )
-                    ]
+                    members: members
                 )
 
                 GroupStorage.set(newGroup: group)
@@ -87,7 +93,7 @@ final class GroupSelectionViewModel {
                     }
                 }
             } catch {
-                isLoading = false
+                print(error)
                 // TODO: handle error
             }
         }

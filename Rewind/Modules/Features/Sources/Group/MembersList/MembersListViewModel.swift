@@ -8,6 +8,7 @@ final class MembersListViewModel {
     enum Intent {
         case createInvitation
         case deleteMember(Member)
+        case loadGroupImage
     }
 
     var toastMessage: String?
@@ -18,6 +19,7 @@ final class MembersListViewModel {
     private(set) var isLoading = false
     private(set) var group: Domain.Group
     private(set) var progressMessage = ""
+    private(set) var groupImage: UIImage = DomainAsset.groupPlaceholder.image
 
     let router: MembersListRouter
     private let backend: NetworkServiceProtocol
@@ -35,6 +37,22 @@ final class MembersListViewModel {
 
         case let .deleteMember(member):
             await deleteMember(member)
+            
+        case .loadGroupImage:
+            await loadGroupImage()
+        }
+    }
+    
+    private func loadGroupImage() async {
+        guard let currentGroup = GroupStorage.currentGroup else {
+            // TODO: handle nil group
+            return
+        }
+        let image = await ImageProvider.loadOrGetImage(
+            for: currentGroup.imageURL, .group
+        )
+        await MainActor.run { [weak self] in
+            self?.groupImage = image
         }
     }
 

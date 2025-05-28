@@ -160,6 +160,15 @@ final class RewindViewModel {
                     groupOwnerID: response.group.ownerID,
                     currentUserID: userID
                 )
+                
+                await withTaskGroup(of: Void.self) { group in
+                    for member in members {
+                        group.addTask {
+                            await ImageProvider
+                                .loadAndCacheImage(for: member.imageURL, .user)
+                        }
+                    }
+                }
 
                 let currentGroup = Domain.Group(
                     id: currentGroupID,
@@ -190,7 +199,7 @@ final class RewindViewModel {
     }
 
     private func loadImage(urlString: String) async -> UIImage {
-        await ImageProvider.loadOrGetImage(for: urlString, .group)
+        await ImageProvider.loadOrGetImage(for: urlString, .user)
     }
 
     func set(showToast: @escaping (String) -> Void) {

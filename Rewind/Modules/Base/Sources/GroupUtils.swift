@@ -47,7 +47,7 @@ public enum GroupUtils {
                 Member(
                     id: String(response.id),
                     name: response.name,
-                    imageData: nil,
+                    imageURL: response.imageURL,
                     isOwner: response.id == groupOwnerID,
                     isUser: String(response.id) == currentUserID
                 )
