@@ -43,7 +43,7 @@ public struct RewindMediaButton: View {
         Image(systemName: imageName)
             .font(.system(size: fontSize, weight: .bold))
             .frame(width: size, height: size)
-            .background(Color.white.opacity(0.5))
+            .background(Color.textTertiaryLight.opacity(1))
             .foregroundColor(foregroundColor)
             .clipShape(Circle())
             .highPriorityGesture(
