@@ -56,8 +56,8 @@ public protocol NetworkServiceProtocol {
     func deleteMedia(tokens: Tokens, groupId: Int, memoryId: Int) async throws -> SuccessResponse
     func addTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> MediaTag
     func deleteTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> SuccessResponse
-    func likeMedia(tokens: Tokens, memoryId: Int) async throws -> SuccessResponse
-    func unlikeMedia(tokens: Tokens, memoryId: Int) async throws -> SuccessResponse
+    func likeMedia(tokens: Tokens, groupId: Int, memoryId: Int) async throws -> MediaLikeResponse
+    func unlikeMedia(tokens: Tokens, groupId: Int, memoryId: Int) async throws -> SuccessResponse
     func getMediaTags(tokens: Tokens, memoryId: Int) async throws -> TagsResponse
 }
 
@@ -343,23 +343,25 @@ public final class NetworkService: NetworkServiceProtocol {
         }
     }
 
-    public func likeMedia(tokens: Tokens, memoryId: Int) async throws -> SuccessResponse {
+    public func likeMedia(tokens: Tokens, groupId: Int, memoryId: Int) async throws -> MediaLikeResponse {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .likeMedia(
                     accessToken: newToken ?? tokens.accessToken,
+                    groupId: groupId,
                     memoryId: memoryId
                 ),
-                type: SuccessResponse.self
+                type: MediaLikeResponse.self
             )
         }
     }
 
-    public func unlikeMedia(tokens: Tokens, memoryId: Int) async throws -> SuccessResponse {
+    public func unlikeMedia(tokens: Tokens, groupId: Int, memoryId: Int) async throws -> SuccessResponse {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .unlikeMedia(
                     accessToken: newToken ?? tokens.accessToken,
+                    groupId: groupId,
                     memoryId: memoryId
                 ),
                 type: SuccessResponse.self

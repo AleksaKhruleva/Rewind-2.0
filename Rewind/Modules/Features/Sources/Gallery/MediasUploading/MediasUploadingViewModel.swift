@@ -77,7 +77,7 @@ final class MediasUploadingViewModel {
                     if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
                         switch loadedMedia.content {
                         case let .image(image):
-                            let _ = try await backend.addMedia(
+                            _ = try await backend.addMedia(
                                 tokens: tokens,
                                 groupId: groupId,
                                 mediaType: "image",

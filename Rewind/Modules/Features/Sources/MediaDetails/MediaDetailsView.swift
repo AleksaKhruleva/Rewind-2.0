@@ -74,9 +74,13 @@ public struct MediaDetailsView: View {
 
     private var rewind: some View {
         MediaContentView(
-            mediaItem: galleryItem.memory,
+            galleryItem: galleryItem,
             onSave: {},
-            onLike: {},
+            onLike: { liked in
+                Task {
+                    await viewModel.dispatch(liked ? .unlikeMedia(galleryItem) : .likeMedia(galleryItem))
+                }
+            },
             onToggleSound: {},
             isTrackPlaying: $isTrackPlaying
         )

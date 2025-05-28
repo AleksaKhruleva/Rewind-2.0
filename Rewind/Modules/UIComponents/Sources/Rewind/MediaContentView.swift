@@ -4,10 +4,10 @@ import Domain
 import Base
 
 public struct MediaContentView: View {
-    private let mediaItem: MediaItem
+    private let galleryItem: GalleryItem
     private let cornerRadius: CGFloat
     private let onSave: () -> Void
-    private let onLike: () -> Void
+    private let onLike: (Bool) -> Void
     private let onToggleSound: () -> Void
     @Binding var isTrackPlaying: Bool
 
@@ -22,14 +22,14 @@ public struct MediaContentView: View {
     @State private var shouldSeekToStartTime = false
 
     public init(
-        mediaItem: MediaItem,
+        galleryItem: GalleryItem,
         cornerRadius: CGFloat = 35,
         onSave: @escaping () -> Void,
-        onLike: @escaping () -> Void,
+        onLike: @escaping (Bool) -> Void,
         onToggleSound: @escaping () -> Void,
         isTrackPlaying: Binding<Bool>
     ) {
-        self.mediaItem = mediaItem
+        self.galleryItem = galleryItem
         self.cornerRadius = cornerRadius
         self.onSave = onSave
         self.onLike = onLike
@@ -39,7 +39,7 @@ public struct MediaContentView: View {
 
     public var body: some View {
         ZStack {
-            switch mediaItem.mediaType {
+            switch galleryItem.memory.mediaType {
             case .image:
                 imageContent
             case .video:
@@ -50,6 +50,7 @@ public struct MediaContentView: View {
         }
         .overlay {
             RewindMediaButtonsOverlay(
+                isLiked: galleryItem.isFavourite,
                 likeAction: onLike,
                 saveAction: onSave
             )
@@ -57,9 +58,9 @@ public struct MediaContentView: View {
     }
 
     private var imageContent: some View {
-        SquareAsyncMedia(url: mediaItem.mediaURL, type: .image)
+        SquareAsyncMedia(url: galleryItem.memory.mediaURL, type: .image)
             .overlay(alignment: .topTrailing) {
-                if mediaItem.track != nil {
+                if galleryItem.memory.track != nil {
                     Button(action: {}) {
                         ZStack {
                             Image(systemName: "speaker.wave.2.fill").opacity(isTrackPlaying ? 1 : 0)
@@ -83,7 +84,7 @@ public struct MediaContentView: View {
 
     private var videoContent: some View {
         ZStack {
-            SquareAsyncMedia(url: mediaItem.mediaURL, type: .video)
+            SquareAsyncMedia(url: galleryItem.memory.mediaURL, type: .video)
 
             if let player = player {
                 CustomPlayerView(
@@ -110,7 +111,7 @@ public struct MediaContentView: View {
     }
 
     private func setupPlayer() {
-        guard let url = mediaItem.mediaURL else { return }
+        guard let url = galleryItem.memory.mediaURL else { return }
 
         let item = AVPlayerItem(url: url)
         playerItem = item

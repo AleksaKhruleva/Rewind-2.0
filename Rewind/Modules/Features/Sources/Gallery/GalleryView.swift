@@ -45,13 +45,20 @@ public struct GalleryView: View {
                 if let selectedMedia = viewModel.viewingBlurredMedia {
                     BlurredMediaView(
                         isPresented: $viewModel.blurredMediaShown,
-                        galleryItem: selectedMedia, onDelete: { galleryItem in
+                        galleryItem: selectedMedia,
+                        onDelete: { galleryItem in
                             Task {
                                 await viewModel.dispatch(.deleteMedia(galleryItem)) {
                                     withAnimation {
                                         viewModel.blurredMediaShown = false
                                     }
                                 }
+                            }
+                        },
+                        onLike: { galleryItem, liked in
+                            Task {
+                                await viewModel.dispatch(liked ? .unlikeMedia(galleryItem) : .likeMedia(galleryItem))
+                                await viewModel.dispatch(.fetchGallery)
                             }
                         },
                         showMediaDetails: {

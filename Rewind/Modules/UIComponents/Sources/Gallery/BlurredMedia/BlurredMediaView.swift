@@ -6,6 +6,7 @@ public struct BlurredMediaView: View {
     @State private var galleryItem: GalleryItem
     @State private var isTrackPlaying: Bool = false
     private var onDelete: (GalleryItem) -> Void
+    private var onLike: (GalleryItem, Bool) -> Void
     private var showMediaDetails: (GalleryItem) -> Void
 
     @Environment(\.showToast)
@@ -15,11 +16,13 @@ public struct BlurredMediaView: View {
         isPresented: Binding<Bool>,
         galleryItem: GalleryItem,
         onDelete: @escaping (GalleryItem) -> Void,
+        onLike: @escaping (GalleryItem, Bool) -> Void,
         showMediaDetails: @escaping (GalleryItem) -> Void
     ) {
         self._isPresented = isPresented
         self.galleryItem = galleryItem
         self.onDelete = onDelete
+        self.onLike = onLike
         self.showMediaDetails = showMediaDetails
     }
 
@@ -43,8 +46,8 @@ public struct BlurredMediaView: View {
 
             mediaView
                 .overlay {
-                    RewindMediaButtonsOverlay {
-                        // TODO: smth
+                    RewindMediaButtonsOverlay(isLiked: galleryItem.isFavourite) { liked in
+                        onLike(galleryItem, liked)
                     } saveAction: {
                         // TODO: сделать сохранение фото или видео
                     }
@@ -75,9 +78,9 @@ public struct BlurredMediaView: View {
 
     private var mediaView: some View {
         MediaContentView(
-            mediaItem: galleryItem.memory,
+            galleryItem: galleryItem,
             onSave: {},
-            onLike: {},
+            onLike: { _ in },
             onToggleSound: {},
             isTrackPlaying: $isTrackPlaying
         )

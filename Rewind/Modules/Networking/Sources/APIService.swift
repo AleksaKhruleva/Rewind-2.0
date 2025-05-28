@@ -56,8 +56,8 @@ enum APIService {
     case deleteMedia(accessToken: String, groupId: Int, memoryId: Int)
     case addTag(accessToken: String, groupId: Int, memoryId: Int, tag: String)
     case deleteTag(accessToken: String, groupId: Int, memoryId: Int, tag: String)
-    case likeMedia(accessToken: String, memoryId: Int)
-    case unlikeMedia(accessToken: String, memoryId: Int)
+    case likeMedia(accessToken: String, groupId: Int, memoryId: Int)
+    case unlikeMedia(accessToken: String, groupId: Int, memoryId: Int)
     case getMediaTags(accessToken: String, memoryId: Int)
 }
 
@@ -133,10 +133,10 @@ extension APIService: TargetType {
             return "groups/\(groupId)/memories/\(memoryId)/tags/\(tag)"
         case let .deleteTag(_, groupId, memoryId, tag):
             return "groups/\(groupId)/memories/\(memoryId)/tags/\(tag)"
-        case let .likeMedia(_, memoryId):
-            return "memories/\(memoryId)/favourite"
-        case let .unlikeMedia(_, memoryId):
-            return "memories/\(memoryId)/favourite"
+        case let .likeMedia(_, groupId, memoryId):
+            return "groups/\(groupId)/memories/\(memoryId)/favourite"
+        case let .unlikeMedia(_, groupId, memoryId):
+            return "groups/\(groupId)/memories/\(memoryId)/favourite"
         case let .getMediaTags(_, memoryId):
             return "memories/\(memoryId)/tags"
         case let .deleteMemberFromGroup(_, groupID, memberID):
@@ -375,8 +375,8 @@ extension APIService: TargetType {
             let .deleteMedia(accessToken, _, _),
             let .addTag(accessToken, _, _, _),
             let .deleteTag(accessToken, _, _, _),
-            let .likeMedia(accessToken, _),
-            let .unlikeMedia(accessToken, _),
+            let .likeMedia(accessToken, _, _),
+            let .unlikeMedia(accessToken, _, _),
             let .getMediaTags(accessToken, _),
             let .addUserToGroup(accessToken, _),
             let .deleteMemberFromGroup(accessToken, _, _),
