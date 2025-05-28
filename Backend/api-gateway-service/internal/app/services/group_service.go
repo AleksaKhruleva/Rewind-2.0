@@ -30,6 +30,7 @@ type GroupServiceInterface interface {
 	CreateGroupInvitation(ctx context.Context, groupID uint64, duration *time.Duration) (*pb.CreateGroupInvitationResponse, error)
 	AcceptGroupInvitation(ctx context.Context, invitationCode string) (*pb.AcceptGroupInvitationResponse, error)
 	ListUserGroups(ctx context.Context) (*pb.ListUserGroupsResponse, error)
+	IncrementMemoriesViewed(ctx context.Context, groupID, count uint64) (*pb.UserViewedMemoriesResponse, error)
 }
 
 // GroupService представляет сервис для взаимодействия с Group-Service через gRPC.
@@ -312,4 +313,44 @@ func (s *GroupService) ListUserGroups(ctx context.Context) (*pb.ListUserGroupsRe
 	}
 
 	return s.groupClient.ListUserGroups(ctx, req)
+}
+
+func (s *GroupService) IncrementMemoriesViewed(ctx context.Context, groupID, count uint64) (*pb.UserViewedMemoriesResponse, error) {
+	requestingUserID, err := GetRequestingUserIDFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("API GW GroupService: Calling IncrementMemoriesViewed RPC for user %d", requestingUserID)
+
+	if err := s.verifyUserExists(ctx, requestingUserID); err != nil {
+		return nil, err
+	}
+
+	newContext, newCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	go func() {
+		defer newCancel()
+
+		reqGroup := &pb.GroupMemberViewedMemoriesRequest{
+			GroupId: groupID,
+			UserId:  requestingUserID,
+			Count:   count,
+		}
+
+		_, err2 := s.groupClient.GroupMemberViewedMemories(newContext, reqGroup)
+		if err2 != nil {
+			log.Printf("API GW GroupService: Failed to increment viewed memories count to group with ID %d and userID %d", groupID, requestingUserID)
+			return
+		}
+
+		req := &pb.UserViewedMemoriesRequest{
+			UserId: requestingUserID,
+			Count:  count,
+		}
+		_, err2 = s.authClient.UserViewedMemories(newContext, req)
+		if err2 != nil {
+			log.Printf("API GW UserService: Failed to increment viewed memories count to user with ID %d", requestingUserID)
+			return
+		}
+	}()
+	return &pb.UserViewedMemoriesResponse{Success: true}, nil
 }

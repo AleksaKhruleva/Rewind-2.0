@@ -153,3 +153,8 @@ func (c *AuthServiceClient) UserAddedMemory(ctx context.Context, req *pb.UserAdd
 func (c *AuthServiceClient) UserInvitedMember(ctx context.Context, req *pb.UserInvitedMemberRequest) (*pb.UserInvitedMemberResponse, error) {
 	return c.client.UserInvitedMember(ctx, req)
 }
+
+// UserViewedMemories вызывает метод UserViewedMemories сервиса аутентификации
+func (c *AuthServiceClient) UserViewedMemories(ctx context.Context, req *pb.UserViewedMemoriesRequest) (*pb.UserViewedMemoriesResponse, error) {
+	return c.client.UserViewedMemories(ctx, req)
+}

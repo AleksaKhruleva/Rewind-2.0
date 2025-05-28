@@ -291,6 +291,20 @@ func (r *gormGroupMemberRepository) GroupMemberAddMemory(ctx context.Context, tx
 	return nil
 }
 
+func (r *gormGroupMemberRepository) GroupMemberViewMemories(ctx context.Context, tx *gorm.DB, groupID, userID, count uint) error {
+	db := r.getDB(tx).WithContext(ctx)
+	result := db.Model(&models.GroupMember{}).
+		Where("group_id = ? AND user_id = ?", groupID, userID).
+		Update("memories_viewed_count", gorm.Expr("memories_viewed_count + ?", count))
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
+
 type gormGroupInvitationRepository struct {
 	db *gorm.DB
 }

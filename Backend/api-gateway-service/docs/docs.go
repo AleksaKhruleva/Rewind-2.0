@@ -1375,83 +1375,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/groups/{group_id}/members/{user_id}": {
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "groups"
-                ],
-                "summary": "Remove a member from a group",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Group ID",
-                        "name": "group_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "User ID to remove",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successfully removed member",
-                        "schema": {
-                            "$ref": "#/definitions/responses.DeleteUserResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request - Invalid group ID or user ID format",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized - User not authenticated",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "403": {
-                        "description": "Forbidden - User does not have permission (not admin or not removing self)",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found - Group or User not found",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    },
-                    "503": {
-                        "description": "Service Unavailable",
-                        "schema": {
-                            "$ref": "#/definitions/responses.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/groups/{id}": {
+        "/api/groups/{group_id}": {
             "get": {
                 "security": [
                     {
@@ -1469,7 +1393,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Group ID",
-                        "name": "id",
+                        "name": "group_id",
                         "in": "path",
                         "required": true
                     }
@@ -1539,7 +1463,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Group ID",
-                        "name": "id",
+                        "name": "group_id",
                         "in": "path",
                         "required": true
                     },
@@ -1618,7 +1542,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Group ID",
-                        "name": "id",
+                        "name": "group_id",
                         "in": "path",
                         "required": true
                     }
@@ -1669,7 +1593,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/groups/{id}/avatar": {
+        "/api/groups/{group_id}/avatar": {
             "delete": {
                 "security": [
                     {
@@ -1687,7 +1611,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Group ID",
-                        "name": "id",
+                        "name": "group_id",
                         "in": "path",
                         "required": true
                     }
@@ -1738,7 +1662,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/groups/{id}/invitations": {
+        "/api/groups/{group_id}/invitations": {
             "post": {
                 "security": [
                     {
@@ -1759,7 +1683,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Group ID",
-                        "name": "id",
+                        "name": "group_id",
                         "in": "path",
                         "required": true
                     },
@@ -1819,7 +1743,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/groups/{id}/members": {
+        "/api/groups/{group_id}/members": {
             "get": {
                 "security": [
                     {
@@ -1837,7 +1761,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Group ID",
-                        "name": "id",
+                        "name": "group_id",
                         "in": "path",
                         "required": true
                     }
@@ -1881,6 +1805,146 @@ const docTemplate = `{
                     },
                     "503": {
                         "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/groups/{group_id}/members/{user_id}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groups"
+                ],
+                "summary": "Remove a member from a group",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Group ID",
+                        "name": "group_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "User ID to remove",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully removed member",
+                        "schema": {
+                            "$ref": "#/definitions/responses.DeleteUserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid group ID or user ID format",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - User not authenticated",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - User does not have permission (not admin or not removing self)",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - Group or User not found",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/groups/{group_id}/memories/viewed": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Increments the count of memories the user has viewed by a given number.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "groups"
+                ],
+                "summary": "Increment user's viewed memories count.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Group ID",
+                        "name": "group_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Increment data",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/requests.UpdateMemoriesViewedRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.UpdateMemoriesViewedResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
@@ -2846,6 +2910,17 @@ const docTemplate = `{
                 }
             }
         },
+        "requests.UpdateMemoriesViewedRequest": {
+            "type": "object",
+            "required": [
+                "count"
+            ],
+            "properties": {
+                "count": {
+                    "type": "integer"
+                }
+            }
+        },
         "requests.UpdateUsernameRequest": {
             "type": "object",
             "properties": {
@@ -3330,6 +3405,14 @@ const docTemplate = `{
                 }
             }
         },
+        "responses.UpdateMemoriesViewedResponse": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
         "responses.UpdateUsernameResponse": {
             "type": "object",
             "properties": {
@@ -3376,7 +3459,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "rewindapp.ru",
+	Host:             "localhost:8080",
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Rewind API Gateway",

@@ -27,6 +27,7 @@ service AuthService {
   rpc DeleteAvatar(DeleteAvatarRequest) returns (DeleteAvatarResponse) {}
   rpc UserAddedMemory(UserAddedMemoryRequest) returns (UserAddedMemoryResponse) {}
   rpc UserInvitedMember(UserInvitedMemberRequest) returns (UserInvitedMemberResponse) {}
+  rpc UserViewedMemories(UserViewedMemoriesRequest) returns (UserViewedMemoriesResponse) {}
 }
 
 message User {
@@ -227,5 +228,14 @@ message UserInvitedMemberRequest {
 }
 
 message UserInvitedMemberResponse {
+  bool success = 1;
+}
+
+message UserViewedMemoriesRequest {
+  uint64 user_id = 1;
+  uint64 count = 2;
+}
+
+message UserViewedMemoriesResponse {
   bool success = 1;
 }

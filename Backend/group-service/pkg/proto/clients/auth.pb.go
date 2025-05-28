@@ -2169,6 +2169,102 @@ func (x *UserInvitedMemberResponse) GetSuccess() bool {
 	return false
 }
 
+type UserViewedMemoriesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Count         uint64                 `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserViewedMemoriesRequest) Reset() {
+	*x = UserViewedMemoriesRequest{}
+	mi := &file_proto_clients_auth_proto_msgTypes[45]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserViewedMemoriesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserViewedMemoriesRequest) ProtoMessage() {}
+
+func (x *UserViewedMemoriesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_clients_auth_proto_msgTypes[45]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserViewedMemoriesRequest.ProtoReflect.Descriptor instead.
+func (*UserViewedMemoriesRequest) Descriptor() ([]byte, []int) {
+	return file_proto_clients_auth_proto_rawDescGZIP(), []int{45}
+}
+
+func (x *UserViewedMemoriesRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *UserViewedMemoriesRequest) GetCount() uint64 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+type UserViewedMemoriesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserViewedMemoriesResponse) Reset() {
+	*x = UserViewedMemoriesResponse{}
+	mi := &file_proto_clients_auth_proto_msgTypes[46]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserViewedMemoriesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserViewedMemoriesResponse) ProtoMessage() {}
+
+func (x *UserViewedMemoriesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_clients_auth_proto_msgTypes[46]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserViewedMemoriesResponse.ProtoReflect.Descriptor instead.
+func (*UserViewedMemoriesResponse) Descriptor() ([]byte, []int) {
+	return file_proto_clients_auth_proto_rawDescGZIP(), []int{46}
+}
+
+func (x *UserViewedMemoriesResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
 var File_proto_clients_auth_proto protoreflect.FileDescriptor
 
 const file_proto_clients_auth_proto_rawDesc = "" +
@@ -2286,7 +2382,12 @@ const file_proto_clients_auth_proto_rawDesc = "" +
 	"\x18UserInvitedMemberRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\x04R\x06userId\"5\n" +
 	"\x19UserInvitedMemberResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess2\xce\r\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"J\n" +
+	"\x19UserViewedMemoriesRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\x12\x14\n" +
+	"\x05count\x18\x02 \x01(\x04R\x05count\"6\n" +
+	"\x1aUserViewedMemoriesResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess2\xa9\x0e\n" +
 	"\vAuthService\x12V\n" +
 	"\x11StartRegistration\x12\x1e.auth.StartRegistrationRequest\x1a\x1f.auth.StartRegistrationResponse\"\x00\x12P\n" +
 	"\x0fVerifyEmailCode\x12\x1c.auth.VerifyEmailCodeRequest\x1a\x1d.auth.VerifyEmailCodeResponse\"\x00\x12e\n" +
@@ -2310,7 +2411,8 @@ const file_proto_clients_auth_proto_rawDesc = "" +
 	"\x0eSetNewPassword\x12\x1b.auth.SetNewPasswordRequest\x1a\x1c.auth.SetNewPasswordResponse\"\x00\x12G\n" +
 	"\fDeleteAvatar\x12\x19.auth.DeleteAvatarRequest\x1a\x1a.auth.DeleteAvatarResponse\"\x00\x12P\n" +
 	"\x0fUserAddedMemory\x12\x1c.auth.UserAddedMemoryRequest\x1a\x1d.auth.UserAddedMemoryResponse\"\x00\x12V\n" +
-	"\x11UserInvitedMember\x12\x1e.auth.UserInvitedMemberRequest\x1a\x1f.auth.UserInvitedMemberResponse\"\x00B'Z%Rewind-2.0/Backend/auth_service/protob\x06proto3"
+	"\x11UserInvitedMember\x12\x1e.auth.UserInvitedMemberRequest\x1a\x1f.auth.UserInvitedMemberResponse\"\x00\x12Y\n" +
+	"\x12UserViewedMemories\x12\x1f.auth.UserViewedMemoriesRequest\x1a .auth.UserViewedMemoriesResponse\"\x00B'Z%Rewind-2.0/Backend/auth_service/protob\x06proto3"
 
 var (
 	file_proto_clients_auth_proto_rawDescOnce sync.Once
@@ -2324,7 +2426,7 @@ func file_proto_clients_auth_proto_rawDescGZIP() []byte {
 	return file_proto_clients_auth_proto_rawDescData
 }
 
-var file_proto_clients_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 45)
+var file_proto_clients_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 47)
 var file_proto_clients_auth_proto_goTypes = []any{
 	(*User)(nil),                            // 0: auth.User
 	(*StartRegistrationRequest)(nil),        // 1: auth.StartRegistrationRequest
@@ -2371,6 +2473,8 @@ var file_proto_clients_auth_proto_goTypes = []any{
 	(*UserAddedMemoryResponse)(nil),         // 42: auth.UserAddedMemoryResponse
 	(*UserInvitedMemberRequest)(nil),        // 43: auth.UserInvitedMemberRequest
 	(*UserInvitedMemberResponse)(nil),       // 44: auth.UserInvitedMemberResponse
+	(*UserViewedMemoriesRequest)(nil),       // 45: auth.UserViewedMemoriesRequest
+	(*UserViewedMemoriesResponse)(nil),      // 46: auth.UserViewedMemoriesResponse
 }
 var file_proto_clients_auth_proto_depIdxs = []int32{
 	0,  // 0: auth.GetUsersByIDsResponse.users:type_name -> auth.User
@@ -2397,30 +2501,32 @@ var file_proto_clients_auth_proto_depIdxs = []int32{
 	39, // 21: auth.AuthService.DeleteAvatar:input_type -> auth.DeleteAvatarRequest
 	41, // 22: auth.AuthService.UserAddedMemory:input_type -> auth.UserAddedMemoryRequest
 	43, // 23: auth.AuthService.UserInvitedMember:input_type -> auth.UserInvitedMemberRequest
-	2,  // 24: auth.AuthService.StartRegistration:output_type -> auth.StartRegistrationResponse
-	4,  // 25: auth.AuthService.VerifyEmailCode:output_type -> auth.VerifyEmailCodeResponse
-	6,  // 26: auth.AuthService.SetPasswordAndUsername:output_type -> auth.SetPasswordAndUsernameResponse
-	8,  // 27: auth.AuthService.Login:output_type -> auth.LoginResponse
-	10, // 28: auth.AuthService.RefreshToken:output_type -> auth.RefreshTokenResponse
-	12, // 29: auth.AuthService.ForgotPassword:output_type -> auth.ForgotPasswordResponse
-	14, // 30: auth.AuthService.ResetPassword:output_type -> auth.ResetPasswordResponse
-	16, // 31: auth.AuthService.Logout:output_type -> auth.LogoutResponse
-	18, // 32: auth.AuthService.DeleteUser:output_type -> auth.DeleteUserResponse
-	20, // 33: auth.AuthService.GetUsersByIDs:output_type -> auth.GetUsersByIDsResponse
-	22, // 34: auth.AuthService.GetUserByID:output_type -> auth.GetUserByIDResponse
-	24, // 35: auth.AuthService.UpdateUsername:output_type -> auth.UpdateUsernameResponse
-	26, // 36: auth.AuthService.CheckPassword:output_type -> auth.CheckPasswordResponse
-	28, // 37: auth.AuthService.UpdateEmail:output_type -> auth.UpdateEmailResponse
-	30, // 38: auth.AuthService.VerifyNewEmailCode:output_type -> auth.VerifyNewEmailCodeResponse
-	32, // 39: auth.AuthService.UpdateAvatar:output_type -> auth.UpdateAvatarResponse
-	34, // 40: auth.AuthService.StartPasswordReset:output_type -> auth.StartPasswordResetResponse
-	36, // 41: auth.AuthService.VerifyPasswordResetCode:output_type -> auth.VerifyPasswordResetCodeResponse
-	38, // 42: auth.AuthService.SetNewPassword:output_type -> auth.SetNewPasswordResponse
-	40, // 43: auth.AuthService.DeleteAvatar:output_type -> auth.DeleteAvatarResponse
-	42, // 44: auth.AuthService.UserAddedMemory:output_type -> auth.UserAddedMemoryResponse
-	44, // 45: auth.AuthService.UserInvitedMember:output_type -> auth.UserInvitedMemberResponse
-	24, // [24:46] is the sub-list for method output_type
-	2,  // [2:24] is the sub-list for method input_type
+	45, // 24: auth.AuthService.UserViewedMemories:input_type -> auth.UserViewedMemoriesRequest
+	2,  // 25: auth.AuthService.StartRegistration:output_type -> auth.StartRegistrationResponse
+	4,  // 26: auth.AuthService.VerifyEmailCode:output_type -> auth.VerifyEmailCodeResponse
+	6,  // 27: auth.AuthService.SetPasswordAndUsername:output_type -> auth.SetPasswordAndUsernameResponse
+	8,  // 28: auth.AuthService.Login:output_type -> auth.LoginResponse
+	10, // 29: auth.AuthService.RefreshToken:output_type -> auth.RefreshTokenResponse
+	12, // 30: auth.AuthService.ForgotPassword:output_type -> auth.ForgotPasswordResponse
+	14, // 31: auth.AuthService.ResetPassword:output_type -> auth.ResetPasswordResponse
+	16, // 32: auth.AuthService.Logout:output_type -> auth.LogoutResponse
+	18, // 33: auth.AuthService.DeleteUser:output_type -> auth.DeleteUserResponse
+	20, // 34: auth.AuthService.GetUsersByIDs:output_type -> auth.GetUsersByIDsResponse
+	22, // 35: auth.AuthService.GetUserByID:output_type -> auth.GetUserByIDResponse
+	24, // 36: auth.AuthService.UpdateUsername:output_type -> auth.UpdateUsernameResponse
+	26, // 37: auth.AuthService.CheckPassword:output_type -> auth.CheckPasswordResponse
+	28, // 38: auth.AuthService.UpdateEmail:output_type -> auth.UpdateEmailResponse
+	30, // 39: auth.AuthService.VerifyNewEmailCode:output_type -> auth.VerifyNewEmailCodeResponse
+	32, // 40: auth.AuthService.UpdateAvatar:output_type -> auth.UpdateAvatarResponse
+	34, // 41: auth.AuthService.StartPasswordReset:output_type -> auth.StartPasswordResetResponse
+	36, // 42: auth.AuthService.VerifyPasswordResetCode:output_type -> auth.VerifyPasswordResetCodeResponse
+	38, // 43: auth.AuthService.SetNewPassword:output_type -> auth.SetNewPasswordResponse
+	40, // 44: auth.AuthService.DeleteAvatar:output_type -> auth.DeleteAvatarResponse
+	42, // 45: auth.AuthService.UserAddedMemory:output_type -> auth.UserAddedMemoryResponse
+	44, // 46: auth.AuthService.UserInvitedMember:output_type -> auth.UserInvitedMemberResponse
+	46, // 47: auth.AuthService.UserViewedMemories:output_type -> auth.UserViewedMemoriesResponse
+	25, // [25:48] is the sub-list for method output_type
+	2,  // [2:25] is the sub-list for method input_type
 	2,  // [2:2] is the sub-list for extension type_name
 	2,  // [2:2] is the sub-list for extension extendee
 	0,  // [0:2] is the sub-list for field type_name
@@ -2437,7 +2543,7 @@ func file_proto_clients_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_clients_auth_proto_rawDesc), len(file_proto_clients_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   45,
+			NumMessages:   47,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

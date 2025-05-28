@@ -70,7 +70,6 @@ func NewServer(dependencies *di.Dependencies) *Server {
 		r.Post("/api/users/password/reset/start", dependencies.AuthHandler.StartPasswordReset)
 		r.Post("/api/users/password/reset/verify", dependencies.AuthHandler.VerifyPasswordResetCode)
 		r.Patch("/api/users/password/reset/set", dependencies.AuthHandler.SetNewPassword)
-		// r.Patch("/api/users/memories/viewed", dependencies.AuthHandler.UpdateMemoriesViewed)
 	})
 
 	// Group routes (typically require authentication middleware)
@@ -79,15 +78,16 @@ func NewServer(dependencies *di.Dependencies) *Server {
 		// r.Use(auth.RequireAuthentication) // Assuming you have a middleware to check for authenticated user ID in context
 
 		r.Post("/api/groups", dependencies.GroupHandler.CreateGroup)
-		r.Get("/api/groups/{id}", dependencies.GroupHandler.GetGroup)
-		r.Put("/api/groups/{id}", dependencies.GroupHandler.UpdateGroup)
-		r.Delete("/api/groups/{id}", dependencies.GroupHandler.DeleteGroup)
-		r.Delete("/api/groups/{id}/avatar", dependencies.GroupHandler.DeleteGroupAvatar)
-		r.Get("/api/groups/{id}/members", dependencies.GroupHandler.ListGroupMembers)
+		r.Get("/api/groups/{group_id}", dependencies.GroupHandler.GetGroup)
+		r.Put("/api/groups/{group_id}", dependencies.GroupHandler.UpdateGroup)
+		r.Delete("/api/groups/{group_id}", dependencies.GroupHandler.DeleteGroup)
+		r.Delete("/api/groups/{group_id}/avatar", dependencies.GroupHandler.DeleteGroupAvatar)
+		r.Get("/api/groups/{group_id}/members", dependencies.GroupHandler.ListGroupMembers)
 		r.Delete("/api/groups/{group_id}/members/{user_id}", dependencies.GroupHandler.RemoveGroupMember)
-		r.Post("/api/groups/{id}/invitations", dependencies.GroupHandler.CreateGroupInvitation)
+		r.Post("/api/groups/{group_id}/invitations", dependencies.GroupHandler.CreateGroupInvitation)
 		r.Post("/api/invitations/{code}/accept", dependencies.GroupHandler.AcceptGroupInvitation)
 		r.Get("/api/users/groups", dependencies.GroupHandler.ListUserGroups)
+		r.Patch("/api/groups/{group_id}/memories/viewed", dependencies.GroupHandler.UpdateMemoriesViewed)
 	})
 
 	// Memory routes (typically require authentication middleware)

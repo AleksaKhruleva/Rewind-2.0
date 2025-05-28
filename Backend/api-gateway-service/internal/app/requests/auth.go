@@ -62,5 +62,5 @@ type SetNewPasswordRequest struct {
 }
 
 type UpdateMemoriesViewedRequest struct {
-	Increment uint32 `json:"increment" validate:"required,gt=0"`
+	Count uint64 `json:"count" validate:"required,gt=0"`
 }

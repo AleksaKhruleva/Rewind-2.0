@@ -41,6 +41,7 @@ const (
 	AuthService_DeleteAvatar_FullMethodName            = "/auth.AuthService/DeleteAvatar"
 	AuthService_UserAddedMemory_FullMethodName         = "/auth.AuthService/UserAddedMemory"
 	AuthService_UserInvitedMember_FullMethodName       = "/auth.AuthService/UserInvitedMember"
+	AuthService_UserViewedMemories_FullMethodName      = "/auth.AuthService/UserViewedMemories"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -69,6 +70,7 @@ type AuthServiceClient interface {
 	DeleteAvatar(ctx context.Context, in *DeleteAvatarRequest, opts ...grpc.CallOption) (*DeleteAvatarResponse, error)
 	UserAddedMemory(ctx context.Context, in *UserAddedMemoryRequest, opts ...grpc.CallOption) (*UserAddedMemoryResponse, error)
 	UserInvitedMember(ctx context.Context, in *UserInvitedMemberRequest, opts ...grpc.CallOption) (*UserInvitedMemberResponse, error)
+	UserViewedMemories(ctx context.Context, in *UserViewedMemoriesRequest, opts ...grpc.CallOption) (*UserViewedMemoriesResponse, error)
 }
 
 type authServiceClient struct {
@@ -299,6 +301,16 @@ func (c *authServiceClient) UserInvitedMember(ctx context.Context, in *UserInvit
 	return out, nil
 }
 
+func (c *authServiceClient) UserViewedMemories(ctx context.Context, in *UserViewedMemoriesRequest, opts ...grpc.CallOption) (*UserViewedMemoriesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserViewedMemoriesResponse)
+	err := c.cc.Invoke(ctx, AuthService_UserViewedMemories_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
@@ -325,6 +337,7 @@ type AuthServiceServer interface {
 	DeleteAvatar(context.Context, *DeleteAvatarRequest) (*DeleteAvatarResponse, error)
 	UserAddedMemory(context.Context, *UserAddedMemoryRequest) (*UserAddedMemoryResponse, error)
 	UserInvitedMember(context.Context, *UserInvitedMemberRequest) (*UserInvitedMemberResponse, error)
+	UserViewedMemories(context.Context, *UserViewedMemoriesRequest) (*UserViewedMemoriesResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -400,6 +413,9 @@ func (UnimplementedAuthServiceServer) UserAddedMemory(context.Context, *UserAdde
 }
 func (UnimplementedAuthServiceServer) UserInvitedMember(context.Context, *UserInvitedMemberRequest) (*UserInvitedMemberResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserInvitedMember not implemented")
+}
+func (UnimplementedAuthServiceServer) UserViewedMemories(context.Context, *UserViewedMemoriesRequest) (*UserViewedMemoriesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UserViewedMemories not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -818,6 +834,24 @@ func _AuthService_UserInvitedMember_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_UserViewedMemories_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserViewedMemoriesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).UserViewedMemories(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_UserViewedMemories_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).UserViewedMemories(ctx, req.(*UserViewedMemoriesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -912,6 +946,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UserInvitedMember",
 			Handler:    _AuthService_UserInvitedMember_Handler,
+		},
+		{
+			MethodName: "UserViewedMemories",
+			Handler:    _AuthService_UserViewedMemories_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

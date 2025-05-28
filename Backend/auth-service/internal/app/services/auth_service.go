@@ -994,6 +994,8 @@ func (s *AuthService) UserAddedMemory(ctx context.Context, req *pb.UserAddedMemo
 			log.Printf("UserAddedMemory: User %d not found", userID)
 			return nil, status.Errorf(codes.NotFound, "User %d not found", userID)
 		}
+		log.Printf("UserAddedMemory: Failed to increment added memories count to user %d: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to increment added memories")
 	}
 	return &pb.UserAddedMemoryResponse{Success: true}, nil
 }
@@ -1012,6 +1014,34 @@ func (s *AuthService) UserInvitedMember(ctx context.Context, req *pb.UserInvited
 			log.Printf("UserInvitedMember: User %d not found", userID)
 			return nil, status.Errorf(codes.NotFound, "User %d not found", userID)
 		}
+		log.Printf("UserInvitedMember: Failed to increment invited members count to user %d: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to increment invited members")
 	}
 	return &pb.UserInvitedMemberResponse{Success: true}, nil
+}
+
+// UserViewedMemories реализует RPC метод для подсчета просмотров воспоминаний пользователем
+func (s *AuthService) UserViewedMemories(ctx context.Context, req *pb.UserViewedMemoriesRequest) (*pb.UserViewedMemoriesResponse, error) {
+	userID := req.GetUserId()
+	if userID <= 0 {
+		log.Printf("UserViewedMemories: Invalid argument: user_id is missing or invalid: %d", userID)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid user ID")
+	}
+
+	count := req.GetCount()
+	if count <= 0 {
+		log.Printf("UserViewedMemories: Invalid argument: count is missing or invalid: %d", count)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid count")
+	}
+
+	err := s.userRepo.UserViewedMemories(nil, uint(userID), uint(count))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("UserViewedMemories: User %d not found", userID)
+			return nil, status.Errorf(codes.NotFound, "User %d not found", userID)
+		}
+		log.Printf("UserViewedMemories: Failed to increment viewed memories count to user %d: %v", userID, err)
+		return nil, status.Errorf(codes.Internal, "Failed to increment viewed memories")
+	}
+	return &pb.UserViewedMemoriesResponse{Success: true}, nil
 }

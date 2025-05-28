@@ -83,8 +83,11 @@ type GroupMemberRepository interface {
 	// CheckUserInGroup проверяет есть ли пользователь в группе и является ли он админом
 	CheckUserInGroup(ctx context.Context, tx *gorm.DB, userID uint, groupID uint) (bool, bool, error)
 
-	// GroupMemberAddMemory добавляет запись о том, что пользователь добавляет воспоминание в группу
+	// GroupMemberAddMemory обновляет запись о том, что пользователь добавляет воспоминание в группу
 	GroupMemberAddMemory(ctx context.Context, tx *gorm.DB, groupID uint, userID uint) error
+
+	// GroupMemberViewMemories обновляет запись о том, что пользователь просматривает воспоминания в группе
+	GroupMemberViewMemories(ctx context.Context, tx *gorm.DB, groupID, userID, count uint) error
 }
 
 // GroupInvitationRepository определяет методы для работы с приглашениями в группы в базе данных.

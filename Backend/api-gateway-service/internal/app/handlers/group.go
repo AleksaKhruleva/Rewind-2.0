@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -76,11 +77,11 @@ func (h *GroupHandler) CreateGroup(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, responseBody)
 }
 
-// GetGroup обработчик для GET /api/groups/{id}
+// GetGroup обработчик для GET /api/groups/{group_id}
 // @Summary Get group details by ID
 // @Tags groups
 // @Produce json
-// @Param id path int true "Group ID"
+// @Param group_id path int true "Group ID"
 // @Success 200 {object} responses.GetGroupResponse "Group details"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid group ID format"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
@@ -89,9 +90,9 @@ func (h *GroupHandler) CreateGroup(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
-// @Router /api/groups/{id} [get]
+// @Router /api/groups/{group_id} [get]
 func (h *GroupHandler) GetGroup(w http.ResponseWriter, r *http.Request) {
-	groupIDStr := chi.URLParam(r, "id")
+	groupIDStr := chi.URLParam(r, "group_id")
 	groupID, err := strconv.ParseUint(groupIDStr, 10, 64)
 	if err != nil || groupID == 0 {
 		log.Printf("GroupHandler.GetGroup: Invalid group ID in URL: %s", groupIDStr)
@@ -127,12 +128,12 @@ func (h *GroupHandler) GetGroup(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, responseBody)
 }
 
-// UpdateGroup обработчик для PUT /api/groups/{id}
+// UpdateGroup обработчик для PUT /api/groups/{group_id}
 // @Summary Update group details by ID
 // @Tags groups
 // @Accept multipart/form-data
 // @Produce json
-// @Param id path int true "Group ID"
+// @Param group_id path int true "Group ID"
 // @Param name formData string false "Updated group name (optional)"
 // @Param image formData file false "Updated group image file (optional)"
 // @Success 200 {object} responses.GroupResponse "Successfully updated group"
@@ -143,9 +144,9 @@ func (h *GroupHandler) GetGroup(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
-// @Router /api/groups/{id} [put]
+// @Router /api/groups/{group_id} [put]
 func (h *GroupHandler) UpdateGroup(w http.ResponseWriter, r *http.Request) {
-	groupIDStr := chi.URLParam(r, "id")
+	groupIDStr := chi.URLParam(r, "group_id")
 	groupID, err := strconv.ParseUint(groupIDStr, 10, 64)
 	if err != nil || groupID == 0 {
 		log.Printf("GroupHandler.UpdateGroup: Invalid group ID in URL: %s", groupIDStr)
@@ -207,11 +208,11 @@ func (h *GroupHandler) UpdateGroup(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, responseBody)
 }
 
-// DeleteGroup обработчик для DELETE /api/groups/{id}
+// DeleteGroup обработчик для DELETE /api/groups/{group_id}
 // @Summary Delete a group by ID
 // @Tags groups
 // @Produce json
-// @Param id path int true "Group ID"
+// @Param group_id path int true "Group ID"
 // @Success 200 {object} responses.DeleteGroupResponse "Successfully deleted group"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid group ID format"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
@@ -220,9 +221,9 @@ func (h *GroupHandler) UpdateGroup(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
-// @Router /api/groups/{id} [delete]
+// @Router /api/groups/{group_id} [delete]
 func (h *GroupHandler) DeleteGroup(w http.ResponseWriter, r *http.Request) {
-	groupIDStr := chi.URLParam(r, "id")
+	groupIDStr := chi.URLParam(r, "group_id")
 	groupID, err := strconv.ParseUint(groupIDStr, 10, 64)
 	if err != nil || groupID == 0 {
 		log.Printf("GroupHandler.DeleteGroup: Invalid group ID in URL: %s", groupIDStr)
@@ -251,11 +252,11 @@ func (h *GroupHandler) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, responseBody)
 }
 
-// DeleteGroupAvatar обработчик для DELETE /api/groups/{id}/avatar
+// DeleteGroupAvatar обработчик для DELETE /api/groups/{group_id}/avatar
 // @Summary Delete a group's avatar by ID
 // @Tags groups
 // @Produce json
-// @Param id path int true "Group ID"
+// @Param group_id path int true "Group ID"
 // @Success 200 {object} responses.DeleteGroupAvatarResponse "Successfully deleted group avatar"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid group ID format"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
@@ -264,9 +265,9 @@ func (h *GroupHandler) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
-// @Router /api/groups/{id}/avatar [delete]
+// @Router /api/groups/{group_id}/avatar [delete]
 func (h *GroupHandler) DeleteGroupAvatar(w http.ResponseWriter, r *http.Request) {
-	groupIDStr := chi.URLParam(r, "id")
+	groupIDStr := chi.URLParam(r, "group_id")
 	groupID, err := strconv.ParseUint(groupIDStr, 10, 64)
 	if err != nil || groupID == 0 {
 		log.Printf("GroupHandler.DeleteGroupAvatar: Invalid group ID in URL: %s", groupIDStr)
@@ -294,11 +295,11 @@ func (h *GroupHandler) DeleteGroupAvatar(w http.ResponseWriter, r *http.Request)
 	respondJSON(w, http.StatusOK, responseBody)
 }
 
-// ListGroupMembers обработчик для GET /api/groups/{id}/members
+// ListGroupMembers обработчик для GET /api/groups/{group_id}/members
 // @Summary List members of a group
 // @Tags groups
 // @Produce json
-// @Param id path int true "Group ID"
+// @Param group_id path int true "Group ID"
 // @Success 200 {object} responses.ListGroupMembersResponse "List of group members"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid group ID format"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
@@ -307,9 +308,9 @@ func (h *GroupHandler) DeleteGroupAvatar(w http.ResponseWriter, r *http.Request)
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
-// @Router /api/groups/{id}/members [get]
+// @Router /api/groups/{group_id}/members [get]
 func (h *GroupHandler) ListGroupMembers(w http.ResponseWriter, r *http.Request) {
-	groupIDStr := chi.URLParam(r, "id")
+	groupIDStr := chi.URLParam(r, "group_id")
 	groupID, err := strconv.ParseUint(groupIDStr, 10, 64)
 	if err != nil || groupID == 0 {
 		log.Printf("GroupHandler.ListGroupMembers: Invalid group ID in URL: %s", groupIDStr)
@@ -394,12 +395,12 @@ func (h *GroupHandler) RemoveGroupMember(w http.ResponseWriter, r *http.Request)
 	respondJSON(w, http.StatusOK, responseBody)
 }
 
-// CreateGroupInvitation обработчик для POST /api/groups/{id}/invitations
+// CreateGroupInvitation обработчик для POST /api/groups/{group_id}/invitations
 // @Summary Create a group invitation
 // @Tags groups
 // @Accept json
 // @Produce json
-// @Param id path int true "Group ID"
+// @Param group_id path int true "Group ID"
 // @Param body body requests.CreateGroupInvitationRequest true "Invitation details (optional duration)"
 // @Success 200 {object} responses.CreateGroupInvitationResponse "Successfully created invitation"
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid group ID format or request body"
@@ -409,9 +410,9 @@ func (h *GroupHandler) RemoveGroupMember(w http.ResponseWriter, r *http.Request)
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Security ApiKeyAuth
-// @Router /api/groups/{id}/invitations [post]
+// @Router /api/groups/{group_id}/invitations [post]
 func (h *GroupHandler) CreateGroupInvitation(w http.ResponseWriter, r *http.Request) {
-	groupIDStr := chi.URLParam(r, "id")
+	groupIDStr := chi.URLParam(r, "group_id")
 	groupID, err := strconv.ParseUint(groupIDStr, 10, 64)
 	if err != nil || groupID == 0 {
 		log.Printf("GroupHandler.CreateGroupInvitation: Invalid group ID in URL: %s", groupIDStr)
@@ -544,4 +545,41 @@ func (h *GroupHandler) ListUserGroups(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondJSON(w, http.StatusOK, responseBody)
+}
+
+// UpdateMemoriesViewed обработчик для PATCH /api/groups/{group_id}/memories/viewed.
+// @Summary Increment user's viewed memories count.
+// @Description Increments the count of memories the user has viewed by a given number.
+// @Tags groups
+// @Accept json
+// @Produce json
+// @Param group_id path int true "Group ID"
+// @Param request body requests.UpdateMemoriesViewedRequest true "Increment data"
+// @Success 200 {object} responses.UpdateMemoriesViewedResponse
+// @Failure 400 {object} responses.ErrorResponse
+// @Failure 401 {object} responses.ErrorResponse
+// @Failure 500 {object} responses.ErrorResponse
+// @Security ApiKeyAuth
+// @Router /api/groups/{group_id}/memories/viewed [patch]
+func (h *GroupHandler) UpdateMemoriesViewed(w http.ResponseWriter, r *http.Request) {
+	groupIDStr := chi.URLParam(r, "group_id")
+	groupID, err := strconv.ParseUint(groupIDStr, 10, 64)
+	if err != nil || groupID == 0 {
+		log.Printf("GroupHandler.CreateGroupInvitation: Invalid group ID in URL: %s", groupIDStr)
+		respondError(w, http.StatusBadRequest, "Invalid group ID format")
+		return
+	}
+	var req requests.UpdateMemoriesViewedRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid request body")
+		return
+	}
+
+	resp, err := h.groupService.IncrementMemoriesViewed(r.Context(), groupID, req.Count)
+	if err != nil {
+		handleServiceError(w, err, "IncrementMemoriesViewed")
+		return
+	}
+
+	respondJSON(w, http.StatusOK, responses.UpdateMemoriesViewedResponse{Success: resp.GetSuccess()})
 }

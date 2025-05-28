@@ -1187,3 +1187,33 @@ func (s *GroupService) GroupMemberAddedMemory(ctx context.Context, req *pb.Group
 	}
 	return &pb.GroupMemberAddedMemoryResponse{Success: true}, nil
 }
+
+// GroupMemberViewedMemories реализует RPC метод добавления воспоминания в группу
+func (s *GroupService) GroupMemberViewedMemories(ctx context.Context, req *pb.GroupMemberViewedMemoriesRequest) (*pb.GroupMemberViewedMemoriesResponse, error) {
+	userID := req.GetUserId()
+	if userID <= 0 {
+		log.Printf("GroupMemberViewedMemories: Invalid argument: user_id is missing or invalid: %d", userID)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid user ID")
+	}
+
+	groupID := req.GetGroupId()
+	if groupID <= 0 {
+		log.Printf("GroupMemberViewedMemories: Invalid argument: group_id is missing or invalid: %d", groupID)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid group ID")
+	}
+
+	count := req.GetCount()
+	if count <= 0 {
+		log.Printf("GroupMemberViewedMemories: Invalid argument: count is missing or invalid: %d", count)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid count value")
+	}
+
+	err := s.groupRepo.GroupMember().GroupMemberViewMemories(ctx, nil, uint(groupID), uint(userID), uint(count))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("GroupMemberViewedMemories: GroupMember %d not found in group %d", userID, groupID)
+			return nil, status.Errorf(codes.NotFound, "GroupMember %d not found in group %d", userID, groupID)
+		}
+	}
+	return &pb.GroupMemberViewedMemoriesResponse{Success: true}, nil
+}

@@ -106,3 +106,8 @@ func (c *GroupServiceClient) CheckUserInGroup(ctx context.Context, in *pb.CheckU
 func (c *GroupServiceClient) GroupMemberAddedMemory(ctx context.Context, in *pb.GroupMemberAddedMemoryRequest, opts ...grpc.CallOption) (*pb.GroupMemberAddedMemoryResponse, error) {
 	return c.client.GroupMemberAddedMemory(ctx, in, opts...)
 }
+
+// GroupMemberViewedMemories вызывает RPC метод GroupMemberViewedMemories в Group-Service
+func (c *GroupServiceClient) GroupMemberViewedMemories(ctx context.Context, in *pb.GroupMemberViewedMemoriesRequest, opts ...grpc.CallOption) (*pb.GroupMemberViewedMemoriesResponse, error) {
+	return c.client.GroupMemberViewedMemories(ctx, in, opts...)
+}
