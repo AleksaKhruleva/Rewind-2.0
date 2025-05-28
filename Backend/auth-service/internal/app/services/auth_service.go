@@ -639,7 +639,7 @@ func (s *AuthService) UpdateUsername(ctx context.Context, req *pb.UpdateUsername
 	userID := req.GetUserId()
 	newUsername := req.GetNewUsername()
 
-	if err := s.validator.Var(newUsername, "required,min=3,max=50"); err != nil {
+	if err := s.validator.Var(newUsername, "required,min=4,max=20"); err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid username")
 	}
 
