@@ -24,7 +24,12 @@ public struct GalleryView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 headerView
-                mediaGridView
+                if viewModel.galleryItems.isEmpty {
+                    Spacer(minLength: 0)
+                    RewindNoteTextView(text: "Your gallery is empty 🫥")
+                } else {
+                    mediaGridView
+                }
                 Spacer(minLength: 0)
             }
             .background(Color.background)
@@ -33,25 +38,30 @@ public struct GalleryView: View {
                     print(settings)
                 }
             }
+            .safeAreaInset(edge: .bottom) {
+                footer
+            }
             .overlay {
                 if let selectedMedia = viewModel.viewingBlurredMedia {
                     BlurredMediaView(
                         isPresented: $viewModel.blurredMediaShown,
                         galleryItem: selectedMedia, onDelete: { galleryItem in
                             Task {
-                                await viewModel.dispatch(.deleteMedia(galleryItem))
-                                withAnimation {
-                                    viewModel.blurredMediaShown = false
+                                await viewModel.dispatch(.deleteMedia(galleryItem)) {
+                                    withAnimation {
+                                        viewModel.blurredMediaShown = false
+                                    }
                                 }
                             }
                         },
                         showMediaDetails: {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            router.navigateToMediaDetails($0)
+                            // Small 🩼 for mor beautiful animation
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: {
                                 withAnimation {
                                     viewModel.blurredMediaShown = false
                                 }
-                            }
-                            router.navigateToMediaDetails($0)
+                            })
                         }
                     )
                 }
@@ -129,9 +139,6 @@ public struct GalleryView: View {
             }
         }
         .scrollIndicators(.hidden)
-        .safeAreaInset(edge: .bottom) {
-            footer
-        }
     }
 
     @ViewBuilder

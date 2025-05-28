@@ -163,4 +163,34 @@ final class GroupViewModel {
             toastMessage = UIComponentsStrings.Toast.error
         }
     }
+
+    private func sortedMembers(
+        from responses: [GroupMemberResponse],
+        groupOwnerID: Int,
+        currentUserID: String
+    ) -> [Member] {
+        let members = responses.map { response in
+            Member(
+                id: String(response.id),
+                name: response.name,
+                imageData: nil,
+                isOwner: response.id == groupOwnerID,
+                isUser: String(response.id) == currentUserID
+            )
+        }
+
+        return members.sorted { lhs, rhs in
+            switch (lhs.isOwner, rhs.isOwner) {
+            case (true, false): return true
+            case (false, true): return false
+            default:
+                switch (lhs.isUser, rhs.isUser) {
+                case (true, false): return true
+                case (false, true): return false
+                default:
+                    return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
+                }
+            }
+        }
+    }
 }

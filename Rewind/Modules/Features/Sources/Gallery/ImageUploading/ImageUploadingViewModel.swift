@@ -35,7 +35,7 @@ final class ImageUploadingViewModel {
         return image
     }
 
-    var loadedMediaTagsBinding: Binding<[String]> {
+    var loadedMediaTagsBinding: Binding<[MediaTag]> {
         Binding {
             return self.loadedMedia?.tags ?? []
         } set: { newTags in

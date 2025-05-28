@@ -51,11 +51,11 @@ public protocol NetworkServiceProtocol {
         musicId: String?,
         offset: Double?,
         duration: Double?,
-        tags: [String]
+        tags: [MediaTag]
     ) async throws -> MediaResponse
     func deleteMedia(tokens: Tokens, groupId: Int, memoryId: Int) async throws -> SuccessResponse
-    func addTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> TagResponse
-    func deleteTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> TagResponse
+    func addTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> MediaTag
+    func deleteTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> SuccessResponse
     func likeMedia(tokens: Tokens, memoryId: Int) async throws -> SuccessResponse
     func unlikeMedia(tokens: Tokens, memoryId: Int) async throws -> SuccessResponse
     func getMediaTags(tokens: Tokens, memoryId: Int) async throws -> TagsResponse
@@ -281,7 +281,7 @@ public final class NetworkService: NetworkServiceProtocol {
         musicId: String? = nil,
         offset: Double? = nil,
         duration: Double? = nil,
-        tags: [String] = []
+        tags: [MediaTag] = []
     ) async throws -> MediaResponse {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
@@ -295,7 +295,7 @@ public final class NetworkService: NetworkServiceProtocol {
                     musicId: musicId,
                     offset: offset,
                     duration: duration,
-                    tags: tags
+                    tags: tags.map { $0.tag }
                 ),
                 type: MediaResponse.self
             )
@@ -324,7 +324,7 @@ public final class NetworkService: NetworkServiceProtocol {
                     memoryId: memoryId,
                     tag: tag
                 ),
-                type: TagResponse.self
+                type: MediaTag.self
             )
         }
     }
@@ -338,7 +338,7 @@ public final class NetworkService: NetworkServiceProtocol {
                     memoryId: memoryId,
                     tag: tag
                 ),
-                type: TagResponse.self
+                type: SuccessResponse.self
             )
         }
     }

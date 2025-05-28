@@ -9,7 +9,7 @@ public struct LoadedMedia: Hashable, Identifiable {
 
     public let id: UUID
     public var content: Content
-    public var tags: [String]?
+    public var tags: [MediaTag]?
     public var photosPickerItem: PhotosPickerItem?
     public var videoEditingSettings: VideoEditingSettings?
 
