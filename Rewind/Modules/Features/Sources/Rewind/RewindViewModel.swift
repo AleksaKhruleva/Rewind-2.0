@@ -16,7 +16,7 @@ final class RewindViewModel {
         case fetchGroups
         case openGroup
         case selectedNewGroup(Domain.Group)
-        case loadGroupImage
+        case loadAvatars
     }
 
     enum UserGroupsState {
@@ -33,6 +33,7 @@ final class RewindViewModel {
     var isTrackPlaying = false
     var rolls = 0
     var groupImage: UIImage?
+    var userImage: UIImage?
     private(set) var groups = [Domain.Group]()
     private(set) var userGroupsState = UserGroupsState.notReady
     private(set) var currentGroupState = CurrentGroupState.ready
@@ -44,7 +45,7 @@ final class RewindViewModel {
         get {
             guard let fetchedUser else {
                 //                router.navigateToWelcome() // TODO: return when routing is ready
-                return User(name: "", email: "")
+                return User(name: "", email: "", imageURL: "")
             }
             return fetchedUser
         }
@@ -118,7 +119,7 @@ final class RewindViewModel {
                 await withTaskGroup(of: Void.self) { group in
                     for groupItem in sorted {
                         group.addTask {
-                            await GroupImageProvider.loadAndCacheImage(for: groupItem.imageURL)
+                            await ImageProvider.loadAndCacheImage(for: groupItem.imageURL, .group)
                         }
                     }
                 }
@@ -180,15 +181,16 @@ final class RewindViewModel {
         case .selectedNewGroup:
             groups = GroupUtils.sortedGroups(groups)
             userGroupsState = .ready
-        case .loadGroupImage:
-            await loadGroupImage()
+        case .loadAvatars:
+            if let url = GroupStorage.currentGroup?.imageURL {
+                groupImage = await loadImage(urlString: url)
+            }
+            userImage = await loadImage(urlString: user.imageURL)
         }
     }
 
-    private func loadGroupImage() async {
-        if let url = GroupStorage.currentGroup?.imageURL {
-            groupImage = await GroupImageProvider.loadOrGetImage(for: url)
-        }
+    private func loadImage(urlString: String) async -> UIImage {
+        await ImageProvider.loadOrGetImage(for: urlString, .group)
     }
 
     func set(showToast: @escaping (String) -> Void) {

@@ -10,6 +10,7 @@ final class AccountViewModel {
         case signOut
         case deleteAccount
         case fetchUser
+        case loadUserImage
         case deleteImage
         case setImage(UIImage?)
     }
@@ -20,16 +21,17 @@ final class AccountViewModel {
     private let backend: NetworkServiceProtocol
 
     var user: User
+    var userImage: UIImage = DomainAsset.userPlacholder.image
 
     var imageBinding: Binding<UIImage?> {
         Binding {
-            self.user.image
+            self.userImage
         } set: { newImage in
             guard let newImage else {
                 self.showToast(UIComponentsStrings.Account.Edit.Image.Set.failure)
                 return
             }
-            self.user.image = newImage
+            self.userImage = newImage
         }
     }
 
@@ -40,7 +42,7 @@ final class AccountViewModel {
         backend = NetworkService()
     }
 
-    func dispatch(_ intent: Intent) async {
+    func dispatch(_ intent: Intent, onSuccess: @escaping () -> Void = {}) async {
         switch intent {
         case .signOut:
             if let tokens = Tokens() {
@@ -82,31 +84,37 @@ final class AccountViewModel {
                 showErrorToast(for: error)
             }
         case .deleteImage:
-            guard user.imageData == nil else {
-                showToast(UIComponentsStrings.Account.Edit.Image.Delete.success)
-                return
-            }
-            withAnimation {
-                user.imageData = nil
-            }
-            showToast(UIComponentsStrings.Account.Edit.Image.Delete.success)
+            print()
+//            await dispatch(.setImage(UIImage()))
         case let .setImage(newImage):
             do {
                 if let tokens = Tokens(), let newImage {
                     let response = try await backend.updateUserAvatar(tokens: tokens, avatar: newImage)
                     if response.success {
-                        showToast(UIComponentsStrings.Account.Edit.Image.Set.failure)
-                        user.image = newImage
+                        showToast(UIComponentsStrings.Account.Edit.Image.Set.success)
+                        userImage = newImage
+                        onSuccess()
                     }
                 }
             } catch {
                 showErrorToast(for: error)
             }
+        case .loadUserImage:
+            await loadUserImage()
         }
     }
 
     func set(showToast: @escaping (String) -> Void) {
         self.showToast = showToast
+    }
+
+    private func loadUserImage() async {
+        let image = await ImageProvider.loadOrGetImage(
+            for: user.imageURL, .group
+        )
+        await MainActor.run { [weak self] in
+            self?.userImage = image
+        }
     }
 
     private func clearLocalData() {

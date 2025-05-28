@@ -20,9 +20,6 @@ public struct LoadableImageThumbnail<Content: View>: View {
             .task {
                 await loadImage(url)
             }
-            .onChange(of: url) { _ in
-                print("URL CHANGED")
-            }
     }
 
     private func loadImage(_ currentURL: URL?) async {
@@ -31,23 +28,13 @@ public struct LoadableImageThumbnail<Content: View>: View {
             animateState(to: .failure)
             return
         }
-        do {
-//            let fileURL = url.deletingPathExtension().lastPathComponent
-//            async let uiImage = await FileManagerImageStorage.shared.getImage(url: fileURL)
-//            if let uiImage = await uiImage {
-//                animateState(to: .ready(uiImage))
-//                return
-//            }
-            async let (data, _) = try await URLSession.shared.data(from: url)
-            if let uiImage = try await UIImage(data: data) {
-//                await FileManagerImageStorage.shared.saveImage(image: uiImage, url: fileURL)
-                animateState(to: .ready(uiImage))
-            } else {
-                animateState(to: .failure)
+        await withTaskGroup(of: Void.self) { group in
+            group.addTask {
+                await ImageProvider.loadAndCacheImage(for: url.absoluteString, .group)
             }
-        } catch {
-            animateState(to: .failure)
         }
+        let uiImage = await ImageProvider.loadOrGetImage(for: url.absoluteString, .group)
+        animateState(to: .ready(uiImage))
     }
 
     private func animateState(to state: LoadableMediaState) {
