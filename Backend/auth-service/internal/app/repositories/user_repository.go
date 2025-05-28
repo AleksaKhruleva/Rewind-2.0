@@ -29,6 +29,8 @@ type UserRepositoryInterface interface {
 	UpdatePassword(tx *gorm.DB, userID uint, newPassword string) error
 	UpdateAvatar(tx *gorm.DB, userID uint, image string) error
 	CheckPassword(tx *gorm.DB, userID uint, password string) error
+	UserAddMemory(tx *gorm.DB, userID uint) error
+	UserAddMember(tx *gorm.DB, userID uint) error
 }
 
 type UserRepository struct {
@@ -189,4 +191,32 @@ func (r *UserRepository) UpdateAvatar(tx *gorm.DB, userID uint, image string) er
 		tx = r.db
 	}
 	return tx.Model(&models.User{}).Where("id = ?", userID).Update("image", image).Error
+}
+
+func (r *UserRepository) UserAddMemory(tx *gorm.DB, userID uint) error {
+	if tx == nil {
+		tx = r.db
+	}
+	result := tx.Model(&models.User{}).Where("id = ?", userID).Update("memories_added_count", gorm.Expr("memories_added_count + 1"))
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
+
+func (r *UserRepository) UserAddMember(tx *gorm.DB, userID uint) error {
+	if tx == nil {
+		tx = r.db
+	}
+	result := tx.Model(&models.User{}).Where("id = ?", userID).Update("invited_members_count", gorm.Expr("invited_members_count + 1"))
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
 }

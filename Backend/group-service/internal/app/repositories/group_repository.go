@@ -279,6 +279,18 @@ func (r *gormGroupMemberRepository) CheckUserInGroup(ctx context.Context, tx *go
 	return true, groupMember.IsAdmin, nil
 }
 
+func (r *gormGroupMemberRepository) GroupMemberAddMemory(ctx context.Context, tx *gorm.DB, groupID uint, userID uint) error {
+	db := r.getDB(tx).WithContext(ctx)
+	result := db.Model(&models.GroupMember{}).Where("group_id = ? AND user_id = ?", groupID, userID).Update("memories_added_count", gorm.Expr("memories_added_count + 1"))
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
+
 type gormGroupInvitationRepository struct {
 	db *gorm.DB
 }

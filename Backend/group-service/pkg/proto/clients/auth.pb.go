@@ -22,13 +22,16 @@ const (
 )
 
 type User struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
-	Email         string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	Image         string                 `protobuf:"bytes,4,opt,name=image,proto3" json:"image,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	Id                  uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Username            string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	Email               string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
+	Image               string                 `protobuf:"bytes,4,opt,name=image,proto3" json:"image,omitempty"`
+	MemoriesAddedCount  uint64                 `protobuf:"varint,5,opt,name=memories_added_count,json=memoriesAddedCount,proto3" json:"memories_added_count,omitempty"`
+	InvitedMembersCount uint64                 `protobuf:"varint,6,opt,name=invited_members_count,json=invitedMembersCount,proto3" json:"invited_members_count,omitempty"`
+	MemoriesViewedCount uint64                 `protobuf:"varint,7,opt,name=memories_viewed_count,json=memoriesViewedCount,proto3" json:"memories_viewed_count,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *User) Reset() {
@@ -87,6 +90,27 @@ func (x *User) GetImage() string {
 		return x.Image
 	}
 	return ""
+}
+
+func (x *User) GetMemoriesAddedCount() uint64 {
+	if x != nil {
+		return x.MemoriesAddedCount
+	}
+	return 0
+}
+
+func (x *User) GetInvitedMembersCount() uint64 {
+	if x != nil {
+		return x.InvitedMembersCount
+	}
+	return 0
+}
+
+func (x *User) GetMemoriesViewedCount() uint64 {
+	if x != nil {
+		return x.MemoriesViewedCount
+	}
+	return 0
 }
 
 type StartRegistrationRequest struct {
@@ -1969,16 +1993,195 @@ func (x *DeleteAvatarResponse) GetSuccess() bool {
 	return false
 }
 
+type UserAddedMemoryRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserAddedMemoryRequest) Reset() {
+	*x = UserAddedMemoryRequest{}
+	mi := &file_proto_clients_auth_proto_msgTypes[41]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserAddedMemoryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserAddedMemoryRequest) ProtoMessage() {}
+
+func (x *UserAddedMemoryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_clients_auth_proto_msgTypes[41]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserAddedMemoryRequest.ProtoReflect.Descriptor instead.
+func (*UserAddedMemoryRequest) Descriptor() ([]byte, []int) {
+	return file_proto_clients_auth_proto_rawDescGZIP(), []int{41}
+}
+
+func (x *UserAddedMemoryRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+type UserAddedMemoryResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserAddedMemoryResponse) Reset() {
+	*x = UserAddedMemoryResponse{}
+	mi := &file_proto_clients_auth_proto_msgTypes[42]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserAddedMemoryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserAddedMemoryResponse) ProtoMessage() {}
+
+func (x *UserAddedMemoryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_clients_auth_proto_msgTypes[42]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserAddedMemoryResponse.ProtoReflect.Descriptor instead.
+func (*UserAddedMemoryResponse) Descriptor() ([]byte, []int) {
+	return file_proto_clients_auth_proto_rawDescGZIP(), []int{42}
+}
+
+func (x *UserAddedMemoryResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+type UserInvitedMemberRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint64                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserInvitedMemberRequest) Reset() {
+	*x = UserInvitedMemberRequest{}
+	mi := &file_proto_clients_auth_proto_msgTypes[43]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserInvitedMemberRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserInvitedMemberRequest) ProtoMessage() {}
+
+func (x *UserInvitedMemberRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_clients_auth_proto_msgTypes[43]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserInvitedMemberRequest.ProtoReflect.Descriptor instead.
+func (*UserInvitedMemberRequest) Descriptor() ([]byte, []int) {
+	return file_proto_clients_auth_proto_rawDescGZIP(), []int{43}
+}
+
+func (x *UserInvitedMemberRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+type UserInvitedMemberResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserInvitedMemberResponse) Reset() {
+	*x = UserInvitedMemberResponse{}
+	mi := &file_proto_clients_auth_proto_msgTypes[44]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserInvitedMemberResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserInvitedMemberResponse) ProtoMessage() {}
+
+func (x *UserInvitedMemberResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_clients_auth_proto_msgTypes[44]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserInvitedMemberResponse.ProtoReflect.Descriptor instead.
+func (*UserInvitedMemberResponse) Descriptor() ([]byte, []int) {
+	return file_proto_clients_auth_proto_rawDescGZIP(), []int{44}
+}
+
+func (x *UserInvitedMemberResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
 var File_proto_clients_auth_proto protoreflect.FileDescriptor
 
 const file_proto_clients_auth_proto_rawDesc = "" +
 	"\n" +
-	"\x18proto/clients/auth.proto\x12\x04auth\"^\n" +
+	"\x18proto/clients/auth.proto\x12\x04auth\"\xf8\x01\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x14\n" +
 	"\x05email\x18\x03 \x01(\tR\x05email\x12\x14\n" +
-	"\x05image\x18\x04 \x01(\tR\x05image\"0\n" +
+	"\x05image\x18\x04 \x01(\tR\x05image\x120\n" +
+	"\x14memories_added_count\x18\x05 \x01(\x04R\x12memoriesAddedCount\x122\n" +
+	"\x15invited_members_count\x18\x06 \x01(\x04R\x13invitedMembersCount\x122\n" +
+	"\x15memories_viewed_count\x18\a \x01(\x04R\x13memoriesViewedCount\"0\n" +
 	"\x18StartRegistrationRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\"^\n" +
 	"\x19StartRegistrationResponse\x12'\n" +
@@ -2075,7 +2278,15 @@ const file_proto_clients_auth_proto_rawDesc = "" +
 	"\x13DeleteAvatarRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\x04R\x06userId\"0\n" +
 	"\x14DeleteAvatarResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess2\xa4\f\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"1\n" +
+	"\x16UserAddedMemoryRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\"3\n" +
+	"\x17UserAddedMemoryResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"3\n" +
+	"\x18UserInvitedMemberRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x04R\x06userId\"5\n" +
+	"\x19UserInvitedMemberResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess2\xce\r\n" +
 	"\vAuthService\x12V\n" +
 	"\x11StartRegistration\x12\x1e.auth.StartRegistrationRequest\x1a\x1f.auth.StartRegistrationResponse\"\x00\x12P\n" +
 	"\x0fVerifyEmailCode\x12\x1c.auth.VerifyEmailCodeRequest\x1a\x1d.auth.VerifyEmailCodeResponse\"\x00\x12e\n" +
@@ -2097,7 +2308,9 @@ const file_proto_clients_auth_proto_rawDesc = "" +
 	"\x12StartPasswordReset\x12\x1f.auth.StartPasswordResetRequest\x1a .auth.StartPasswordResetResponse\"\x00\x12h\n" +
 	"\x17VerifyPasswordResetCode\x12$.auth.VerifyPasswordResetCodeRequest\x1a%.auth.VerifyPasswordResetCodeResponse\"\x00\x12M\n" +
 	"\x0eSetNewPassword\x12\x1b.auth.SetNewPasswordRequest\x1a\x1c.auth.SetNewPasswordResponse\"\x00\x12G\n" +
-	"\fDeleteAvatar\x12\x19.auth.DeleteAvatarRequest\x1a\x1a.auth.DeleteAvatarResponse\"\x00B'Z%Rewind-2.0/Backend/auth_service/protob\x06proto3"
+	"\fDeleteAvatar\x12\x19.auth.DeleteAvatarRequest\x1a\x1a.auth.DeleteAvatarResponse\"\x00\x12P\n" +
+	"\x0fUserAddedMemory\x12\x1c.auth.UserAddedMemoryRequest\x1a\x1d.auth.UserAddedMemoryResponse\"\x00\x12V\n" +
+	"\x11UserInvitedMember\x12\x1e.auth.UserInvitedMemberRequest\x1a\x1f.auth.UserInvitedMemberResponse\"\x00B'Z%Rewind-2.0/Backend/auth_service/protob\x06proto3"
 
 var (
 	file_proto_clients_auth_proto_rawDescOnce sync.Once
@@ -2111,7 +2324,7 @@ func file_proto_clients_auth_proto_rawDescGZIP() []byte {
 	return file_proto_clients_auth_proto_rawDescData
 }
 
-var file_proto_clients_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 41)
+var file_proto_clients_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 45)
 var file_proto_clients_auth_proto_goTypes = []any{
 	(*User)(nil),                            // 0: auth.User
 	(*StartRegistrationRequest)(nil),        // 1: auth.StartRegistrationRequest
@@ -2154,6 +2367,10 @@ var file_proto_clients_auth_proto_goTypes = []any{
 	(*SetNewPasswordResponse)(nil),          // 38: auth.SetNewPasswordResponse
 	(*DeleteAvatarRequest)(nil),             // 39: auth.DeleteAvatarRequest
 	(*DeleteAvatarResponse)(nil),            // 40: auth.DeleteAvatarResponse
+	(*UserAddedMemoryRequest)(nil),          // 41: auth.UserAddedMemoryRequest
+	(*UserAddedMemoryResponse)(nil),         // 42: auth.UserAddedMemoryResponse
+	(*UserInvitedMemberRequest)(nil),        // 43: auth.UserInvitedMemberRequest
+	(*UserInvitedMemberResponse)(nil),       // 44: auth.UserInvitedMemberResponse
 }
 var file_proto_clients_auth_proto_depIdxs = []int32{
 	0,  // 0: auth.GetUsersByIDsResponse.users:type_name -> auth.User
@@ -2178,28 +2395,32 @@ var file_proto_clients_auth_proto_depIdxs = []int32{
 	35, // 19: auth.AuthService.VerifyPasswordResetCode:input_type -> auth.VerifyPasswordResetCodeRequest
 	37, // 20: auth.AuthService.SetNewPassword:input_type -> auth.SetNewPasswordRequest
 	39, // 21: auth.AuthService.DeleteAvatar:input_type -> auth.DeleteAvatarRequest
-	2,  // 22: auth.AuthService.StartRegistration:output_type -> auth.StartRegistrationResponse
-	4,  // 23: auth.AuthService.VerifyEmailCode:output_type -> auth.VerifyEmailCodeResponse
-	6,  // 24: auth.AuthService.SetPasswordAndUsername:output_type -> auth.SetPasswordAndUsernameResponse
-	8,  // 25: auth.AuthService.Login:output_type -> auth.LoginResponse
-	10, // 26: auth.AuthService.RefreshToken:output_type -> auth.RefreshTokenResponse
-	12, // 27: auth.AuthService.ForgotPassword:output_type -> auth.ForgotPasswordResponse
-	14, // 28: auth.AuthService.ResetPassword:output_type -> auth.ResetPasswordResponse
-	16, // 29: auth.AuthService.Logout:output_type -> auth.LogoutResponse
-	18, // 30: auth.AuthService.DeleteUser:output_type -> auth.DeleteUserResponse
-	20, // 31: auth.AuthService.GetUsersByIDs:output_type -> auth.GetUsersByIDsResponse
-	22, // 32: auth.AuthService.GetUserByID:output_type -> auth.GetUserByIDResponse
-	24, // 33: auth.AuthService.UpdateUsername:output_type -> auth.UpdateUsernameResponse
-	26, // 34: auth.AuthService.CheckPassword:output_type -> auth.CheckPasswordResponse
-	28, // 35: auth.AuthService.UpdateEmail:output_type -> auth.UpdateEmailResponse
-	30, // 36: auth.AuthService.VerifyNewEmailCode:output_type -> auth.VerifyNewEmailCodeResponse
-	32, // 37: auth.AuthService.UpdateAvatar:output_type -> auth.UpdateAvatarResponse
-	34, // 38: auth.AuthService.StartPasswordReset:output_type -> auth.StartPasswordResetResponse
-	36, // 39: auth.AuthService.VerifyPasswordResetCode:output_type -> auth.VerifyPasswordResetCodeResponse
-	38, // 40: auth.AuthService.SetNewPassword:output_type -> auth.SetNewPasswordResponse
-	40, // 41: auth.AuthService.DeleteAvatar:output_type -> auth.DeleteAvatarResponse
-	22, // [22:42] is the sub-list for method output_type
-	2,  // [2:22] is the sub-list for method input_type
+	41, // 22: auth.AuthService.UserAddedMemory:input_type -> auth.UserAddedMemoryRequest
+	43, // 23: auth.AuthService.UserInvitedMember:input_type -> auth.UserInvitedMemberRequest
+	2,  // 24: auth.AuthService.StartRegistration:output_type -> auth.StartRegistrationResponse
+	4,  // 25: auth.AuthService.VerifyEmailCode:output_type -> auth.VerifyEmailCodeResponse
+	6,  // 26: auth.AuthService.SetPasswordAndUsername:output_type -> auth.SetPasswordAndUsernameResponse
+	8,  // 27: auth.AuthService.Login:output_type -> auth.LoginResponse
+	10, // 28: auth.AuthService.RefreshToken:output_type -> auth.RefreshTokenResponse
+	12, // 29: auth.AuthService.ForgotPassword:output_type -> auth.ForgotPasswordResponse
+	14, // 30: auth.AuthService.ResetPassword:output_type -> auth.ResetPasswordResponse
+	16, // 31: auth.AuthService.Logout:output_type -> auth.LogoutResponse
+	18, // 32: auth.AuthService.DeleteUser:output_type -> auth.DeleteUserResponse
+	20, // 33: auth.AuthService.GetUsersByIDs:output_type -> auth.GetUsersByIDsResponse
+	22, // 34: auth.AuthService.GetUserByID:output_type -> auth.GetUserByIDResponse
+	24, // 35: auth.AuthService.UpdateUsername:output_type -> auth.UpdateUsernameResponse
+	26, // 36: auth.AuthService.CheckPassword:output_type -> auth.CheckPasswordResponse
+	28, // 37: auth.AuthService.UpdateEmail:output_type -> auth.UpdateEmailResponse
+	30, // 38: auth.AuthService.VerifyNewEmailCode:output_type -> auth.VerifyNewEmailCodeResponse
+	32, // 39: auth.AuthService.UpdateAvatar:output_type -> auth.UpdateAvatarResponse
+	34, // 40: auth.AuthService.StartPasswordReset:output_type -> auth.StartPasswordResetResponse
+	36, // 41: auth.AuthService.VerifyPasswordResetCode:output_type -> auth.VerifyPasswordResetCodeResponse
+	38, // 42: auth.AuthService.SetNewPassword:output_type -> auth.SetNewPasswordResponse
+	40, // 43: auth.AuthService.DeleteAvatar:output_type -> auth.DeleteAvatarResponse
+	42, // 44: auth.AuthService.UserAddedMemory:output_type -> auth.UserAddedMemoryResponse
+	44, // 45: auth.AuthService.UserInvitedMember:output_type -> auth.UserInvitedMemberResponse
+	24, // [24:46] is the sub-list for method output_type
+	2,  // [2:24] is the sub-list for method input_type
 	2,  // [2:2] is the sub-list for extension type_name
 	2,  // [2:2] is the sub-list for extension extendee
 	0,  // [0:2] is the sub-list for field type_name
@@ -2216,7 +2437,7 @@ func file_proto_clients_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_clients_auth_proto_rawDesc), len(file_proto_clients_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   41,
+			NumMessages:   45,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

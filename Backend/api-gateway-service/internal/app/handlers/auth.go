@@ -363,10 +363,13 @@ func (h *AuthHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responseBody := responses.GetUserByIDResponse{
-		ID:       userPB.GetId(),
-		Username: userPB.GetUsername(),
-		Email:    userPB.GetEmail(),
-		Image:    userPB.GetImage(),
+		ID:                  userPB.GetId(),
+		Username:            userPB.GetUsername(),
+		Email:               userPB.GetEmail(),
+		Image:               userPB.GetImage(),
+		MemoriesAddedCount:  userPB.GetMemoriesAddedCount(),
+		InvitedMembersCount: userPB.GetInvitedMembersCount(),
+		MemoriesViewedCount: userPB.GetMemoriesViewedCount(),
 	}
 
 	respondJSON(w, http.StatusOK, responseBody)

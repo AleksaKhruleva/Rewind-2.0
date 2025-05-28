@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"strings"
+	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -118,6 +119,24 @@ func (s *MemoryService) CreateMemory(ctx context.Context, req *requests.CreateMe
 	if err != nil {
 		return nil, err
 	}
+
+	newContext, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	go func() {
+		defer cancel()
+		_, err2 := s.authClient.UserAddedMemory(newContext, &pb.UserAddedMemoryRequest{UserId: userID})
+		if err2 != nil {
+			log.Printf("API GW UserService: Failed to increment memory count to user with ID %d", userID)
+			return
+		}
+	}()
+	go func() {
+		defer cancel()
+		_, err2 := s.groupClient.GroupMemberAddedMemory(newContext, &pb.GroupMemberAddedMemoryRequest{GroupId: req.GroupID, UserId: userID})
+		if err2 != nil {
+			log.Printf("API GW MemoryService: Failed to increment memory count to group member with userID %d", userID)
+			return
+		}
+	}()
 
 	return s.AddUserInfoToMemory(ctx, resp.GetMemory())
 }

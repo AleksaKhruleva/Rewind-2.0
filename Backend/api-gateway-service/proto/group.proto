@@ -23,6 +23,8 @@ service GroupService {
   rpc AcceptGroupInvitation (AcceptGroupInvitationRequest) returns (AcceptGroupInvitationResponse);
 
   rpc ListUserGroups (ListUserGroupsRequest) returns (ListUserGroupsResponse);
+
+  rpc GroupMemberAddedMemory (GroupMemberAddedMemoryRequest) returns (GroupMemberAddedMemoryResponse);
 }
 
 // GroupMessage представляет структуру группы
@@ -180,6 +182,7 @@ message AcceptGroupInvitationRequest {
 message AcceptGroupInvitationResponse {
   GroupMember group_member = 1; // Информация о только что созданном участии
   Group group = 2; // Возможно, вернуть информацию о группе, к которой присоединился
+  uint64 inviter_user_id = 3; // ID пользователя, который создал приглашение
 }
 
 // Запрос на получение списка групп пользователя
@@ -206,5 +209,14 @@ message DeleteGroupAvatarRequest {
 }
 
 message DeleteGroupAvatarResponse {
+  bool success = 1;
+}
+
+message GroupMemberAddedMemoryRequest {
+  uint64 group_id = 1;
+  uint64 user_id = 2;
+}
+
+message GroupMemberAddedMemoryResponse {
   bool success = 1;
 }

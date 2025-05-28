@@ -50,10 +50,13 @@ type DeleteUserResponse struct {
 
 // GetUserByIDResponse represents the HTTP response body for getting user details by ID.
 type GetUserByIDResponse struct {
-	ID       uint64 `json:"id"`       // User ID
-	Username string `json:"username"` // Username
-	Email    string `json:"email"`    // Email address
-	Image    string `json:"image"`    // User image URL
+	ID                  uint64 `json:"id"`                    // User ID
+	Username            string `json:"username"`              // Username
+	Email               string `json:"email"`                 // Email address
+	Image               string `json:"image"`                 // User image URL
+	MemoriesAddedCount  uint64 `json:"memories_added_count"`  // Number of memories added by the user
+	InvitedMembersCount uint64 `json:"invited_members_count"` // Number of invited members
+	MemoriesViewedCount uint64 `json:"memories_viewed_count"` // Number of memories rolled by the user
 }
 
 type UpdateUsernameResponse struct {

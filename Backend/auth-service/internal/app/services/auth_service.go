@@ -572,10 +572,13 @@ func (s *AuthService) GetUsersByIDs(ctx context.Context, req *pb.GetUsersByIDsRe
 	pbUsers := make([]*pb.User, 0, len(users))
 	for _, user := range users {
 		pbUsers = append(pbUsers, &pb.User{
-			Id:       uint64(user.ID),
-			Username: user.Username,
-			Email:    user.Email,
-			Image:    user.Image,
+			Id:                  uint64(user.ID),
+			Username:            user.Username,
+			Email:               user.Email,
+			Image:               user.Image,
+			MemoriesAddedCount:  uint64(user.MemoriesAddedCount),
+			InvitedMembersCount: uint64(user.InvitedMembersCount),
+			MemoriesViewedCount: uint64(user.MemoriesViewedCount),
 		})
 	}
 
@@ -615,10 +618,13 @@ func (s *AuthService) GetUserByID(ctx context.Context, req *pb.GetUserByIDReques
 	// 4. Формирование успешного ответа
 	// Маппинг модели GORM models.User на protobuf сообщение pb.User
 	pbUser := &pb.User{
-		Id:       uint64(user.ID),
-		Username: user.Username,
-		Email:    user.Email,
-		Image:    user.Image,
+		Id:                  uint64(user.ID),
+		Username:            user.Username,
+		Email:               user.Email,
+		Image:               user.Image,
+		MemoriesAddedCount:  uint64(user.MemoriesAddedCount),
+		InvitedMembersCount: uint64(user.InvitedMembersCount),
+		MemoriesViewedCount: uint64(user.MemoriesViewedCount),
 	}
 
 	// Формирование и возврат ответа
@@ -972,4 +978,40 @@ func (s *AuthService) DeleteAvatar(ctx context.Context, req *pb.DeleteAvatarRequ
 	}
 
 	return &pb.DeleteAvatarResponse{Success: true}, nil
+}
+
+// UserAddedMemory реализует RPC метод добавления воспоминания в группу
+func (s *AuthService) UserAddedMemory(ctx context.Context, req *pb.UserAddedMemoryRequest) (*pb.UserAddedMemoryResponse, error) {
+	userID := req.GetUserId()
+	if userID <= 0 {
+		log.Printf("UserAddedMemory: Invalid argument: user_id is missing or invalid: %d", userID)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid user ID")
+	}
+
+	err := s.userRepo.UserAddMemory(nil, uint(userID))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("UserAddedMemory: User %d not found", userID)
+			return nil, status.Errorf(codes.NotFound, "User %d not found", userID)
+		}
+	}
+	return &pb.UserAddedMemoryResponse{Success: true}, nil
+}
+
+// UserInvitedMember реализует RPC метод добавления воспоминания в группу
+func (s *AuthService) UserInvitedMember(ctx context.Context, req *pb.UserInvitedMemberRequest) (*pb.UserInvitedMemberResponse, error) {
+	userID := req.GetUserId()
+	if userID <= 0 {
+		log.Printf("UserInvitedMember: Invalid argument: user_id is missing or invalid: %d", userID)
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid user ID")
+	}
+
+	err := s.userRepo.UserAddMember(nil, uint(userID))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Printf("UserInvitedMember: User %d not found", userID)
+			return nil, status.Errorf(codes.NotFound, "User %d not found", userID)
+		}
+	}
+	return &pb.UserInvitedMemberResponse{Success: true}, nil
 }

@@ -25,6 +25,8 @@ service AuthService {
   rpc VerifyPasswordResetCode(VerifyPasswordResetCodeRequest) returns (VerifyPasswordResetCodeResponse) {}
   rpc SetNewPassword(SetNewPasswordRequest) returns (SetNewPasswordResponse) {}
   rpc DeleteAvatar(DeleteAvatarRequest) returns (DeleteAvatarResponse) {}
+  rpc UserAddedMemory(UserAddedMemoryRequest) returns (UserAddedMemoryResponse) {}
+  rpc UserInvitedMember(UserInvitedMemberRequest) returns (UserInvitedMemberResponse) {}
 }
 
 message User {
@@ -32,6 +34,9 @@ message User {
   string username = 2;
   string email = 3;
   string image = 4;
+  uint64 memories_added_count = 5;
+  uint64 invited_members_count = 6;
+  uint64 memories_viewed_count = 7;
 }
 
 message StartRegistrationRequest {
@@ -206,5 +211,21 @@ message DeleteAvatarRequest {
 }
 
 message DeleteAvatarResponse {
+  bool success = 1;
+}
+
+message UserAddedMemoryRequest {
+  uint64 user_id = 1;
+}
+
+message UserAddedMemoryResponse {
+  bool success = 1;
+}
+
+message UserInvitedMemberRequest {
+  uint64 user_id = 1;
+}
+
+message UserInvitedMemberResponse {
   bool success = 1;
 }

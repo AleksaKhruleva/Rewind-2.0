@@ -1184,8 +1184,9 @@ func (x *AcceptGroupInvitationRequest) GetInvitationCode() string {
 // Ответ на принятие приглашения
 type AcceptGroupInvitationResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	GroupMember   *GroupMember           `protobuf:"bytes,1,opt,name=group_member,json=groupMember,proto3" json:"group_member,omitempty"` // Информация о только что созданном участии
-	Group         *Group                 `protobuf:"bytes,2,opt,name=group,proto3" json:"group,omitempty"`                                // Возможно, вернуть информацию о группе, к которой присоединился
+	GroupMember   *GroupMember           `protobuf:"bytes,1,opt,name=group_member,json=groupMember,proto3" json:"group_member,omitempty"`          // Информация о только что созданном участии
+	Group         *Group                 `protobuf:"bytes,2,opt,name=group,proto3" json:"group,omitempty"`                                         // Возможно, вернуть информацию о группе, к которой присоединился
+	InviterUserId uint64                 `protobuf:"varint,3,opt,name=inviter_user_id,json=inviterUserId,proto3" json:"inviter_user_id,omitempty"` // ID пользователя, который создал приглашение
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1232,6 +1233,13 @@ func (x *AcceptGroupInvitationResponse) GetGroup() *Group {
 		return x.Group
 	}
 	return nil
+}
+
+func (x *AcceptGroupInvitationResponse) GetInviterUserId() uint64 {
+	if x != nil {
+		return x.InviterUserId
+	}
+	return 0
 }
 
 // Запрос на получение списка групп пользователя
@@ -1421,6 +1429,102 @@ func (x *DeleteGroupAvatarResponse) GetSuccess() bool {
 	return false
 }
 
+type GroupMemberAddedMemoryRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GroupId       uint64                 `protobuf:"varint,1,opt,name=group_id,json=groupId,proto3" json:"group_id,omitempty"`
+	UserId        uint64                 `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GroupMemberAddedMemoryRequest) Reset() {
+	*x = GroupMemberAddedMemoryRequest{}
+	mi := &file_proto_group_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GroupMemberAddedMemoryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GroupMemberAddedMemoryRequest) ProtoMessage() {}
+
+func (x *GroupMemberAddedMemoryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_group_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GroupMemberAddedMemoryRequest.ProtoReflect.Descriptor instead.
+func (*GroupMemberAddedMemoryRequest) Descriptor() ([]byte, []int) {
+	return file_proto_group_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *GroupMemberAddedMemoryRequest) GetGroupId() uint64 {
+	if x != nil {
+		return x.GroupId
+	}
+	return 0
+}
+
+func (x *GroupMemberAddedMemoryRequest) GetUserId() uint64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+type GroupMemberAddedMemoryResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GroupMemberAddedMemoryResponse) Reset() {
+	*x = GroupMemberAddedMemoryResponse{}
+	mi := &file_proto_group_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GroupMemberAddedMemoryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GroupMemberAddedMemoryResponse) ProtoMessage() {}
+
+func (x *GroupMemberAddedMemoryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_group_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GroupMemberAddedMemoryResponse.ProtoReflect.Descriptor instead.
+func (*GroupMemberAddedMemoryResponse) Descriptor() ([]byte, []int) {
+	return file_proto_group_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *GroupMemberAddedMemoryResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
 // Тут нужно возвращать не только GroupMember, но и информацию о пользователе (username, image и т.д.)
 // Так как информация о пользователе в Auth-Service, group-service придется запрашивать ее у Auth-Service.
 // Для gRPC сообщения можно создать отдельную структуру, объединяющую GroupMember и User info.
@@ -1439,7 +1543,7 @@ type ListGroupMembersResponse_MemberDetails struct {
 
 func (x *ListGroupMembersResponse_MemberDetails) Reset() {
 	*x = ListGroupMembersResponse_MemberDetails{}
-	mi := &file_proto_group_proto_msgTypes[25]
+	mi := &file_proto_group_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1451,7 +1555,7 @@ func (x *ListGroupMembersResponse_MemberDetails) String() string {
 func (*ListGroupMembersResponse_MemberDetails) ProtoMessage() {}
 
 func (x *ListGroupMembersResponse_MemberDetails) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_group_proto_msgTypes[25]
+	mi := &file_proto_group_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1612,10 +1716,11 @@ const file_proto_group_proto_rawDesc = "" +
 	"invitation\"u\n" +
 	"\x1cAcceptGroupInvitationRequest\x12,\n" +
 	"\x12requesting_user_id\x18\x01 \x01(\x04R\x10requestingUserId\x12'\n" +
-	"\x0finvitation_code\x18\x02 \x01(\tR\x0einvitationCode\"z\n" +
+	"\x0finvitation_code\x18\x02 \x01(\tR\x0einvitationCode\"\xa2\x01\n" +
 	"\x1dAcceptGroupInvitationResponse\x125\n" +
 	"\fgroup_member\x18\x01 \x01(\v2\x12.group.GroupMemberR\vgroupMember\x12\"\n" +
-	"\x05group\x18\x02 \x01(\v2\f.group.GroupR\x05group\"0\n" +
+	"\x05group\x18\x02 \x01(\v2\f.group.GroupR\x05group\x12&\n" +
+	"\x0finviter_user_id\x18\x03 \x01(\x04R\rinviterUserId\"0\n" +
 	"\x15ListUserGroupsRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\x04R\x06userId\">\n" +
 	"\x16ListUserGroupsResponse\x12$\n" +
@@ -1624,7 +1729,12 @@ const file_proto_group_proto_rawDesc = "" +
 	"\x12requesting_user_id\x18\x01 \x01(\x04R\x10requestingUserId\x12\x19\n" +
 	"\bgroup_id\x18\x02 \x01(\x04R\agroupId\"5\n" +
 	"\x19DeleteGroupAvatarResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess2\x8e\a\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\"S\n" +
+	"\x1dGroupMemberAddedMemoryRequest\x12\x19\n" +
+	"\bgroup_id\x18\x01 \x01(\x04R\agroupId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\x04R\x06userId\":\n" +
+	"\x1eGroupMemberAddedMemoryResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess2\xf5\a\n" +
 	"\fGroupService\x12D\n" +
 	"\vCreateGroup\x12\x19.group.CreateGroupRequest\x1a\x1a.group.CreateGroupResponse\x12;\n" +
 	"\bGetGroup\x12\x16.group.GetGroupRequest\x1a\x17.group.GetGroupResponse\x12D\n" +
@@ -1636,7 +1746,8 @@ const file_proto_group_proto_rawDesc = "" +
 	"\x10CheckUserInGroup\x12\x1e.group.CheckUserInGroupRequest\x1a\x1f.group.CheckUserInGroupResponse\x12b\n" +
 	"\x15CreateGroupInvitation\x12#.group.CreateGroupInvitationRequest\x1a$.group.CreateGroupInvitationResponse\x12b\n" +
 	"\x15AcceptGroupInvitation\x12#.group.AcceptGroupInvitationRequest\x1a$.group.AcceptGroupInvitationResponse\x12M\n" +
-	"\x0eListUserGroups\x12\x1c.group.ListUserGroupsRequest\x1a\x1d.group.ListUserGroupsResponseB(Z&Rewind-2.0/Backend/group-service/protob\x06proto3"
+	"\x0eListUserGroups\x12\x1c.group.ListUserGroupsRequest\x1a\x1d.group.ListUserGroupsResponse\x12e\n" +
+	"\x16GroupMemberAddedMemory\x12$.group.GroupMemberAddedMemoryRequest\x1a%.group.GroupMemberAddedMemoryResponseB(Z&Rewind-2.0/Backend/group-service/protob\x06proto3"
 
 var (
 	file_proto_group_proto_rawDescOnce sync.Once
@@ -1650,7 +1761,7 @@ func file_proto_group_proto_rawDescGZIP() []byte {
 	return file_proto_group_proto_rawDescData
 }
 
-var file_proto_group_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
+var file_proto_group_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
 var file_proto_group_proto_goTypes = []any{
 	(*Group)(nil),                                  // 0: group.Group
 	(*GroupMember)(nil),                            // 1: group.GroupMember
@@ -1677,27 +1788,29 @@ var file_proto_group_proto_goTypes = []any{
 	(*ListUserGroupsResponse)(nil),                 // 22: group.ListUserGroupsResponse
 	(*DeleteGroupAvatarRequest)(nil),               // 23: group.DeleteGroupAvatarRequest
 	(*DeleteGroupAvatarResponse)(nil),              // 24: group.DeleteGroupAvatarResponse
-	(*ListGroupMembersResponse_MemberDetails)(nil), // 25: group.ListGroupMembersResponse.MemberDetails
-	(*timestamppb.Timestamp)(nil),                  // 26: google.protobuf.Timestamp
-	(*durationpb.Duration)(nil),                    // 27: google.protobuf.Duration
+	(*GroupMemberAddedMemoryRequest)(nil),          // 25: group.GroupMemberAddedMemoryRequest
+	(*GroupMemberAddedMemoryResponse)(nil),         // 26: group.GroupMemberAddedMemoryResponse
+	(*ListGroupMembersResponse_MemberDetails)(nil), // 27: group.ListGroupMembersResponse.MemberDetails
+	(*timestamppb.Timestamp)(nil),                  // 28: google.protobuf.Timestamp
+	(*durationpb.Duration)(nil),                    // 29: google.protobuf.Duration
 }
 var file_proto_group_proto_depIdxs = []int32{
-	26, // 0: group.Group.created_at:type_name -> google.protobuf.Timestamp
-	26, // 1: group.Group.updated_at:type_name -> google.protobuf.Timestamp
-	26, // 2: group.GroupMember.created_at:type_name -> google.protobuf.Timestamp
-	26, // 3: group.GroupMember.updated_at:type_name -> google.protobuf.Timestamp
-	26, // 4: group.GroupInvitation.created_at:type_name -> google.protobuf.Timestamp
-	26, // 5: group.GroupInvitation.expires_at:type_name -> google.protobuf.Timestamp
+	28, // 0: group.Group.created_at:type_name -> google.protobuf.Timestamp
+	28, // 1: group.Group.updated_at:type_name -> google.protobuf.Timestamp
+	28, // 2: group.GroupMember.created_at:type_name -> google.protobuf.Timestamp
+	28, // 3: group.GroupMember.updated_at:type_name -> google.protobuf.Timestamp
+	28, // 4: group.GroupInvitation.created_at:type_name -> google.protobuf.Timestamp
+	28, // 5: group.GroupInvitation.expires_at:type_name -> google.protobuf.Timestamp
 	0,  // 6: group.CreateGroupResponse.group:type_name -> group.Group
 	0,  // 7: group.GetGroupResponse.group:type_name -> group.Group
 	0,  // 8: group.UpdateGroupResponse.group:type_name -> group.Group
-	25, // 9: group.ListGroupMembersResponse.members:type_name -> group.ListGroupMembersResponse.MemberDetails
-	27, // 10: group.CreateGroupInvitationRequest.duration:type_name -> google.protobuf.Duration
+	27, // 9: group.ListGroupMembersResponse.members:type_name -> group.ListGroupMembersResponse.MemberDetails
+	29, // 10: group.CreateGroupInvitationRequest.duration:type_name -> google.protobuf.Duration
 	2,  // 11: group.CreateGroupInvitationResponse.invitation:type_name -> group.GroupInvitation
 	1,  // 12: group.AcceptGroupInvitationResponse.group_member:type_name -> group.GroupMember
 	0,  // 13: group.AcceptGroupInvitationResponse.group:type_name -> group.Group
 	0,  // 14: group.ListUserGroupsResponse.groups:type_name -> group.Group
-	26, // 15: group.ListGroupMembersResponse.MemberDetails.joined_at:type_name -> google.protobuf.Timestamp
+	28, // 15: group.ListGroupMembersResponse.MemberDetails.joined_at:type_name -> google.protobuf.Timestamp
 	3,  // 16: group.GroupService.CreateGroup:input_type -> group.CreateGroupRequest
 	5,  // 17: group.GroupService.GetGroup:input_type -> group.GetGroupRequest
 	7,  // 18: group.GroupService.UpdateGroup:input_type -> group.UpdateGroupRequest
@@ -1709,19 +1822,21 @@ var file_proto_group_proto_depIdxs = []int32{
 	17, // 24: group.GroupService.CreateGroupInvitation:input_type -> group.CreateGroupInvitationRequest
 	19, // 25: group.GroupService.AcceptGroupInvitation:input_type -> group.AcceptGroupInvitationRequest
 	21, // 26: group.GroupService.ListUserGroups:input_type -> group.ListUserGroupsRequest
-	4,  // 27: group.GroupService.CreateGroup:output_type -> group.CreateGroupResponse
-	6,  // 28: group.GroupService.GetGroup:output_type -> group.GetGroupResponse
-	8,  // 29: group.GroupService.UpdateGroup:output_type -> group.UpdateGroupResponse
-	10, // 30: group.GroupService.DeleteGroup:output_type -> group.DeleteGroupResponse
-	24, // 31: group.GroupService.DeleteGroupAvatar:output_type -> group.DeleteGroupAvatarResponse
-	12, // 32: group.GroupService.ListGroupMembers:output_type -> group.ListGroupMembersResponse
-	14, // 33: group.GroupService.RemoveGroupMember:output_type -> group.RemoveGroupMemberResponse
-	16, // 34: group.GroupService.CheckUserInGroup:output_type -> group.CheckUserInGroupResponse
-	18, // 35: group.GroupService.CreateGroupInvitation:output_type -> group.CreateGroupInvitationResponse
-	20, // 36: group.GroupService.AcceptGroupInvitation:output_type -> group.AcceptGroupInvitationResponse
-	22, // 37: group.GroupService.ListUserGroups:output_type -> group.ListUserGroupsResponse
-	27, // [27:38] is the sub-list for method output_type
-	16, // [16:27] is the sub-list for method input_type
+	25, // 27: group.GroupService.GroupMemberAddedMemory:input_type -> group.GroupMemberAddedMemoryRequest
+	4,  // 28: group.GroupService.CreateGroup:output_type -> group.CreateGroupResponse
+	6,  // 29: group.GroupService.GetGroup:output_type -> group.GetGroupResponse
+	8,  // 30: group.GroupService.UpdateGroup:output_type -> group.UpdateGroupResponse
+	10, // 31: group.GroupService.DeleteGroup:output_type -> group.DeleteGroupResponse
+	24, // 32: group.GroupService.DeleteGroupAvatar:output_type -> group.DeleteGroupAvatarResponse
+	12, // 33: group.GroupService.ListGroupMembers:output_type -> group.ListGroupMembersResponse
+	14, // 34: group.GroupService.RemoveGroupMember:output_type -> group.RemoveGroupMemberResponse
+	16, // 35: group.GroupService.CheckUserInGroup:output_type -> group.CheckUserInGroupResponse
+	18, // 36: group.GroupService.CreateGroupInvitation:output_type -> group.CreateGroupInvitationResponse
+	20, // 37: group.GroupService.AcceptGroupInvitation:output_type -> group.AcceptGroupInvitationResponse
+	22, // 38: group.GroupService.ListUserGroups:output_type -> group.ListUserGroupsResponse
+	26, // 39: group.GroupService.GroupMemberAddedMemory:output_type -> group.GroupMemberAddedMemoryResponse
+	28, // [28:40] is the sub-list for method output_type
+	16, // [16:28] is the sub-list for method input_type
 	16, // [16:16] is the sub-list for extension type_name
 	16, // [16:16] is the sub-list for extension extendee
 	0,  // [0:16] is the sub-list for field type_name
@@ -1740,7 +1855,7 @@ func file_proto_group_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_group_proto_rawDesc), len(file_proto_group_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   26,
+			NumMessages:   28,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

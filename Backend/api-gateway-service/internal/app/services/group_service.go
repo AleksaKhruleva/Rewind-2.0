@@ -274,7 +274,25 @@ func (s *GroupService) AcceptGroupInvitation(ctx context.Context, invitationCode
 		InvitationCode:   invitationCode,
 	}
 
-	return s.groupClient.AcceptGroupInvitation(ctx, req)
+	resp, err := s.groupClient.AcceptGroupInvitation(ctx, req)
+
+	if err != nil {
+		return nil, err
+	}
+
+	inviterUserID := resp.InviterUserId
+
+	newContext, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	go func() {
+		defer cancel()
+		_, err2 := s.authClient.UserInvitedMember(newContext, &pb.UserInvitedMemberRequest{UserId: inviterUserID})
+		if err2 != nil {
+			log.Printf("API GW UserService: Failed to increment invited members count to user with ID %d", inviterUserID)
+			return
+		}
+	}()
+
+	return resp, err
 }
 
 // ListUserGroups вызывает RPC метод ListUserGroups в Group-Service.
