@@ -209,6 +209,15 @@ definitions:
       image:
         description: User image URL
         type: string
+      invited_members_count:
+        description: Number of invited members
+        type: integer
+      memories_added_count:
+        description: Number of memories added by the user
+        type: integer
+      memories_viewed_count:
+        description: Number of memories rolled by the user
+        type: integer
       username:
         description: Username
         type: string
@@ -401,7 +410,7 @@ definitions:
       success:
         type: boolean
     type: object
-host: localhost:8080
+host: rewindapp.ru
 info:
   contact: {}
   description: This is the API Gateway for the Rewind application.

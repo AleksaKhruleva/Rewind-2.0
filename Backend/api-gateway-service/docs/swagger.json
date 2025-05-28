@@ -6,7 +6,7 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8080",
+    "host": "rewindapp.ru",
     "paths": {
         "/api/auth/finish-register": {
             "post": {
@@ -2974,6 +2974,18 @@
                 "image": {
                     "description": "User image URL",
                     "type": "string"
+                },
+                "invited_members_count": {
+                    "description": "Number of invited members",
+                    "type": "integer"
+                },
+                "memories_added_count": {
+                    "description": "Number of memories added by the user",
+                    "type": "integer"
+                },
+                "memories_viewed_count": {
+                    "description": "Number of memories rolled by the user",
+                    "type": "integer"
                 },
                 "username": {
                     "description": "Username",

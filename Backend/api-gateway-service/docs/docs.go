@@ -2982,6 +2982,18 @@ const docTemplate = `{
                     "description": "User image URL",
                     "type": "string"
                 },
+                "invited_members_count": {
+                    "description": "Number of invited members",
+                    "type": "integer"
+                },
+                "memories_added_count": {
+                    "description": "Number of memories added by the user",
+                    "type": "integer"
+                },
+                "memories_viewed_count": {
+                    "description": "Number of memories rolled by the user",
+                    "type": "integer"
+                },
                 "username": {
                     "description": "Username",
                     "type": "string"
@@ -3287,7 +3299,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
+	Host:             "rewindapp.ru",
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Rewind API Gateway",
