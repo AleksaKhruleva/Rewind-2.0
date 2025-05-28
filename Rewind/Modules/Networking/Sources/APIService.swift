@@ -229,7 +229,7 @@ extension APIService: TargetType {
             let parameters = ["new_username": name]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
         case let .updateUserAvatar(_, avatar):
-            guard let imageData = avatar.jpegData(compressionQuality: 1) else {
+            guard let imageData = avatar.jpegData(compressionQuality: 0.8) else {
                 return .requestPlain
             }
 
@@ -241,7 +241,7 @@ extension APIService: TargetType {
             )
             return .uploadMultipart([formData])
         case let .updateGroupImage(_, _, image):
-            guard let imageData = image.jpegData(compressionQuality: 1) else {
+            guard let imageData = image.jpegData(compressionQuality: 0.8) else {
                 return .requestPlain
             }
 
@@ -307,7 +307,7 @@ extension APIService: TargetType {
             tags
         ):
             let tagsString = tags.joined(separator: ",")
-            guard let imageData = mediaFile.jpegData(compressionQuality: 1),
+            guard let imageData = mediaFile.jpegData(compressionQuality: 0.8),
                   let groupIdData = groupId.defaultUTF8Data(),
                   let mediaTypeData = mediaType.defaultUTF8Data() else {
                 return .requestPlain

@@ -81,7 +81,10 @@ public struct RewindView: View {
             .presentationDetents([.height(450)])
         }
         .sheet(isPresented: $filterSettingsShown) {
-            FilterView(title: UIComponentsStrings.Rewind.Filters.title) { settings in
+            FilterView(
+                title: UIComponentsStrings.Rewind.Filters.title,
+                filters: .constant(FilterSettings())
+            ) { settings in
                 print(settings)
             }
         }

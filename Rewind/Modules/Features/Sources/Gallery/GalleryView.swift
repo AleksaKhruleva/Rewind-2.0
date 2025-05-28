@@ -34,8 +34,12 @@ public struct GalleryView: View {
             }
             .background(Color.background)
             .sheet(isPresented: $viewModel.filterSettingsShown) {
-                FilterView(title: UIComponentsStrings.Gallery.Filters.title) { settings in
-                    print(settings)
+                FilterView(
+                    title: UIComponentsStrings.Gallery.Filters.title,
+                    filters: $viewModel.currentFilters
+                ) { filters in
+                    viewModel.currentFilters = filters
+                    viewModel.filterGallery()
                 }
             }
             .safeAreaInset(edge: .bottom) {
@@ -135,7 +139,7 @@ public struct GalleryView: View {
                     repeating: GridItem(.flexible(), spacing: mediaSpacing),
                     count: 3
                 ), spacing: mediaSpacing) {
-                    ForEach(viewModel.galleryItems) { galleryItem in
+                    ForEach(viewModel.gallery) { galleryItem in
                         SquareAsyncMedia(
                             url: galleryItem.memory.mediaURL,
                             type: galleryItem.memory.mediaType,

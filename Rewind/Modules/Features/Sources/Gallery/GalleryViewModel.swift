@@ -38,10 +38,20 @@ final class GalleryViewModel {
     var blurredMediaShown = false
     var blurredMediaSelection: GalleryItem?
 
+    var currentFilters = FilterSettings()
+
     var showToast: (String) -> Void
 
     private(set) var groupImage: UIImage = DomainAsset.groupPlaceholder.image
-    private(set) var galleryItems = [GalleryItem]()
+    private(set) var galleryItems = [GalleryItem]() {
+        didSet {
+            filteredGalleryItems = galleryItems
+        }
+    }
+    private(set) var filteredGalleryItems = [GalleryItem]()
+    var gallery: [GalleryItem] {
+        currentFilters.areDefault ? galleryItems : filteredGalleryItems
+    }
 
     private let transformer: PhotosPickerItemTransformer
 
@@ -209,6 +219,40 @@ final class GalleryViewModel {
         await MainActor.run { [weak self] in
             self?.groupImage = image
         }
+    }
+
+    public func filterGallery() {
+        filteredGalleryItems = galleryItems
+            .filter {
+                $0.memory.mediaType == .image && currentFilters.photos ||
+                $0.memory.mediaType == .video && currentFilters.videos ||
+                $0.memory.mediaType == .quote && currentFilters.quotes
+            }
+            .filter {
+                if let onlyFavourites = currentFilters.favourites {
+                    return $0.isFavourite == onlyFavourites
+                }
+                return true
+            }
+            .filter {
+                var greaterStartDate = true
+                var lessEndDate = true
+                if let date = $0.memory.createdAt.toDate() {
+                    if let startDate = currentFilters.startDate?.toDate() {
+                        greaterStartDate = date >= startDate
+                    }
+                    if let endDate = currentFilters.endDate?.toDate() {
+                        lessEndDate = date <= endDate
+                    }
+                }
+                return greaterStartDate && lessEndDate
+            }
+            .filter {
+                guard let tags = currentFilters.tags, !tags.isEmpty else {
+                    return true
+                }
+                return !Set($0.tags).isDisjoint(with: tags)
+            }
     }
 
     func set(showToast: @escaping (String) -> Void) {

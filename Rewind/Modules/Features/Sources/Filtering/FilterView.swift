@@ -1,8 +1,9 @@
 import SwiftUI
 import UIComponents
+import Domain
 
 public struct FilterView: View {
-    @State private var viewModel: FilterViewModel
+    @Binding var filters: FilterSettings
     var title: String
     var onSave: (FilterSettings) -> Void
 
@@ -11,14 +12,17 @@ public struct FilterView: View {
 
     @Environment(\.dismiss)
     private var dismiss
+    @Environment(\.showToast)
+    private var showToast
 
     public init(
         title: String,
+        filters: Binding<FilterSettings>,
         onSave: @escaping (FilterSettings) -> Void
     ) {
         self.title = title
+        self._filters = filters
         self.onSave = onSave
-        viewModel = FilterViewModel()
     }
 
     public var body: some View {
@@ -37,15 +41,23 @@ public struct FilterView: View {
 
                         RewindDatePicker(
                             title: UIComponentsStrings.FilterSettings.fromDate,
-                            date: $viewModel.startDate
+                            date: Binding {
+                                filters.startDate?.toDate()
+                            } set: { newValue in
+                                filters.startDate = newValue?.toString()
+                            }
                         )
 
                         RewindDatePicker(
                             title: UIComponentsStrings.FilterSettings.toDate,
-                            date: $viewModel.endDate
+                            date: Binding {
+                                filters.endDate?.toDate()
+                            } set: { newValue in
+                                filters.endDate = newValue?.toString()
+                            }
                         )
 
-                        TagsSectionView(tags: $viewModel.tags, useInvertedColors: true)
+                        tagsSection
                     }
                     .padding(.horizontal, 8)
                 }
@@ -64,11 +76,30 @@ public struct FilterView: View {
     }
 
     private var header: some View {
-        RewindHeader(centerView: {
+        RewindHeader {
+            RewindButton(type: .trash).hidden()
+        } centerView: {
             Text(title)
                 .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .bold))
                 .foregroundColor(.textPrimary)
-        })
+        } rightView: {
+            RewindButton(type: .trash) {
+                withAnimation {
+                    filters = .init()
+                }
+            }
+        }
+    }
+
+    private var tagsSection: some View {
+        TagsSectionView(
+            tags: Binding {
+                filters.tags.map { tags in tags.map { MediaTag(tag: $0) } } ?? []
+            } set: { newValue in
+                filters.tags = newValue.map { $0.tag }
+            },
+            useInvertedColors: true
+        )
     }
 
     private var mediasToggle: some View {
@@ -76,17 +107,17 @@ public struct FilterView: View {
             RewindToggle(
                 title: UIComponentsStrings.FilterSettings.Toggle.photos,
                 description: UIComponentsStrings.FilterSettings.Toggle.mediasCount(104),
-                isOn: $viewModel.photos
+                isOn: $filters.photos
             )
             RewindToggle(
                 title: UIComponentsStrings.FilterSettings.Toggle.videos,
                 description: UIComponentsStrings.FilterSettings.Toggle.mediasCount(12),
-                isOn: $viewModel.videos
+                isOn: $filters.videos
             )
             RewindToggle(
                 title: UIComponentsStrings.FilterSettings.Toggle.quotes,
                 description: UIComponentsStrings.FilterSettings.Toggle.mediasCount(32),
-                isOn: $viewModel.quotes
+                isOn: $filters.quotes
             )
         }
         .background(Color.background)
@@ -96,7 +127,11 @@ public struct FilterView: View {
     private var favoritesToggle: some View {
         RewindToggle(
             title: UIComponentsStrings.FilterSettings.Toggle.favourites,
-            isOn: $viewModel.favourites
+            isOn: Binding {
+                filters.favourites ?? false
+            } set: { newValue in
+                filters.favourites = newValue
+            }
         )
         .background(Color.background)
         .cornerRadius(22)
@@ -107,11 +142,8 @@ public struct FilterView: View {
             title: UIComponentsStrings.FilterSettings.save,
             width: .generic
         ) {
-            guard !viewModel.invalidDates else {
-//                invalidDatesShown = true
-                return
-            }
-            onSave(viewModel.generateFilters())
+            onSave(filters)
+            showToast("Filters were applied successfully! ⚙️")
             dismiss()
         }
     }
