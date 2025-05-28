@@ -1,7 +1,9 @@
 import SwiftUI
+import Base
 import Domain
 
 struct MemberRow: View {
+    @State private var image: UIImage?
     private let member: Member
     private let onTap: (Member) -> Void
     private let onRemove: () -> Void
@@ -19,7 +21,7 @@ struct MemberRow: View {
     var body: some View {
         HStack {
             HStack(spacing: 12) {
-                Image(uiImage: member.image)
+                Image(uiImage: image ?? DomainAsset.groupPlaceholder.image)
                     .resizable()
                     .scaledToFill()
                     .frame(width: 34, height: 34)
@@ -61,5 +63,10 @@ struct MemberRow: View {
             .padding(.horizontal, 14)
         }
         .padding(.vertical, 5)
+        .task {
+            if image == nil {
+                image = await ImageProvider.loadOrGetImage(for: member.imageURL, .user)
+            }
+        }
     }
 }

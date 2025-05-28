@@ -45,6 +45,15 @@ final class LinkProcessingViewModel {
                 currentUserID: userID
             )
 
+            await withTaskGroup(of: Void.self) { group in
+                for member in members {
+                    group.addTask {
+                        await ImageProvider
+                            .loadAndCacheImage(for: member.imageURL, .user)
+                    }
+                }
+            }
+
             let currentGroup = Domain.Group(
                 id: responseGroupDetails.group.groupID,
                 name: responseGroupDetails.group.name,

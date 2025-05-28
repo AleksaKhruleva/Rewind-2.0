@@ -1,4 +1,5 @@
 import SwiftUI
+import Base
 import UIKit
 import Domain
 
@@ -148,10 +149,21 @@ public final class Cell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(with group: Domain.Group, imageSize: CGFloat, isSelected: Bool) {
-        imageView.image = UIComponentsAsset.groupAvatar.image
+    func configure(
+        with group: Domain.Group,
+        imageSize: CGFloat,
+        isSelected: Bool
+    ) {
         titleLabel.text = group.name
         widthConstraint?.constant = imageSize
+        imageView.image = DomainAsset.groupPlaceholder.image
+
+        Task {
+            let image = await ImageProvider.loadOrGetImage(for: group.imageURL, .group)
+            await MainActor.run {
+                self.imageView.image = image
+            }
+        }
 
         if isSelected {
             imageView.layer.borderColor = UIComponentsAsset.pinkPrimary.color.cgColor

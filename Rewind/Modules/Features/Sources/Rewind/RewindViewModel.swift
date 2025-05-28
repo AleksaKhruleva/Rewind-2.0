@@ -161,6 +161,15 @@ final class RewindViewModel {
                     currentUserID: userID
                 )
 
+                await withTaskGroup(of: Void.self) { group in
+                    for member in members {
+                        group.addTask {
+                            await ImageProvider
+                                .loadAndCacheImage(for: member.imageURL, .user)
+                        }
+                    }
+                }
+
                 let currentGroup = Domain.Group(
                     id: currentGroupID,
                     name: response.group.name,
@@ -179,8 +188,12 @@ final class RewindViewModel {
                 showToast("Error: \(error)")
             }
         case .selectedNewGroup:
+            currentGroupState = .notReady
+            defer {
+                currentGroupState = .ready
+            }
             groups = GroupUtils.sortedGroups(groups)
-            userGroupsState = .ready
+            await loadGroupImage()
         case .loadAvatars:
             if let url = GroupStorage.currentGroup?.imageURL {
                 groupImage = await loadImage(urlString: url)
@@ -189,8 +202,21 @@ final class RewindViewModel {
         }
     }
 
+    private func loadGroupImage() async {
+        guard let currentGroup = GroupStorage.currentGroup else {
+            // TODO: handle nil group
+            return
+        }
+        let image = await ImageProvider.loadOrGetImage(
+            for: currentGroup.imageURL, .group
+        )
+        await MainActor.run { [weak self] in
+            self?.groupImage = image
+        }
+    }
+
     private func loadImage(urlString: String) async -> UIImage {
-        await ImageProvider.loadOrGetImage(for: urlString, .group)
+        await ImageProvider.loadOrGetImage(for: urlString, .user)
     }
 
     func set(showToast: @escaping (String) -> Void) {

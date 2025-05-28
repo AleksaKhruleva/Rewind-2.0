@@ -20,22 +20,12 @@ final class GalleryViewModel {
 
         case likeMedia(GalleryItem)
         case unlikeMedia(GalleryItem)
+
+        case loadGroupImage
     }
 
-    var group: Domain.Group {
-        if let currentGroup = GroupStorage.currentGroup {
-            return Domain.Group(
-                    id: currentGroup.id,
-                    name: currentGroup.name,
-                    imageURL: currentGroup.imageURL
-                )
-        } else {
-            return Domain.Group(
-                    id: -1,
-                    name: "Anonymous",
-                    imageURL: ""
-                )
-        }
+    var currentGroup: CurrentGroupInfo {
+        GroupStorage.currentGroup ?? CurrentGroupInfo(id: -1, name: "Anonymous", imageURL: "")
     }
 
     var mediaPickerPresented: Bool = false
@@ -50,6 +40,7 @@ final class GalleryViewModel {
 
     var showToast: (String) -> Void
 
+    private(set) var groupImage: UIImage = DomainAsset.groupPlaceholder.image
     private(set) var galleryItems = [GalleryItem]()
 
     private let transformer: PhotosPickerItemTransformer
@@ -179,6 +170,21 @@ final class GalleryViewModel {
             } catch {
                 showToast(UIComponentsStrings.Toast.error)
             }
+        case .loadGroupImage:
+            await loadGroupImage()
+        }
+    }
+
+    private func loadGroupImage() async {
+        guard let currentGroup = GroupStorage.currentGroup else {
+            // TODO: handle nil group
+            return
+        }
+        let image = await ImageProvider.loadOrGetImage(
+            for: currentGroup.imageURL, .group
+        )
+        await MainActor.run { [weak self] in
+            self?.groupImage = image
         }
     }
 

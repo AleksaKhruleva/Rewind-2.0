@@ -145,6 +145,15 @@ final class GroupViewModel {
                 currentUserID: userID
             )
 
+            await withTaskGroup(of: Void.self) { group in
+                for member in members {
+                    group.addTask {
+                        await ImageProvider
+                            .loadAndCacheImage(for: member.imageURL, .user)
+                    }
+                }
+            }
+
             let currentGroup = Domain.Group(
                 id: currentGroupID,
                 name: response.group.name,
@@ -153,7 +162,9 @@ final class GroupViewModel {
                 createdAt: DateParser.parseISODate(response.group.createdAt), members: members
             )
 
+            GroupStorage.set(newGroup: currentGroup)
             self.group = currentGroup
+            await loadGroupImage()
             toastMessage = "Group data has been successfully updated!"
         } catch let error as HTTPError where error == .forbidden || error == .notFound {
             toastMessage = "You no longer have access to this group!"
@@ -161,36 +172,6 @@ final class GroupViewModel {
             router.navigateToRewind()
         } catch {
             toastMessage = UIComponentsStrings.Toast.error
-        }
-    }
-
-    private func sortedMembers(
-        from responses: [GroupMemberResponse],
-        groupOwnerID: Int,
-        currentUserID: String
-    ) -> [Member] {
-        let members = responses.map { response in
-            Member(
-                id: String(response.id),
-                name: response.name,
-                imageData: nil,
-                isOwner: response.id == groupOwnerID,
-                isUser: String(response.id) == currentUserID
-            )
-        }
-
-        return members.sorted { lhs, rhs in
-            switch (lhs.isOwner, rhs.isOwner) {
-            case (true, false): return true
-            case (false, true): return false
-            default:
-                switch (lhs.isUser, rhs.isUser) {
-                case (true, false): return true
-                case (false, true): return false
-                default:
-                    return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
-                }
-            }
         }
     }
 }

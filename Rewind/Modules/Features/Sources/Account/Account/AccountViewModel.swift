@@ -110,7 +110,7 @@ final class AccountViewModel {
 
     private func loadUserImage() async {
         let image = await ImageProvider.loadOrGetImage(
-            for: user.imageURL, .group
+            for: user.imageURL, .user
         )
         await MainActor.run { [weak self] in
             self?.userImage = image

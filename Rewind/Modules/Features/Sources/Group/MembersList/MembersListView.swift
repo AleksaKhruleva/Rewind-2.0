@@ -54,7 +54,7 @@ public struct MembersListView: View {
     private var header: some View {
         RewindHeader(centerView: {
             HeaderBadgeView(
-                image: UIComponentsAsset.groupAvatar.image, // TODO: get real group image
+                image: viewModel.groupImage,
                 text: viewModel.group.name
             )
         }, rightView: {

@@ -77,7 +77,10 @@ public struct GalleryView: View {
                 viewModel.set(showToast: showToast)
             }
             .onTopAppear {
-                Task { await viewModel.dispatch(.fetchGallery) }
+                Task {
+                    await viewModel.dispatch(.fetchGallery)
+                    await viewModel.dispatch(.loadGroupImage)
+                }
             }
             .onChange(of: viewModel.mediaSelection) { _, newValue in
                 if let newValue {
@@ -107,8 +110,8 @@ public struct GalleryView: View {
 
     private var headerView: some View {
         GalleryHeader(
-            image: UIComponentsAsset.groupAvatar.image, // TODO: get real group image
-            groupName: viewModel.group.name,
+            image: viewModel.groupImage,
+            groupName: viewModel.currentGroup.name,
             onDismiss: {
                 DispatchQueue.main.async {
                     router.dismiss()
