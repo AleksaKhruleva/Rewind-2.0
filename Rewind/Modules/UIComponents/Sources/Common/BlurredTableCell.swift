@@ -48,12 +48,13 @@ public struct BlurredTableCell: View {
 
             }
         }
+        .contentShape(Rectangle())
         .foregroundColor(foregroundColor)
+        .padding(.horizontal, needChevron ? 24 : 0)
+        .padding(.vertical, 16)
         .onTapGesture {
             action()
         }
-        .padding(.horizontal, needChevron ? 24 : 0)
-        .padding(.vertical, 16)
     }
 }
 

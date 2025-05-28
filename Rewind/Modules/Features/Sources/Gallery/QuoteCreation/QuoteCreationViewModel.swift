@@ -1,6 +1,8 @@
 import SwiftUI
 import UIComponents
 import Domain
+import Base
+import Networking
 
 @MainActor @Observable
 final class QuoteCreationViewModel {
@@ -13,7 +15,7 @@ final class QuoteCreationViewModel {
         case presentQuoteInput
         case presentAuthorInput
         case dismissAll
-        case saveQuote(AnyView)
+        case createQuote(AnyView)
         case resetQuote
         case findTrack
         case trackSelected(Track)
@@ -38,8 +40,14 @@ final class QuoteCreationViewModel {
     var quoteState: QuoteState {
         !quote.isEmpty && !author.isEmpty ? .ready : .empty
     }
+    
+    private let backend = NetworkService()
 
-    func dispatch(_ intent: Intent) {
+    func dispatch(
+        _ intent: Intent,
+        onSuccess: @escaping () -> Void = {},
+        onFailure: @escaping () -> Void = {}
+    ) {
         switch intent {
         case .presentQuoteInput:
             isSelectedTrackPlaying = false
@@ -51,16 +59,32 @@ final class QuoteCreationViewModel {
             guard !quote.isEmpty, !author.isEmpty else { return }
             quoteInputPresented = false
             isSelectedTrackPlaying = true
-        case let .saveQuote(content):
-            let renderer = ImageRenderer(content: content)
-            renderer.scale = UIScreen.main.scale
-            renderer.proposedSize = .init(CGSize(
-                width: UIScreen.main.bounds.width,
-                height: UIScreen.main.bounds.width
-            ))
+        case let .createQuote(content):
+            Task {
+                let renderer = ImageRenderer(content: content)
+                renderer.scale = UIScreen.main.scale
+                renderer.proposedSize = .init(CGSize(
+                    width: UIScreen.main.bounds.width,
+                    height: UIScreen.main.bounds.width
+                ))
 
-            saveImageWithToast(image: renderer.uiImage) { message in
-                print(message)
+                do {
+                    if let quoteImage = renderer.uiImage,
+                        let tokens = Tokens(),
+                        let groupId = GroupStorage.currentGroup?.id {
+                        _ = try await backend.addMedia(
+                            tokens: tokens,
+                            groupId: groupId,
+                            mediaType: "quote",
+                            mediaFile: quoteImage,
+                            musicId: "id",
+                            tags: tags
+                        )
+                        onSuccess()
+                    }
+                } catch {
+                    onFailure()
+                }
             }
         case .resetQuote:
             quote = ""

@@ -40,12 +40,10 @@ public struct MediaContentView: View {
     public var body: some View {
         ZStack {
             switch galleryItem.memory.mediaType {
-            case .image:
+            case .image, .quote:
                 imageContent
             case .video:
                 videoContent
-            case .quote:
-                EmptyView()
             }
         }
         .overlay {
