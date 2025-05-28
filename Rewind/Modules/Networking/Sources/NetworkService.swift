@@ -315,7 +315,7 @@ public final class NetworkService: NetworkServiceProtocol {
         }
     }
 
-    public func addTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> TagResponse {
+    public func addTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> MediaTag {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .addTag(
@@ -329,7 +329,7 @@ public final class NetworkService: NetworkServiceProtocol {
         }
     }
 
-    public func deleteTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> TagResponse {
+    public func deleteTag(tokens: Tokens, groupId: Int, memoryId: Int, tag: String) async throws -> SuccessResponse {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .deleteTag(
