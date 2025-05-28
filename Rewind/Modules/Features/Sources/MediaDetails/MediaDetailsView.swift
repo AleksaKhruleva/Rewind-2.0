@@ -91,7 +91,7 @@ public struct MediaDetailsView: View {
             imageURL: galleryItem.memory.userImage,
             name: galleryItem.memory.username,
             date: galleryItem.memory.createdAt,
-            track: galleryItem.memory.track
+            track: galleryItem.memory.lightTrack
         )
     }
 

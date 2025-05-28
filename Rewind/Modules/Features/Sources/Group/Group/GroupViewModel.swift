@@ -145,21 +145,13 @@ final class GroupViewModel {
                 currentUserID: userID
             )
 
-            await withTaskGroup(of: Void.self) { group in
-                for member in members {
-                    group.addTask {
-                        await ImageProvider
-                            .loadAndCacheImage(for: member.imageURL, .user)
-                    }
-                }
-            }
-
             let currentGroup = Domain.Group(
                 id: currentGroupID,
                 name: response.group.name,
                 ownerID: response.group.ownerID,
                 imageURL: response.group.imageURL,
-                createdAt: DateParser.parseISODate(response.group.createdAt), members: members
+                createdAt: DateParser.parseISODate(response.group.createdAt),
+                members: members
             )
 
             GroupStorage.set(newGroup: currentGroup)

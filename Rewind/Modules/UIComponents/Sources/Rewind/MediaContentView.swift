@@ -58,7 +58,7 @@ public struct MediaContentView: View {
     private var imageContent: some View {
         SquareAsyncMedia(url: galleryItem.memory.mediaURL, type: .image)
             .overlay(alignment: .topTrailing) {
-                if galleryItem.memory.track != nil {
+                if galleryItem.memory.lightTrack != nil {
                     Button(action: {}) {
                         ZStack {
                             Image(systemName: "speaker.wave.2.fill").opacity(isTrackPlaying ? 1 : 0)
@@ -73,7 +73,6 @@ public struct MediaContentView: View {
                     .highPriorityGesture(
                         TapGesture().onEnded {
                             onToggleSound()
-                            print("toggle sound")
                         }
                     )
                 }

@@ -1,4 +1,5 @@
 import SwiftUI
+import Base
 import Domain
 
 public struct MembersTable: View {
@@ -52,7 +53,7 @@ public struct MembersTable: View {
                     }
                 }
 
-                if isShortened && members.count > 4 {
+                if isShortened/* && members.count > 4*/ {
                     MembersTableButton(
                         systemImageName: "eye.fill",
                         title: "View all members",

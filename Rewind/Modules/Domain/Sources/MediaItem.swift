@@ -16,11 +16,10 @@ public struct MediaItem: Identifiable, Codable, Hashable {
     public let mediaURL: URL?
     public let latitude: Double?
     public let longitude: Double?
-    public let duration: Double?
-    public let offset: Double?
     public let createdAt: String
     
-    public let track: Track?
+    public let trackInfo: TrackInformation?
+    public var lightTrack: LightTrack?
     
     public init(
         id: Int = -1,
@@ -32,10 +31,10 @@ public struct MediaItem: Identifiable, Codable, Hashable {
         mediaURL: URL? = nil,
         latitude: Double? = nil,
         longitude: Double? = nil,
+        musicId: String? = nil,
         duration: Double? = nil,
         offset: Double? = nil,
-        createdAt: String,
-        track: Track? = nil,
+        createdAt: String
     ) {
         self.id = id
         self.userId = userId
@@ -46,10 +45,13 @@ public struct MediaItem: Identifiable, Codable, Hashable {
         self.mediaURL = mediaURL
         self.latitude = latitude
         self.longitude = longitude
-        self.duration = duration
-        self.offset = offset
         self.createdAt = createdAt
-        self.track = track
+        
+        if let musicId, !musicId.isEmpty, let offset, let duration {
+            self.trackInfo = TrackInformation(id: musicId, startTime: offset, duration: duration)
+        } else {
+            self.trackInfo = nil
+        }
     }
 }
 
@@ -63,8 +65,7 @@ extension MediaItem {
                 userImage: URL(string: "https://i2-prod.dailyrecord.co.uk/incoming/article1906467.ece/ALTERNATES/s1227b/laughing-animals.jpg"),
                 mediaType: .image,
                 mediaURL: URL(string: "https://pushinka.top/uploads/posts/2023-08/1692812086_pushinka-top-p-smekh-kartinki-smeshnie-vkontakte-13.jpg"),
-                createdAt: "23.11.2024",
-                track: track
+                createdAt: "23.11.2024"
             ),
             MediaItem(
                 userId: 2,
@@ -73,8 +74,7 @@ extension MediaItem {
                 userImage: URL(string: "https://i2-prod.dailyrecord.co.uk/incoming/article1906467.ece/ALTERNATES/s1227b/laughing-animals.jpg"),
                 mediaType: .image,
                 mediaURL: URL(string: "https://i.pinimg.com/originals/54/93/42/54934276d19ad7a7dc396dc8069bc485.jpg"),
-                createdAt: "01.01.2025",
-                track: track
+                createdAt: "01.01.2025"
             ),
             MediaItem(
                 userId: 3,
@@ -83,8 +83,7 @@ extension MediaItem {
                 userImage: URL(string: "https://i2-prod.dailyrecord.co.uk/incoming/article1906467.ece/ALTERNATES/s1227b/laughing-animals.jpg"),
                 mediaType: .image,
                 mediaURL: URL(string: "https://i2-prod.dailyrecord.co.uk/incoming/article1906467.ece/ALTERNATES/s1227b/laughing-animals.jpg"),
-                createdAt: "01.01.2025",
-                track: track
+                createdAt: "01.01.2025"
             ),
             MediaItem(
                 userId: 4,
@@ -93,8 +92,7 @@ extension MediaItem {
                 userImage: URL(string: "https://i2-prod.dailyrecord.co.uk/incoming/article1906467.ece/ALTERNATES/s1227b/laughing-animals.jpg"),
                 mediaType: .image,
                 mediaURL: URL(string: "https://i.pinimg.com/736x/80/09/ca/8009ca0a8bb73d596838a57d4c8fa491.jpg"),
-                createdAt: "04.02.2022",
-                track: track
+                createdAt: "04.02.2022"
             ),
             MediaItem(
                 userId: 5,
@@ -103,8 +101,7 @@ extension MediaItem {
                 userImage: URL(string: "https://i2-prod.dailyrecord.co.uk/incoming/article1906467.ece/ALTERNATES/s1227b/laughing-animals.jpg"),
                 mediaType: .video,
                 mediaURL: URL(string: "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4"),
-                createdAt: "23.11.2024",
-                track: track
+                createdAt: "23.11.2024"
             )
         ]
     }

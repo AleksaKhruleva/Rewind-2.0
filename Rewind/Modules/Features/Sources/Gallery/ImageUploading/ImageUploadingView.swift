@@ -129,15 +129,16 @@ public struct ImageUploadingView: View {
 
     private var continueButton: some View {
         GradientButton(title: "Save image", width: .given(200)) {
-            if let loadedMedia = viewModel.loadedMedia {
-                // TODO: delete later
-                let trackInfo = (
-                    viewModel.selectedTrack?.id,
-                    viewModel.selectedStartTime,
-                    viewModel.selectedDuration
-                )
-
-                print(trackInfo)
+            if var loadedMedia = viewModel.loadedMedia {
+                if let track = viewModel.selectedTrack {
+                    let trackInfo = TrackInformation(
+                        id: String(track.id),
+                        startTime: viewModel.selectedStartTime,
+                        duration: viewModel.selectedDuration
+                    )
+                    loadedMedia.trackInfo = trackInfo
+                    print(loadedMedia)
+                }
 
                 onSave(loadedMedia)
                 dismiss()

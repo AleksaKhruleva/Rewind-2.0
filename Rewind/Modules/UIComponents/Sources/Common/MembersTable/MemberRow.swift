@@ -68,5 +68,10 @@ struct MemberRow: View {
                 image = await ImageProvider.loadOrGetImage(for: member.imageURL, .user)
             }
         }
+        .onChange(of: member.imageURL) { _, newURL in
+            Task {
+                image = await ImageProvider.loadOrGetImage(for: newURL, .user)
+            }
+        }
     }
 }

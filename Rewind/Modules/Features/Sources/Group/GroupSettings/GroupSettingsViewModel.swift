@@ -98,10 +98,9 @@ final class GroupSettingsViewModel {
                     name: response.name,
                     imageURL: response.imageURL
                 )
-                GroupStorage.set(newGroup: newGroup)
                 group.imageURL = response.imageURL
-                await loadGroupImage()
-                toastMessage = UIComponentsStrings.Account.Edit.Image.Set.success
+                GroupStorage.set(newGroup: newGroup)
+                groupImage = newImage
             } catch let error as HTTPError where error == .forbidden || error == .notFound {
                 toastMessage = "You no longer have access to this group!"
                 GroupStorage.clear()
@@ -182,11 +181,9 @@ final class GroupSettingsViewModel {
             // TODO: handle nil group
             return
         }
-        let image = await ImageProvider.loadOrGetImage(
-            for: currentGroup.imageURL, .group
-        )
-        await MainActor.run { [weak self] in
-            self?.groupImage = image
+        let image = await ImageProvider.loadOrGetImage(for: currentGroup.imageURL, .group)
+        await MainActor.run {
+            self.groupImage = image
         }
     }
 }

@@ -45,6 +45,7 @@ public struct MediaResponse: Codable {
             mediaURL: self.mediaURL,
             latitude: self.latitude,
             longitude: self.longitude,
+            musicId: self.musicId,
             duration: self.duration,
             offset: self.offset,
             createdAt: self.createdAt.toRewindDate(),

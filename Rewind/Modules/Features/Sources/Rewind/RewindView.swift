@@ -209,7 +209,7 @@ public struct RewindView: View {
                 ),
                 name: "sasha",
                 date: "22.04.2025",
-                track: viewModel.currentMediaItem.memory.track
+                track: viewModel.currentMediaItem.memory.lightTrack
             )
         }
     }

@@ -49,6 +49,9 @@ public struct MembersListView: View {
                 }
             }
         }
+        .task {
+            await viewModel.dispatch(.loadGroupImage)
+        }
     }
 
     private var header: some View {

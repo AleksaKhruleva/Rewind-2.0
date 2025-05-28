@@ -53,6 +53,7 @@ final class GalleryViewModel {
     }
 
     let backend: NetworkService
+    let soundCloudBackend: SoundCloudServiceProtocol
 
     init() {
         transformer = .init()
@@ -60,6 +61,7 @@ final class GalleryViewModel {
 
         galleryItems = []
         backend = NetworkService()
+        soundCloudBackend = SoundCloudNetworkService()
     }
 
     func dispatch(_ intent: Intent, onSuccess: @escaping () -> Void = {}) async {
@@ -76,7 +78,23 @@ final class GalleryViewModel {
             } catch {
                 showToast(UIComponentsStrings.MediaUpload.error)
             }
-        case let .viewBlurredMedia(galleryItem):
+        case var .viewBlurredMedia(galleryItem):
+            if let trackInfo = galleryItem.memory.trackInfo {
+                do {
+                    let response = try await soundCloudBackend.fetchTrack(by: trackInfo.id)
+                    var lightTrack = response.toLightTrack(with: trackInfo)
+
+                    if let streamURL = try await soundCloudBackend.fetchStreamURL(for: lightTrack) {
+                        lightTrack.streamURL = streamURL
+                    } else {
+                        showToast("Couldn't get track stream URL.")
+                    }
+
+                    galleryItem.memory.lightTrack = lightTrack
+                } catch {
+                    showToast("Couldn't download music :( Try again later!")
+                }
+            }
             withAnimation {
                 blurredMediaSelection = galleryItem
                 blurredMediaShown = true
@@ -95,9 +113,9 @@ final class GalleryViewModel {
                             mediaFile: image,
                             latitude: 23.1,
                             longitude: 22.2,
-                            musicId: "id",
-                            offset: 321,
-                            duration: 123,
+                            musicId: loadedMedia.trackInfo?.id,
+                            offset: loadedMedia.trackInfo?.startTime,
+                            duration: loadedMedia.trackInfo?.duration,
                             tags: loadedMedia.tags ?? []
                         )
                         withAnimation {
