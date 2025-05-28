@@ -17,8 +17,8 @@ public final class GalleryRouter {
         appRouter?.navigate(to: .mediasUploading)
     }
 
-    func navigateToMediaDetails(_ galleryItem: GalleryItem) {
-        appRouter?.navigate(to: .mediaDetails(galleryItem))
+    func navigateToMediaDetails(_ galleryItemId: Int) {
+        appRouter?.navigate(to: .mediaDetails(galleryItemId))
     }
 
     func dismiss() {

@@ -58,6 +58,7 @@ enum APIService {
         duration: Double? = nil,
         tags: [String] = []
     )
+    case getMedia(accessToken: String, groupId: Int, memoryId: Int)
     case deleteMedia(accessToken: String, groupId: Int, memoryId: Int)
     case addTag(accessToken: String, groupId: Int, memoryId: Int, tag: String)
     case deleteTag(accessToken: String, groupId: Int, memoryId: Int, tag: String)
@@ -132,6 +133,8 @@ extension APIService: TargetType {
             return "groups/\(groupId)/memories/random"
         case let .addMedia(_, groupId, _, _, _, _, _, _, _, _):
             return "groups/\(groupId)/memories"
+        case let .getMedia(_, groupId, memoryId):
+            return "groups/\(groupId)/memories/\(memoryId)"
         case let .deleteMedia(_, groupId, memoryId):
             return "groups/\(groupId)/memories/\(memoryId)"
         case let .addTag(_, groupId, memoryId, tag):
@@ -156,6 +159,7 @@ extension APIService: TargetType {
                 .fetchGroup,
                 .fetchGroupMembers,
                 .getMedias,
+                .getMedia,
                 .getRandomMedias,
                 .getMediaTags:
             return .get
@@ -340,6 +344,8 @@ extension APIService: TargetType {
             }
 
             return .uploadMultipart(multipartFormData)
+        case .getMedia:
+            return .requestPlain
         case .deleteMedia:
             return .requestPlain
         case .addTag:
@@ -378,6 +384,7 @@ extension APIService: TargetType {
             let .getMedias(accessToken, _),
             let .getRandomMedias(accessToken, _, _, _),
             let .addMedia(accessToken, _, _, _, _, _, _, _, _, _),
+            let .getMedia(accessToken, _, _),
             let .deleteMedia(accessToken, _, _),
             let .addTag(accessToken, _, _, _),
             let .deleteTag(accessToken, _, _, _),

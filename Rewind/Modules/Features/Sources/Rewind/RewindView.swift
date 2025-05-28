@@ -22,7 +22,7 @@ public struct RewindView: View {
             if let currentGalleryItem = viewModel.currentGalleryItem {
                 VStack(spacing: 10) {
                     MediaTopButtons {
-                        viewModel.router.navigateToMediaDetails(currentGalleryItem)
+                        viewModel.router.navigateToMediaDetails(currentGalleryItem.id)
                     } onSettingsTap: {
                         filterSettingsShown = true
                     }
@@ -91,6 +91,7 @@ public struct RewindView: View {
                 await viewModel.dispatch(.fetchGroups)
                 await viewModel.dispatch(.fetchGallery)
                 await viewModel.dispatch(.fetchRandomGalleryItems)
+                await viewModel.dispatch(.fetchCurrentMedia)
                 await viewModel.dispatch(.loadAvatars)
             }
         }
@@ -189,10 +190,7 @@ public struct RewindView: View {
                 onSave: {},
                 onLike: { liked in
                     Task {
-                        await viewModel.dispatch(liked
-                             ? .unlikeMedia(currentGalleryItem)
-                             : .likeMedia(currentGalleryItem)
-                        )
+                        await viewModel.dispatch(liked ? .unlikeMedia : .likeMedia)
                     }
                 },
                 onToggleSound: {
