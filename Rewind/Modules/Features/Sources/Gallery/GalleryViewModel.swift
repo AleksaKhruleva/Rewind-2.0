@@ -19,6 +19,22 @@ final class GalleryViewModel {
         case deleteMedia(GalleryItem)
     }
 
+    var group: Domain.Group {
+        if let currentGroup = GroupStorage.currentGroup {
+            return Domain.Group(
+                    id: currentGroup.id,
+                    name: currentGroup.name,
+                    imageURL: currentGroup.imageURL
+                )
+        } else {
+            return Domain.Group(
+                    id: -1,
+                    name: "Anonymous",
+                    imageURL: ""
+                )
+        }
+    }
+
     var mediaPickerPresented: Bool = false
     var mediaSelection: PhotosPickerItem?
 

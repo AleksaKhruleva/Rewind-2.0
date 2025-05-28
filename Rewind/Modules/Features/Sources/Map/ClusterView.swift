@@ -70,7 +70,7 @@ struct ClusterView: View {
                 .frame(width: badgeWidth + 16, height: 50)
                 .border(ViewBorder(color: .textTertiaryLight, width: 2, cornerRadius: 22))
 
-            AuthorBadgeView(image: image, name: name, date: date)
+            AuthorBadgeView(image: image, name: name, date: date, track: nil)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
                 .modifier(MeasureWidthModifier(width: $badgeWidth))

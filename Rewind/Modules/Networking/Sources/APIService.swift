@@ -33,6 +33,7 @@ enum APIService {
     case fetchGroup(accessToken: String, id: Int)
     case fetchGroupMembers(accessToken: String, id: Int)
     case updateGroupName(accessToken: String, id: Int, name: String)
+    case updateGroupImage(accessToken: String, id: Int, image: UIImage)
     case createGroupInvitation(accessToken: String, id: Int)
     case deleteGroup(accessToken: String, id: Int)
     case addUserToGroup(accessToken: String, invitationCode: String)
@@ -111,7 +112,8 @@ extension APIService: TargetType {
             return "/groups/\(id)"
         case let .fetchGroupMembers(_, id):
             return "/groups/\(id)/members"
-        case let .updateGroupName(_, id, _):
+        case let .updateGroupName(_, id, _),
+            let .updateGroupImage(_, id, _):
             return "/groups/\(id)"
         case let .createGroupInvitation(_, id):
             return "/groups/\(id)/invitations"
@@ -181,7 +183,8 @@ extension APIService: TargetType {
                 .deleteMedia,
                 .deleteMemberFromGroup:
             return .delete
-        case .updateGroupName:
+        case .updateGroupName,
+                .updateGroupImage:
             return .put
         }
     }
@@ -228,6 +231,18 @@ extension APIService: TargetType {
                 mimeType: "image/jpeg"
             )
             return .uploadMultipart([formData])
+        case let .updateGroupImage(_, _, image):
+            guard let imageData = image.jpegData(compressionQuality: 1) else {
+                return .requestPlain
+            }
+
+            let formData = MultipartFormData(
+                provider: .data(imageData),
+                name: "image",
+                fileName: "image.jpg",
+                mimeType: "image/jpeg"
+            )
+            return .uploadMultipart([formData])
         case let .passwordResetSet(_, password):
             let parameters = ["new_password": password]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
@@ -264,7 +279,7 @@ extension APIService: TargetType {
                 .fetchGroup,
                 .fetchGroupMembers,
                 .deleteGroup:
-                return .requestPlain
+            return .requestPlain
         case .getMedias:
             return .requestPlain
         case .getRandomMedias:
@@ -364,7 +379,8 @@ extension APIService: TargetType {
             let .unlikeMedia(accessToken, _),
             let .getMediaTags(accessToken, _),
             let .addUserToGroup(accessToken, _),
-            let .deleteMemberFromGroup(accessToken, _, _):
+            let .deleteMemberFromGroup(accessToken, _, _),
+            let .updateGroupImage(accessToken, _, _):
             return [
                 "Authorization": "Bearer \(accessToken)",
                 "Content-Type": "application/json"

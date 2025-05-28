@@ -39,8 +39,9 @@ final class LinkProcessingViewModel {
                 id: responseAddUser.groupID
             )
 
-            let members = sortedMembers(
+            let members = GroupUtils.sortedMembers(
                 from: responseGroupDetails.members,
+                groupOwnerID: responseGroupDetails.group.ownerID,
                 currentUserID: userID
             )
 
@@ -48,17 +49,21 @@ final class LinkProcessingViewModel {
                 id: responseGroupDetails.group.groupID,
                 name: responseGroupDetails.group.name,
                 ownerID: responseGroupDetails.group.ownerID,
-                members: members,
-                createdAt: DateParser.parseISODate(responseGroupDetails.group.createdAt)
+                imageURL: responseGroupDetails.group.imageURL,
+                createdAt: DateParser.parseISODate(responseGroupDetails.group.createdAt),
+                members: members
             )
 
             GroupStorage.set(newGroup: currentGroup)
 
-            dismiss("You have been successfully added to the group")
+            dismiss("You have been successfully added to the group!")
             router?.navigate(to: .group(currentGroup), with: .pushFromLeft)
+        } catch let error as HTTPError where error == .conflict {
+            dismiss("You are already a member of this group!")
+        } catch let error as HTTPError where error == .notFound {
+            dismiss("The group you're trying to join doesn't exist!")
         } catch {
-            print(error, error.localizedDescription)
-            dismiss("\(error). Try again later")
+            dismiss("Error: \(error). Try again later!")
         }
     }
 
@@ -69,52 +74,5 @@ final class LinkProcessingViewModel {
             return components[index + 1]
         }
         return nil
-    }
-
-    private func sortedGroups(from responses: [GroupResponse]) -> [Domain.Group] {
-        var groups = responses
-            .map { response in
-                Group(
-                    id: response.groupID,
-                    name: response.name
-                    // imageData: ...
-                )
-            }
-            .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-
-        if let currentGroupID = GroupStorage.currentGroup?.id {
-            if let currentGroup = groups.first(where: { $0.id == currentGroupID }) {
-                groups.removeAll { $0.id == currentGroupID }
-                groups.insert(currentGroup, at: 0)
-            }
-        }
-
-        return groups
-    }
-
-    private func sortedMembers(from responses: [GroupMemberResponse], currentUserID: String) -> [Member] {
-        let members = responses.map { response in
-            Member(
-                id: String(response.id),
-                name: response.name,
-                imageData: nil,
-                isOwner: response.isOwner,
-                isUser: String(response.id) == currentUserID
-            )
-        }
-
-        return members.sorted { lhs, rhs in
-            switch (lhs.isOwner, rhs.isOwner) {
-            case (true, false): return true
-            case (false, true): return false
-            default:
-                switch (lhs.isUser, rhs.isUser) {
-                case (true, false): return true
-                case (false, true): return false
-                default:
-                    return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
-                }
-            }
-        }
     }
 }

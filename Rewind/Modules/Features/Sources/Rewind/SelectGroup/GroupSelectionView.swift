@@ -46,6 +46,7 @@ struct GroupSelectionView: View {
             GroupNameInputView(
                 isPresented: $viewModel.isGroupCreationViewPresented,
                 isLoading: $viewModel.isLoading,
+                error: $viewModel.groupNameError,
                 message: "Creating new group..."
             ) { name in
                 Task {
@@ -86,7 +87,7 @@ struct GroupSelectionView: View {
                         viewModel.currentGroup = CurrentGroupInfo(
                             id: newGroup.id,
                             name: newGroup.name,
-                            imageData: newGroup.imageData
+                            imageURL: newGroup.imageURL
                         )
                         onGroupSelected?(newGroup)
                         dismiss()

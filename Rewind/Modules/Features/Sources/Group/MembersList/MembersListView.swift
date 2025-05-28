@@ -39,12 +39,22 @@ public struct MembersListView: View {
             .scrollIndicators(.hidden)
         }
         .background(Color.background)
+        .overlay {
+            if viewModel.isLoading {
+                ZStack {
+                    Color.background.ignoresSafeArea()
+
+                    ProgressView(viewModel.progressMessage)
+                        .modifier(RoundFontModifier(size: 15))
+                }
+            }
+        }
     }
 
     private var header: some View {
         RewindHeader(centerView: {
             HeaderBadgeView(
-                image: viewModel.group.image,
+                image: UIComponentsAsset.groupAvatar.image, // TODO: get real group image
                 text: viewModel.group.name
             )
         }, rightView: {
@@ -74,8 +84,10 @@ public struct MembersListView: View {
             onMemberTap: { member in
                 viewModel.router.navigateToMemberDetails(member)
             },
-            onDeleteMember: { _ in
-                // TODO: delete member
+            onDeleteMember: { member in
+                Task {
+                    await viewModel.dispatch(.deleteMember(member))
+                }
             }
         )
         .animation(.easeInOut(duration: 0.3), value: filteredMembers)
