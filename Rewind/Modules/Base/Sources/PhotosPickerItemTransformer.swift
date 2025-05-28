@@ -8,10 +8,15 @@ public final class PhotosPickerItemTransformer {
     public init() {}
 
     public func transform(source: PhotosPickerItem) async throws -> LoadedMedia {
+        async let coordinates = await MetaDataExtractor.shared.extractCoordinates(from: source)
         if let movie = try await source.loadTransferable(type: Movie.self) {
             let firstFrame = try await makeImageFromVideo(url: movie.url, at: 0)
 
-            return LoadedMedia(content: .video(url: movie.url, firstFrame: firstFrame), photosPickerItem: source)
+            return await LoadedMedia(
+                content: .video(url: movie.url, firstFrame: firstFrame),
+                photosPickerItem: source,
+                coordinates: coordinates
+            )
         }
 
         guard let data = try await source.loadTransferable(type: Data.self),
@@ -19,7 +24,11 @@ public final class PhotosPickerItemTransformer {
             throw TransformItemError()
         }
 
-        return LoadedMedia(content: .image(image), photosPickerItem: source)
+        return await LoadedMedia(
+            content: .image(image),
+            photosPickerItem: source,
+            coordinates: coordinates
+        )
     }
 
     public func makeImageFromVideo(

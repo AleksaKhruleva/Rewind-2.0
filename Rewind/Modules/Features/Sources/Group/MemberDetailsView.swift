@@ -45,13 +45,15 @@ public struct MemberDetailsView: View {
     }
 
     private var header: some View {
-        RewindHeader(centerView: {
+        RewindHeader {
+            RewindButton(type: .rightChevron).hidden()
+        } centerView: {
             HeaderBadgeView(image: image, text: member.name)
-        }, rightView: {
+        } rightView: {
             RewindButton(type: .rightChevron) {
                 router?.pop()
             }
-        })
+        }
     }
 
     private var avatar: some View {

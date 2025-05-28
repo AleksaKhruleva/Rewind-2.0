@@ -82,11 +82,11 @@ final class MediasUploadingViewModel {
                                 groupId: groupId,
                                 mediaType: "image",
                                 mediaFile: image,
-                                latitude: 23.1,
-                                longitude: 22.2,
-                                musicId: "id",
-                                offset: 321,
-                                duration: 123,
+                                latitude: loadedMedia.coordinates?.latitude,
+                                longitude: loadedMedia.coordinates?.longitude,
+                                musicId: nil,
+                                offset: nil,
+                                duration: nil,
                                 tags: loadedMedia.tags ?? []
                             )
                         case .video:

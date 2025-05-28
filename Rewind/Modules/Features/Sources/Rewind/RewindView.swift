@@ -167,7 +167,10 @@ public struct RewindView: View {
 
     private var mapButton: some View {
         Button {
-            viewModel.router.navigateToMap()
+            viewModel.router.navigateToMap(
+                galleryItems: viewModel.groupGallery
+                    .filter { $0.memory.latitude != nil && $0.memory.longitude != nil }
+            )
         } label: {
             Image(systemName: "globe.asia.australia.fill")
                 .font(.system(size: 26))

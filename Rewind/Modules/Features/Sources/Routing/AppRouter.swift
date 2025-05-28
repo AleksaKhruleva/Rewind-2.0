@@ -22,7 +22,7 @@ public final class AppRouter {
         case name(email: String, password: String, registrationID: String)
 
         case rewind
-        case map
+        case map([GalleryItem])
 
         case account(User)
         case gallery

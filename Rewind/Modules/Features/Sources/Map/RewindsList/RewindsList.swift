@@ -1,5 +1,6 @@
 import SwiftUI
 import UIComponents
+import Domain
 import MapKit
 
 struct RewindsList: View {
@@ -17,14 +18,14 @@ struct RewindsList: View {
         }
     }
 
-    var allRewinds: [RewindOnMap]
-    var visibleRewinds: [RewindOnMap]
+    var allRewinds: [GalleryItem]
+    var visibleRewinds: [GalleryItem]
     var group: String
-    var onSelect: (UUID) -> Void
+    var onSelect: (Int) -> Void
 
     @State private var option: ListOption = .visible
 
-    var listRewinds: [RewindOnMap] {
+    var listRewinds: [GalleryItem] {
         switch option {
         case .all:
             allRewinds
@@ -70,22 +71,4 @@ struct RewindsList: View {
         .padding(.horizontal, 8)
         .padding(.top, 20)
     }
-}
-
-#Preview {
-    let demoImage1 = UIComponentsAsset.media1.image
-    let demoImage2 = UIComponentsAsset.media3.image
-    let demoImage3 = UIComponentsAsset.media8.image
-    let demoImage4 = UIComponentsAsset.media10.image
-    let demoImage5 = UIComponentsAsset.media2.image
-
-    let points = [
-        RewindOnMap(coordinate: CLLocationCoordinate2D(latitude: 55.7558, longitude: 37.6176), image: demoImage1),
-        RewindOnMap(coordinate: CLLocationCoordinate2D(latitude: 55.8133, longitude: 37.39), image: demoImage2),
-        RewindOnMap(coordinate: CLLocationCoordinate2D(latitude: 55.682, longitude: 37.5734), image: demoImage3),
-        RewindOnMap(coordinate: CLLocationCoordinate2D(latitude: 55.782, longitude: 37.7734), image: demoImage4),
-        RewindOnMap(coordinate: CLLocationCoordinate2D(latitude: 55.702, longitude: 37.5334), image: demoImage5)
-    ]
-
-    RewindsList(allRewinds: points, visibleRewinds: points, group: "Friends") { _ in }
 }

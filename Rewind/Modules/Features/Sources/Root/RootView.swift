@@ -42,7 +42,7 @@ public struct RootView: View {
         case let .name(email, password, registrationID): NameInputView(router: AuthenticationRouter(appRouter: router), email: email, password: password, registrationID: registrationID)
 
         case .rewind: RewindView(router: RewindRouter(appRouter: router))
-        case .map: RewindsMap(router: router)
+        case let .map(galleryItems): RewindsMap(galleryItems: galleryItems, router: router)
 
         case let .account(user): AccountView(user: user, router: AccountRouter(appRouter: router))
         case .gallery: GalleryView(router: GalleryRouter(appRouter: router))

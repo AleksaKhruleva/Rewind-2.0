@@ -1,6 +1,7 @@
 import SwiftUI
 import MapKit
 import UIComponents
+import Domain
 
 public struct RewindsMap: View {
     @State private var viewModel: RewindsMapViewModel
@@ -10,8 +11,8 @@ public struct RewindsMap: View {
 
     private let router: AppRouter
 
-    public init(router: AppRouter) {
-        viewModel = RewindsMapViewModel()
+    public init(galleryItems: [GalleryItem], router: AppRouter) {
+        viewModel = RewindsMapViewModel(galleryItems: galleryItems)
         self.router = router
     }
 
@@ -44,7 +45,6 @@ public struct RewindsMap: View {
             .presentationDetents([.height(760), .height(500)])
         }
         .onAppear {
-            viewModel.dispatch(.fetchRewinds)
             if let center = viewModel.centerCoordinate() {
                 viewModel.region = MKCoordinateRegion(
                     center: center,
