@@ -149,7 +149,7 @@ func (r *MemoryRepository) ListMemoriesByGroupDetailed(ctx context.Context, tx *
 	return memories, nil
 }
 
-// ListMemoriesByGroupWithFilters получает список воспоминаний в заданной группе с применением фильтров и детальной информацией.
+// ListMemoriesByGroupWithFiltersDetailed получает список воспоминаний в заданной группе с применением фильтров и детальной информацией.
 func (r *MemoryRepository) ListMemoriesByGroupWithFiltersDetailed(ctx context.Context, tx *gorm.DB, groupID uint, userID uint, filters map[string]string, numberOfMemories uint) ([]models.MemoryDetailed, error) {
 	db := r.getDB(tx).WithContext(ctx)
 	var memoriesDetailed []models.MemoryDetailed
@@ -177,8 +177,14 @@ func (r *MemoryRepository) ListMemoriesByGroupWithFiltersDetailed(ctx context.Co
 		switch key {
 		case "media_type":
 			if value != "" {
-				whereClauses = append(whereClauses, "m.media_type = ?")
-				args = append(args, value)
+				types := strings.Split(value, ",")
+				if len(types) > 0 {
+					placeholders := strings.Repeat("?,", len(types)-1) + "?"
+					whereClauses = append(whereClauses, fmt.Sprintf("m.media_type IN (%s)", placeholders))
+					for _, t := range types {
+						args = append(args, t)
+					}
+				}
 			}
 		case "is_favourite":
 			if value == "true" {

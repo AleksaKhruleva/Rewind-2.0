@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"log"
+	"strings"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -263,11 +264,15 @@ func (s *MemoryService) ListMemoriesByGroupWithFilters(ctx context.Context, req 
 		NumberOfMemories: req.NumberOfMemories,
 	}
 
-	mediaType, found := req.Filters["media_type"]
+	mtRaw, found := req.Filters["media_type"]
 	if found {
-		mediaTypeValue, ok := pb.MediaType_value[mediaType]
-		if !ok || mediaTypeValue == int32(pb.MediaType_UNSPECIFIED) {
-			return nil, status.Errorf(codes.InvalidArgument, "invalid mediaType: %s", mediaType)
+		values := strings.Split(mtRaw, ",")
+		for _, v := range values {
+			v = strings.TrimSpace(v)
+			enumValue, ok := pb.MediaType_value[v]
+			if !ok || enumValue == int32(pb.MediaType_UNSPECIFIED) {
+				return nil, status.Errorf(codes.InvalidArgument, "invalid media_type value: %s", v)
+			}
 		}
 	}
 

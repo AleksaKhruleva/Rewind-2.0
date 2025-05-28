@@ -1227,7 +1227,7 @@ paths:
         name: groupId
         required: true
         type: integer
-      - description: Filter by media type (image, video, quote)
+      - description: Filter by media type (image, video, quote) (comma-separated)
         in: query
         name: media_type
         type: string

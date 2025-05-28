@@ -267,7 +267,7 @@ func (h *MemoryHandler) ListMemoriesByGroup(w http.ResponseWriter, r *http.Reque
 // @Accept json
 // @Produce json
 // @Param groupId path int true "Group ID"
-// @Param media_type query string false "Filter by media type (image, video, quote)"
+// @Param media_type query string false "Filter by media type (image, video, quote) (comma-separated)"
 // @Param is_favourite query string false "Filter by favourite status (true, false)"
 // @Param start_time query string false "Filter by start time (ISO 8601 format)"
 // @Param end_time query string false "Filter by end time (ISO 8601 format)"

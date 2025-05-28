@@ -707,7 +707,7 @@
                     },
                     {
                         "type": "string",
-                        "description": "Filter by media type (image, video, quote)",
+                        "description": "Filter by media type (image, video, quote) (comma-separated)",
                         "name": "media_type",
                         "in": "query"
                     },
