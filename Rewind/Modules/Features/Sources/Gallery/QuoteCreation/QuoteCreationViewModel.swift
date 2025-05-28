@@ -40,7 +40,7 @@ final class QuoteCreationViewModel {
     var quoteState: QuoteState {
         !quote.isEmpty && !author.isEmpty ? .ready : .empty
     }
-    
+
     private let backend = NetworkService()
 
     func dispatch(

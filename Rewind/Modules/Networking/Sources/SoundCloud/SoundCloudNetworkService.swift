@@ -9,14 +9,23 @@ public enum TrackSource {
 public protocol SoundCloudServiceProtocol {
     func fetchCharts(limit: Int) async throws -> TracksResponse
     func fetchStreamURL(for track: Track) async throws -> URL?
+    func fetchStreamURL(for lightTrack: LightTrack) async throws -> URL?
     func searchTracks(query: String, limit: Int) async throws -> TracksResponse
     func fetchNextPage(from href: String, for source: TrackSource) async throws -> TracksResponse
+    func fetchTrack(by id: String) async throws -> LightTrackResponse
 }
 
 public final class SoundCloudNetworkService: SoundCloudServiceProtocol {
     private let provider = NetworkProvider<SoundCloudService>(timeout: 15)
 
     public init() {}
+
+    public func fetchTrack(by id: String) async throws -> LightTrackResponse {
+        try await provider.request(
+            .fetchTrack(id: id),
+            type: LightTrackResponse.self
+        )
+    }
 
     public func fetchCharts(limit: Int) async throws -> TracksResponse {
         let response = try await provider.request(
@@ -37,7 +46,22 @@ public final class SoundCloudNetworkService: SoundCloudServiceProtocol {
 
     public func fetchStreamURL(for track: Track) async throws -> URL? {
         guard let progressive = track.media?.transcodings.first(where: {
-            $0.format.`protocol` == "progressive"
+            $0.format.protocolType == "progressive"
+        }) else {
+            return nil
+        }
+
+        let response = try await provider.request(
+            .fetchStreamURL(url: progressive.url),
+            type: [String: URL].self
+        )
+
+        return response["url"]
+    }
+
+    public func fetchStreamURL(for lightTrack: LightTrack) async throws -> URL? {
+        guard let progressive = lightTrack.media?.transcodings.first(where: {
+            $0.format.protocolType == "progressive"
         }) else {
             return nil
         }
@@ -68,7 +92,7 @@ public final class SoundCloudNetworkService: SoundCloudServiceProtocol {
         }
 
         var queryItems = components.queryItems ?? []
-        queryItems.append(URLQueryItem(name: "client_id", value: "ha0UP7nWZvg1nBR5ZfoRsMC7GXi4Qe6x"))
+        queryItems.append(URLQueryItem(name: "client_id", value: "CQzyZQR9J1A6DwlJEpfEiEDQbCbwOMfu"))
         components.queryItems = queryItems
 
         guard let url = components.url else {
@@ -102,7 +126,7 @@ public final class SoundCloudNetworkService: SoundCloudServiceProtocol {
 
     private func isProgressive(_ track: Track) -> Bool {
         track.media?.transcodings.contains {
-            $0.format.`protocol` == "progressive"
+            $0.format.protocolType == "progressive"
         } ?? false
     }
 }

@@ -4,7 +4,7 @@ public struct GalleryItem: Hashable, Identifiable {
     public var id: Int
     public var isFavourite: Bool
     public var tags: [String]
-    public let memory: MediaItem
+    public var memory: MediaItem
     
     public init(id: Int = -1, isFavourite: Bool, tags: [String], memory: MediaItem) {
         self.id = memory.id

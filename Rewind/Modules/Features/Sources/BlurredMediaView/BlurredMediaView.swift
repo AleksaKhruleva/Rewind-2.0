@@ -1,10 +1,11 @@
 import SwiftUI
 import Domain
+import UIComponents
 
-public struct BlurredMediaView: View {
+struct BlurredMediaView: View {
     @Binding var isPresented: Bool
     @State private var galleryItem: GalleryItem
-    @State private var isTrackPlaying: Bool = false
+    @State private var viewModel: BlurredMediaViewModel
     private var onDelete: (GalleryItem) -> Void
     private var onLike: (GalleryItem, Bool) -> Void
     private var showMediaDetails: (GalleryItem) -> Void
@@ -12,7 +13,7 @@ public struct BlurredMediaView: View {
     @Environment(\.showToast)
     private var showToast
 
-    public init(
+    init(
         isPresented: Binding<Bool>,
         galleryItem: GalleryItem,
         onDelete: @escaping (GalleryItem) -> Void,
@@ -24,13 +25,15 @@ public struct BlurredMediaView: View {
         self.onDelete = onDelete
         self.onLike = onLike
         self.showMediaDetails = showMediaDetails
+        viewModel = BlurredMediaViewModel(galleryItem: galleryItem)
     }
 
-    public var body: some View {
+    var body: some View {
         Rectangle()
             .fill(.ultraThinMaterial)
             .ignoresSafeArea()
             .onTapGesture {
+                viewModel.dispatch(.killPlayer)
                 withAnimation {
                     isPresented = false
                 }
@@ -66,7 +69,7 @@ public struct BlurredMediaView: View {
                 imageURL: galleryItem.memory.userImage,
                 name: galleryItem.memory.username,
                 date: galleryItem.memory.createdAt,
-                track: galleryItem.memory.track
+                track: galleryItem.memory.lightTrack
             )
             .padding(.leading, 6)
             Spacer()
@@ -81,8 +84,10 @@ public struct BlurredMediaView: View {
             galleryItem: galleryItem,
             onSave: {},
             onLike: { _ in },
-            onToggleSound: {},
-            isTrackPlaying: $isTrackPlaying
+            onToggleSound: {
+                viewModel.dispatch(.toggleTrackPlaying)
+            },
+            isTrackPlaying: $viewModel.isTrackPlaying
         )
     }
 
@@ -92,7 +97,10 @@ public struct BlurredMediaView: View {
                 icon: "gearshape.fill",
                 title: UIComponentsStrings.Media.Blurred.title,
                 needChevron: true,
-                action: { showMediaDetails(galleryItem) }
+                action: {
+                    viewModel.dispatch(.killPlayer)
+                    showMediaDetails(galleryItem)
+                }
             )
         }
         .background(Color.background)

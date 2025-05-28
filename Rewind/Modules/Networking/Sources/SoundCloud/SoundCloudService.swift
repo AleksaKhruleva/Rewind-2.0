@@ -1,19 +1,22 @@
 import Moya
 import Foundation
 
-private let clientID = "ha0UP7nWZvg1nBR5ZfoRsMC7GXi4Qe6x"
+private let clientID = "CQzyZQR9J1A6DwlJEpfEiEDQbCbwOMfu"
 
 enum SoundCloudService {
     case fetchCharts(kind: String, genre: String, offset: Int, limit: Int)
     case fetchStreamURL(url: URL)
     case searchTracks(query: String, limit: Int)
     case fetchNextPage(from: URL)
+    case fetchTrack(id: String)
 }
 
 extension SoundCloudService: TargetType {
     var baseURL: URL {
         switch self {
-        case .fetchCharts, .searchTracks:
+        case .fetchCharts,
+                .searchTracks,
+                .fetchTrack:
             return URL(string: "https://api-v2.soundcloud.com")!
         case let .fetchStreamURL(url), let .fetchNextPage(url):
             return url.deletingLastPathComponent()
@@ -28,6 +31,8 @@ extension SoundCloudService: TargetType {
             return "/search/tracks"
         case let .fetchStreamURL(url), let .fetchNextPage(url):
             return url.lastPathComponent
+        case let .fetchTrack(id):
+            return "/tracks/\(id)"
         }
     }
 
@@ -62,6 +67,14 @@ extension SoundCloudService: TargetType {
                 parameters: [
                     "q": query,
                     "limit": limit,
+                    "client_id": clientID
+                ],
+                encoding: URLEncoding.default
+            )
+
+        case let .fetchTrack(id):
+            return .requestParameters(
+                parameters: [
                     "client_id": clientID
                 ],
                 encoding: URLEncoding.default

@@ -5,12 +5,17 @@ public struct AuthorBadgeView: View {
     private let imageURL: URL?
     private let name: String
     private let date: String
-    private let track: Track?
+    private let track: LightTrack?
 
     @State private var showTrack = true
     private let timer = Timer.publish(every: 3.5, on: .main, in: .common).autoconnect()
 
-    public init(imageURL: URL?, name: String, date: String, track: Track?) {
+    public init(
+        imageURL: URL?,
+        name: String,
+        date: String,
+        track: LightTrack?
+    ) {
         self.imageURL = imageURL
         self.name = name
         self.date = date
@@ -34,7 +39,7 @@ public struct AuthorBadgeView: View {
                     if let track, showTrack {
                         HStack(spacing: 4) {
                             Image(systemName: "music.note")
-                            Text("\(track.artist.username) — \(track.title)")
+                            Text("\(track.artistName) — \(track.title)")
                                 .lineLimit(1)
                         }
                     } else {

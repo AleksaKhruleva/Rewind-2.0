@@ -90,7 +90,7 @@ final class RewindViewModel {
             }
         case .toggleTrackPlaying:
             if !isTrackPlaying {
-                guard let streamURL = currentMediaItem.memory.track?.streamURL else {
+                guard let streamURL = currentMediaItem.memory.lightTrack?.streamURL else {
                     return
                 }
                 audioManager.load(url: streamURL)
