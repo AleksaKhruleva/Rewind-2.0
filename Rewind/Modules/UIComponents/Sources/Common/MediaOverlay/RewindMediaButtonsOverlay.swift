@@ -1,16 +1,16 @@
 import SwiftUI
 
 public struct RewindMediaButtonsOverlay: View {
-    private let isLiked: Bool
+    @Binding var isLiked: Bool
     private let likeAction: (Bool) -> Void
     private let saveAction: () -> Void
 
     public init(
-        isLiked: Bool,
+        isLiked: Binding<Bool>,
         likeAction: @escaping (Bool) -> Void,
         saveAction: @escaping () -> Void
     ) {
-        self.isLiked = isLiked
+        self._isLiked = isLiked
         self.likeAction = likeAction
         self.saveAction = saveAction
     }
@@ -24,7 +24,7 @@ public struct RewindMediaButtonsOverlay: View {
                 RewindMediaButton(
                     type: .like,
                     fillable: true,
-                    filled: isLiked,
+                    filled: $isLiked,
                     fillableAction: likeAction
                 )
             }

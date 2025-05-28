@@ -58,7 +58,6 @@ public struct GalleryView: View {
                         onLike: { galleryItem, liked in
                             Task {
                                 await viewModel.dispatch(liked ? .unlikeMedia(galleryItem) : .likeMedia(galleryItem))
-                                await viewModel.dispatch(.fetchGallery)
                             }
                         },
                         showMediaDetails: {
@@ -77,6 +76,12 @@ public struct GalleryView: View {
                 viewModel.set(showToast: showToast)
             }
             .onTopAppear {
+                Task {
+                    await viewModel.dispatch(.fetchGallery)
+                    await viewModel.dispatch(.loadGroupImage)
+                }
+            }
+            .refreshable {
                 Task {
                     await viewModel.dispatch(.fetchGallery)
                     await viewModel.dispatch(.loadGroupImage)

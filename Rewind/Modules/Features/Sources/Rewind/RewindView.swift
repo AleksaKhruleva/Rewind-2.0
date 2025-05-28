@@ -19,23 +19,27 @@ public struct RewindView: View {
         ZStack {
             Color.background.ignoresSafeArea()
 
-            VStack(spacing: 10) {
-                MediaTopButtons {
-                    viewModel.router.navigateToMediaDetails(viewModel.currentMediaItem)
-                } onSettingsTap: {
-                    filterSettingsShown = true
-                }
+            if let currentGalleryItem = viewModel.currentGalleryItem {
+                VStack(spacing: 10) {
+                    MediaTopButtons {
+                        viewModel.router.navigateToMediaDetails(currentGalleryItem)
+                    } onSettingsTap: {
+                        filterSettingsShown = true
+                    }
 
-                mediaView
+                    mediaView
 
-                HStack {
-                    author
-                    Spacer()
-                    RewindRollsStat(rolls: $viewModel.rolls)
+                    HStack {
+                        author
+                        Spacer()
+                        RewindRollsStat(rolls: $viewModel.rolls)
+                    }
                 }
+                .modifier(VStackTopOffsetModifier(topOffsetRatio: 0.15))
+                .padding(.horizontal, 8)
+            } else {
+                RewindNoteTextView(text: "This group's gallery is empty 🫥")
             }
-            .modifier(VStackTopOffsetModifier(topOffsetRatio: 0.15))
-            .padding(.horizontal, 8)
 
             VStack {
                 header
@@ -45,14 +49,10 @@ public struct RewindView: View {
             VStack {
                 Spacer()
                 GalleryPreview(
-                    gallerySize: 63,
-                    images: [
-                        // Временно
-                        UIComponentsAsset.media1.image,
-                        UIComponentsAsset.media2.image,
-                        UIComponentsAsset.media3.image,
-                        UIComponentsAsset.media4.image
-                    ]
+                    gallerySize: viewModel.groupGallery.count,
+                    imageURLs: viewModel.groupGallery
+                        .filter { $0.memory.mediaType != .video }
+                        .map { $0.memory.mediaURL }
                 )
                 .onTapGesture {
                     viewModel.router.navigateToGallery()
@@ -89,6 +89,8 @@ public struct RewindView: View {
             Task {
                 await viewModel.dispatch(.fetchUser)
                 await viewModel.dispatch(.fetchGroups)
+                await viewModel.dispatch(.fetchGallery)
+                await viewModel.dispatch(.fetchRandomGalleryItems)
                 await viewModel.dispatch(.loadAvatars)
             }
         }
@@ -176,41 +178,52 @@ public struct RewindView: View {
         .foregroundStyle(Color.textPrimary)
     }
 
+    @ViewBuilder
     private var mediaView: some View {
-        MediaContentView(
-            galleryItem: viewModel.currentMediaItem,
-            onSave: {},
-            onLike: { _ in },
-            onToggleSound: {
-                Task {
-                    await viewModel.dispatch(.toggleTrackPlaying)
-                }
-            },
-            isTrackPlaying: $viewModel.isTrackPlaying
-        )
-        .gesture(
-            ExclusiveGesture(
-                TapGesture(),
-                LongPressGesture(minimumDuration: 0.4)
+        if let currentGalleryItem = viewModel.currentGalleryItem {
+            MediaContentView(
+                galleryItem: currentGalleryItem,
+                onSave: {},
+                onLike: { liked in
+                    Task {
+                        await viewModel.dispatch(liked
+                             ? .unlikeMedia(currentGalleryItem)
+                             : .likeMedia(currentGalleryItem)
+                        )
+                    }
+                },
+                onToggleSound: {
+                    Task {
+                        await viewModel.dispatch(.toggleTrackPlaying)
+                    }
+                },
+                isTrackPlaying: $viewModel.isTrackPlaying
             )
-            .onEnded { _ in
-                Task {
-                    await viewModel.dispatch(.showNextMediaItem)
+            .gesture(
+                ExclusiveGesture(
+                    TapGesture(),
+                    LongPressGesture(minimumDuration: 0.4)
+                )
+                .onEnded { _ in
+                    Task {
+                        await viewModel.dispatch(.showNextMediaItem)
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 
+    @ViewBuilder
     private var author: some View {
-        HStack {
-            AuthorBadgeView(
-                imageURL: URL(
-                    string: "https://i2-prod.dailyrecord.co.uk/incoming/article1906467.ece/ALTERNATES/s1227b/laughing-animals.jpg"
-                ),
-                name: "sasha",
-                date: "22.04.2025",
-                track: viewModel.currentMediaItem.memory.lightTrack
-            )
+        if let memory = viewModel.currentGalleryItem?.memory {
+            HStack {
+                AuthorBadgeView(
+                    imageURL: memory.userImage,
+                    name: memory.username,
+                    date: memory.createdAt,
+                    track: memory.lightTrack
+                )
+            }
         }
     }
 }

@@ -40,7 +40,12 @@ public protocol NetworkServiceProtocol {
     func deleteGroup(tokens: Tokens, id: Int) async throws -> SuccessResponse
 
     func getMedias(tokens: Tokens, groupId: Int) async throws -> MediasResponse
-    func getRandomMedias(tokens: Tokens, groupId: Int) async throws -> MediasResponse
+    func getRandomMedias(
+        tokens: Tokens,
+        groupId: Int,
+        mediaType: String?,
+        limit: Int
+    ) async throws -> MediasResponse
     func addMedia(
         tokens: Tokens,
         groupId: Int,
@@ -259,12 +264,19 @@ public final class NetworkService: NetworkServiceProtocol {
         }
     }
 
-    public func getRandomMedias(tokens: Tokens, groupId: Int) async throws -> MediasResponse {
+    public func getRandomMedias(
+        tokens: Tokens,
+        groupId: Int,
+        mediaType: String?,
+        limit: Int
+    ) async throws -> MediasResponse {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .getRandomMedias(
                     accessToken: newToken ?? tokens.accessToken,
-                    groupId: groupId
+                    groupId: groupId,
+                    mediaType: mediaType,
+                    limit: limit
                 ),
                 type: MediasResponse.self
             )

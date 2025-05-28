@@ -40,7 +40,12 @@ enum APIService {
     case deleteMemberFromGroup(accessToken: String, groupID: Int, memberID: String)
 
     case getMedias(accessToken: String, groupId: Int)
-    case getRandomMedias(accessToken: String, groupId: Int)
+    case getRandomMedias(
+        accessToken: String,
+        groupId: Int,
+        mediaType: String?,
+        limit: Int
+    )
     case addMedia(
         accessToken: String,
         groupId: String,
@@ -123,8 +128,8 @@ extension APIService: TargetType {
             return "/invitations/\(invitationCode)/accept"
         case let .getMedias(_, groupId):
             return "groups/\(groupId)/memories"
-        case let .getRandomMedias(_, groupId):
-            return "groups/\(groupId)/memories/filter"
+        case let .getRandomMedias(_, groupId, _, _):
+            return "groups/\(groupId)/memories/random"
         case let .addMedia(_, groupId, _, _, _, _, _, _, _, _):
             return "groups/\(groupId)/memories"
         case let .deleteMedia(_, groupId, memoryId):
@@ -282,8 +287,9 @@ extension APIService: TargetType {
             return .requestPlain
         case .getMedias:
             return .requestPlain
-        case .getRandomMedias:
-            return .requestPlain
+        case let .getRandomMedias(_, _, _, limit):
+            let parameters = ["numberOfMemories": limit]
+            return .requestParameters(parameters: parameters, encoding: URLEncoding.queryString)
         case let .addMedia(
             _,
             groupId,
@@ -370,7 +376,7 @@ extension APIService: TargetType {
             let .deleteGroup(accessToken, _),
             let .createGroupInvitation(accessToken, _),
             let .getMedias(accessToken, _),
-            let .getRandomMedias(accessToken, _),
+            let .getRandomMedias(accessToken, _, _, _),
             let .addMedia(accessToken, _, _, _, _, _, _, _, _, _),
             let .deleteMedia(accessToken, _, _),
             let .addTag(accessToken, _, _, _),

@@ -3,7 +3,7 @@ import SwiftUI
 import Base
 
 public struct LoadableImageThumbnail<Content: View>: View {
-    @State private var url: URL?
+    private var url: URL?
     @ViewBuilder let content: (LoadableMediaState) -> Content
     @State private var state: LoadableMediaState = .empty
 
@@ -17,6 +17,9 @@ public struct LoadableImageThumbnail<Content: View>: View {
 
     public var body: some View {
         content(state)
+            .onChange(of: url) { _, newValue in
+                Task { await loadImage(newValue) }
+            }
             .task {
                 await loadImage(url)
             }
@@ -30,8 +33,7 @@ public struct LoadableImageThumbnail<Content: View>: View {
         }
         await withTaskGroup(of: Void.self) { group in
             group.addTask {
-                await ImageProvider
-                    .loadAndCacheImage(for: url.absoluteString, .media)
+                await ImageProvider.loadAndCacheImage(for: url.absoluteString, .media)
             }
         }
         let uiImage = await ImageProvider.loadOrGetImage(

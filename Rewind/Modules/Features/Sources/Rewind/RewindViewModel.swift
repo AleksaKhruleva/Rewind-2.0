@@ -1,3 +1,4 @@
+// swiftline:disable type_body_length
 import SwiftUI
 
 // удалить позже
@@ -17,6 +18,12 @@ final class RewindViewModel {
         case openGroup
         case selectedNewGroup(Domain.Group)
         case loadAvatars
+
+        case fetchGallery
+        case fetchRandomGalleryItems
+
+        case likeMedia(GalleryItem)
+        case unlikeMedia(GalleryItem)
     }
 
     enum UserGroupsState {
@@ -33,11 +40,12 @@ final class RewindViewModel {
     var isTrackPlaying = false
     var rolls = 0
     var groupImage: UIImage?
+    var groupGallery = [GalleryItem]()
     var userImage: UIImage?
     private(set) var groups = [Domain.Group]()
     private(set) var userGroupsState = UserGroupsState.notReady
     private(set) var currentGroupState = CurrentGroupState.ready
-    private(set) var currentMediaItem: GalleryItem
+    var currentGalleryItem: GalleryItem?
     let router: RewindRouter
 
     var fetchedUser: User?
@@ -57,8 +65,7 @@ final class RewindViewModel {
     private let backend: NetworkServiceProtocol
     private let jwtDecoder: JWTDecoder
     private let audioManager: AudioPlayerManager
-    private var mediaItems = [GalleryItem]()
-    private var currentIndex = 0
+    private var galleryItemsStack = [GalleryItem]()
 
     init(router: RewindRouter) {
         self.router = router
@@ -66,13 +73,6 @@ final class RewindViewModel {
         backend = NetworkService()
         jwtDecoder = JWTDecoder()
         audioManager = AudioPlayerManager.shared
-
-        let items = MediaItem.stubs(track: Self.fetchTrack()).map {
-            GalleryItem(isFavourite: false, tags: [], memory: $0)
-        }
-
-        mediaItems = items
-        currentMediaItem = items[0]
     }
 
     func dispatch(_ intent: Intent) async {
@@ -88,9 +88,43 @@ final class RewindViewModel {
             } catch {
                 showToast("\(error.localizedDescription) 😨")
             }
+        case .fetchGallery:
+            do {
+                if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                    let response = try await backend.getMedias(tokens: tokens, groupId: groupId)
+                    withAnimation(.easeInOut(duration: 0.1)) {
+                        groupGallery = response.memories?.map {
+                            return $0.toGalleryItem()
+                        }.shuffled() ?? []
+                    }
+                }
+            } catch {
+                showToast(UIComponentsStrings.Toast.error)
+            }
+        case .fetchRandomGalleryItems:
+            do {
+                if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                    let response = try await backend.getRandomMedias(
+                        tokens: tokens,
+                        groupId: groupId,
+                        mediaType: "",
+                        limit: 10
+                    )
+                    withAnimation(.easeInOut(duration: 0.1)) {
+                        galleryItemsStack.append(contentsOf: response.memories?.map {
+                            $0.toGalleryItem()
+                        }.shuffled() ?? [])
+                        if currentGalleryItem == nil {
+                            currentGalleryItem = galleryItemsStack.first
+                        }
+                    }
+                }
+            } catch {
+                showToast(UIComponentsStrings.Toast.error)
+            }
         case .toggleTrackPlaying:
-            if !isTrackPlaying {
-                guard let streamURL = currentMediaItem.memory.lightTrack?.streamURL else {
+            if let currentGalleryItem, !isTrackPlaying {
+                guard let streamURL = currentGalleryItem.memory.lightTrack?.streamURL else {
                     return
                 }
                 audioManager.load(url: streamURL)
@@ -102,10 +136,12 @@ final class RewindViewModel {
             }
         case .showNextMediaItem:
             stopPlayer()
-            withAnimation {
-                rolls += 1
-                currentIndex = (currentIndex + 1) % mediaItems.count
-                currentMediaItem = mediaItems[currentIndex]
+            rolls += 1
+            if let galleryItem = galleryItemsStack.popLast() {
+                currentGalleryItem = galleryItem
+            }
+            if galleryItemsStack.count <= 2 {
+                await dispatch(.fetchRandomGalleryItems)
             }
         case .fetchGroups:
             userGroupsState = .notReady
@@ -137,9 +173,9 @@ final class RewindViewModel {
                 showToast(UIComponentsStrings.Toast.error)
             }
         case .openGroup:
-            currentGroupState = .notReady
+            withAnimation { currentGroupState = .notReady }
             defer {
-                currentGroupState = .ready
+                withAnimation { currentGroupState = .ready }
             }
             do {
                 guard let currentGroupID = GroupStorage.currentGroup?.id,
@@ -164,8 +200,7 @@ final class RewindViewModel {
                 await withTaskGroup(of: Void.self) { group in
                     for member in members {
                         group.addTask {
-                            await ImageProvider
-                                .loadAndCacheImage(for: member.imageURL, .user)
+                            await ImageProvider.loadAndCacheImage(for: member.imageURL, .user)
                         }
                     }
                 }
@@ -188,13 +223,43 @@ final class RewindViewModel {
                 showToast("Error: \(error)")
             }
         case .selectedNewGroup:
-            groups = GroupUtils.sortedGroups(groups)
-            await loadGroupImage()
+            withAnimation {
+                groups = GroupUtils.sortedGroups(groups)
+                currentGalleryItem = nil
+                galleryItemsStack = []
+            }
+            await dispatch(.fetchGallery)
+            await dispatch(.fetchRandomGalleryItems)
+            await dispatch(.loadAvatars)
         case .loadAvatars:
             if let url = GroupStorage.currentGroup?.imageURL {
                 groupImage = await loadImage(urlString: url)
             }
             userImage = await loadImage(urlString: user.imageURL)
+        case let .likeMedia(galleryItem):
+            do {
+                if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                    _ = try await backend.likeMedia(
+                        tokens: tokens,
+                        groupId: groupId,
+                        memoryId: galleryItem.id
+                    )
+                }
+            } catch {
+                showToast(UIComponentsStrings.Toast.error)
+            }
+        case let .unlikeMedia(galleryItem):
+            do {
+                if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                    _ = try await backend.unlikeMedia(
+                        tokens: tokens,
+                        groupId: groupId,
+                        memoryId: galleryItem.id
+                    )
+                }
+            } catch {
+                showToast(UIComponentsStrings.Toast.error)
+            }
         }
     }
 
@@ -263,3 +328,4 @@ final class RewindViewModel {
     }
     // swiftlint:enable line_length
 }
+// swiftline:enable type_body_length

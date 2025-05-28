@@ -17,14 +17,14 @@ public struct RewindMediaButton: View {
     private let action: () -> Void
     private let fillableAction: ((Bool) -> Void)?
 
-    @State private var filled: Bool
+    @Binding private var filled: Bool
 
     public init(
         size: CGFloat = 40,
         fontSize: CGFloat = 22,
         type: ButtonType,
         fillable: Bool = false,
-        filled: Bool = false,
+        filled: Binding<Bool> = .constant(false),
         filledColor: Color = .pinkPrimary,
         action: @escaping () -> Void = {},
         fillableAction: ((Bool) -> Void)? = nil,
@@ -33,7 +33,7 @@ public struct RewindMediaButton: View {
         self.fontSize = fontSize
         self.type = type
         self.fillable = fillable
-        self.filled = filled
+        self._filled = filled
         self.filledColor = filledColor
         self.action = action
         self.fillableAction = fillableAction
