@@ -71,4 +71,8 @@ extension View {
     public func onTopAppear(perform: @escaping () -> Void) -> some View {
         modifier(OnTopAppearModifier(perform: perform))
     }
+
+    public func onTopDisappear(perform: @escaping () -> Void) -> some View {
+        modifier(OnTopDisappearModifier(perform: perform))
+    }
 }

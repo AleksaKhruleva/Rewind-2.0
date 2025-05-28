@@ -25,6 +25,9 @@ public struct RewindView: View {
                         viewModel.router.navigateToMediaDetails(currentGalleryItem.id)
                     } onSettingsTap: {
                         filterSettingsShown = true
+                        Task {
+                            await viewModel.dispatch(.stopPlayer)
+                        }
                     }
 
                     mediaView
@@ -96,6 +99,11 @@ public struct RewindView: View {
                 await viewModel.dispatch(.fetchRandomGalleryItems)
                 await viewModel.dispatch(.fetchCurrentMedia)
                 await viewModel.dispatch(.loadAvatars)
+            }
+        }
+        .onTopDisappear {
+            Task {
+                await viewModel.dispatch(.stopPlayer)
             }
         }
     }

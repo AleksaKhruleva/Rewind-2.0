@@ -13,6 +13,7 @@ final class RewindViewModel {
     enum Intent {
         case fetchUser
         case toggleTrackPlaying
+        case stopPlayer
         case showNextMediaItem
         case fetchGroups
         case openGroup
@@ -64,6 +65,7 @@ final class RewindViewModel {
     }
 
     private let backend: NetworkServiceProtocol
+    private let soundCloudBackend: SoundCloudNetworkService
     private let jwtDecoder: JWTDecoder
     private let audioManager: AudioPlayerManager
     private var galleryItemsStack = [GalleryItem]()
@@ -72,6 +74,7 @@ final class RewindViewModel {
         self.router = router
         showToast = { _ in }
         backend = NetworkService()
+        soundCloudBackend = SoundCloudNetworkService()
         jwtDecoder = JWTDecoder()
         audioManager = AudioPlayerManager.shared
     }
@@ -79,6 +82,7 @@ final class RewindViewModel {
     func dispatch(_ intent: Intent) async {
         switch intent {
         case .fetchUser:
+            stopPlayer()
             do {
                 guard let tokens = Tokens() else {
                     // router.navigateToWelcome() // TODO: return when routing is ready
@@ -90,6 +94,7 @@ final class RewindViewModel {
                 showToast("\(error.localizedDescription) 😨")
             }
         case .fetchCurrentMedia:
+            stopPlayer()
             do {
                 if let tokens = Tokens(),
                    let groupId = GroupStorage.currentGroup?.id,
@@ -99,11 +104,27 @@ final class RewindViewModel {
                         groupId: groupId,
                         memoryId: memoryId
                     ).toGalleryItem()
+                    if let trackInfo = currentGalleryItem?.memory.trackInfo {
+                        do {
+                            let response = try await soundCloudBackend.fetchTrack(by: trackInfo.id)
+                            var lightTrack = response.toLightTrack(with: trackInfo)
+
+                            if let streamURL = try await soundCloudBackend.fetchStreamURL(for: lightTrack) {
+                                lightTrack.streamURL = streamURL
+                            } else {
+                                showToast("Couldn't get track stream URL.")
+                            }
+                            currentGalleryItem?.memory.lightTrack = lightTrack
+                        } catch {
+                            showToast("Couldn't download music :( Try again later!")
+                        }
+                    }
                 }
             } catch {
                 await dispatch(.showNextMediaItem)
             }
         case .fetchGallery:
+            stopPlayer()
             do {
                 if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
                     let response = try await backend.getMedias(tokens: tokens, groupId: groupId)
@@ -117,6 +138,7 @@ final class RewindViewModel {
                 showToast(UIComponentsStrings.Toast.error)
             }
         case .fetchRandomGalleryItems:
+            stopPlayer()
             do {
                 if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
                     let response = try await backend.getRandomMedias(
@@ -138,6 +160,23 @@ final class RewindViewModel {
                         }.shuffled() ?? [])
                         if currentGalleryItem == nil {
                             currentGalleryItem = galleryItemsStack.first
+                            Task {
+                                if let trackInfo = currentGalleryItem?.memory.trackInfo {
+                                    do {
+                                        let response = try await soundCloudBackend.fetchTrack(by: trackInfo.id)
+                                        var lightTrack = response.toLightTrack(with: trackInfo)
+
+                                        if let streamURL = try await soundCloudBackend.fetchStreamURL(for: lightTrack) {
+                                            lightTrack.streamURL = streamURL
+                                        } else {
+                                            showToast("Couldn't get track stream URL.")
+                                        }
+                                        currentGalleryItem?.memory.lightTrack = lightTrack
+                                    } catch {
+                                        showToast("Couldn't download music :( Try again later!")
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -145,12 +184,16 @@ final class RewindViewModel {
                 showToast(UIComponentsStrings.Toast.error)
             }
         case .toggleTrackPlaying:
-            if let currentGalleryItem, !isTrackPlaying {
-                guard let streamURL = currentGalleryItem.memory.lightTrack?.streamURL else {
+            if let currentGalleryItem, !isTrackPlaying, let lightTrack = currentGalleryItem.memory.lightTrack {
+                guard let streamURL = lightTrack.streamURL else {
                     return
                 }
                 audioManager.load(url: streamURL)
-                audioManager.play(from: .zero, duration: 15.0) { [weak self] isPlaying in
+                audioManager.play(
+                    from: lightTrack.startTime,
+                    duration: lightTrack.duration,
+                    loop: true
+                ) { [weak self] isPlaying in
                     self?.isTrackPlaying = isPlaying
                 }
             } else {
@@ -159,13 +202,29 @@ final class RewindViewModel {
         case .showNextMediaItem:
             stopPlayer()
             rolls += 1
-            if let galleryItem = galleryItemsStack.popLast() {
+            if var galleryItem = galleryItemsStack.popLast() {
+                if let trackInfo = galleryItem.memory.trackInfo {
+                    do {
+                        let response = try await soundCloudBackend.fetchTrack(by: trackInfo.id)
+                        var lightTrack = response.toLightTrack(with: trackInfo)
+
+                        if let streamURL = try await soundCloudBackend.fetchStreamURL(for: lightTrack) {
+                            lightTrack.streamURL = streamURL
+                        } else {
+                            showToast("Couldn't get track stream URL.")
+                        }
+                        galleryItem.memory.lightTrack = lightTrack
+                    } catch {
+                        showToast("Couldn't download music :( Try again later!")
+                    }
+                }
                 currentGalleryItem = galleryItem
             }
             if galleryItemsStack.count <= 1 {
                 await dispatch(.fetchRandomGalleryItems)
             }
         case .fetchGroups:
+            stopPlayer()
             userGroupsState = .notReady
             defer {
                 userGroupsState = .ready
@@ -195,6 +254,7 @@ final class RewindViewModel {
                 showToast(UIComponentsStrings.Toast.error)
             }
         case .openGroup:
+            stopPlayer()
             withAnimation { currentGroupState = .notReady }
             defer {
                 withAnimation { currentGroupState = .ready }
@@ -245,6 +305,7 @@ final class RewindViewModel {
                 showToast("Error: \(error)")
             }
         case .selectedNewGroup:
+            stopPlayer()
             withAnimation {
                 groups = GroupUtils.sortedGroups(groups)
                 currentGalleryItem = nil
@@ -286,6 +347,8 @@ final class RewindViewModel {
             } catch {
                 showToast(UIComponentsStrings.Toast.error)
             }
+        case .stopPlayer:
+            stopPlayer()
         }
     }
 
