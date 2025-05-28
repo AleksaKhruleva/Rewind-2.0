@@ -2,7 +2,7 @@ public struct FilterSettings: Equatable {
     var photos: Bool
     var videos: Bool
     var quotes: Bool
-    
+
     var mediaTypes: String {
         var mediaTypes = [String]()
         if photos { mediaTypes.append("image")}
@@ -17,11 +17,11 @@ public struct FilterSettings: Equatable {
     var endDate: String?
 
     var tags: [String]?
-    
+
     var areDefault: Bool {
         self == FilterSettings()
     }
-    
+
     init(
         photos: Bool = true,
         videos: Bool = true,

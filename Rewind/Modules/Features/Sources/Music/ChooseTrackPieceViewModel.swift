@@ -6,10 +6,12 @@ import Domain
 @MainActor @Observable
 final class ChooseTrackPieceViewModel {
     enum Intent {
-        case playTrack(startTime: Double = 0)
+        case playTrack(startTime: Double, duration: Double?, loop: Bool = false)
         case stopPlaying
         case destroyPlayer
     }
+
+    var toastMessage: String?
 
     private(set) var selectedTrack: Track
     private(set) var isTrackPlaying: Bool = false
@@ -17,7 +19,7 @@ final class ChooseTrackPieceViewModel {
     private let backend: SoundCloudServiceProtocol
     private let playerManager: AudioPlayerManager
 
-    init(selectedTrack: Track, ) {
+    init(selectedTrack: Track) {
         self.selectedTrack = selectedTrack
 
         backend = SoundCloudNetworkService()
@@ -26,7 +28,7 @@ final class ChooseTrackPieceViewModel {
 
     func dispatch(_ intent: Intent) {
         switch intent {
-        case let .playTrack(startTime):
+        case let .playTrack(startTime, duration, loop):
             isTrackPlaying = false
             playerManager.stop()
 
@@ -49,12 +51,11 @@ final class ChooseTrackPieceViewModel {
                     playerManager.stop()
                     playerManager.load(url: streamURL)
 
-                    playerManager.play(from: startTime) { [weak self] success in
+                    playerManager.play(from: startTime, duration: duration, loop: loop) { [weak self] success in
                         self?.isTrackPlaying = success
                     }
-
                 } catch {
-                    // TODO: show error
+                    toastMessage = "Error: \(error) :("
                 }
             }
 

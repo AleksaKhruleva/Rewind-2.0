@@ -12,7 +12,7 @@ extension String {
         isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         return isoFormatter.string(from: date)
     }
-    
+
     public func toDate() -> Date? {
             let formatter = DateFormatter()
             formatter.locale = Locale(identifier: "en_US_POSIX")

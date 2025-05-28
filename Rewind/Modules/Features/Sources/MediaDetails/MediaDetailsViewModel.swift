@@ -14,17 +14,25 @@ final class MediaDetailsViewModel {
 
         case likeMedia
         case unlikeMedia
+
+        case toggleTrackPlaying
+        case killPlayer
     }
 
+    var isTrackPlaying = false
     var galleryItem: GalleryItem?
     var tags: [MediaTag]
     var showToast: (String) -> Void
     let backend: NetworkServiceProtocol
+    let soundCloudBackend: SoundCloudServiceProtocol
+    let audioManager: AudioPlayerManager
 
     init() {
         self.showToast = { _ in }
         self.tags = []
         self.backend = NetworkService()
+        self.soundCloudBackend = SoundCloudNetworkService()
+        self.audioManager = AudioPlayerManager.shared
     }
 
     func dispatch(_ intent: Intent, onSuccess: @escaping () -> Void = {}) async {
@@ -38,6 +46,22 @@ final class MediaDetailsViewModel {
                         memoryId: memoryId
                     ).toGalleryItem()
                     tags = galleryItem?.tags.map { MediaTag(tag: $0) } ?? []
+                    if let trackInfo = galleryItem?.memory.trackInfo {
+                        do {
+                            let response = try await soundCloudBackend.fetchTrack(by: trackInfo.id)
+                            var lightTrack = response.toLightTrack(with: trackInfo)
+
+                            if let streamURL = try await soundCloudBackend.fetchStreamURL(for: lightTrack) {
+                                lightTrack.streamURL = streamURL
+                            } else {
+                                showToast("Couldn't get track stream URL.")
+                            }
+
+                            galleryItem?.memory.lightTrack = lightTrack
+                        } catch {
+                            showToast("Couldn't download music :( Try again later!")
+                        }
+                    }
                 }
             } catch {
                 showToast(UIComponentsStrings.Toast.error)
@@ -119,6 +143,29 @@ final class MediaDetailsViewModel {
             } catch {
                 showToast(UIComponentsStrings.Toast.error)
             }
+        case .toggleTrackPlaying:
+            if !isTrackPlaying {
+                guard let track = galleryItem?.memory.lightTrack else {
+                    return
+                }
+                guard let streamURL = track.streamURL else {
+                    return
+                }
+                audioManager.load(url: streamURL)
+                audioManager.play(
+                    from: track.startTime,
+                    duration: track.duration,
+                    loop: true
+                ) { [weak self] isPlaying in
+                    self?.isTrackPlaying = isPlaying
+                }
+            } else {
+                isTrackPlaying = false
+                audioManager.stop()
+            }
+        case .killPlayer:
+            isTrackPlaying = false
+            audioManager.cleanup()
         }
     }
 

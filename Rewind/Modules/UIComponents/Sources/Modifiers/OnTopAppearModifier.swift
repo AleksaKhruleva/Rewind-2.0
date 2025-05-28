@@ -33,3 +33,23 @@ struct OnTopAppearModifier: ViewModifier {
             }
     }
 }
+
+struct OnTopDisappearModifier: ViewModifier {
+    @Environment(\.isTopScreen) private var isTopScreen
+    @State private var previousTop = false
+
+    let perform: () -> Void
+
+    func body(content: Content) -> some View {
+        content
+            .onAppear {
+                previousTop = isTopScreen
+            }
+            .onChange(of: isTopScreen) { _, newValue in
+                if !newValue && previousTop {
+                    perform()
+                }
+                previousTop = newValue
+            }
+    }
+}

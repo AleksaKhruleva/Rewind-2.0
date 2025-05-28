@@ -76,7 +76,7 @@ struct ChooseTrackPieceView: View {
                         viewModel.dispatch(.stopPlaying)
                     } else {
                         startTime = computedStartTime
-                        viewModel.dispatch(.playTrack(startTime: startTime))
+                        viewModel.dispatch(.playTrack(startTime: startTime, duration: Double(selectorDuration)))
                     }
                 } label: {
                     Image(systemName: viewModel.isTrackPlaying ? "stop.fill" : "play.fill")
@@ -115,7 +115,13 @@ struct ChooseTrackPieceView: View {
                     onEndDragging: { newOffset in
                         offset = newOffset
                         startTime = computedStartTime
-                        viewModel.dispatch(.playTrack(startTime: startTime))
+                        viewModel
+                            .dispatch(
+                                .playTrack(
+                                    startTime: startTime,
+                                    duration: selectorDuration
+                                )
+                            )
                     },
                     onScroll: { currentOffset in
                         realTimeOffset = currentOffset
@@ -150,7 +156,7 @@ struct ChooseTrackPieceView: View {
         .onChange(of: shouldPlay) { _, _ in
             if shouldPlay {
                 startTime = computedStartTime
-                viewModel.dispatch(.playTrack(startTime: startTime))
+                viewModel.dispatch(.playTrack(startTime: startTime, duration: Double(selectorDuration)))
             } else {
                 viewModel.dispatch(.stopPlaying)
             }
@@ -211,7 +217,13 @@ struct ChooseTrackPieceView: View {
                 stopFill()
                 startTime = computedStartTime
                 Task {
-                    await viewModel.dispatch(.playTrack(startTime: startTime))
+                    await viewModel
+                        .dispatch(
+                            .playTrack(
+                                startTime: startTime,
+                                duration: selectorDuration
+                            )
+                        )
                 }
             }
         }
@@ -242,7 +254,13 @@ struct ChooseTrackPieceView: View {
                 selectorDuration = durationInPicker
                 showDurationPicker = false
                 startTime = computedStartTime
-                viewModel.dispatch(.playTrack(startTime: startTime))
+                viewModel
+                    .dispatch(
+                        .playTrack(
+                            startTime: startTime,
+                            duration: selectorDuration
+                        )
+                    )
             }
             .modifier(
                 RoundFontModifier(size: 15, foregroundColor: .pinkPrimary)

@@ -4,7 +4,6 @@ import Domain
 
 public struct MediaDetailsView: View {
     @State private var viewModel: MediaDetailsViewModel
-    @State private var isTrackPlaying: Bool = false
     @State private var galleryItemId: Int
     private let router: AppRouter
 
@@ -26,7 +25,6 @@ public struct MediaDetailsView: View {
                     rewind
 
                     author
-                        .padding(.leading)
 
                     TagsSectionView(tags: $viewModel.tags) { tag in
                         Task {
@@ -63,7 +61,12 @@ public struct MediaDetailsView: View {
 
     private var header: some View {
         RewindHeader {
-            RewindButton(type: .leftChevron) { router.pop() }
+            RewindButton(type: .leftChevron) {
+                Task {
+                    await viewModel.dispatch(.killPlayer)
+                }
+                router.pop()
+            }
         } centerView: {
             Text(UIComponentsStrings.MediaDetails.title)
                 .modifier(RoundFontModifier(size: AccountConstants.defaultFontSize, weight: .bold))
@@ -84,8 +87,12 @@ public struct MediaDetailsView: View {
                         await viewModel.dispatch(liked ? .unlikeMedia : .likeMedia)
                     }
                 },
-                onToggleSound: {},
-                isTrackPlaying: $isTrackPlaying
+                onToggleSound: {
+                    Task {
+                        await viewModel.dispatch(.toggleTrackPlaying)
+                    }
+                },
+                isTrackPlaying: $viewModel.isTrackPlaying
             )
         }
     }

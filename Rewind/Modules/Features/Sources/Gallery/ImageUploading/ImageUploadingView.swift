@@ -51,6 +51,8 @@ public struct ImageUploadingView: View {
             return viewModel.image
         } set: { newImage in
             viewModel.dispatch(.changeImage(newImage, .hard))
+        }, onDismiss: {
+            viewModel.dispatch(.resumePlayback)
         })
         .fullScreenCover(isPresented: $viewModel.imageEditorPresented, onDismiss: {
             viewModel.dispatch(.resumePlayback)
