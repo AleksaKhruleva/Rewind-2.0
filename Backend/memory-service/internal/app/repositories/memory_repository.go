@@ -197,7 +197,7 @@ func (r *MemoryRepository) ListMemoriesByGroupWithFiltersDetailed(ctx context.Co
 	db := r.getDB(tx).WithContext(ctx)
 	var memoriesDetailed []models.MemoryDetailed
 
-	query := `
+	baseQuery := `
         SELECT
             m.*,
             COALESCE(string_agg(DISTINCT mt.tag, ','), '') as tags,
@@ -211,10 +211,12 @@ func (r *MemoryRepository) ListMemoriesByGroupWithFiltersDetailed(ctx context.Co
         WHERE m.group_id = ?
     `
 
-	var args []interface{}
-	args = append(args, userID, userID, groupID)
+	args := []interface{}{userID, userID, groupID}
 	whereClauses := []string{}
 	havingClauses := []string{}
+	var tagFilterArgs []interface{}
+	var mediaTypeArgs []interface{}
+	var favouriteHavingArgs []interface{}
 
 	for key, value := range filters {
 		switch key {
@@ -225,33 +227,19 @@ func (r *MemoryRepository) ListMemoriesByGroupWithFiltersDetailed(ctx context.Co
 					placeholders := strings.Repeat("?,", len(types)-1) + "?"
 					whereClauses = append(whereClauses, fmt.Sprintf("m.media_type IN (%s)", placeholders))
 					for _, t := range types {
-						args = append(args, t)
+						mediaTypeArgs = append(mediaTypeArgs, t)
 					}
 				}
-			}
-		case "is_favourite":
-			if value == "true" {
-				havingClauses = append(havingClauses,
-					"EXISTS (SELECT 1 FROM favourites f2 WHERE f2.memory_id = m.id AND f2.user_id = ?)")
-				args = append(args, userID)
-			} else if value == "false" {
-				havingClauses = append(havingClauses,
-					"NOT EXISTS (SELECT 1 FROM favourites f2 WHERE f2.memory_id = m.id AND f2.user_id = ?)")
-				args = append(args, userID)
 			}
 		case "start_time":
 			if parsedTime, err := time.Parse(time.RFC3339, value); err == nil && value != "" {
 				whereClauses = append(whereClauses, "m.created_at >= ?")
 				args = append(args, parsedTime)
-			} else if value != "" {
-				log.Printf("MemoryRepository: Failed to parse start_time: %v", err)
 			}
 		case "end_time":
 			if parsedTime, err := time.Parse(time.RFC3339, value); err == nil && value != "" {
 				whereClauses = append(whereClauses, "m.created_at <= ?")
 				args = append(args, parsedTime)
-			} else if value != "" {
-				log.Printf("MemoryRepository: Failed to parse end_time: %v", err)
 			}
 		case "has_geo":
 			if value == "true" {
@@ -266,15 +254,30 @@ func (r *MemoryRepository) ListMemoriesByGroupWithFiltersDetailed(ctx context.Co
 				tags := strings.Split(value, ",")
 				if len(tags) > 0 {
 					placeholders := strings.Repeat("?,", len(tags)-1) + "?"
-					whereClauses = append(whereClauses,
-						`EXISTS (
+					whereClauses = append(whereClauses, `
+						EXISTS (
 							SELECT 1 FROM memory_tags filter_mt
 							WHERE filter_mt.memory_id = m.id AND filter_mt.tag IN (`+placeholders+`)
 						)`)
 					for _, tag := range tags {
-						args = append(args, tag)
+						tagFilterArgs = append(tagFilterArgs, strings.TrimSpace(tag))
 					}
 				}
+			}
+		case "is_favourite":
+			if value == "true" {
+				havingClauses = append(havingClauses, `EXISTS (
+					SELECT 1 FROM favourites f2
+					WHERE f2.memory_id = m.id AND f2.user_id = ?
+				)`)
+				favouriteHavingArgs = append(favouriteHavingArgs, userID)
+			}
+			if value == "false" {
+				havingClauses = append(havingClauses, `NOT EXISTS (
+					SELECT 1 FROM favourites f2
+					WHERE f2.memory_id = m.id AND f2.user_id = ?
+				)`)
+				favouriteHavingArgs = append(favouriteHavingArgs, userID)
 			}
 		default:
 			log.Printf("MemoryRepository: Unknown filter key: %s", key)
@@ -282,25 +285,29 @@ func (r *MemoryRepository) ListMemoriesByGroupWithFiltersDetailed(ctx context.Co
 	}
 
 	if len(whereClauses) > 0 {
-		query += " AND " + strings.Join(whereClauses, " AND ")
+		baseQuery += " AND " + strings.Join(whereClauses, " AND ")
 	}
 
-	query += " GROUP BY m.id"
+	baseQuery += " GROUP BY m.id"
 
 	if len(havingClauses) > 0 {
-		query += " HAVING " + strings.Join(havingClauses, " AND ")
+		baseQuery += " HAVING " + strings.Join(havingClauses, " AND ")
 	}
 
-	query += " ORDER BY RANDOM() LIMIT ?"
-	args = append(args, numberOfMemories)
+	baseQuery += " ORDER BY RANDOM() LIMIT ?"
 
-	result := db.Raw(query, args...).Scan(&memoriesDetailed)
+	// Собираем финальный args в правильном порядке
+	finalArgs := append(args, mediaTypeArgs...)
+	finalArgs = append(finalArgs, tagFilterArgs...)
+	finalArgs = append(finalArgs, favouriteHavingArgs...)
+	finalArgs = append(finalArgs, numberOfMemories)
+
+	result := db.Raw(baseQuery, finalArgs...).Scan(&memoriesDetailed)
 	if result.Error != nil {
 		log.Printf("MemoryRepository: Failed to list detailed memories by group with custom filters: %v", result.Error)
 		return nil, fmt.Errorf("failed to list detailed memories by group with custom filters: %w", result.Error)
 	}
 
-	// Post-process the results to split the comma-separated strings into slices
 	for i := range memoriesDetailed {
 		if memoriesDetailed[i].Tags != "" {
 			memoriesDetailed[i].TagsArray = strings.Split(memoriesDetailed[i].Tags, ",")
