@@ -32,17 +32,19 @@ public struct RewindsMap: View {
                 .padding(.horizontal, 16)
         }
         .sheet(isPresented: $isRewindsListPresented) {
-            RewindsList(
-                allRewinds: viewModel.points,
-                visibleRewinds: viewModel.visiblePoints,
-                group: "Friends"
-            ) {
-                isRewindsListPresented = false
-                viewModel.dispatch(.select($0))
+            if let group = viewModel.group {
+                RewindsList(
+                    allRewinds: viewModel.points,
+                    visibleRewinds: viewModel.visiblePoints,
+                    group: group.name
+                ) {
+                    isRewindsListPresented = false
+                    viewModel.dispatch(.select($0))
+                }
+                .presentationCornerRadius(30)
+                .presentationDragIndicator(.visible)
+                .presentationDetents([.height(760), .height(500)])
             }
-            .presentationCornerRadius(30)
-            .presentationDragIndicator(.visible)
-            .presentationDetents([.height(760), .height(500)])
         }
         .onAppear {
             if let center = viewModel.centerCoordinate() {
@@ -81,19 +83,21 @@ public struct RewindsMap: View {
             HStack {
                 makeButton("chevron.left") { router.pop() }
                 Spacer()
-                RoundedRectangle(cornerRadius: 15)
-                    .frame(height: 54)
-                    .border(ViewBorder(color: .textTertiary.opacity(0.4), width: 1, cornerRadius: 14))
-                    .foregroundColor(.clear)
-                    .overlay {
-                        HeaderBadgeView(
-                            image: UIComponentsAsset.media1.image,
-                            imageSize: 44,
-                            cornerRadius: 15,
-                            text: "Friends",
-                            fontSize: 18
-                        )
-                    }
+                if let group = viewModel.group {
+                    RoundedRectangle(cornerRadius: 15)
+                        .frame(height: 54)
+                        .border(ViewBorder(color: .textTertiary.opacity(0.4), width: 1, cornerRadius: 14))
+                        .foregroundColor(.clear)
+                        .overlay {
+                            HeaderBadgeView(
+                                image: viewModel.groupImage,
+                                imageSize: 44,
+                                cornerRadius: 15,
+                                text: group.name,
+                                fontSize: 18
+                            )
+                        }
+                }
                 Spacer()
                 makeButton("list.bullet") {
                     isRewindsListPresented = true
