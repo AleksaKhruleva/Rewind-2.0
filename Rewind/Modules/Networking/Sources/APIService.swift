@@ -19,6 +19,7 @@ enum APIService {
     case achievements(accessToken: String)
 
     case updateUserName(accessToken: String, name: String)
+    case deleteUserAvatar(accessToken: String)
     case updateUserAvatar(accessToken: String, avatar: UIImage)
 
     case passwordResetSet(accessToken: String, password: String)
@@ -107,7 +108,7 @@ extension APIService: TargetType {
             return "users/achievements"
         case .updateUserName:
             return "users/username"
-        case .updateUserAvatar:
+        case .updateUserAvatar, .deleteUserAvatar:
             return "users/avatar"
         case .passwordResetSet:
             return "users/password/reset/set"
@@ -205,7 +206,8 @@ extension APIService: TargetType {
                 .unlikeMedia,
                 .deleteTag,
                 .deleteMedia,
-                .deleteMemberFromGroup:
+                .deleteMemberFromGroup,
+                .deleteUserAvatar:
             return .delete
         case .updateGroupName,
                 .updateGroupImage:
@@ -245,6 +247,8 @@ extension APIService: TargetType {
         case let .updateUserName(_, name):
             let parameters = ["new_username": name]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+        case .deleteUserAvatar:
+            return .requestPlain
         case let .updateUserAvatar(_, avatar):
             guard let imageData = avatar.jpegData(compressionQuality: 0.8) else {
                 return .requestPlain
@@ -419,6 +423,7 @@ extension APIService: TargetType {
             let .achievements(accessToken),
             let .updateUserName(accessToken, _),
             let .updateUserAvatar(accessToken, _),
+            let .deleteUserAvatar(accessToken),
             let .passwordResetSet(accessToken, _),
             let .passwordResetStart(accessToken),
             let .passwordResetVerify(accessToken, _),

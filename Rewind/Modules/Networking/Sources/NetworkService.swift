@@ -20,6 +20,7 @@ public protocol NetworkServiceProtocol {
     func achievements(tokens: Tokens) async throws -> AchievementsResponse
 
     func updateUserName(tokens: Tokens, name: String) async throws -> SuccessResponse
+    func deleteUserAvatar(tokens: Tokens) async throws -> SuccessResponse
     func updateUserAvatar(tokens: Tokens, avatar: UIImage) async throws -> SuccessResponse
 
     func passwordResetSet(tokens: Tokens, password: String) async throws -> SuccessResponse
@@ -182,6 +183,17 @@ public final class NetworkService: NetworkServiceProtocol {
                 .updateUserName(
                     accessToken: newToken ?? tokens.accessToken,
                     name: name
+                ),
+                type: SuccessResponse.self
+            )
+        }
+    }
+    
+    public func deleteUserAvatar(tokens: Tokens) async throws -> SuccessResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
+            try await self.provider.request(
+                .deleteUserAvatar(
+                    accessToken: newToken ?? tokens.accessToken
                 ),
                 type: SuccessResponse.self
             )

@@ -14,15 +14,14 @@ public final class AppIconsViewModel: Identifiable {
             AppIconViewModel(appIcon: "RewindLight", locked: false),
             AppIconViewModel(appIcon: "RewindPink", locked: false)
         ]
-
+        
         for achievement in achievements {
             appIcons.append(AppIconViewModel(
                 appIcon: achievement.icon,
                 task: achievement.name,
-                locked: achievement.isUnlocked
+                locked: !achievement.isUnlocked
             ))
         }
-        print(appIcons.count)
     }
 
     func dispatch(_ intent: Intent) {
