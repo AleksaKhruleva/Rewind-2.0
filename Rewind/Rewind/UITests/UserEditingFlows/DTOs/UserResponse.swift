@@ -5,4 +5,5 @@ struct UserResponse: Content {
     let id: Int
     let image: String
     let username: String
+    let createdAt: String
 }

@@ -1,3 +1,4 @@
+// swiftlint:disable line_length
 import Vapor
 
 struct UserEditingResponseFactory {
@@ -13,8 +14,9 @@ struct UserEditingResponseFactory {
             UserResponse(
                 email: "example@ex.com",
                 id: 0,
-                image: "some_image_URL",
-                username: "some_cool_name"
+                image: "https://avatars.mds.yandex.net/i?id=69f88251729e08e874dd925efa4f6d52_l-5228667-images-thumbs&n=13",
+                username: "some_cool_name",
+                createdAt: "some_cool_date"
             )
         )
         return response
@@ -26,3 +28,4 @@ struct UserEditingResponseFactory {
         return response
     }
 }
+// swiftlint:enable line_length
