@@ -63,7 +63,15 @@ final class RewindViewModel {
         get {
             guard let fetchedUser else {
                 //                router.navigateToWelcome() // TODO: return when routing is ready
-                return User(name: "", email: "", imageURL: "")
+                return User(
+                    name: "",
+                    email: "",
+                    imageURL: "",
+                    invitedMembers: 0,
+                    memoriesAdded: 0,
+                    memoriesViewed: 0,
+                    createdAt: ""
+                )
             }
             return fetchedUser
         }
@@ -96,7 +104,7 @@ final class RewindViewModel {
                     // router.navigateToWelcome() // TODO: return when routing is ready
                     return
                 }
-                let response = try await backend.user(tokens: tokens)
+                let response = try await backend.user(tokens: tokens, userId: nil)
                 user = response.toUser()
             } catch {
                 showToast("\(error.localizedDescription) 😨")
@@ -218,26 +226,38 @@ final class RewindViewModel {
                 stopPlayer()
             }
         case .showNextMediaItem:
-            if galleryItemsStack.count != 0 {
-            stopPlayer()
-            rolls += 1
-                if var galleryItem = galleryItemsStack.popLast() {
-                    if let trackInfo = galleryItem.memory.trackInfo {
-                        do {
-                            let response = try await soundCloudBackend.fetchTrack(by: trackInfo.id)
-                            var lightTrack = response.toLightTrack(with: trackInfo)
-
-                            if let streamURL = try await soundCloudBackend.fetchStreamURL(for: lightTrack) {
-                                lightTrack.streamURL = streamURL
-                            } else {
-                                showToast("Couldn't get track stream URL.")
+            if galleryItemsStack.count > 1 {
+                stopPlayer()
+                rolls += 1
+                do {
+                    if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
+                        let response = try await backend.viewMemories(
+                            tokens: tokens,
+                            groupId: groupId,
+                            count: 1
+                        )
+                        guard response.success else { return }
+                        if var galleryItem = galleryItemsStack.popLast() {
+                            if let trackInfo = galleryItem.memory.trackInfo {
+                                do {
+                                    let response = try await soundCloudBackend.fetchTrack(by: trackInfo.id)
+                                    var lightTrack = response.toLightTrack(with: trackInfo)
+                                    
+                                    if let streamURL = try await soundCloudBackend.fetchStreamURL(for: lightTrack) {
+                                        lightTrack.streamURL = streamURL
+                                    } else {
+                                        showToast("Couldn't get track stream URL.")
+                                    }
+                                    galleryItem.memory.lightTrack = lightTrack
+                                } catch {
+                                    showToast("Couldn't download music :( Try again later!")
+                                }
                             }
-                            galleryItem.memory.lightTrack = lightTrack
-                        } catch {
-                            showToast("Couldn't download music :( Try again later!")
+                            currentGalleryItem = galleryItem
                         }
                     }
-                    currentGalleryItem = galleryItem
+                } catch {
+                    showToast(UIComponentsStrings.Toast.error)
                 }
             }
             if galleryItemsStack.count == 0 {

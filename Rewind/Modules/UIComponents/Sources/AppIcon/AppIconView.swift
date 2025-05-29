@@ -23,7 +23,7 @@ public struct AppIconView: View {
         Image(viewModel.name)
             .resizable()
             .aspectRatio(contentMode: .fit)
-            .frame(width: 70, height: 70)
+            .frame(70)
             .cornerRadius(18)
     }
 
@@ -46,8 +46,11 @@ public struct AppIconView: View {
         .offset(x: 25, y: -25)
     }
 
+    @ViewBuilder
     public var taskTitle: some View {
-        Text(viewModel.task)
-            .modifier(AppIconTaskModifier())
+        if let task = viewModel.task {
+            Text(task)
+                .modifier(AppIconTaskModifier())
+        }
     }
 }

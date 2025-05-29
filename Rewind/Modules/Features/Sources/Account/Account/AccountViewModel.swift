@@ -10,6 +10,7 @@ final class AccountViewModel {
         case signOut
         case deleteAccount
         case fetchUser
+        case fetchAchievements
         case loadUserImage
         case deleteImage
         case setImage(UIImage?)
@@ -19,6 +20,8 @@ final class AccountViewModel {
     let router: AccountRouter
 
     private let backend: NetworkServiceProtocol
+
+    var achievements: [Achievement]
 
     var user: User
     var userImage: UIImage = DomainAsset.userPlacholder.image
@@ -40,6 +43,7 @@ final class AccountViewModel {
         self.router = router
         showToast = { _ in }
         backend = NetworkService()
+        achievements = []
     }
 
     func dispatch(_ intent: Intent, onSuccess: @escaping () -> Void = {}) async {
@@ -78,8 +82,17 @@ final class AccountViewModel {
                     router.navigateToWelcome()
                     return
                 }
-                let response = try await backend.user(tokens: tokens)
+                let response = try await backend.user(tokens: tokens, userId: nil)
                 user = response.toUser()
+            } catch {
+                showErrorToast(for: error)
+            }
+        case .fetchAchievements:
+            do {
+                if let tokens = Tokens() {
+                    let response = try await backend.achievements(tokens: tokens)
+                    achievements = response.achievements
+                }
             } catch {
                 showErrorToast(for: error)
             }

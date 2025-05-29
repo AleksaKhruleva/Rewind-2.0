@@ -125,8 +125,8 @@ final class GroupSettingsViewModel {
             do {
                 let response = try await backend.deleteMemberFromGroup(
                     tokens: tokens,
-                    groupID: group.id,
-                    memberID: userID
+                    groupId: group.id,
+                    memberId: userID
                 )
                 if response.success {
                     GroupStorage.clear()

@@ -48,7 +48,7 @@ final class CodeInputViewModel {
         case let .submitCode(code):
             state = .loading
             do {
-                let response = try await backend.verifyEmail(registrationID: registrationID, verificationCode: code)
+                let response = try await backend.verifyEmail(registrationId: registrationID, verificationCode: code)
                 animateState(to: !response.success ? .error(.incorrect) : .ready )
             } catch {
                 animateState(to: .error(.responseError))

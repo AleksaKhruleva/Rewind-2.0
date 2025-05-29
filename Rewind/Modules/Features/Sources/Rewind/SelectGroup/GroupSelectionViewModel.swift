@@ -66,7 +66,9 @@ final class GroupSelectionViewModel {
                         name: user.name,
                         imageURL: user.imageURL,
                         isOwner: true,
-                        isUser: true
+                        isUser: true,
+                        memoriesAddedCount: user.memoriesAdded,
+                        memoriesViewedCount: user.memoriesViewed
                     )
                 ]
 

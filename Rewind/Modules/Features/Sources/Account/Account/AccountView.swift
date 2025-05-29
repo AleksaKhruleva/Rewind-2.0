@@ -6,7 +6,6 @@ import AccessibilitySupport
 import Domain
 
 public struct AccountView: View {
-    @State private var appIconsViewModel: AppIconsViewModel
     @State private var viewModel: AccountViewModel
 
     @State private var imageEditingDialogShown = false
@@ -22,7 +21,6 @@ public struct AccountView: View {
     private var showToast
 
     public init(user: User, router: AccountRouter) {
-        appIconsViewModel = AppIconsViewModel()
         viewModel = AccountViewModel(user: user, router: router)
     }
 
@@ -59,8 +57,12 @@ public struct AccountView: View {
 
                     riskyTable
 
-                    RewindNoteTextView(text: UIComponentsStrings.Account.Note.you(100))
-                        .padding(.vertical, 4)
+                    RewindNoteTextView(text: UIComponentsStrings.Account.Note.you(
+                        UIComponentsStrings.Days.countLld(
+                            DateParser.parseISODate(viewModel.user.createdAt).daysSince
+                        )
+                    ))
+                    .padding(.vertical, 4)
                 }
                 .padding(.horizontal, 16)
             }
@@ -110,6 +112,7 @@ public struct AccountView: View {
         .onTopAppear {
             Task {
                 await viewModel.dispatch(.fetchUser)
+                await viewModel.dispatch(.fetchAchievements)
                 await viewModel.dispatch(.loadUserImage)
             }
         }
@@ -159,14 +162,17 @@ public struct AccountView: View {
         AvatarView(image: viewModel.userImage, text: viewModel.user.name)
     }
 
+    @ViewBuilder
     var appIconsTable: some View {
-        ZStack {
-            AppIconsGridView()
-                .padding(.vertical, 8)
-                .padding(.horizontal, 8)
+        if !viewModel.achievements.isEmpty {
+            ZStack {
+                AppIconsGridView(with: viewModel.achievements)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 8)
+            }
+            .background(Color.backgroundSecondary)
+            .cornerRadius(23)
         }
-        .background(Color.backgroundSecondary)
-        .cornerRadius(23)
     }
 
     var groupsTable: some View {
@@ -178,7 +184,30 @@ public struct AccountView: View {
     }
 
     var activityTable: some View {
-        InformationTable(title: UIComponentsStrings.Account.activity, data: AccountConstants.activities, isRisky: false)
+        InformationTable(
+            title: UIComponentsStrings.Account.activity,
+            data: [
+                (
+                    "photo.fill.on.rectangle.fill",
+                    UIComponentsStrings.Rewind.countLld(viewModel.user.memoriesAdded),
+                    nil,
+                    nil
+                ),
+                (
+                    "person.fill",
+                    UIComponentsStrings.People.countLld(viewModel.user.invitedMembers),
+                    nil,
+                    nil
+                ),
+                (
+                    "forward.fill",
+                    UIComponentsStrings.Rolls.countLld(viewModel.user.memoriesViewed),
+                    nil,
+                    nil
+                )
+            ],
+            isRisky: false
+        )
     }
 
     var generalTable: some View {
@@ -222,9 +251,4 @@ public struct AccountView: View {
             isRisky: true
         )
     }
-}
-
-#Preview {
-    let router = AppRouter()
-    AccountView(user: User(name: "nae", email: "e,a", imageURL: ""), router: .init(appRouter: router))
 }

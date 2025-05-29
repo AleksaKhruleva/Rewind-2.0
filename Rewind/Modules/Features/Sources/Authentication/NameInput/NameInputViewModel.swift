@@ -51,7 +51,7 @@ final class NameInputViewModel {
             do {
                 let response = try await backend.finishRegister(
                     password: password,
-                    registrationID: registrationID,
+                    registrationId: registrationID,
                     username: name
                 )
                 animateState(to: .ready)

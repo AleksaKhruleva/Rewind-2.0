@@ -68,17 +68,16 @@ final class QuoteCreationViewModel {
                     width: UIScreen.main.bounds.width,
                     height: UIScreen.main.bounds.width
                 ))
-
+                
                 do {
                     if let quoteImage = renderer.uiImage,
-                        let tokens = Tokens(),
-                        let groupId = GroupStorage.currentGroup?.id {
-
+                       let tokens = Tokens(),
+                       let groupId = GroupStorage.currentGroup?.id {
                         var musicId: String?
                         if let selectedTrack {
                             musicId = String(selectedTrack.id)
                         }
-
+                        
                         _ = try await backend
                             .addMedia(
                                 tokens: tokens,

@@ -38,9 +38,9 @@
 
 "account.risky.delete" = "Delete account";
 
-"account.note.you" = "✨ You are already %@ days with Rewind!";
+"account.note.you" = "✨ You are already %@ with Rewind!";
 
-"account.note.stranger" = "✨ %@ is already %@ days with Rewind!";
+"account.note.stranger" = "✨ %@ is already %@ with Rewind!";
 
 "account.sign_out.alert.title" = "Are you sure you want to log out?";
 
@@ -166,7 +166,7 @@
 
 "group.settings.risky.delete" = "Delete group";
 
-"group.note" = "✨ This group exists for %@ days!";
+"group.note" = "✨ This group exists for %@!";
 
 "members.title" = "%@ Members";
 

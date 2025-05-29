@@ -7,8 +7,8 @@ import Base
 
 public protocol NetworkServiceProtocol {
     func register(email: String) async throws -> RegisterResponse
-    func verifyEmail(registrationID: String, verificationCode: String) async throws -> SuccessResponse
-    func finishRegister(password: String, registrationID: String, username: String) async throws -> UserTokensResponse
+    func verifyEmail(registrationId: String, verificationCode: String) async throws -> SuccessResponse
+    func finishRegister(password: String, registrationId: String, username: String) async throws -> UserTokensResponse
 
     func login(email: String, password: String) async throws -> UserTokensResponse
 
@@ -16,7 +16,8 @@ public protocol NetworkServiceProtocol {
     func deleteUser(tokens: Tokens, email: String) async throws -> SuccessResponse
 
     func refresh(refreshToken: String) async throws -> UserAccessTokenResponse
-    func user(tokens: Tokens) async throws -> UserResponse
+    func user(tokens: Tokens, userId: String?) async throws -> UserResponse
+    func achievements(tokens: Tokens) async throws -> AchievementsResponse
 
     func updateUserName(tokens: Tokens, name: String) async throws -> SuccessResponse
     func updateUserAvatar(tokens: Tokens, avatar: UIImage) async throws -> SuccessResponse
@@ -36,8 +37,9 @@ public protocol NetworkServiceProtocol {
     func updateGroupImage(tokens: Tokens, id: Int, image: UIImage) async throws -> GroupResponse
     func createGroupInvitationCode(tokens: Tokens, id: Int) async throws -> GroupInvitationCodeResponse
     func addUserToGroup(tokens: Tokens, invitationCode: String) async throws -> GroupResponse
-    func deleteMemberFromGroup(tokens: Tokens, groupID: Int, memberID: String) async throws -> SuccessResponse
+    func deleteMemberFromGroup(tokens: Tokens, groupId: Int, memberId: String) async throws -> SuccessResponse
     func deleteGroup(tokens: Tokens, id: Int) async throws -> SuccessResponse
+    func viewMemories(tokens: Tokens, groupId: Int, count: Int) async throws -> SuccessResponse
 
     func getMedias(tokens: Tokens, groupId: Int) async throws -> MediasResponse
     func getRandomMedias(
@@ -85,10 +87,10 @@ public final class NetworkService: NetworkServiceProtocol {
         )
     }
 
-    public func verifyEmail(registrationID: String, verificationCode: String) async throws -> SuccessResponse {
+    public func verifyEmail(registrationId: String, verificationCode: String) async throws -> SuccessResponse {
         try await provider.request(
             .verifyEmail(
-                registrationID: registrationID,
+                registrationId: registrationId,
                 verificationCode: verificationCode
             ),
             type: SuccessResponse.self
@@ -97,13 +99,13 @@ public final class NetworkService: NetworkServiceProtocol {
 
     public func finishRegister(
         password: String,
-        registrationID: String,
+        registrationId: String,
         username: String
     ) async throws -> UserTokensResponse {
         try await provider.request(
             .finishRegister(
                 password: password,
-                registrationID: registrationID,
+                registrationId: registrationId,
                 username: username
             ),
             type: UserTokensResponse.self
@@ -151,13 +153,25 @@ public final class NetworkService: NetworkServiceProtocol {
         )
     }
 
-    public func user(tokens: Tokens) async throws -> UserResponse {
+    public func user(tokens: Tokens, userId: String?) async throws -> UserResponse {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
                 .user(
-                    accessToken: newToken ?? tokens.accessToken
+                    accessToken: newToken ?? tokens.accessToken,
+                    userId: userId
                 ),
                 type: UserResponse.self
+            )
+        }
+    }
+    
+    public func achievements(tokens: Tokens) async throws -> AchievementsResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
+            try await self.provider.request(
+                .achievements(
+                    accessToken: newToken ?? tokens.accessToken
+                ),
+                type: AchievementsResponse.self
             )
         }
     }
@@ -502,14 +516,14 @@ public final class NetworkService: NetworkServiceProtocol {
         }
     }
 
-    public func deleteMemberFromGroup(tokens: Tokens, groupID: Int, memberID: String) async throws -> SuccessResponse {
+    public func deleteMemberFromGroup(tokens: Tokens, groupId: Int, memberId: String) async throws -> SuccessResponse {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await provider
                 .request(
                     .deleteMemberFromGroup(
                         accessToken: newToken ?? tokens.accessToken,
-                        groupID: groupID,
-                        memberID: memberID
+                        groupId: groupId,
+                        memberId: memberId
                     ),
                     type: SuccessResponse.self
                 )
@@ -523,6 +537,19 @@ public final class NetworkService: NetworkServiceProtocol {
                     .deleteGroup(accessToken: newToken ?? tokens.accessToken, id: id),
                     type: SuccessResponse.self
                 )
+        }
+    }
+    
+    public func viewMemories(tokens: Tokens, groupId: Int, count: Int) async throws -> SuccessResponse {
+        try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
+            try await provider.request(
+                .viewMemories(
+                    accessToken: newToken ?? tokens.accessToken,
+                    groupId: groupId,
+                    count: count
+                ),
+                type: SuccessResponse.self
+            )
         }
     }
 }
