@@ -106,17 +106,17 @@ public struct FilterView: View {
         VStack(spacing: -8) {
             RewindToggle(
                 title: UIComponentsStrings.FilterSettings.Toggle.photos,
-                description: UIComponentsStrings.FilterSettings.Toggle.mediasCount(104),
+//                description: UIComponentsStrings.FilterSettings.Toggle.mediasCount(104),
                 isOn: $filters.photos
             )
             RewindToggle(
                 title: UIComponentsStrings.FilterSettings.Toggle.videos,
-                description: UIComponentsStrings.FilterSettings.Toggle.mediasCount(12),
+//                description: UIComponentsStrings.FilterSettings.Toggle.mediasCount(12),
                 isOn: $filters.videos
             )
             RewindToggle(
                 title: UIComponentsStrings.FilterSettings.Toggle.quotes,
-                description: UIComponentsStrings.FilterSettings.Toggle.mediasCount(32),
+//                description: UIComponentsStrings.FilterSettings.Toggle.mediasCount(32),
                 isOn: $filters.quotes
             )
         }

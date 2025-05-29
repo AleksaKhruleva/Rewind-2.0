@@ -1,6 +1,7 @@
 // swiftlint:disable identifier_name
 import SwiftUI
 import MapKit
+import Base
 import Domain
 import UIComponents
 
@@ -22,6 +23,8 @@ final class RewindsMapViewModel {
     var points: [GalleryItem]
     var visiblePoints: [GalleryItem]
     var clusters: [ClusteredPoint]
+    var group: CurrentGroupInfo?
+    var groupImage = DomainAsset.groupPlaceholder.image
 
     var selectedPointID: Int?
     var region: MKCoordinateRegion
@@ -40,6 +43,8 @@ final class RewindsMapViewModel {
             center: .init(latitude: 0, longitude: 0),
             span: .init(latitudeDelta: 0, longitudeDelta: 0)
         )
+        group = GroupStorage.currentGroup
+        Task { await loadGroupImage() }
     }
 
     func dispatch(_ intent: Intent) {
@@ -128,6 +133,10 @@ final class RewindsMapViewModel {
         let lat = points.map { $0.coordinate.latitude }.reduce(0, +) / Double(points.count)
         let lon = points.map { $0.coordinate.longitude }.reduce(0, +) / Double(points.count)
         return CLLocationCoordinate2D(latitude: lat, longitude: lon)
+    }
+    
+    private func loadGroupImage() async {
+        groupImage = await ImageProvider.loadOrGetImage(for: group?.imageURL, .user)
     }
 }
 // swiftlint:enable identifier_name

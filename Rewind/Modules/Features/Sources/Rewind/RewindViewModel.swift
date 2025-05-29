@@ -1,4 +1,4 @@
-// swiftline:disable type_body_length
+// swiftlint:disable type_body_length
 import SwiftUI
 
 // удалить позже
@@ -424,4 +424,4 @@ final class RewindViewModel {
         audioManager.stop()
     }
 }
-// swiftline:enable type_body_length
+// swiftlint:enable type_body_length
