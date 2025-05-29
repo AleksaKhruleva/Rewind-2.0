@@ -27,6 +27,14 @@ public struct GalleryView: View {
                 if viewModel.galleryItems.isEmpty {
                     Spacer(minLength: 0)
                     RewindNoteTextView(text: "Your gallery is empty 🫥")
+                } else if viewModel.isLoading {
+                    ZStack {
+                        Color.background
+                            .ignoresSafeArea()
+
+                        ProgressView(viewModel.progressMessage)
+                            .modifier(RoundFontModifier(size: 15))
+                    }
                 } else {
                     mediaGridView
                 }
@@ -170,7 +178,11 @@ public struct GalleryView: View {
                 onSave: onSave
             )
         case .video:
-            VideoUploadingView(media: media, onSave: onSave)
+            VideoUploadingView(
+                isSingleUploading: true,
+                media: media,
+                onSave: onSave
+            )
         }
     }
 

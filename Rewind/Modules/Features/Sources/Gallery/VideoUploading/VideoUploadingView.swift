@@ -6,6 +6,7 @@ import UIComponents
 
 public struct VideoUploadingView: View {
     @State private var viewModel: VideoUploadingViewModel
+    private let isSingleUploading: Bool
 
     @Environment(\.showToast)
     private var showToast
@@ -14,7 +15,8 @@ public struct VideoUploadingView: View {
 
     private var onSave: (LoadedMedia) -> Void
 
-    public init(media: LoadedMedia, onSave: @escaping (LoadedMedia) -> Void) {
+    public init(isSingleUploading: Bool = false, media: LoadedMedia, onSave: @escaping (LoadedMedia) -> Void) {
+        self.isSingleUploading = isSingleUploading
         self.onSave = onSave
         viewModel = VideoUploadingViewModel(loadedMedia: media)
     }

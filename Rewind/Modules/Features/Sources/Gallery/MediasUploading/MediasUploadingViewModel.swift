@@ -81,7 +81,7 @@ final class MediasUploadingViewModel {
                                 tokens: tokens,
                                 groupId: groupId,
                                 mediaType: "image",
-                                mediaFile: image,
+                                mediaFile: .image(image),
                                 latitude: loadedMedia.coordinates?.latitude,
                                 longitude: loadedMedia.coordinates?.longitude,
                                 musicId: loadedMedia.trackInfo?.id,

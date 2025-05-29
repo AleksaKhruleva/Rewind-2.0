@@ -7,7 +7,8 @@ public final class VideoTransformer {
     public func makeVideoComposition(
         from asset: AVAsset,
         cropScale: CGFloat,
-        cropOffset: CGSize
+        cropOffset: CGSize,
+        preferredTransform: CGAffineTransform? = nil
     ) async throws -> AVMutableVideoComposition {
         let tracks = try await asset.loadTracks(withMediaType: .video)
         guard let videoTrack = tracks.first else {
@@ -16,9 +17,16 @@ public final class VideoTransformer {
 
         let naturalSize = try await videoTrack.load(.naturalSize)
         let duration = try await asset.load(.duration)
-        let preferredTransform = try await videoTrack.load(.preferredTransform)
 
-        let isPortrait = abs(preferredTransform.b) == 1 && abs(preferredTransform.c) == 1
+        let resolvedTransform: CGAffineTransform = await {
+            if let provided = preferredTransform {
+                return provided
+            } else {
+                return (try? await videoTrack.load(.preferredTransform)) ?? .identity
+            }
+        }()
+
+        let isPortrait = abs(resolvedTransform.b) == 1 && abs(resolvedTransform.c) == 1
         let renderSize = isPortrait ? CGSize(width: naturalSize.height, height: naturalSize.width) : naturalSize
 
         let cropFrameSize = await CGSize(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width)
@@ -56,7 +64,7 @@ public final class VideoTransformer {
         let offsetTransform = CGAffineTransform(translationX: transformedOffset.width, y: transformedOffset.height)
 
         let cropTransform = scaleTransform.concatenating(offsetTransform)
-        let finalTransform = preferredTransform.concatenating(cropTransform)
+        let finalTransform = resolvedTransform.concatenating(cropTransform)
 
         let layerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: videoTrack)
         layerInstruction.setTransform(finalTransform, at: .zero)

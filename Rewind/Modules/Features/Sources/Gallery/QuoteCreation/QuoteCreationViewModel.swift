@@ -84,7 +84,7 @@ final class QuoteCreationViewModel {
                                 tokens: tokens,
                                 groupId: groupId,
                                 mediaType: "quote",
-                                mediaFile: quoteImage,
+                                mediaFile: .image(quoteImage),
                                 musicId: musicId,
                                 offset: selectedStartTime,
                                 duration: selectedDuration,

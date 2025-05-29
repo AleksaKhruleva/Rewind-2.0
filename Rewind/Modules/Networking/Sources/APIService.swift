@@ -54,7 +54,7 @@ enum APIService {
         accessToken: String,
         groupId: String,
         mediaType: String,
-        mediaFile: UIImage,
+        mediaFile: MediaFile,
         latitude: Double? = nil,
         longitude: Double? = nil,
         musicId: String? = nil,
@@ -316,40 +316,66 @@ extension APIService: TargetType {
             tags
         ):
             let tagsString = tags.joined(separator: ",")
-            guard let imageData = mediaFile.jpegData(compressionQuality: 0.8),
-                  let groupIdData = groupId.defaultUTF8Data(),
+
+            guard let groupIdData = groupId.defaultUTF8Data(),
                   let mediaTypeData = mediaType.defaultUTF8Data() else {
                 return .requestPlain
             }
 
-            var multipartFormData = [
-                MultipartFormData(
-                    provider: .data(imageData),
-                    name: "mediaFile",
-                    fileName: "mediaFile.jpg",
-                    mimeType: "mediaFile/jpeg"
-                ),
-                MultipartFormData(provider: .data(groupIdData), name: "groupId"),
-                MultipartFormData(provider: .data(mediaTypeData), name: "mediaType")
+            var multipartFormData: [MultipartFormData] = [
+                .init(provider: .data(groupIdData), name: "groupId"),
+                .init(provider: .data(mediaTypeData), name: "mediaType")
             ]
 
-            if let latitude, let latitudeData = String(latitude).defaultUTF8Data() {
-                multipartFormData.append(.init(provider: .data(latitudeData), name: "latitude"))
+            switch mediaFile {
+            case let .image(image):
+                guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+                    return .requestPlain
+                }
+
+                multipartFormData.append(
+                    .init(
+                        provider: .data(imageData),
+                        name: "mediaFile",
+                        fileName: "mediaFile.jpg",
+                        mimeType: "image/jpeg"
+                    )
+                )
+
+            case let .video(videoURL):
+                multipartFormData.append(
+                    .init(
+                        provider: .file(videoURL),
+                        name: "mediaFile",
+                        fileName: "mediaFile.mp4",
+                        mimeType: "video/mp4"
+                    )
+                )
             }
-            if let longitude, let longitudeData = String(longitude).defaultUTF8Data() {
-                multipartFormData.append(.init(provider: .data(longitudeData), name: "longitude"))
+
+            // optional fields
+            if let latitude, let data = String(latitude).defaultUTF8Data() {
+                multipartFormData.append(.init(provider: .data(data), name: "latitude"))
             }
-            if let musicId, let musicIdData = musicId.defaultUTF8Data() {
-                multipartFormData.append(.init(provider: .data(musicIdData), name: "musicId"))
+
+            if let longitude, let data = String(longitude).defaultUTF8Data() {
+                multipartFormData.append(.init(provider: .data(data), name: "longitude"))
             }
-            if let offset, let offsetData = String(offset).defaultUTF8Data() {
-                multipartFormData.append(.init(provider: .data(offsetData), name: "offset"))
+
+            if let musicId, let data = musicId.defaultUTF8Data() {
+                multipartFormData.append(.init(provider: .data(data), name: "musicId"))
             }
-            if let duration, let durationData = String(duration).defaultUTF8Data() {
-                multipartFormData.append(.init(provider: .data(durationData), name: "duration"))
+
+            if let offset, let data = String(offset).defaultUTF8Data() {
+                multipartFormData.append(.init(provider: .data(data), name: "offset"))
             }
-            if !tags.isEmpty, let tagsData = tagsString.defaultUTF8Data() {
-                multipartFormData.append(.init(provider: .data(tagsData), name: "tags"))
+
+            if let duration, let data = String(duration).defaultUTF8Data() {
+                multipartFormData.append(.init(provider: .data(data), name: "duration"))
+            }
+
+            if !tags.isEmpty, let data = tagsString.defaultUTF8Data() {
+                multipartFormData.append(.init(provider: .data(data), name: "tags"))
             }
 
             return .uploadMultipart(multipartFormData)

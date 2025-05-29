@@ -24,9 +24,12 @@ final class GalleryViewModel {
         case loadGroupImage
     }
 
+    private(set) var progressMessage = ""
+
     var currentGroup: CurrentGroupInfo {
         GroupStorage.currentGroup ?? CurrentGroupInfo(id: -1, name: "Anonymous", imageURL: "")
     }
+    var isLoading = false
 
     var mediaPickerPresented: Bool = false
     var mediaSelection: PhotosPickerItem?
@@ -64,6 +67,7 @@ final class GalleryViewModel {
 
     let backend: NetworkService
     let soundCloudBackend: SoundCloudServiceProtocol
+    let videoExporter: VideoExporter
 
     init() {
         transformer = .init()
@@ -72,6 +76,7 @@ final class GalleryViewModel {
         galleryItems = []
         backend = NetworkService()
         soundCloudBackend = SoundCloudNetworkService()
+        videoExporter = VideoExporter()
     }
 
     func dispatch(_ intent: Intent, onSuccess: @escaping () -> Void = {}) async {
@@ -82,6 +87,11 @@ final class GalleryViewModel {
         case .showMediasDialog:
             mediaUploadingDialogShown = true
         case let .selectOneMedia(item):
+            isLoading = true
+            progressMessage = "Preparing media..."
+            defer {
+                isLoading = false
+            }
             do {
                 let media = try await self.transformer.transform(source: item)
                 uploadingMedia = media
@@ -120,7 +130,7 @@ final class GalleryViewModel {
                             tokens: tokens,
                             groupId: groupId,
                             mediaType: "image",
-                            mediaFile: image,
+                            mediaFile: .image(image),
                             latitude: loadedMedia.coordinates?.latitude,
                             longitude: loadedMedia.coordinates?.longitude,
                             musicId: loadedMedia.trackInfo?.id,
@@ -139,10 +149,46 @@ final class GalleryViewModel {
                             ] + galleryItems
                         }
                     case .video:
-                        print()
+                        progressMessage = "Uploading video..."
+                        isLoading = true
+                        defer {
+                            isLoading = false
+                        }
+                        guard let settings = loadedMedia.videoEditingSettings else {
+                            showToast(UIComponentsStrings.Toast.error)
+                            return
+                        }
+                        let exported = try await videoExporter.export(
+                            from: loadedMedia,
+                            options: settings
+                        )
+                        guard case let .video(videoURL, _) = exported.content else { return }
+                        let response = try await backend.addMedia(
+                            tokens: tokens,
+                            groupId: groupId,
+                            mediaType: "video",
+                            mediaFile: .video(videoURL),
+                            latitude: loadedMedia.coordinates?.latitude,
+                            longitude: loadedMedia.coordinates?.longitude,
+                            musicId: loadedMedia.trackInfo?.id,
+                            offset: loadedMedia.trackInfo?.startTime,
+                            duration: loadedMedia.trackInfo?.duration,
+                            tags: loadedMedia.tags ?? []
+                        )
+                        withAnimation {
+                            onSuccess()
+                            galleryItems = [
+                                GalleryItem(
+                                    isFavourite: false,
+                                    tags: loadedMedia.tags?.map { $0.tag } ?? [],
+                                    memory: response.toMediaItem()
+                                )
+                            ] + galleryItems
+                        }
                     }
                 }
             } catch {
+                print(error)
                 showToast(UIComponentsStrings.Toast.error)
             }
         case .fetchGallery:
@@ -258,41 +304,4 @@ final class GalleryViewModel {
     func set(showToast: @escaping (String) -> Void) {
         self.showToast = showToast
     }
-
-    // временно
-    // swiftlint:disable line_length
-    private static func fetchTrack() -> Track? {
-        let json = """
-        {
-          "id": 2026794888,
-          "title": "миражи — кружок хора (>∆<)",
-          "artwork_url": "https://i1.sndcdn.com/artworks-1WyHHVfSQvKviNzI-bP1zeA-large.jpg",
-          "duration": 247063,
-          "media": {
-            "transcodings": [
-              {
-                "url": "https://api-v2.soundcloud.com/media/soundcloud:tracks:2026794888/cf1a0f7f-7d0e-4ce8-b601-656593f23ab3/stream/progressive",
-                "preset": "mp3_1_0",
-                "duration": 247066,
-                "snipped": false,
-                "format": {
-                  "protocol": "progressive",
-                  "mime_type": "audio/mpeg"
-                },
-                "quality": "sq",
-                "is_legacy_transcoding": true
-              }
-            ]
-          },
-          "user": {
-            "username": "skibidi rizz"
-          }
-        }
-        """
-
-        let data = Data(json.utf8)
-        let track = try? JSONDecoder().decode(Track.self, from: data)
-        return track
-    }
-    // swiftlint:enable line_length
 }

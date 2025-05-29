@@ -45,6 +45,7 @@ final class RewindViewModel {
 
     var showToast: (String) -> Void
     var isTrackPlaying = false
+    var isVideoPlaying = true
     var rolls = 0
     var groupImage: UIImage?
     var groupGallery = [GalleryItem]()
@@ -101,6 +102,7 @@ final class RewindViewModel {
                 showToast("\(error.localizedDescription) 😨")
             }
         case .fetchCurrentMedia:
+            isVideoPlaying = false
             stopPlayer()
             do {
                 if let tokens = Tokens(),
@@ -145,6 +147,7 @@ final class RewindViewModel {
                 showToast(UIComponentsStrings.Toast.error)
             }
         case let .fetchRandomGalleryItems(type):
+            isVideoPlaying = false
             stopPlayer()
             do {
                 if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
@@ -271,6 +274,7 @@ final class RewindViewModel {
                 showToast(UIComponentsStrings.Toast.error)
             }
         case .openGroup:
+            isVideoPlaying = false
             stopPlayer()
             withAnimation { currentGroupState = .notReady }
             defer {
@@ -322,6 +326,7 @@ final class RewindViewModel {
                 showToast("Error: \(error)")
             }
         case .selectedNewGroup:
+            isVideoPlaying = false
             stopPlayer()
             withAnimation {
                 groups = GroupUtils.sortedGroups(groups)
@@ -396,42 +401,5 @@ final class RewindViewModel {
         isTrackPlaying = false
         audioManager.stop()
     }
-
-    // временно
-    // swiftlint:disable line_length
-    private static func fetchTrack() -> Track? {
-        let json = """
-        {
-          "id": 2026794888,
-          "title": "миражи — кружок хора (>∆<)",
-          "artwork_url": "https://i1.sndcdn.com/artworks-1WyHHVfSQvKviNzI-bP1zeA-large.jpg",
-          "duration": 247063,
-          "media": {
-            "transcodings": [
-              {
-                "url": "https://api-v2.soundcloud.com/media/soundcloud:tracks:2026794888/cf1a0f7f-7d0e-4ce8-b601-656593f23ab3/stream/progressive",
-                "preset": "mp3_1_0",
-                "duration": 247066,
-                "snipped": false,
-                "format": {
-                  "protocol": "progressive",
-                  "mime_type": "audio/mpeg"
-                },
-                "quality": "sq",
-                "is_legacy_transcoding": true
-              }
-            ]
-          },
-          "user": {
-            "username": "skibidi rizz"
-          }
-        }
-        """
-
-        let data = Data(json.utf8)
-        let track = try? JSONDecoder().decode(Track.self, from: data)
-        return track
-    }
-    // swiftlint:enable line_length
 }
 // swiftline:enable type_body_length

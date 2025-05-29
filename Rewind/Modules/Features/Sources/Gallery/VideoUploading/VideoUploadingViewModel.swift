@@ -65,6 +65,9 @@ final class VideoUploadingViewModel {
     private var playerItem: AVPlayerItem?
     private var timeObserver: Any?
 
+    private var offset: CGSize = .zero
+    private var scale: CGFloat = .zero
+
     // MARK: - Init
 
     init(loadedMedia: LoadedMedia?) {
@@ -95,6 +98,8 @@ final class VideoUploadingViewModel {
         case let .applyCrop(scale, offset):
             Task {
                 guard let videoAsset else { return }
+                self.offset = offset
+                self.scale = scale
                 let composition = try await videoTransformer.makeVideoComposition(
                     from: videoAsset,
                     cropScale: scale,
@@ -136,7 +141,9 @@ final class VideoUploadingViewModel {
                 startTime: startTime,
                 endTime: endTime,
                 isMuted: isMuted,
-                composition: playerItem?.videoComposition
+                composition: playerItem?.videoComposition,
+                cropScale: scale,
+                cropOffset: offset
             )
             Task {
                 guard let url = videoAsset?.url else { return }

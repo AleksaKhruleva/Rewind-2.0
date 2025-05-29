@@ -92,7 +92,8 @@ public struct MediaDetailsView: View {
                         await viewModel.dispatch(.toggleTrackPlaying)
                     }
                 },
-                isTrackPlaying: $viewModel.isTrackPlaying
+                isTrackPlaying: $viewModel.isTrackPlaying,
+                isVideoPlaying: $viewModel.isVideoPlaying
             )
         }
     }
