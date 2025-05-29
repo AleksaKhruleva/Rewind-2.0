@@ -151,7 +151,10 @@ public struct RewindView: View {
                     .contentShape(Circle())
                     .onTapGesture {
                         if !viewModel.user.isEmpty {
-                            viewModel.router.navigateToAccount(user: viewModel.user)
+                            viewModel.router.navigateToAccount(
+                                user: viewModel.user,
+                                groupsCount: viewModel.groups.count
+                            )
                         }
                     }.rewindAccessibilityIdentifier(.rewind(.button(.account)))
             } else {

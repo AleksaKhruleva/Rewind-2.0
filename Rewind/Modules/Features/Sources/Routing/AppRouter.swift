@@ -25,8 +25,8 @@ public final class AppRouter {
         case map([GalleryItem])
 
         case forgotPassword(URL)
+        case account(User, Int)
 
-        case account(User)
         case gallery
         case quoteCreation
         case mediasUploading

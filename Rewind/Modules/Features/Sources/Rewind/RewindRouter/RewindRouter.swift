@@ -13,8 +13,8 @@ public final class RewindRouter {
         appRouter?.navigate(to: .gallery, with: .pushFromBottom)
     }
 
-    func navigateToAccount(user: User) {
-        appRouter?.navigate(to: .account(user))
+    func navigateToAccount(user: User, groupsCount: Int) {
+        appRouter?.navigate(to: .account(user, groupsCount))
     }
 
     func navigateToMediaDetails(_ galleryItemId: Int) {

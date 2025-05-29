@@ -16,11 +16,14 @@ public struct AccountView: View {
     @State private var helpAlertShown = false
 
     @State private var genericSheetItem: GenericInputSheetItem?
+    
+    let groupsCount: Int
 
     @Environment(\.showToast)
     private var showToast
 
-    public init(user: User, router: AccountRouter) {
+    public init(user: User, groupsCount: Int, router: AccountRouter) {
+        self.groupsCount = groupsCount
         viewModel = AccountViewModel(user: user, router: router)
     }
 
@@ -177,9 +180,7 @@ public struct AccountView: View {
 
     var groupsTable: some View {
         InformationTable(title: UIComponentsStrings.Account.groups, data: [
-            ("person.2.fill", UIComponentsStrings.Account.Groups.count(8), nilAccessibility, {
-                viewModel.router.navigateToGroupsList()
-            })
+            ("person.2.fill", UIComponentsStrings.Account.Groups.count(groupsCount), nilAccessibility, nil)
         ], isRisky: false)
     }
 

@@ -21,11 +21,10 @@ public struct StandView: View {
                 : $0.memoriesViewedCount > $1.memoriesViewedCount
         }
 
-        podiumMembers = [
-            self.members[1].toPodiumMember(rank: 2, counterType: counterType),
-            self.members[0].toPodiumMember(rank: 1, counterType: counterType),
-            self.members[2].toPodiumMember(rank: 3, counterType: counterType)
-        ]
+        podiumMembers = []
+        for index in self.members.indices.prefix(3) {
+            podiumMembers.append(self.members[index].toPodiumMember(rank: index + 1, counterType: counterType))
+        }
 
         userRank = .fromMembers(self.members, counterType: counterType)
     }
