@@ -197,6 +197,9 @@ public struct RewindView: View {
             viewModel.router.navigateToMap(
                 galleryItems: viewModel.groupGallery
                     .filter {
+                        $0.memory.mediaType == .image
+                    }
+                    .filter {
                         $0.memory.latitude != nil && $0.memory.longitude != nil &&
                         $0.memory.latitude != 0 && $0.memory.longitude != 0
                     }
