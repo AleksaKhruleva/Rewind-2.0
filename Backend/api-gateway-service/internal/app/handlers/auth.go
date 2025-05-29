@@ -539,6 +539,7 @@ func (h *AuthHandler) VerifyNewEmailCode(w http.ResponseWriter, r *http.Request)
 // @Success 200 {object} responses.UpdateAvatarResponse "Avatar successfully updated".
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid user ID or image upload error".
 // @Failure 404 {object} responses.ErrorResponse "Not Found - User not found".
+// @Failure 413 {object} responses.ErrorResponse "Payload Too Large - Image file size exceeds the limit".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error".
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable".
 // @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".

@@ -726,6 +726,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
+                    "413": {
+                        "description": "Payload Too Large - Image file size exceeds the limit\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -1625,6 +1631,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
                     },
+                    "413": {
+                        "description": "Payload Too Large - Image file size exceeds the limit\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -2327,6 +2339,12 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found - User not found\".",
+                        "schema": {
+                            "$ref": "#/definitions/responses.ErrorResponse"
+                        }
+                    },
+                    "413": {
+                        "description": "Payload Too Large - Image file size exceeds the limit\".",
                         "schema": {
                             "$ref": "#/definitions/responses.ErrorResponse"
                         }
