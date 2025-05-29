@@ -193,126 +193,116 @@ func (r *MemoryRepository) ListMemoriesByGroupDetailed(ctx context.Context, tx *
 }
 
 // ListMemoriesByGroupWithFiltersDetailed получает список воспоминаний в заданной группе с применением фильтров и детальной информацией.
-func (r *MemoryRepository) ListMemoriesByGroupWithFiltersDetailed(ctx context.Context, tx *gorm.DB, groupID uint, userID uint, filters map[string]string, numberOfMemories uint) ([]models.MemoryDetailed, error) {
+func (r *MemoryRepository) ListMemoriesByGroupWithFiltersDetailed(
+	ctx context.Context,
+	tx *gorm.DB,
+	groupID uint,
+	userID uint,
+	filters map[string]string,
+	numberOfMemories uint,
+) ([]models.MemoryDetailed, error) {
 	db := r.getDB(tx).WithContext(ctx)
 	var memoriesDetailed []models.MemoryDetailed
 
-	baseQuery := `
-        SELECT
-            m.*,
-            COALESCE(string_agg(DISTINCT mt.tag, ','), '') as tags,
-            CASE
-                WHEN EXISTS (SELECT 1 FROM favourites f WHERE f.memory_id = m.id AND f.user_id = ?) THEN TRUE
-                ELSE FALSE
-            END as is_favourite
-        FROM memories m
-        LEFT JOIN memory_tags mt ON mt.memory_id = m.id
-        LEFT JOIN favourites f ON f.memory_id = m.id AND f.user_id = ?
-        WHERE m.group_id = ?
-    `
-
-	args := []interface{}{userID, userID, groupID}
+	query := `
+		SELECT
+			m.*,
+			COALESCE(string_agg(DISTINCT mt.tag, ','), '') as tags,
+			CASE
+				WHEN EXISTS (SELECT 1 FROM favourites f WHERE f.memory_id = m.id AND f.user_id = ?) THEN TRUE
+				ELSE FALSE
+			END as is_favourite
+		FROM memories m
+		LEFT JOIN memory_tags mt ON mt.memory_id = m.id
+		WHERE m.group_id = ?
+	`
+	args := []interface{}{userID, groupID}
 	whereClauses := []string{}
 	havingClauses := []string{}
-	var tagFilterArgs []interface{}
-	var mediaTypeArgs []interface{}
-	var favouriteHavingArgs []interface{}
 
-	for key, value := range filters {
-		switch key {
-		case "media_type":
-			if value != "" {
-				types := strings.Split(value, ",")
-				if len(types) > 0 {
-					placeholders := strings.Repeat("?,", len(types)-1) + "?"
-					whereClauses = append(whereClauses, fmt.Sprintf("m.media_type IN (%s)", placeholders))
-					for _, t := range types {
-						mediaTypeArgs = append(mediaTypeArgs, t)
-					}
-				}
-			}
-		case "start_time":
-			if parsedTime, err := time.Parse(time.RFC3339, value); err == nil && value != "" {
-				whereClauses = append(whereClauses, "m.created_at >= ?")
-				args = append(args, parsedTime)
-			}
-		case "end_time":
-			if parsedTime, err := time.Parse(time.RFC3339, value); err == nil && value != "" {
-				whereClauses = append(whereClauses, "m.created_at <= ?")
-				args = append(args, parsedTime)
-			}
-		case "has_geo":
-			if value == "true" {
-				whereClauses = append(whereClauses, "m.latitude IS NOT NULL AND m.longitude IS NOT NULL AND m.latitude != '0' AND m.longitude != '0'")
-			}
-		case "has_music":
-			if value == "true" {
-				whereClauses = append(whereClauses, "m.music_id IS NOT NULL AND m.music_id != '' AND m.offset IS NOT NULL AND m.duration IS NOT NULL AND m.duration != '0'")
-			}
-		case "tags":
-			if value != "" {
-				tags := strings.Split(value, ",")
-				if len(tags) > 0 {
-					placeholders := strings.Repeat("?,", len(tags)-1) + "?"
-					whereClauses = append(whereClauses, `
-						EXISTS (
-							SELECT 1 FROM memory_tags filter_mt
-							WHERE filter_mt.memory_id = m.id AND filter_mt.tag IN (`+placeholders+`)
-						)`)
-					for _, tag := range tags {
-						tagFilterArgs = append(tagFilterArgs, strings.TrimSpace(tag))
-					}
-				}
-			}
-		case "is_favourite":
-			if value == "true" {
-				havingClauses = append(havingClauses, `EXISTS (
-					SELECT 1 FROM favourites f2
-					WHERE f2.memory_id = m.id AND f2.user_id = ?
-				)`)
-				favouriteHavingArgs = append(favouriteHavingArgs, userID)
-			}
-			if value == "false" {
-				havingClauses = append(havingClauses, `NOT EXISTS (
-					SELECT 1 FROM favourites f2
-					WHERE f2.memory_id = m.id AND f2.user_id = ?
-				)`)
-				favouriteHavingArgs = append(favouriteHavingArgs, userID)
-			}
-		default:
-			log.Printf("MemoryRepository: Unknown filter key: %s", key)
+	// media_type
+	if val := filters["media_type"]; val != "" {
+		types := strings.Split(val, ",")
+		placeholders := strings.Repeat("?,", len(types))
+		placeholders = strings.TrimSuffix(placeholders, ",")
+		whereClauses = append(whereClauses, fmt.Sprintf("m.media_type IN (%s)", placeholders))
+		for _, t := range types {
+			args = append(args, t)
 		}
 	}
 
-	if len(whereClauses) > 0 {
-		baseQuery += " AND " + strings.Join(whereClauses, " AND ")
+	// tags
+	if val := filters["tags"]; val != "" {
+		tags := strings.Split(val, ",")
+		placeholders := strings.Repeat("?,", len(tags))
+		placeholders = strings.TrimSuffix(placeholders, ",")
+		whereClauses = append(whereClauses, fmt.Sprintf(`
+			EXISTS (
+				SELECT 1 FROM memory_tags filter_mt
+				WHERE filter_mt.memory_id = m.id AND filter_mt.tag IN (%s)
+			)`, placeholders))
+		for _, tag := range tags {
+			args = append(args, tag)
+		}
 	}
 
-	baseQuery += " GROUP BY m.id"
+	// start_time
+	if val := filters["start_time"]; val != "" {
+		if parsed, err := time.Parse(time.RFC3339, val); err == nil {
+			whereClauses = append(whereClauses, "m.created_at >= ?")
+			args = append(args, parsed)
+		}
+	}
+
+	// end_time
+	if val := filters["end_time"]; val != "" {
+		if parsed, err := time.Parse(time.RFC3339, val); err == nil {
+			whereClauses = append(whereClauses, "m.created_at <= ?")
+			args = append(args, parsed)
+		}
+	}
+
+	// has_geo
+	if val := filters["has_geo"]; val == "true" {
+		whereClauses = append(whereClauses, "m.latitude IS NOT NULL AND m.longitude IS NOT NULL AND m.latitude != 0 AND m.longitude != 0")
+	}
+
+	// has_music
+	if val := filters["has_music"]; val == "true" {
+		whereClauses = append(whereClauses, "m.music_id IS NOT NULL AND m.music_id != '' AND m.offset IS NOT NULL AND m.duration IS NOT NULL AND m.duration != 0")
+	}
+
+	// is_favourite
+	if val := filters["is_favourite"]; val == "true" {
+		havingClauses = append(havingClauses, "EXISTS (SELECT 1 FROM favourites f2 WHERE f2.memory_id = m.id AND f2.user_id = ?)")
+		args = append(args, userID)
+	} else if val == "false" {
+		havingClauses = append(havingClauses, "NOT EXISTS (SELECT 1 FROM favourites f2 WHERE f2.memory_id = m.id AND f2.user_id = ?)")
+		args = append(args, userID)
+	}
+
+	if len(whereClauses) > 0 {
+		query += " AND " + strings.Join(whereClauses, " AND ")
+	}
+
+	query += " GROUP BY m.id"
 
 	if len(havingClauses) > 0 {
-		baseQuery += " HAVING " + strings.Join(havingClauses, " AND ")
+		query += " HAVING " + strings.Join(havingClauses, " AND ")
 	}
 
-	baseQuery += " ORDER BY RANDOM() LIMIT ?"
+	query += " ORDER BY RANDOM() LIMIT ?"
+	args = append(args, numberOfMemories)
 
-	// Собираем финальный args в правильном порядке
-	finalArgs := append(args, mediaTypeArgs...)
-	finalArgs = append(finalArgs, tagFilterArgs...)
-	finalArgs = append(finalArgs, favouriteHavingArgs...)
-	finalArgs = append(finalArgs, numberOfMemories)
-
-	result := db.Raw(baseQuery, finalArgs...).Scan(&memoriesDetailed)
+	result := db.Raw(query, args...).Scan(&memoriesDetailed)
 	if result.Error != nil {
-		log.Printf("MemoryRepository: Failed to list detailed memories by group with custom filters: %v", result.Error)
-		return nil, fmt.Errorf("failed to list detailed memories by group with custom filters: %w", result.Error)
+		log.Printf("MemoryRepository: Failed to list memories with filters: %v", result.Error)
+		return nil, fmt.Errorf("failed to list detailed memories by group with filters: %w", result.Error)
 	}
 
 	for i := range memoriesDetailed {
 		if memoriesDetailed[i].Tags != "" {
 			memoriesDetailed[i].TagsArray = strings.Split(memoriesDetailed[i].Tags, ",")
-		} else {
-			memoriesDetailed[i].TagsArray = []string{}
 		}
 	}
 
