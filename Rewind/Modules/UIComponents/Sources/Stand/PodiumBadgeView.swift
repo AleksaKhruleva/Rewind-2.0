@@ -36,15 +36,13 @@ public struct PodiumBadgeView: View {
     public var body: some View {
         VStack(spacing: 5) {
             ZStack(alignment: .topTrailing) {
-//                Image(uiImage: member.avatar)
-//                    .resizable()
-//                    .aspectRatio(contentMode: .fill)
-//                    .frame(width: imageSize, height: imageSize)
-//                    .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-//                    .overlay(
-//                        RoundedRectangle(cornerRadius: cornerRadius)
-//                            .stroke(Color.white, lineWidth: 3)
-//                    )
+                SquareAsyncMedia(url: URL(string: member.imageURL), type: .image, cornerRadius: cornerRadius)
+                    .frame(width: imageSize, height: imageSize)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: cornerRadius)
+                            .stroke(Color.white, lineWidth: 3)
+                    )
+
                 Text("\(rank)")
                     .modifier(RoundFontModifier(size: badgeSize * 0.5, foregroundColor: .white))
                     .frame(width: badgeSize, height: badgeSize)
@@ -56,11 +54,11 @@ public struct PodiumBadgeView: View {
             }
 
             Text(member.name)
-                .modifier(RoundFontModifier(size: 16, foregroundColor: .white))
+                .modifier(RoundFontModifier(size: 16, foregroundColor: Color.primary))
                 .padding(.top, 4)
 
             Text("\(count) \(counterType)")
-                .modifier(RoundFontModifier(size: 12, foregroundColor: .textTertiary))
+                .modifier(RoundFontModifier(size: 12, foregroundColor: Color.secondary))
         }
         .padding()
     }

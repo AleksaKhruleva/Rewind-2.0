@@ -14,7 +14,7 @@ public final class AppIconsViewModel: Identifiable {
             AppIconViewModel(appIcon: "RewindLight", locked: false),
             AppIconViewModel(appIcon: "RewindPink", locked: false)
         ]
-        
+
         for achievement in achievements {
             appIcons.append(AppIconViewModel(
                 appIcon: achievement.icon,

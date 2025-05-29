@@ -118,29 +118,32 @@ public struct GroupView: View {
 
     // думаю, стоит либо сделать отдельно SectionTable, либо чуть "обобщить" InformationTable,
     // чтобы код в activityTable тоже можно было в эту таблицу обернуть, короче позже переделаю
+    @ViewBuilder
     private var activityTable: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            Text(UIComponentsStrings.Group.activity)
-                .modifier(RoundFontModifier(size: 17, foregroundColor: .textSecondary))
-                .padding(.leading, 15)
+        if let members = viewModel.group.members {
             VStack(alignment: .leading, spacing: 5) {
-                MembersTableButton(
-                    systemImageName: "photo.on.rectangle",
-                    title: UIComponentsStrings.Group.Stand.rewinds,
-                    imageSize: 20) {
-                        viewModel.router.navigateToRewindsStand()
-                    }
+                Text(UIComponentsStrings.Group.activity)
+                    .modifier(RoundFontModifier(size: 17, foregroundColor: .textSecondary))
+                    .padding(.leading, 15)
+                VStack(alignment: .leading, spacing: 5) {
+                    MembersTableButton(
+                        systemImageName: "photo.on.rectangle",
+                        title: UIComponentsStrings.Group.Stand.rewinds,
+                        imageSize: 20) {
+                            viewModel.router.navigateToRewindsStand(members: members)
+                        }
 
-                MembersTableButton(
-                    systemImageName: "forward.fill",
-                    title: UIComponentsStrings.Group.Stand.rolls,
-                    imageSize: 15) {
-                        viewModel.router.navigateToRollsStand()
-                    }
+                    MembersTableButton(
+                        systemImageName: "forward.fill",
+                        title: UIComponentsStrings.Group.Stand.rolls,
+                        imageSize: 15) {
+                            viewModel.router.navigateToRollsStand(members: members)
+                        }
+                }
+                .padding(.vertical, 5)
+                .background(Color.backgroundSecondary)
+                .cornerRadius(24)
             }
-            .padding(.vertical, 5)
-            .background(Color.backgroundSecondary)
-            .cornerRadius(24)
         }
     }
 

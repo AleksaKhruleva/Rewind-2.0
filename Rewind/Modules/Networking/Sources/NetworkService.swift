@@ -188,7 +188,7 @@ public final class NetworkService: NetworkServiceProtocol {
             )
         }
     }
-    
+
     public func deleteUserAvatar(tokens: Tokens) async throws -> SuccessResponse {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(

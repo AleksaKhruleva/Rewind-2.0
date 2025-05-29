@@ -37,8 +37,8 @@ public final class AppRouter {
         case memberDetails(Member)
         case membersList(Domain.Group)
 
-        case rewindsStand
-        case rollsStand
+        case rewindsStand([Member])
+        case rollsStand([Member])
     }
 
     public var stack: [RouteWrapper] = []
