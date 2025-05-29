@@ -20,7 +20,7 @@ final class MemberDetailsViewModel {
 
     let member: Member
     private let backend = NetworkService()
-    
+
     init(member: Member) {
         self.member = member
     }

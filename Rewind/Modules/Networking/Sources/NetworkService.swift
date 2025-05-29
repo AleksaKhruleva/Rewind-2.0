@@ -164,7 +164,7 @@ public final class NetworkService: NetworkServiceProtocol {
             )
         }
     }
-    
+
     public func achievements(tokens: Tokens) async throws -> AchievementsResponse {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await self.provider.request(
@@ -539,7 +539,7 @@ public final class NetworkService: NetworkServiceProtocol {
                 )
         }
     }
-    
+
     public func viewMemories(tokens: Tokens, groupId: Int, count: Int) async throws -> SuccessResponse {
         try await retryOnUnauthorized(refreshToken: tokens.refreshToken) { [unowned self] newToken in
             try await provider.request(

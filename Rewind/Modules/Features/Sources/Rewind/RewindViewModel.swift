@@ -93,6 +93,7 @@ final class RewindViewModel {
         soundCloudBackend = SoundCloudNetworkService()
         jwtDecoder = JWTDecoder()
         audioManager = AudioPlayerManager.shared
+        rolls = UserDefaults.standard.integer(forKey: "rolls")
     }
 
     func dispatch(_ intent: Intent) async {
@@ -228,7 +229,6 @@ final class RewindViewModel {
         case .showNextMediaItem:
             if galleryItemsStack.count > 1 {
                 stopPlayer()
-                rolls += 1
                 do {
                     if let tokens = Tokens(), let groupId = GroupStorage.currentGroup?.id {
                         let response = try await backend.viewMemories(
@@ -237,12 +237,14 @@ final class RewindViewModel {
                             count: 1
                         )
                         guard response.success else { return }
+                        rolls += 1
+                        UserDefaults.standard.set(rolls + 1, forKey: "rolls")
                         if var galleryItem = galleryItemsStack.popLast() {
                             if let trackInfo = galleryItem.memory.trackInfo {
                                 do {
                                     let response = try await soundCloudBackend.fetchTrack(by: trackInfo.id)
                                     var lightTrack = response.toLightTrack(with: trackInfo)
-                                    
+
                                     if let streamURL = try await soundCloudBackend.fetchStreamURL(for: lightTrack) {
                                         lightTrack.streamURL = streamURL
                                     } else {

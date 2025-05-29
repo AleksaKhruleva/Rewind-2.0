@@ -8,7 +8,7 @@ public struct MemberDetailsView: View {
     @State private var image: UIImage = DomainAsset.userPlacholder.image
 
     private weak var router: AppRouter?
-    
+
     @Environment(\.showToast)
     private var showToast
 

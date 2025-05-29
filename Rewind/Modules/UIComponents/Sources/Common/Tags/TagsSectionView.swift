@@ -36,14 +36,14 @@ public struct TagsSectionView: View {
 
                 Spacer()
 
-                Button(UIComponentsStrings.Tags.Section.autogenerate) {
-                    withAnimation { tags.shuffle() }
-                }
-                .buttonStyle(.plain)
-                .foregroundColor(.pinkPrimary)
-                .modifier(RoundFontModifier(size: 14, weight: .black))
-                .padding(.trailing, 16)
-                .disabledWithOpacity(tags.isEmpty)
+//                Button(UIComponentsStrings.Tags.Section.autogenerate) {
+//                    withAnimation { tags.shuffle() }
+//                }
+//                .buttonStyle(.plain)
+//                .foregroundColor(.pinkPrimary)
+//                .modifier(RoundFontModifier(size: 14, weight: .black))
+//                .padding(.trailing, 16)
+//                .disabledWithOpacity(tags.isEmpty)
             }
 
             TagsView(
