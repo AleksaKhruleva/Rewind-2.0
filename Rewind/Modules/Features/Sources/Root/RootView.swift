@@ -57,8 +57,16 @@ public struct RootView: View {
         case let .memberDetails(member): MemberDetailsView(member: member, router: router)
         case let .membersList(group): MembersListView(group: group, router: MembersListRouter(appRouter: router))
 
-        case .rewindsStand: StandView(title: "You added 207 Rewinds", counterType: .rewinds, router: router)
-        case .rollsStand: StandView(title: "You rolled 207 Rewinds", counterType: .rolls, router: router)
+        case let .rewindsStand(members): StandView(
+            counterType: .rewinds,
+            members: members,
+            router: router
+        )
+        case let .rollsStand(members): StandView(
+            counterType: .rolls,
+            members: members,
+            router: router
+        )
         }
     }
 

@@ -25,12 +25,12 @@ public final class GroupRouter {
         appRouter?.navigate(to: .membersList(group), with: .pushFromLeft)
     }
 
-    func navigateToRewindsStand() {
-        appRouter?.navigate(to: .rewindsStand, with: .pushFromLeft)
+    func navigateToRewindsStand(members: [Member]) {
+        appRouter?.navigate(to: .rewindsStand(members), with: .pushFromLeft)
     }
 
-    func navigateToRollsStand() {
-        appRouter?.navigate(to: .rollsStand, with: .pushFromLeft)
+    func navigateToRollsStand(members: [Member]) {
+        appRouter?.navigate(to: .rollsStand(members), with: .pushFromLeft)
     }
 
     func navigateToGallery() {
