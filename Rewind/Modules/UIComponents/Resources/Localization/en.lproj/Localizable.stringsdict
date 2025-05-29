@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>days.count %lld</key>
+	<dict>
+		<key>count</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>zero</key>
+			<string>%lld days</string>
+			<key>one</key>
+			<string>%lld day</string>
+			<key>few</key>
+			<string>%lld days</string>
+			<key>many</key>
+			<string>%lld days</string>
+			<key>other</key>
+			<string>%lld days</string>
+		</dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@count@</string>
+	</dict>
+	<key>rewind.count %lld</key>
+	<dict>
+		<key>count</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>zero</key>
+			<string>%lld added rewinds</string>
+			<key>one</key>
+			<string>%lld added rewind</string>
+			<key>few</key>
+			<string>%lld added rewinds</string>
+			<key>many</key>
+			<string>%lld added rewinds</string>
+			<key>other</key>
+			<string>%lld added rewinds</string>
+		</dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@count@</string>
+	</dict>
+	<key>rolls.count %lld</key>
+	<dict>
+		<key>count</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>zero</key>
+			<string>%lld rewind rolls</string>
+			<key>one</key>
+			<string>%lld rewind roll</string>
+			<key>few</key>
+			<string>%lld rewind rolls</string>
+			<key>many</key>
+			<string>%lld rewind rolls</string>
+			<key>other</key>
+			<string>%lld rewind rolls</string>
+		</dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@count@</string>
+	</dict>
+	<key>people.count %lld</key>
+	<dict>
+		<key>count</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>lld</string>
+			<key>zero</key>
+			<string>%lld invited people</string>
+			<key>one</key>
+			<string>%lld invited person</string>
+			<key>few</key>
+			<string>%lld invited people</string>
+			<key>many</key>
+			<string>%lld invited people</string>
+			<key>other</key>
+			<string>%lld invited people</string>
+		</dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@count@</string>
+	</dict>
+</dict>
+</plist>

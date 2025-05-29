@@ -7,6 +7,7 @@ public struct User: Codable, Hashable {
     public let memoriesAdded: Int
     public let memoriesViewed: Int
     public var imageURL: String
+    public let createdAt: String
 
     public var isEmpty: Bool {
         name.isEmpty && email.isEmpty
@@ -18,7 +19,8 @@ public struct User: Codable, Hashable {
         imageURL: String,
         invitedMembers: Int,
         memoriesAdded: Int,
-        memoriesViewed: Int
+        memoriesViewed: Int,
+        createdAt: String
     ) {
         self.name = name
         self.email = email
@@ -26,6 +28,7 @@ public struct User: Codable, Hashable {
         self.invitedMembers = invitedMembers
         self.memoriesAdded = memoriesAdded
         self.memoriesViewed = memoriesViewed
+        self.createdAt = createdAt
     }
 }
 
@@ -37,6 +40,7 @@ public struct UserResponse: Codable {
     public let memoriesAdded: Int
     public let memoriesViewed: Int
     public let username: String
+    public let createdAt: String
     
     enum CodingKeys: String, CodingKey {
         case email
@@ -46,6 +50,7 @@ public struct UserResponse: Codable {
         case memoriesAdded = "memories_added_count"
         case memoriesViewed = "memories_viewed_count"
         case username
+        case createdAt = "created_at"
     }
 
     public func toUser() -> User {
@@ -55,7 +60,8 @@ public struct UserResponse: Codable {
             imageURL: image,
             invitedMembers: invitedMembers,
             memoriesAdded: memoriesAdded,
-            memoriesViewed: memoriesViewed
+            memoriesViewed: memoriesViewed,
+            createdAt: createdAt
         )
     }
 }

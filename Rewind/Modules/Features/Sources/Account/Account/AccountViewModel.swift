@@ -82,7 +82,7 @@ final class AccountViewModel {
                     router.navigateToWelcome()
                     return
                 }
-                let response = try await backend.user(tokens: tokens)
+                let response = try await backend.user(tokens: tokens, userId: nil)
                 user = response.toUser()
             } catch {
                 showErrorToast(for: error)

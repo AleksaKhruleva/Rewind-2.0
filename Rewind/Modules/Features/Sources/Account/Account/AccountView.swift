@@ -57,8 +57,12 @@ public struct AccountView: View {
 
                     riskyTable
 
-                    RewindNoteTextView(text: UIComponentsStrings.Account.Note.you(100))
-                        .padding(.vertical, 4)
+                    RewindNoteTextView(text: UIComponentsStrings.Account.Note.you(
+                        UIComponentsStrings.Days.countLld(
+                            DateParser.parseISODate(viewModel.user.createdAt).daysSince
+                        )
+                    ))
+                    .padding(.vertical, 4)
                 }
                 .padding(.horizontal, 16)
             }
@@ -185,19 +189,19 @@ public struct AccountView: View {
             data: [
                 (
                     "photo.fill.on.rectangle.fill",
-                    UIComponentsStrings.Account.Activity.rewinds(viewModel.user.memoriesAdded),
+                    UIComponentsStrings.Rewind.countLld(viewModel.user.memoriesAdded),
                     nil,
                     nil
                 ),
                 (
                     "person.fill",
-                    UIComponentsStrings.Account.Activity.people(viewModel.user.invitedMembers),
+                    UIComponentsStrings.People.countLld(viewModel.user.invitedMembers),
                     nil,
                     nil
                 ),
                 (
-                    "backward.fill",
-                    UIComponentsStrings.Account.Activity.rolls(viewModel.user.memoriesViewed),
+                    "forward.fill",
+                    UIComponentsStrings.Rolls.countLld(viewModel.user.memoriesViewed),
                     nil,
                     nil
                 )

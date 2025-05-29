@@ -15,7 +15,7 @@ enum APIService {
     case deleteUser(accessToken: String, email: String)
 
     case refresh(refreshToken: String)
-    case user(accessToken: String)
+    case user(accessToken: String, userId: String?)
     case achievements(accessToken: String)
 
     case updateUserName(accessToken: String, name: String)
@@ -97,9 +97,12 @@ extension APIService: TargetType {
             return "/users/delete-user"
         case .refresh:
             return "/auth/refresh"
-        case let .user(accessToken):
-            let id = JWTDecoder().getUserId(from: accessToken) ?? "undefined"
-            return "users/\(id)"
+        case let .user(accessToken, userId):
+            guard let userId else {
+                let id = JWTDecoder().getUserId(from: accessToken) ?? "undefined"
+                return "users/\(id)"
+            }
+            return "users/\(userId)"
         case .achievements:
             return "users/achievements"
         case .updateUserName:
@@ -412,7 +415,7 @@ extension APIService: TargetType {
         switch self {
         case let .logout(accessToken, _),
             let .deleteUser(accessToken, _),
-            let .user(accessToken),
+            let .user(accessToken, _),
             let .achievements(accessToken),
             let .updateUserName(accessToken, _),
             let .updateUserAvatar(accessToken, _),

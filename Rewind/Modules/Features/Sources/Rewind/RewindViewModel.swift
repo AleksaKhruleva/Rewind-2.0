@@ -69,7 +69,8 @@ final class RewindViewModel {
                     imageURL: "",
                     invitedMembers: 0,
                     memoriesAdded: 0,
-                    memoriesViewed: 0
+                    memoriesViewed: 0,
+                    createdAt: ""
                 )
             }
             return fetchedUser
@@ -103,7 +104,7 @@ final class RewindViewModel {
                     // router.navigateToWelcome() // TODO: return when routing is ready
                     return
                 }
-                let response = try await backend.user(tokens: tokens)
+                let response = try await backend.user(tokens: tokens, userId: nil)
                 user = response.toUser()
             } catch {
                 showToast("\(error.localizedDescription) 😨")
