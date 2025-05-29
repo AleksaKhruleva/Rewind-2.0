@@ -82,7 +82,8 @@ struct BlurredMediaView: View {
             onToggleSound: {
                 viewModel.dispatch(.toggleTrackPlaying)
             },
-            isTrackPlaying: $viewModel.isTrackPlaying
+            isTrackPlaying: $viewModel.isTrackPlaying,
+            isVideoPlaying: $viewModel.isVideoPlaying
         )
     }
 

@@ -10,6 +10,7 @@ final class BlurredMediaViewModel {
     }
 
     var isTrackPlaying = false
+    var isVideoPlaying = true
     private let galleryItem: GalleryItem
     private let audioManager: AudioPlayerManager
 
@@ -32,7 +33,6 @@ final class BlurredMediaViewModel {
                 audioManager.play(
                     from: track.startTime,
                     duration: track.duration,
-                    fullDurationMillis: track.fullDuration,
                     loop: true
                 ) { [weak self] isPlaying in
                     self?.isTrackPlaying = isPlaying

@@ -27,6 +27,7 @@ public struct RewindView: View {
                         }
                     } onSettingsTap: {
                         filterSettingsShown = true
+                        viewModel.isVideoPlaying = false
                         Task {
                             await viewModel.dispatch(.stopPlayer)
                         }
@@ -111,6 +112,7 @@ public struct RewindView: View {
             }
         }
         .onTopDisappear {
+            viewModel.isVideoPlaying = false
             Task {
                 await viewModel.dispatch(.stopPlayer)
             }
@@ -162,6 +164,7 @@ public struct RewindView: View {
     private var groupsButton: some View {
         Button {
             isSelectGroupPresented = true
+            viewModel.isVideoPlaying = false
             Task {
                 await viewModel.dispatch(.stopPlayer)
             }
@@ -224,7 +227,8 @@ public struct RewindView: View {
                         await viewModel.dispatch(.toggleTrackPlaying)
                     }
                 },
-                isTrackPlaying: $viewModel.isTrackPlaying
+                isTrackPlaying: $viewModel.isTrackPlaying,
+                isVideoPlaying: $viewModel.isVideoPlaying
             )
             .gesture(
                 ExclusiveGesture(

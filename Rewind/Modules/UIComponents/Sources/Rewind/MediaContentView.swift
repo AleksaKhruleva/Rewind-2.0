@@ -10,6 +10,7 @@ public struct MediaContentView: View {
     private let onLike: (Bool) -> Void
     private let onToggleSound: () -> Void
     @Binding var isTrackPlaying: Bool
+    @Binding var isVideoPlaying: Bool
 
     @State private var isLiked: Bool
 
@@ -19,7 +20,6 @@ public struct MediaContentView: View {
     @State private var statusObserver: NSKeyValueObservation?
 
     @State private var isVideoReadyToPlay = false
-    @State private var isVideoPlaying = false
     @State private var isVideoMuted = true
     @State private var shouldSeekToStartTime = false
 
@@ -29,7 +29,8 @@ public struct MediaContentView: View {
         onSave: @escaping () -> Void,
         onLike: @escaping (Bool) -> Void,
         onToggleSound: @escaping () -> Void,
-        isTrackPlaying: Binding<Bool>
+        isTrackPlaying: Binding<Bool>,
+        isVideoPlaying: Binding<Bool>
     ) {
         self.galleryItem = galleryItem
         self.cornerRadius = cornerRadius
@@ -37,6 +38,7 @@ public struct MediaContentView: View {
         self.onLike = onLike
         self.onToggleSound = onToggleSound
         self._isTrackPlaying = isTrackPlaying
+        self._isVideoPlaying = isVideoPlaying
         self.isLiked = galleryItem?.isFavourite ?? false
     }
 
