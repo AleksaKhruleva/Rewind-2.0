@@ -45,6 +45,7 @@ func NewMemoryHandler(memoryService services.MemoryServiceInterface) *MemoryHand
 // @Failure 400 {object} responses.ErrorResponse "Bad Request - Invalid request data"
 // @Failure 401 {object} responses.ErrorResponse "Unauthorized - User not authenticated"
 // @Failure 404 {object} responses.ErrorResponse "Not Found - Group or User not found"
+// @Failure 413 {object} responses.ErrorResponse "Payload Too Large - Image file size exceeds the limit".
 // @Failure 500 {object} responses.ErrorResponse "Internal Server Error"
 // @Failure 503 {object} responses.ErrorResponse "Service Unavailable"
 // @Failure 504 {object} responses.ErrorResponse "Deadline Exceeded - response timed out".
