@@ -219,7 +219,6 @@ public struct RewindView: View {
         if let currentGalleryItem = viewModel.currentGalleryItem {
             MediaContentView(
                 galleryItem: currentGalleryItem,
-                onSave: {},
                 onLike: { liked in
                     Task {
                         await viewModel.dispatch(liked ? .unlikeMedia : .likeMedia)

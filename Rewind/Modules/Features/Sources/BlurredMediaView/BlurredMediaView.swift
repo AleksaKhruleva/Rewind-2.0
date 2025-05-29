@@ -75,7 +75,6 @@ struct BlurredMediaView: View {
     private var mediaView: some View {
         MediaContentView(
             galleryItem: galleryItem,
-            onSave: {},
             onLike: { liked in
                 onLike(galleryItem, liked)
             },

@@ -81,7 +81,6 @@ public struct MediaDetailsView: View {
         if let galleryItem = viewModel.galleryItem {
             MediaContentView(
                 galleryItem: galleryItem,
-                onSave: {},
                 onLike: { liked in
                     Task {
                         await viewModel.dispatch(liked ? .unlikeMedia : .likeMedia)
