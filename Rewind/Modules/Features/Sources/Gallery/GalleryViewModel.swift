@@ -187,8 +187,10 @@ final class GalleryViewModel {
                         }
                     }
                 }
+            } catch let error as HTTPError where error == .payloadTooLarge {
+                showToast("Media was too big and we couldn't upload it :(")
             } catch {
-                print(error)
+                print("VIDEO ERROR: \(error)")
                 showToast(UIComponentsStrings.Toast.error)
             }
         case .fetchGallery:
