@@ -66,7 +66,7 @@ final class VideoUploadingViewModel {
     private var timeObserver: Any?
 
     private var offset: CGSize = .zero
-    private var scale: CGFloat = .zero
+    private var scale: CGFloat = 1
 
     // MARK: - Init
 
@@ -164,6 +164,14 @@ final class VideoUploadingViewModel {
 
     // MARK: - Private Methods
 
+    private func extractCoordinates(from asset: AVAsset) async {
+        if let coordinates = await MetaDataExtractor.shared.extractCoordinates(from: asset) {
+            self.loadedMedia?.coordinates = coordinates
+        } else {
+            print("No coordinates found")
+        }
+    }
+
     private func resetPlayer() {
         if let observer = timeObserver, let player = player {
             player.removeTimeObserver(observer)
@@ -223,6 +231,8 @@ final class VideoUploadingViewModel {
             self.player = newPlayer
             await newPlayer.seek(to: self.startTime, toleranceBefore: .zero, toleranceAfter: .zero)
             self.isPlaying = false
+
+            await extractCoordinates(from: asset)
 
             let interval = CMTime(seconds: 0.05, preferredTimescale: 600)
             self.timeObserver = newPlayer.addPeriodicTimeObserver(

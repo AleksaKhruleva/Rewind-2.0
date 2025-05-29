@@ -44,6 +44,8 @@ public struct RootView: View {
         case .rewind: RewindView(router: RewindRouter(appRouter: router))
         case let .map(galleryItems): RewindsMap(galleryItems: galleryItems, router: router)
 
+        case let .forgotPassword(url): ForgotPasswordView(url: url, router: router)
+
         case let .account(user): AccountView(user: user, router: AccountRouter(appRouter: router))
         case .gallery: GalleryView(router: GalleryRouter(appRouter: router))
         case .quoteCreation: QuoteCreationView(router: router)

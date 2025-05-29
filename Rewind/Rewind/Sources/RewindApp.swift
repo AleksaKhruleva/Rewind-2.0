@@ -10,6 +10,7 @@ struct RewindApp: App {
     @State private var toastController = ToastController()
     @State private var appRouter = AppRouter()
     @State private var pendingLink: IdentifiableURL?
+    @State private var shouldOpenForgotPassword = false
 
     init() {
         setupAudioSession()
@@ -30,19 +31,19 @@ struct RewindApp: App {
                     toastController.present(with: $0)
                 })
                 .onOpenURL { url in
-                    if hasTokens && !testingAuth {
-                        pendingLink = IdentifiableURL(url)
-                    } else {
-                        toastController.present(with: "You need to log in to join the group!")
-                    }
+                    handleUniversalLink(
+                        url: url,
+                        hasTokens: hasTokens,
+                        testingAuth: testingAuth
+                    )
                 }
                 .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { userActivity in
                     if let url = userActivity.webpageURL {
-                        if hasTokens && !testingAuth {
-                            pendingLink = IdentifiableURL(url)
-                        } else {
-                            toastController.present(with: "You need to log in to join the group!")
-                        }
+                        handleUniversalLink(
+                            url: url,
+                            hasTokens: hasTokens,
+                            testingAuth: testingAuth
+                        )
                     }
                 }
                 .fullScreenCover(item: $pendingLink) { link in
@@ -65,6 +66,24 @@ struct RewindApp: App {
             try session.setActive(true)
         } catch {
             print("Ошибка настройки аудиосессии: \(error)")
+        }
+    }
+
+    func handleUniversalLink(url: URL, hasTokens: Bool, testingAuth: Bool) {
+        let path = url.path
+
+        if path.contains("/join/") {
+            if hasTokens && !testingAuth {
+                pendingLink = IdentifiableURL(url)
+            } else {
+                toastController.present(with: "You need to log in to join the group!")
+            }
+        } else if path.contains("/reset-password") {
+            if !testingAuth {
+                appRouter.navigate(to: .forgotPassword(url))
+            }
+        } else {
+            toastController.present(with: "Unsupported link :(")
         }
     }
 }

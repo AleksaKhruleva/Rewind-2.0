@@ -26,6 +26,9 @@ enum APIService {
     case passwordResetStart(accessToken: String)
     case passwordResetVerify(accessToken: String, verificationCode: String)
 
+    case forgotPasswordStart(email: String)
+    case forgotPasswordReset(newPassword: String, token: String)
+
     case checkPassword(accessToken: String, password: String)
     case emailStartChange(accessToken: String, email: String)
     case emailVerifyChange(accessToken: String, verificationCode: String)
@@ -163,6 +166,10 @@ extension APIService: TargetType {
             return "/groups/\(groupId)/members/\(memberId)"
         case let .viewMemories(_, groupId, _):
             return "/groups/\(groupId)/memories/viewed"
+        case .forgotPasswordStart:
+            return "/auth/forgot-password"
+        case .forgotPasswordReset:
+            return "/auth/reset-password"
         }
     }
 
@@ -193,7 +200,9 @@ extension APIService: TargetType {
                 .addTag,
                 .likeMedia,
                 .addMedia,
-                .addUserToGroup:
+                .addUserToGroup,
+                .forgotPasswordStart,
+                .forgotPasswordReset:
             return .post
         case .updateUserName,
                 .updateUserAvatar,
@@ -249,6 +258,13 @@ extension APIService: TargetType {
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
         case .deleteUserAvatar:
             return .requestPlain
+        case let .forgotPasswordStart(email):
+            return jsonRequest(["email": email])
+        case let .forgotPasswordReset(newPassword, token):
+            return jsonRequest([
+                "new_password": newPassword,
+                "token": token
+            ])
         case let .updateUserAvatar(_, avatar):
             guard let imageData = avatar.jpegData(compressionQuality: 0.8) else {
                 return .requestPlain

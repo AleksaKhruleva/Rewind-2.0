@@ -27,6 +27,9 @@ public protocol NetworkServiceProtocol {
     func passwordResetStart(tokens: Tokens) async throws -> SuccessResponse
     func passwordResetVerify(tokens: Tokens, verificationCode: String) async throws -> SuccessResponse
 
+    func forgotPasswordStart(email: String) async throws -> SuccessResponse
+    func forgotPasswordReset(newPassword: String, token: String) async throws -> SuccessResponse
+
     func checkPassword(tokens: Tokens, password: String) async throws -> SuccessResponse
     func emailStartChange(tokens: Tokens, email: String) async throws -> SuccessResponse
     func emailVerifyChange(tokens: Tokens, verificationCode: String) async throws -> SuccessResponse
@@ -187,6 +190,23 @@ public final class NetworkService: NetworkServiceProtocol {
                 type: SuccessResponse.self
             )
         }
+    }
+
+    public func forgotPasswordStart(email: String) async throws -> SuccessResponse {
+        try await self.provider.request(
+            .forgotPasswordStart(email: email),
+            type: SuccessResponse.self
+        )
+    }
+
+    public func forgotPasswordReset(newPassword: String, token: String) async throws -> SuccessResponse {
+        try await self.provider.request(
+                .forgotPasswordReset(
+                    newPassword: newPassword,
+                    token: token
+                ),
+                type: SuccessResponse.self
+            )
     }
 
     public func deleteUserAvatar(tokens: Tokens) async throws -> SuccessResponse {

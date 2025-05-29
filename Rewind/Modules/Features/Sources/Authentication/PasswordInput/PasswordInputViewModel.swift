@@ -16,6 +16,7 @@ final class PasswordInputViewModel {
     enum Intent {
         case submitPassword
         case dismiss
+        case forgotPassword
     }
 
     enum LoginError: Error {
@@ -32,6 +33,13 @@ final class PasswordInputViewModel {
         }
     }
 
+    var email: String {
+        switch flow {
+        case .login(let email), .registration(let email):
+            return email
+        }
+    }
+    var showNotice = false
     var state: PasswordState = .empty
     var password = ""
     let registrationID: String?
@@ -76,6 +84,24 @@ final class PasswordInputViewModel {
                 router.dismiss(by: 2)
             case .login:
                 router.dismiss(by: 1)
+            }
+        case .forgotPassword:
+            switch flow {
+            case .registration:
+                print("no no")
+            case let .login(email):
+                state = .loading
+                do {
+                    let response = try await backend.forgotPasswordStart(email: email)
+                    if response.success {
+                        showNotice = true
+                        animateState(to: .ready)
+                    } else {
+                        animateState(to: .error(.responseError))
+                    }
+                } catch {
+                    animateState(to: .error(.responseError))
+                }
             }
         }
     }
