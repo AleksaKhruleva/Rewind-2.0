@@ -24,6 +24,8 @@ public final class AppRouter {
         case rewind
         case map([GalleryItem])
 
+        case forgotPassword(URL)
+
         case account(User)
         case gallery
         case quoteCreation
@@ -49,7 +51,7 @@ public final class AppRouter {
         stack = [.init(route: route, transition: .none)]
     }
 
-    func navigate(to route: Route, with transition: TransitionStyle = .pushFromRight) {
+    public func navigate(to route: Route, with transition: TransitionStyle = .pushFromRight) {
         stack.append(.init(route: route, transition: transition))
     }
 

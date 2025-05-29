@@ -3,7 +3,6 @@ import UIComponents
 
 public struct PasswordInputView: View {
     @State private var viewModel: PasswordInputViewModel
-    @State private var showNotice = false
     @State private var canResend = false
     @State private var timer: Timer?
     @State private var secondsLeft = 60
@@ -52,7 +51,7 @@ public struct PasswordInputView: View {
                 }
 
                 if case .login = viewModel.flow {
-                    if showNotice {
+                    if viewModel.showNotice {
                         notice
                             .transition(.opacity)
                     } else {
@@ -73,7 +72,9 @@ public struct PasswordInputView: View {
 
     private var forgotPasswordButton: some View {
         Button {
-            showNotice = true
+            Task {
+                await viewModel.dispatch(.forgotPassword)
+            }
             startTimer()
         } label: {
             Text(UIComponentsStrings.Password.forgot)
@@ -85,7 +86,7 @@ public struct PasswordInputView: View {
         VStack(spacing: 8) {
             VStack {
                 Text(UIComponentsStrings.Password.Forgot.sent)
-                Text(verbatim: "aleksa.khruleva@yandex.ru")
+                Text(verbatim: viewModel.email)
                     .foregroundStyle(Color.pinkPrimaryLight)
             }
             .modifier(RoundFontModifier(size: 13))
@@ -108,7 +109,9 @@ public struct PasswordInputView: View {
 
     private var resendButton: some View {
         Button {
-            // TODO: send reset link to email later
+            Task {
+                await viewModel.dispatch(.forgotPassword)
+            }
             startTimer()
         } label: {
             Text(UIComponentsStrings.Password.resend)

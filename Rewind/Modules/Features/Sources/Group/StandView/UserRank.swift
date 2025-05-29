@@ -6,12 +6,7 @@ import UIComponents
 struct UserRank {
     let count: Int
     let rank: Int
-    
-    init(count: Int, rank: Int) {
-        self.count = count
-        self.rank = rank
-    }
-    
+
     static func fromMembers(_ members: [Member], counterType: CounterType) -> Self? {
         if let token = Tokens()?.accessToken,
            let id = JWTDecoder().getUserId(from: token),
