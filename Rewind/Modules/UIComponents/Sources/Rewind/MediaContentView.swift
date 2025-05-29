@@ -6,7 +6,6 @@ import Base
 public struct MediaContentView: View {
     private let galleryItem: GalleryItem?
     private let cornerRadius: CGFloat
-    private let onSave: () -> Void
     private let onLike: (Bool) -> Void
     private let onToggleSound: () -> Void
     @Binding var isTrackPlaying: Bool
@@ -23,10 +22,12 @@ public struct MediaContentView: View {
     @State private var isVideoMuted = true
     @State private var shouldSeekToStartTime = false
 
+    @Environment(\.showToast)
+    private var showToast
+
     public init(
         galleryItem: GalleryItem?,
         cornerRadius: CGFloat = 35,
-        onSave: @escaping () -> Void,
         onLike: @escaping (Bool) -> Void,
         onToggleSound: @escaping () -> Void,
         isTrackPlaying: Binding<Bool>,
@@ -34,7 +35,6 @@ public struct MediaContentView: View {
     ) {
         self.galleryItem = galleryItem
         self.cornerRadius = cornerRadius
-        self.onSave = onSave
         self.onLike = onLike
         self.onToggleSound = onToggleSound
         self._isTrackPlaying = isTrackPlaying
@@ -56,7 +56,16 @@ public struct MediaContentView: View {
                 RewindMediaButtonsOverlay(
                     isLiked: $isLiked,
                     likeAction: onLike,
-                    saveAction: onSave
+                    saveAction: {
+                        Task {
+                            let image = await ImageProvider.loadOrGetImage(
+                                for: galleryItem.memory.mediaURL?.absoluteString, .media
+                            )
+                            saveImageWithToast(image: image) { message in
+                                showToast(message)
+                            }
+                        }
+                    }
                 )
             }
             .onChange(of: galleryItem) {
