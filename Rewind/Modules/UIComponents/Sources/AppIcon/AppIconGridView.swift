@@ -1,10 +1,11 @@
 import SwiftUI
+import Domain
 
 public struct AppIconsGridView: View {
     @State private var viewModel: AppIconsViewModel
 
-    public init() {
-        viewModel = AppIconsViewModel()
+    public init(with achievements: [Achievement]) {
+        viewModel = AppIconsViewModel(with: achievements)
     }
 
     public var body: some View {
@@ -28,8 +29,4 @@ public struct AppIconsGridView: View {
             .padding(.bottom, 10)
         }
     }
-}
-
-#Preview {
-    AppIconsGridView()
 }

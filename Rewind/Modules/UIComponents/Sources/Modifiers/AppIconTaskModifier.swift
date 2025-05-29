@@ -4,7 +4,7 @@ public struct AppIconTaskModifier: ViewModifier {
     public func body(content: Content) -> some View {
         content
             .font(.system(size: 10, weight: .semibold, design: .monospaced))
-            .frame(width: 66, height: 24)
+            .frame(width: 76, height: 24)
             .background(Color.backgroundSecondary)
             .foregroundColor(.textPrimary)
             .cornerRadius(8)

@@ -6,8 +6,8 @@ import Domain
 
 enum APIService {
     case register(email: String)
-    case verifyEmail(registrationID: String, verificationCode: String)
-    case finishRegister(password: String, registrationID: String, username: String)
+    case verifyEmail(registrationId: String, verificationCode: String)
+    case finishRegister(password: String, registrationId: String, username: String)
 
     case login(email: String, password: String)
 
@@ -16,6 +16,7 @@ enum APIService {
 
     case refresh(refreshToken: String)
     case user(accessToken: String)
+    case achievements(accessToken: String)
 
     case updateUserName(accessToken: String, name: String)
     case updateUserAvatar(accessToken: String, avatar: UIImage)
@@ -37,7 +38,8 @@ enum APIService {
     case createGroupInvitation(accessToken: String, id: Int)
     case deleteGroup(accessToken: String, id: Int)
     case addUserToGroup(accessToken: String, invitationCode: String)
-    case deleteMemberFromGroup(accessToken: String, groupID: Int, memberID: String)
+    case deleteMemberFromGroup(accessToken: String, groupId: Int, memberId: String)
+    case viewMemories(accessToken: String, groupId: Int, count: Int)
 
     case getMedias(accessToken: String, groupId: Int)
     case getRandomMedias(
@@ -98,6 +100,8 @@ extension APIService: TargetType {
         case let .user(accessToken):
             let id = JWTDecoder().getUserId(from: accessToken) ?? "undefined"
             return "users/\(id)"
+        case .achievements:
+            return "users/achievements"
         case .updateUserName:
             return "users/username"
         case .updateUserAvatar:
@@ -151,14 +155,17 @@ extension APIService: TargetType {
             return "groups/\(groupId)/memories/\(memoryId)/favourite"
         case let .getMediaTags(_, memoryId):
             return "memories/\(memoryId)/tags"
-        case let .deleteMemberFromGroup(_, groupID, memberID):
-            return "/groups/\(groupID)/members/\(memberID)"
+        case let .deleteMemberFromGroup(_, groupId, memberId):
+            return "/groups/\(groupId)/members/\(memberId)"
+        case let .viewMemories(_, groupId, _):
+            return "/groups/\(groupId)/memories/viewed"
         }
     }
 
     var method: Moya.Method {
         switch self {
         case .user,
+                .achievements,
                 .fetchGroups,
                 .fetchGroup,
                 .fetchGroupMembers,
@@ -187,7 +194,8 @@ extension APIService: TargetType {
         case .updateUserName,
                 .updateUserAvatar,
                 .passwordResetSet,
-                .emailVerifyChange:
+                .emailVerifyChange,
+                .viewMemories:
             return .patch
         case .deleteUser,
                 .deleteGroup,
@@ -206,12 +214,12 @@ extension APIService: TargetType {
         switch self {
         case let .register(email):
             return jsonRequest(["email": email])
-        case let .verifyEmail(registrationID, verificationCode):
-            return jsonRequest(["registration_id": registrationID, "verification_code": verificationCode])
-        case let .finishRegister(password, registrationID, username):
+        case let .verifyEmail(registrationId, verificationCode):
+            return jsonRequest(["registration_id": registrationId, "verification_code": verificationCode])
+        case let .finishRegister(password, registrationId, username):
             let parameters = [
                 "password": password,
-                "registration_id": registrationID,
+                "registration_id": registrationId,
                 "username": username
             ]
             return jsonRequest(parameters)
@@ -228,6 +236,8 @@ extension APIService: TargetType {
             let parameters = ["refresh_token": refreshToken]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
         case .user:
+            return .requestPlain
+        case .achievements:
             return .requestPlain
         case let .updateUserName(_, name):
             let parameters = ["new_username": name]
@@ -393,6 +403,8 @@ extension APIService: TargetType {
             return .requestPlain
         case .getMediaTags:
             return .requestPlain
+        case let .viewMemories(_, _, count):
+            return jsonRequest(["count": count])
         }
     }
 
@@ -401,6 +413,7 @@ extension APIService: TargetType {
         case let .logout(accessToken, _),
             let .deleteUser(accessToken, _),
             let .user(accessToken),
+            let .achievements(accessToken),
             let .updateUserName(accessToken, _),
             let .updateUserAvatar(accessToken, _),
             let .passwordResetSet(accessToken, _),
@@ -428,7 +441,8 @@ extension APIService: TargetType {
             let .getMediaTags(accessToken, _),
             let .addUserToGroup(accessToken, _),
             let .deleteMemberFromGroup(accessToken, _, _),
-            let .updateGroupImage(accessToken, _, _):
+            let .updateGroupImage(accessToken, _, _),
+            let .viewMemories(accessToken, _, _):
             return [
                 "Authorization": "Bearer \(accessToken)",
                 "Content-Type": "application/json"

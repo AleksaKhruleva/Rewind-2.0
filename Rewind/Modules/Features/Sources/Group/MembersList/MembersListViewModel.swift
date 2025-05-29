@@ -90,8 +90,8 @@ final class MembersListViewModel {
         do {
             let response = try await backend.deleteMemberFromGroup(
                 tokens: tokens,
-                groupID: group.id,
-                memberID: member.id
+                groupId: group.id,
+                memberId: member.id
             )
             if response.success {
                 groupMembers.removeAll { $0.id == member.id }

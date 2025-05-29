@@ -49,7 +49,9 @@ public enum GroupUtils {
                     name: response.name,
                     imageURL: response.imageURL,
                     isOwner: response.id == groupOwnerID,
-                    isUser: String(response.id) == currentUserID
+                    isUser: String(response.id) == currentUserID,
+                    memoriesAddedCount: response.memoriesAddedCount,
+                    memoriesViewedCount: response.memoriesViewedCount
                 )
             }
             .sorted { lhs, rhs in

@@ -155,7 +155,7 @@ public struct GroupView: View {
 
     @ViewBuilder
     private var groupExistenceNote: some View {
-        RewindNoteTextView(text: UIComponentsStrings.Group.note(viewModel.group.daysSinceCreation))
+        RewindNoteTextView(text: UIComponentsStrings.Group.note(viewModel.group.createdAt.daysSince))
             .padding(.vertical, 4)
     }
 }

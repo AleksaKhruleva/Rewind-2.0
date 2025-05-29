@@ -29,3 +29,13 @@ extension Date {
         return formatter.string(from: self)
     }
 }
+
+extension Optional where Wrapped == Date {
+    public var daysSince: Int {
+        guard let date = self else { return 0 }
+        let calendar = Calendar.current
+        let start = calendar.startOfDay(for: date)
+        let end = calendar.startOfDay(for: Date())
+        return calendar.dateComponents([.day], from: start, to: end).day ?? 0
+    }
+}

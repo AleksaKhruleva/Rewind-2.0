@@ -1,4 +1,5 @@
 import SwiftUI
+import Domain
 
 @MainActor @Observable
 public final class AppIconsViewModel: Identifiable {
@@ -6,18 +7,22 @@ public final class AppIconsViewModel: Identifiable {
         case change(icon: AppIconViewModel)
     }
 
-    var appIcons: [AppIconViewModel]
+    public var appIcons: [AppIconViewModel]
 
-    public init() {
-        self.appIcons = [
-            AppIconViewModel(appIcon: "RewindLight", task: "5 days", locked: true),
-            AppIconViewModel(appIcon: "RewindPink", task: "5 days", locked: true),
-            AppIconViewModel(appIcon: "RewindGradient", task: "20 rewinds", locked: true),
-            AppIconViewModel(appIcon: "RewindSakura", task: "2 groups", locked: true),
-            AppIconViewModel(appIcon: "RewindLazer", task: "5 invites", locked: false),
-            AppIconViewModel(appIcon: "RewindForest", task: "100 rolls", locked: false),
-            AppIconViewModel(appIcon: "RewindSea", task: "5 days", locked: false)
+    public init(with achievements: [Achievement]) {
+        appIcons = [
+            AppIconViewModel(appIcon: "RewindLight", locked: false),
+            AppIconViewModel(appIcon: "RewindPink", locked: false)
         ]
+
+        for achievement in achievements {
+            appIcons.append(AppIconViewModel(
+                appIcon: achievement.icon,
+                task: achievement.name,
+                locked: achievement.isUnlocked
+            ))
+        }
+        print(appIcons.count)
     }
 
     func dispatch(_ intent: Intent) {

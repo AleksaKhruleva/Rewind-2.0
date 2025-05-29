@@ -8,16 +8,14 @@ public final class AppIconViewModel: Identifiable {
     }
 
     let name: String
-    let task: String
-    let needTitle: Bool
+    let task: String?
     var selected: Bool
     var locked: Bool
 
-    public init(appIcon: String, task: String, locked: Bool = true, needTitle: Bool = true) {
+    public init(appIcon: String, task: String? = nil, locked: Bool = true) {
         self.name = appIcon
         self.task = task
         self.locked = locked
-        self.needTitle = needTitle
         self.selected = appIcon == UserDefaults.standard.string(forKey: "appIcon") ? true : false
     }
 

@@ -4,11 +4,6 @@ import Domain
 import Base
 
 let groupsData = [("person.2.fill", UIComponentsStrings.Account.Groups.count(8), nilAccessibility, nilAction)]
-let activitiesData = [
-    ("photo.fill.on.rectangle.fill", UIComponentsStrings.Account.Activity.rewinds(245), nilAccessibility, nilAction),
-    ("person.fill", UIComponentsStrings.Account.Activity.people(15), nilAccessibility, nil),
-    ("forward.fill", UIComponentsStrings.Account.Activity.rolls(92), nilAccessibility, nil)
-]
 
 public struct MemberDetailsView: View {
     @State private var image: UIImage = DomainAsset.userPlacholder.image
@@ -65,7 +60,30 @@ public struct MemberDetailsView: View {
     }
 
     private var activityTable: some View {
-        InformationTable(title: UIComponentsStrings.Account.activity, data: activitiesData, isRisky: false)
+        InformationTable(
+            title: UIComponentsStrings.Account.activity,
+            data: [
+                (
+                    "photo.fill.on.rectangle.fill",
+                    UIComponentsStrings.Account.Activity.rewinds(member.memoriesAddedCount),
+                    nil,
+                    nil
+                ),
+                (
+                    "person.fill",
+                    UIComponentsStrings.Account.Activity.people(0),
+                    nil,
+                    nil
+                ),
+                (
+                    "forward.fill",
+                    UIComponentsStrings.Account.Activity.rolls(member.memoriesViewedCount),
+                    nil,
+                    nil
+                )
+            ],
+            isRisky: false
+        )
     }
 
     private var userExistenceNote: some View {
