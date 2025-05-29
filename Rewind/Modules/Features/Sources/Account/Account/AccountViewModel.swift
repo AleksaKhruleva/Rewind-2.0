@@ -97,8 +97,20 @@ final class AccountViewModel {
                 showErrorToast(for: error)
             }
         case .deleteImage:
-            print()
-//            await dispatch(.setImage(UIImage()))
+            do {
+                if let tokens = Tokens() {
+                    let response = try await backend.deleteUserAvatar(tokens: tokens)
+                    if response.success {
+                        showToast(UIComponentsStrings.Account.Edit.Image.Delete.success)
+                        withAnimation {
+                            userImage = DomainAsset.userPlacholder.image
+                        }
+                        onSuccess()
+                    }
+                }
+            } catch {
+                showErrorToast(for: error)
+            }
         case let .setImage(newImage):
             do {
                 if let tokens = Tokens(), let newImage {
